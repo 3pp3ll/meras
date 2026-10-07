@@ -36,6 +36,9 @@ Object.assign(UI, {
   im_h: ["استيراد تاريخ سهم من ملف", "Import a share's history from a file"],
   im_p: ["الباقة المجانية تعطي شمعة اليوم فقط. لو نزّلت ملف الأسعار التاريخية للسهم (Excel أو CSV) من أي مصدر، ارفعه هنا وتنضاف شموعه مرة وحدة، والسحب اليومي يكمّل عليها.", "The free plan gives today's candle only. If you download the share's historical prices (Excel or CSV) from any source, upload it here and its candles are added once; the daily fetch continues from there."],
   im_sym: ["السهم", "Share"], im_file: ["اختر الملف", "Choose file"],
+  im_paste: ["أو الصق الجدول", "Or paste the table"], im_paste_ph: ["حدد صفوف الجدول في صفحة الأسعار التاريخية، انسخها، والصقها هنا.", "Select the table rows on the historical prices page, copy them, and paste here."], im_read: ["اقرأ الجدول", "Read table"],
+  im_bad_paste: ["ما قدرت أقرأ اللي لصقته. انسخ الصفوف كاملة من عمود التاريخ إلى عمود الكمية.", "Could not read what you pasted. Copy full rows from the date column through the volume column."],
+  im_more: ["لو الجدول أكثر من صفحة، كرر النسخ واللصق لكل صفحة. الشموع تنضاف على بعض.", "If the table has several pages, repeat copy and paste for each. The candles add up."],
   im_found: ["لقيت {n} شمعة يومية، من {a} إلى {b}. آخر إغلاق في الملف {c}.", "Found {n} daily candles, from {a} to {b}. Last close in the file: {c}."],
   im_check: ["تأكد إن الملف لنفس السهم المختار قبل الحفظ.", "Make sure the file is for the selected share before saving."],
   im_save: ["احفظ الشموع", "Save candles"], im_cancel: ["تراجع", "Cancel"], im_saved: ["انحفظت الشموع", "Candles saved"],
@@ -165,7 +168,7 @@ function analyze(data, s, e) {
 }
 
 let chImport = null;
-const IM_COLS = { d: ["date", "التاريخ", "تاريخ", "time"], o: ["open", "افتتاح"], h: ["high", "أعلى", "اعلى", "الأعلى", "الاعلى"], l: ["low", "أدنى", "ادنى", "الأدنى", "الادنى"], c: ["close", "إغلاق", "اغلاق", "الإغلاق", "الاغلاق", "price", "last", "السعر"], v: ["volume", "vol", "الكمية", "الحجم", "حجم"] };
+const IM_COLS = { d: ["date", "التاريخ", "تاريخ", "time"], o: ["open", "افتتاح", "الافتتاح"], h: ["high", "اعلى", "الاعلى"], l: ["low", "ادنى", "الادنى"], c: ["close", "اغلاق", "الاغلاق", "price", "last", "السعر"], v: ["volume", "vol", "الكمية", "الحجم", "حجم"] };
 function imNum(x) {
   if (typeof x === "number") return x; if (x == null) return NaN;
   let s = String(x).replace(/[\u0660-\u0669]/g, (d) => d.charCodeAt(0) - 0x660).replace(/[,\s\u066C]/g, "").replace("\u066B", "."), mul = 1;
@@ -186,8 +189,17 @@ function imDates(raw) {
   });
 }
 function parseHistory(buf) {
-  const wb = XLSX.read(buf, { type: "array", cellDates: true, raw: true }), rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: null });
-  const norm = (x) => String(x == null ? "" : x).toLowerCase().replace(/[\u064B-\u0652"']/g, "").trim();
+  const wb = XLSX.read(buf, { type: "array", cellDates: true, raw: true });
+  return parseRows(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: null }));
+}
+/* a table copied from a web page: one row per line, cells separated by tabs (or runs of spaces) */
+function parsePasted(text) {
+  const lines = String(text || "").replace(/\r/g, "").split("\n").map((x) => x.trim()).filter(Boolean);
+  const tabs = lines.some((x) => x.includes("\t"));
+  return parseRows(lines.map((x) => (tabs ? x.split("\t") : x.split(/\s{2,}|\s(?=[\d\-+▲▼])/)).map((c) => c.trim())));
+}
+function parseRows(rows) {
+  const norm = (x) => String(x == null ? "" : x).toLowerCase().replace(/[\u064B-\u0652"']/g, "").replace(/[\u0625\u0623\u0622]/g, "\u0627").trim();
   let hi = -1, map = null;
   for (let r = 0; r < Math.min(rows.length, 25) && hi < 0; r++) {
     const cells = (rows[r] || []).map(norm), m = {};
@@ -198,10 +210,15 @@ function parseHistory(buf) {
     }
     if (m.d != null && m.c != null && m.o != null && m.h != null && m.l != null) { hi = r; map = m; }
   }
-  if (hi < 0) return null;
+  if (hi < 0) {
+    /* no header row: accept the common order date, open, high, low, close, [change, change %], volume */
+    const first = rows.find((r) => r && r.length >= 5), looksDate = first && imDates([first[0]])[0], nums = first ? first.slice(1, 5).every((x) => imNum(x) > 0) : false;
+    if (!looksDate || !nums) return null;
+    map = { d: 0, o: 1, h: 2, l: 3, c: 4, v: first.length >= 8 ? 7 : first.length === 6 ? 5 : null }; hi = -1;
+  }
   const body = rows.slice(hi + 1).filter((r) => r && r[map.d] != null && r[map.d] !== ""), dates = imDates(body.map((r) => r[map.d])), out = {};
   body.forEach((r, i) => {
-    const o = imNum(r[map.o]), h = imNum(r[map.h]), l = imNum(r[map.l]), c = imNum(r[map.c]), v = map.v != null ? imNum(r[map.v]) : 0;
+    const o = imNum(r[map.o]), h = imNum(r[map.h]), l = imNum(r[map.l]), c = imNum(r[map.c]), v = map.v != null ? imNum(String(r[map.v] == null ? "" : r[map.v]).replace(/[▲▼]/g, "")) : 0;
     if (!dates[i] || !(o > 0 && h > 0 && l > 0 && c > 0) || h < l) return;
     out[dates[i]] = { d: dates[i], o, h, l, c, v: isFinite(v) ? Math.round(v) : 0 };
   });
@@ -337,7 +354,7 @@ function importHtml() {
   let inner;
   if (!syms.length) inner = '<p class="small muted">' + esc(t("im_no_sym")) + "</p>";
   else if (chImport) inner = '<div class="result" style="flex-direction:column;gap:4px"><b style="font-family:var(--body);font-size:15px">' + esc(chImport.sym + " " + symName(chImport.sym)) + '</b><span style="font-size:14.5px;color:var(--ink)">' + esc(t("im_found").replace("{n}", chImport.rows.length).replace("{a}", chImport.rows[0].d).replace("{b}", chImport.rows[chImport.rows.length - 1].d).replace("{c}", chImport.rows[chImport.rows.length - 1].c.toFixed(2))) + "</span><span>" + esc(t("im_check")) + '</span></div><div class="row"><button class="btn primary" data-act="im-save">' + esc(t("im_save")) + '</button><button class="btn" data-act="im-cancel">' + esc(t("im_cancel")) + "</button></div>";
-  else inner = '<div class="row"><div class="field" style="flex:1;min-width:160px"><label for="im-sym">' + esc(t("im_sym")) + '</label><select id="im-sym">' + syms.map((k) => '<option value="' + esc(k) + '"' + (k === cur ? " selected" : "") + ">" + esc(k + " " + symName(k)) + "</option>").join("") + '</select></div><label class="btn" for="im-file" style="align-self:flex-end">' + esc(t("im_file")) + '</label><input id="im-file" type="file" accept=".csv,.xlsx,.xls,text/csv" hidden></div>';
+  else inner = '<div class="row"><div class="field" style="flex:1;min-width:160px"><label for="im-sym">' + esc(t("im_sym")) + '</label><select id="im-sym">' + syms.map((k) => '<option value="' + esc(k) + '"' + (k === cur ? " selected" : "") + ">" + esc(k + " " + symName(k)) + "</option>").join("") + '</select></div><label class="btn" for="im-file" style="align-self:flex-end">' + esc(t("im_file")) + '</label><input id="im-file" type="file" accept=".csv,.xlsx,.xls,text/csv" hidden></div><div class="field"><label for="im-text">' + esc(t("im_paste")) + '</label><textarea id="im-text" rows="4" dir="ltr" placeholder="' + esc(t("im_paste_ph")) + '" style="font-family:var(--mono);font-size:12.5px;white-space:pre;overflow:auto"></textarea></div><div class="row"><button class="btn" data-act="im-read">' + esc(t("im_read")) + '</button><span class="small muted">' + esc(t("im_more")) + "</span></div>";
   return '<div class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div><h3 style="font-size:17px">' + esc(t("im_h")) + '</h3><p class="small muted">' + esc(t("im_p")) + "</p></div>" + inner + "</div>";
 }
 async function importSave() {
@@ -445,6 +462,11 @@ document.addEventListener("click", (ev) => {
   const el = ev.target.closest && ev.target.closest("[data-act]"); if (!el) return;
   const act = el.dataset.act;
   if (act === "im-save") { importSave(); return; }
+  if (act === "im-read") {
+    let rows = null; try { rows = parsePasted(document.getElementById("im-text").value); } catch (e) {}
+    if (!rows) { toast(t("im_bad_paste")); return; }
+    chImport = { sym: document.getElementById("im-sym").value, rows, today: today() }; render(); return;
+  }
   if (act === "im-cancel") { chImport = null; render(); return; }
   if (act === "wl-del") { if (WL) saveWatch(WL.filter((w) => w !== el.dataset.sym), "wl_removed"); return; }
   if (act.slice(0, 3) !== "ch-") return;
