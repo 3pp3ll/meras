@@ -9,7 +9,7 @@ Object.assign(UI, {
   ai_h: ["الذكاء الاصطناعي (OpenRouter)", "AI (OpenRouter)"],
   ai_p: ["اختياري. يخلي نموذج ذكاء اصطناعي يشرح لك قراءة الشارت بالكلام. المفتاح مستقل عن رمز GitHub وما يأثر عليه.", "Optional. Lets an AI model explain the chart reading in words. The key is separate from the GitHub token and does not affect it."],
   ai_key: ["مفتاح OpenRouter", "OpenRouter key"], ai_model: ["اسم النموذج", "Model name"],
-  ai_model_ph: ["مثال: openai/gpt-4o-mini", "e.g. openai/gpt-4o-mini"],
+  ai_model_ph: ["مثال: google/gemini-3.8-flash", "e.g. google/gemini-3.8-flash"],
   ai_note: ["المفتاح ينحفظ على هذا الجهاز فقط وينرسل إلى OpenRouter وحده. حط له حد صرف من لوحة OpenRouter. اسم النموذج تنسخه من صفحة النماذج عندهم.", "The key is stored on this device only and sent to OpenRouter alone. Set a spending limit on it in the OpenRouter dashboard. Copy the model name from their models page."],
   ai_save: ["احفظ", "Save"], ai_forget: ["احذف المفتاح من هذا الجهاز", "Remove key from this device"], ai_saved: ["انحفظ", "Saved"],
   ai_on: ["مربوط", "Connected"], ai_off: ["غير مربوط", "Not connected"],
