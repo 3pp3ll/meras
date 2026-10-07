@@ -28,7 +28,15 @@ Object.assign(UI, {
   ch_read_p: ["وصف محسوب بقواعد الدروس من الشموع الظاهرة. يوصف اللي صار، وما يتوقع اللي بيصير، وليس توصية.", "A description computed with the lessons' rules from the candles shown. It describes what happened, does not predict what will, and is not a recommendation."],
   ch_draw_it: ["ارسمها لي على الشارت", "Draw it on the chart for me"], ch_drawn: ["انرسمت. قارنها برسمك.", "Drawn. Compare with your own."],
   ch_hide_read: ["أخفِ القراءة", "Hide reading"],
-  rd_need: ["القراءة تحتاج 20 شمعة على الأقل، والظاهر {n}.", "A reading needs at least 20 candles; {n} are shown."],
+  rd_need: ["القراءة تحتاج 20 شمعة على الأقل، والظاهر {n}. استورد تاريخ السهم من ملف (تحت في قائمة أسهمك)، أو جرّب على سهم تدريبي.", "A reading needs at least 20 candles; {n} are shown. Import the share's history from a file (below, in your watchlist), or try a practice share."],
+  im_h: ["استيراد تاريخ سهم من ملف", "Import a share's history from a file"],
+  im_p: ["الباقة المجانية تعطي شمعة اليوم فقط. لو نزّلت ملف الأسعار التاريخية للسهم (Excel أو CSV) من أي مصدر، ارفعه هنا وتنضاف شموعه مرة وحدة، والسحب اليومي يكمّل عليها.", "The free plan gives today's candle only. If you download the share's historical prices (Excel or CSV) from any source, upload it here and its candles are added once; the daily fetch continues from there."],
+  im_sym: ["السهم", "Share"], im_file: ["اختر الملف", "Choose file"],
+  im_found: ["لقيت {n} شمعة يومية، من {a} إلى {b}. آخر إغلاق في الملف {c}.", "Found {n} daily candles, from {a} to {b}. Last close in the file: {c}."],
+  im_check: ["تأكد إن الملف لنفس السهم المختار قبل الحفظ.", "Make sure the file is for the selected share before saving."],
+  im_save: ["احفظ الشموع", "Save candles"], im_cancel: ["تراجع", "Cancel"], im_saved: ["انحفظت الشموع", "Candles saved"],
+  im_bad: ["ما قدرت أقرأ الملف. يحتاج أعمدة: التاريخ، الافتتاح، الأعلى، الأدنى، الإغلاق.", "Could not read the file. It needs columns: date, open, high, low, close."],
+  im_no_sym: ["ما فيه أسهم في قائمتك للحين. انتظر أول سحب للأسعار.", "No shares in your list yet. Wait for the first price fetch."],
   rd_trend: ["الاتجاه", "Trend"], rd_ma: ["المتوسطات", "Averages"], rd_mom: ["الزخم", "Momentum"], rd_volume: ["الحجم", "Volume"], rd_levels: ["المستويات", "Levels"], rd_try: ["وش تجرّب هنا", "What to try here"],
   rd_up: ["صاعد: السعر ارتفع {p}% خلال الشموع الظاهرة، وأغلب الحركة كانت في نفس الجهة.", "Up: price rose {p}% across the candles shown, and most of the movement was in that direction."],
   rd_down: ["هابط: السعر نزل {p}% خلال الشموع الظاهرة، وأغلب الحركة كانت في نفس الجهة.", "Down: price fell {p}% across the candles shown, and most of the movement was in that direction."],
@@ -152,6 +160,51 @@ function analyze(data, s, e) {
   return out;
 }
 
+let chImport = null;
+const IM_COLS = { d: ["date", "التاريخ", "تاريخ", "time"], o: ["open", "افتتاح"], h: ["high", "أعلى", "اعلى", "الأعلى", "الاعلى"], l: ["low", "أدنى", "ادنى", "الأدنى", "الادنى"], c: ["close", "إغلاق", "اغلاق", "الإغلاق", "الاغلاق", "price", "last", "السعر"], v: ["volume", "vol", "الكمية", "الحجم", "حجم"] };
+function imNum(x) {
+  if (typeof x === "number") return x; if (x == null) return NaN;
+  let s = String(x).replace(/[\u0660-\u0669]/g, (d) => d.charCodeAt(0) - 0x660).replace(/[,\s\u066C]/g, "").replace("\u066B", "."), mul = 1;
+  const m = s.match(/^(-?[\d.]+)([KMB])$/i); if (m) { s = m[1]; mul = { k: 1e3, m: 1e6, b: 1e9 }[m[2].toLowerCase()]; }
+  return s === "" || s === "-" ? NaN : parseFloat(s) * mul;
+}
+function imDates(raw) {
+  const z = (n) => String(n).padStart(2, "0"), iso = (y, m, d) => (y > 1990 && y < 2100 && m >= 1 && m <= 12 && d >= 1 && d <= 31 ? y + "-" + z(m) + "-" + z(d) : null);
+  const parts = raw.map((x) => (typeof x === "string" ? x.trim().match(/^(\d{1,4})[\/\-.](\d{1,2})[\/\-.](\d{1,4})/) : null));
+  let dayFirst = true; /* 07/10/2026: decide day-first or month-first from the whole column */
+  if (parts.some((m) => m && m[1].length <= 2 && +m[2] > 12) && !parts.some((m) => m && m[1].length <= 2 && +m[1] > 12)) dayFirst = false;
+  return raw.map((x, i) => {
+    if (x instanceof Date && !isNaN(x)) { const d = new Date(x.getTime() + 12 * 3600 * 1000); return iso(d.getFullYear(), d.getMonth() + 1, d.getDate()); }
+    const m = parts[i];
+    if (m) { if (m[1].length === 4) return iso(+m[1], +m[2], +m[3]); const y = m[3].length === 2 ? 2000 + +m[3] : +m[3]; return dayFirst ? iso(y, +m[2], +m[1]) : iso(y, +m[1], +m[2]); }
+    if (typeof x === "string" && x.trim()) { const d = new Date(x); if (!isNaN(d)) return iso(d.getFullYear(), d.getMonth() + 1, d.getDate()); }
+    return null;
+  });
+}
+function parseHistory(buf) {
+  const wb = XLSX.read(buf, { type: "array", cellDates: true, raw: true }), rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: null });
+  const norm = (x) => String(x == null ? "" : x).toLowerCase().replace(/[\u064B-\u0652"']/g, "").trim();
+  let hi = -1, map = null;
+  for (let r = 0; r < Math.min(rows.length, 25) && hi < 0; r++) {
+    const cells = (rows[r] || []).map(norm), m = {};
+    for (const k of Object.keys(IM_COLS)) {
+      let idx = cells.findIndex((c) => IM_COLS[k].includes(c));
+      if (idx < 0) idx = cells.findIndex((c) => c && !/adj|معدل|change|تغير|%/.test(c) && IM_COLS[k].some((w) => c.includes(w)));
+      if (idx >= 0) m[k] = idx;
+    }
+    if (m.d != null && m.c != null && m.o != null && m.h != null && m.l != null) { hi = r; map = m; }
+  }
+  if (hi < 0) return null;
+  const body = rows.slice(hi + 1).filter((r) => r && r[map.d] != null && r[map.d] !== ""), dates = imDates(body.map((r) => r[map.d])), out = {};
+  body.forEach((r, i) => {
+    const o = imNum(r[map.o]), h = imNum(r[map.h]), l = imNum(r[map.l]), c = imNum(r[map.c]), v = map.v != null ? imNum(r[map.v]) : 0;
+    if (!dates[i] || !(o > 0 && h > 0 && l > 0 && c > 0) || h < l) return;
+    out[dates[i]] = { d: dates[i], o, h, l, c, v: isFinite(v) ? Math.round(v) : 0 };
+  });
+  const list = Object.values(out).sort((a, b) => (a.d < b.d ? -1 : 1)).slice(-400);
+  return list.length >= 2 ? list : null;
+}
+
 const chartDefaults = () => ({ sym: "TRN-A", n: 60, vol: true, sma1: { on: true, p: 5 }, sma2: { on: false, p: 20 }, ema: { on: false, p: 10 }, rsi: { on: false, p: 14 } });
 let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null, chFull = false, chNative = false, chReading = false, WL = null;
 function chartCfg() { if (!S.chart || !S.chart.sma1) S.chart = chartDefaults(); if (!S.drawings) S.drawings = {}; return S.chart; }
@@ -254,7 +307,7 @@ function pageChart() {
   const step = Math.max(1, Math.round(CH.slots / 3));
   const canWl = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const wl = !(typeof HOSTED !== "undefined" && HOSTED) ? "" : '<div class="panel stack"><div><h3 style="font-size:18px">' + esc(t("wl_h")) + (WL ? ' <span class="tag num">' + WL.length + " / " + WL_MAX + "</span>" : "") + '</h3><p class="small muted">' + esc(canWl ? t("wl_p") : t("wl_need")) + "</p></div>" +
-    (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
+    (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" + importHtml() : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
 
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">' + symSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + ind("sma1", t("ch_sma"), "i1") + ind("sma2", t("ch_sma"), "i2") + ind("ema", t("ch_ema"), "i3") + ind("rsi", t("ch_rsi"), "i2") + '<label class="indbox"><input type="checkbox" id="ch-vol" data-ch="vol"' + (cfg.vol ? " checked" : "") + "><span>" + esc(t("ch_vol")) + "</span></label></div>" +
@@ -265,6 +318,38 @@ function pageChart() {
     '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + "</div></div>" + wl +
     '<div class="notice">' + esc(note) + " " + esc(t("disclaimer")) + "</div></div></div>";
 }
+
+function importHtml() {
+  const syms = Object.keys(LIVE.quotes || {}), cur = chartCfg().sym;
+  let inner;
+  if (!syms.length) inner = '<p class="small muted">' + esc(t("im_no_sym")) + "</p>";
+  else if (chImport) inner = '<div class="result" style="flex-direction:column;gap:4px"><b style="font-family:var(--body);font-size:15px">' + esc(chImport.sym + " " + symName(chImport.sym)) + '</b><span style="font-size:14.5px;color:var(--ink)">' + esc(t("im_found").replace("{n}", chImport.rows.length).replace("{a}", chImport.rows[0].d).replace("{b}", chImport.rows[chImport.rows.length - 1].d).replace("{c}", chImport.rows[chImport.rows.length - 1].c.toFixed(2))) + "</span><span>" + esc(t("im_check")) + '</span></div><div class="row"><button class="btn primary" data-act="im-save">' + esc(t("im_save")) + '</button><button class="btn" data-act="im-cancel">' + esc(t("im_cancel")) + "</button></div>";
+  else inner = '<div class="row"><div class="field" style="flex:1;min-width:160px"><label for="im-sym">' + esc(t("im_sym")) + '</label><select id="im-sym">' + syms.map((k) => '<option value="' + esc(k) + '"' + (k === cur ? " selected" : "") + ">" + esc(k + " " + symName(k)) + "</option>").join("") + '</select></div><label class="btn" for="im-file" style="align-self:flex-end">' + esc(t("im_file")) + '</label><input id="im-file" type="file" accept=".csv,.xlsx,.xls,text/csv" hidden></div>';
+  return '<div class="stack" style="border-top:1px solid var(--line);padding-top:14px"><div><h3 style="font-size:17px">' + esc(t("im_h")) + '</h3><p class="small muted">' + esc(t("im_p")) + "</p></div>" + inner + "</div>";
+}
+async function importSave() {
+  const im = chImport; if (!im) return;
+  try {
+    const f = await readJson("history.json"), hist = (f && f.data && typeof f.data === "object" ? f.data : {}), byDate = {};
+    (hist[im.sym] || []).forEach((r) => { byDate[r.d] = r; });
+    im.rows.forEach((r) => { if (!byDate[r.d] || r.d !== im.today) byDate[r.d] = r; });
+    hist[im.sym] = Object.values(byDate).sort((a, b) => (a.d < b.d ? -1 : 1)).slice(-400);
+    await gh("history.json", "PUT", { message: "import history " + im.sym, content: b64e(JSON.stringify(hist)), sha: f ? f.sha : undefined });
+    LIVE.history = hist; try { localStorage.setItem(PX_KEY, JSON.stringify(LIVE)); } catch (e) {}
+    chImport = null; chartCfg().sym = im.sym; chOffset = 0; chReplay = null; save(); toast(t("im_saved"));
+  } catch (e) { toast(errText(e)); }
+  render();
+}
+document.addEventListener("change", (ev) => {
+  if (ev.target.id !== "im-file" || !ev.target.files[0]) return;
+  const sym = document.getElementById("im-sym").value, fr = new FileReader();
+  fr.onload = () => {
+    let rows = null; try { rows = parseHistory(new Uint8Array(fr.result)); } catch (e) {}
+    if (!rows) { toast(t("im_bad")); return; }
+    chImport = { sym, rows, today: today() }; render();
+  };
+  fr.readAsArrayBuffer(ev.target.files[0]);
+});
 
 function chartReadout(i) {
   if (!CH || !CH.data[i]) return "&nbsp;";
@@ -338,6 +423,8 @@ document.addEventListener("click", (ev) => {
   }
   const el = ev.target.closest && ev.target.closest("[data-act]"); if (!el) return;
   const act = el.dataset.act;
+  if (act === "im-save") { importSave(); return; }
+  if (act === "im-cancel") { chImport = null; render(); return; }
   if (act === "wl-del") { if (WL) saveWatch(WL.filter((w) => w !== el.dataset.sym), "wl_removed"); return; }
   if (act.slice(0, 3) !== "ch-") return;
   const cfg = chartCfg(), full = chartData(cfg.sym);
