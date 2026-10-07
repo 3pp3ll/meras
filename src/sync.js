@@ -28,7 +28,7 @@ Object.assign(UI, {
   set_steps: [
     ["في GitHub: Settings ثم Developer settings ثم Personal access tokens ثم Fine-grained tokens ثم Generate new token.", "In GitHub: Settings, Developer settings, Personal access tokens, Fine-grained tokens, Generate new token."],
     ["في Repository access اختر Only select repositories وحدد meras-data فقط.", "Under Repository access choose Only select repositories and pick meras-data only."],
-    ["في Permissions افتح Repository permissions وخل Contents على Read and write.", "Under Permissions open Repository permissions and set Contents to Read and write."],
+    ["في Permissions اضغط Add permissions واختر Contents، ثم غيّرها من Read-only إلى Read and write.", "Under Permissions press Add permissions and choose Contents, then change it from Read-only to Read and write."],
     ["انسخ الرمز والصقه هنا. كرر اللصق على كل جهاز تبي تزامنه.", "Copy the token and paste it here. Paste it again on every device you want to sync."]
   ]
 });
