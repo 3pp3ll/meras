@@ -223,8 +223,8 @@ function readingHtml() {
   const r = analyze(CH.data, CH.s, CH.e);
   if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p></div>";
   return '<div class="panel reading stack"><div class="row" style="justify-content:space-between"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><button class="btn sm ghost" data-act="ch-read">' + esc(t("ch_hide_read")) + '</button></div><p class="small muted">' + esc(t("ch_read_p")) + '</p><dl class="rdlist">' +
-    r.items.map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
-    (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + "</div>";
+    r.items.slice(0, -1).concat([["rd_stats", statsLines(signalStats(CH.data, CH.e))]], r.items.slice(-1)).map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : k === "rd_stats" ? "wide" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
+    (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + aiPanel() + "</div>";
 }
 
 function pageChart() {
@@ -364,7 +364,7 @@ document.addEventListener("click", (ev) => {
 document.addEventListener("change", (ev) => {
   const key = ev.target.dataset && ev.target.dataset.ch; if (!key) return;
   const cfg = chartCfg(), el = ev.target;
-  if (key === "sym") { cfg.sym = el.value; chOffset = 0; chReplay = null; chPending = null; }
+  if (key === "sym") { cfg.sym = el.value; chOffset = 0; chReplay = null; chPending = null; aiState = { busy: false, text: "", err: "", model: "" }; }
   else if (key === "n") { cfg.n = el.value === "all" ? "all" : +el.value; chOffset = 0; }
   else if (key === "vol") cfg.vol = el.checked;
   else { const [k, f] = key.split("."); if (f === "on") cfg[k].on = el.checked; else cfg[k].p = Math.max(2, Math.min(200, parseInt(el.value, 10) || cfg[k].p)); }

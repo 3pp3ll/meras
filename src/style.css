@@ -312,3 +312,8 @@ td .num,td.num{font-size:13.5px}
 .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 10px;font-size:13.5px}
 [dir="rtl"] .chip{padding:2px 10px 2px 4px}
 .chip button{border:0;background:var(--sunk);border-radius:50%;width:22px;height:22px;cursor:pointer;line-height:1;font-size:15px}
+.rdlist > div.wide{grid-column:1/-1}
+.ai-box{border-top:1px solid var(--line);padding-top:14px}
+.ai-box input{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.ai-box .btn svg{flex:none}
+.ai-out{background:var(--sunk);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:16px}

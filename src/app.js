@@ -446,7 +446,7 @@ document.addEventListener("change", (e) => {
 document.addEventListener("input", (e) => { if (e.target.matches("[data-calc]")) runCalc(); });
 
 document.addEventListener("submit", (e) => {
-  const form = e.target.closest("[data-form]"); if (!form || form.dataset.form === "sync") return;
+  const form = e.target.closest("[data-form]"); if (!form || ["sync", "watch", "ai", "ai-set"].includes(form.dataset.form)) return;
   e.preventDefault();
   const val = (id) => (document.getElementById(id) || {}).value || "", kind = form.dataset.form;
   if (kind === "journal") {
