@@ -94,6 +94,55 @@ const LESSONS = [
         why: ["المؤشر متوسط موزون لحركة السوق، وما يوصف كل سهم لحاله.", "The index is a weighted average of the market and does not describe each share individually."] }
     ] },
 
+  { id: "inv-1-3", track: "inv", level: 1, mins: 7, title: ["أول أمر شراء: كيف تتم الصفقة", "Your first buy order: how a trade happens"],
+    body: [
+      { p: ["عشان تشتري سهم تحتاج محفظة استثمارية عند وسيط مرخص، وغالباً يكون البنك نفسه أو شركة وساطة. تحوّل لها مبلغ، وتدخل أمرك من تطبيق الوسيط. الوسيط يوصل أمرك للسوق وياخذ عمولة على كل عملية شراء وبيع، فاعرف نسبتها عنده قبل ما تبدأ.", "To buy a share you need an investment account with a licensed broker, often your bank or a brokerage firm. You fund it and enter your order in the broker's app. The broker routes your order to the market and charges a commission on every buy and sell, so find out its rate before you start."] },
+      { h: ["العرض والطلب", "Bid and ask"] },
+      { p: ["في أي لحظة فيه سعرين: أعلى سعر مشتري مستعد يدفعه (الطلب)، وأقل سعر بائع مستعد يقبله (العرض). الفرق بينهم اسمه الفارق السعري. في الأسهم النشطة يكون هللة أو هللتين، وفي الأسهم ضعيفة السيولة يتوسع.", "At any moment there are two prices: the highest a buyer will pay (the bid) and the lowest a seller will accept (the ask). The gap between them is the spread. In active shares it is a halala or two; in illiquid shares it widens."] },
+      { h: ["نوعين من الأوامر", "Two kinds of order"] },
+      { ul: [
+        ["أمر سوق: نفّذ الحين بأفضل سعر متاح. يتنفذ فوراً، لكن ما تتحكم في السعر.", "Market order: execute now at the best available price. It fills at once, but you do not control the price."],
+        ["أمر محدد: نفّذ بهذا السعر أو أحسن منه. تتحكم في السعر، لكن ممكن ما يتنفذ إذا السوق ما وصل له.", "Limit order: execute at this price or better. You control the price, but it may not fill if the market does not reach it."]
+      ] },
+      { p: ["للمبتدئ الأمر المحدد أسلم: تعرف بالضبط كم بتدفع.", "For a beginner the limit order is safer: you know exactly what you will pay."] },
+      { h: ["بعد التنفيذ", "After execution"] },
+      { p: ["السهم يظهر في محفظتك مباشرة، لكن التسوية الرسمية (نقل الملكية والمبلغ) تتم بعد يومي عمل، ويرمز لها T+2. وتكلفتك الفعلية هي سعر الشراء × الكمية + العمولة والضريبة عليها.", "The share shows in your account at once, but formal settlement (transfer of ownership and cash) completes two business days later, written T+2. Your true cost is price × quantity plus commission and the tax on it."] },
+      { quote: "7010" },
+      { note: ["جرّبها في سجل التداول أول: اضغط \"تدرّب على هذا السهم\" وسجّل صفقة تدريبية قبل ما تحط ريال حقيقي.", "Try it in the trading journal first: press \"Practise on this share\" and log a practice trade before risking a real riyal."] }
+    ],
+    quiz: [
+      { q: ["تبي تشتري بسعر 40 ريال بالضبط أو أقل. أي أمر تستخدم؟", "You want to buy at exactly SAR 40 or lower. Which order do you use?"],
+        opts: [["أمر سوق", "Market order"], ["أمر محدد بسعر 40", "Limit order at 40"], ["ما فيه طريقة", "There is no way"]], a: 1,
+        why: ["الأمر المحدد يتنفذ بسعرك أو أحسن منه فقط.", "A limit order fills only at your price or better."] },
+      { q: ["وش معنى T+2؟", "What does T+2 mean?"],
+        opts: [["السوق يفتح ساعتين", "The market opens for two hours"], ["التسوية تتم بعد يومي عمل من التنفيذ", "Settlement completes two business days after the trade"], ["العمولة 2%", "Commission is 2%"]], a: 1,
+        why: ["T هو يوم التنفيذ، والتسوية بعده بيومي عمل.", "T is the trade day, and settlement follows two business days later."] }
+    ] },
+
+  { id: "inv-1-4", track: "inv", level: 1, mins: 7, title: ["المخاطرة والتنويع", "Risk and diversification"],
+    body: [
+      { p: ["أول سؤال قبل أي استثمار مو \"كم بربح؟\" لكن \"كم ممكن أخسر، وهل أتحملها؟\". الأسهم ممكن تنزل 30% أو أكثر وتبقى نازلة سنين.", "The first question before any investment is not \"how much will I make?\" but \"how much could I lose, and can I bear it?\". Shares can fall 30% or more and stay down for years."] },
+      { h: ["ثلاث قواعد قبل أول ريال", "Three rules before the first riyal"] },
+      { ul: [
+        ["استثمر المبلغ اللي ما تحتاجه خلال السنوات الجاية. فلوس الإيجار والطوارئ مكانها مو الأسهم.", "Invest money you will not need in the coming years. Rent and emergency money do not belong in shares."],
+        ["لا تستثمر بالدين. الخسارة بفلوسك تنتهي عند الصفر، والخسارة بالدين تلحقك.", "Do not invest with borrowed money. A loss on your own money ends at zero; a loss on debt follows you."],
+        ["لا تحط كل شي في سهم واحد.", "Do not put everything in one share."]
+      ] },
+      { h: ["التنويع", "Diversification"] },
+      { p: ["لو عندك سهم واحد ونزل 40%، نزلت محفظتك 40%. لو عندك خمسة أسهم بمبالغ متساوية ونزل واحد منها 40%، نزلت محفظتك 8% فقط. التنويع ما يمنع الخسارة، لكنه يمنع إن غلطة وحدة تمسح محفظتك.", "With one share that falls 40%, your portfolio falls 40%. With five shares in equal amounts where one falls 40%, your portfolio falls only 8%. Diversification does not prevent loss, but it stops one mistake wiping you out."] },
+      { p: ["والتنويع الحقيقي بين قطاعات مختلفة. خمسة بنوك ما تعتبر تنويع، لأنها تتحرك مع بعض.", "Real diversification is across different sectors. Five banks is not diversification, because they move together."] },
+      { h: ["الخسارة والتعويض", "Loss and recovery"] },
+      { p: ["لو خسرت 50%، تحتاج تربح 100% عشان ترجع لرأس مالك. 100 ريال تصير 50، والـ 50 لازم تتضاعف عشان ترجع 100. لهذا حماية رأس المال تجي قبل تعظيم الربح.", "If you lose 50%, you need to gain 100% to get back to your capital. SAR 100 becomes 50, and the 50 must double to return to 100. That is why protecting capital comes before maximising profit."] }
+    ],
+    quiz: [
+      { q: ["محفظتك أربعة أسهم بمبالغ متساوية، ونزل واحد منها 20%. كم نزلت المحفظة؟", "Your portfolio is four shares in equal amounts and one falls 20%. How much did the portfolio fall?"],
+        opts: [["20%", "20%"], ["5%", "5%"], ["80%", "80%"]], a: 1,
+        why: ["السهم ربع المحفظة: 20% × ¼ = 5%.", "The share is a quarter of the portfolio: 20% × ¼ = 5%."] },
+      { q: ["خسرت 50% من مبلغ. كم تحتاج تربح عشان ترجع له؟", "You lost 50% of an amount. How much must you gain to get back?"],
+        opts: [["50%", "50%"], ["75%", "75%"], ["100%", "100%"]], a: 2,
+        why: ["النص الباقي لازم يتضاعف، يعني ربح 100%.", "The remaining half has to double, a 100% gain."] }
+    ] },
+
   /* ---------- المستثمر: الدرجة 2 ---------- */
   { id: "inv-2-1", track: "inv", level: 2, mins: 8, title: ["كيف تقرأ شاشة السعر", "How to read a quote screen"],
     body: [
@@ -137,6 +186,51 @@ const LESSONS = [
       { q: ["ليش السيولة تهم المستثمر؟", "Why does liquidity matter to an investor?"],
         opts: [["لأنها تضمن الربح", "It guarantees profit"], ["لأنها تسهّل الدخول والخروج بسعر قريب من السوق", "It makes entering and exiting near the market price easier"], ["لأنها ترفع التوزيعات", "It raises dividends"]], a: 1,
         why: ["السيولة ما لها علاقة بالربح أو التوزيعات. فايدتها إنك تلقى طرف ثاني للصفقة بسهولة.", "Liquidity has nothing to do with profit or dividends. Its benefit is finding a counterparty easily."] }
+    ] },
+
+  { id: "inv-2-3", track: "inv", level: 2, mins: 7, title: ["التوزيعات النقدية", "Cash dividends"],
+    body: [
+      { p: ["التوزيعات جزء من أرباح الشركة تدفعه نقداً للمساهمين، عن كل سهم مبلغ. بعض الشركات توزع كل ربع سنة، وبعضها كل نص سنة أو سنة، وبعضها ما توزع وتعيد استثمار أرباحها.", "Dividends are part of a company's profit paid in cash to shareholders, an amount per share. Some companies pay quarterly, some half-yearly or yearly, and some pay nothing and reinvest their profit."] },
+      { h: ["تاريخ الأحقية", "The eligibility date"] },
+      { p: ["الشركة تعلن تاريخ أحقية. اللي يملك السهم بنهاية تداول ذاك اليوم يستحق التوزيع، حتى لو باع اليوم اللي بعده. واللي يشتري بعده ما يستحق.", "The company announces an eligibility date. Whoever holds the share at the end of trading that day is entitled to the dividend, even if they sell the next day. Whoever buys after it is not."] },
+      { p: ["في اليوم اللي بعد الأحقية ينخفض سعر السهم غالباً بمقدار قريب من التوزيع، لأن المبلغ طلع من الشركة. فشراء السهم قبل الأحقية بيوم عشان التوزيع فقط ما يعتبر ربح مجاني.", "The day after eligibility the share price usually drops by roughly the dividend, because the cash has left the company. So buying the day before just for the dividend is not free money."] },
+      { h: ["عائد التوزيع", "Dividend yield"] },
+      { p: ["عائد التوزيع = التوزيع السنوي للسهم ÷ سعر السهم × 100. سهم سعره 50 ريال ويوزع 2 ريال في السنة، عائده 4%. هذا الرقم يخليك تقارن بين الأسهم، وبين الأسهم وبدائل ثانية.", "Dividend yield = annual dividend per share ÷ share price × 100. A share at SAR 50 paying SAR 2 a year yields 4%. This number lets you compare shares with each other and with alternatives."] },
+      { note: ["العائد العالي جداً إنذار مو هدية: ممكن يكون السعر نازل لأن السوق يتوقع إن الشركة بتخفض التوزيع. شيّك هل أرباح الشركة تغطي توزيعاتها.", "A very high yield is a warning, not a gift: the price may be down because the market expects a dividend cut. Check whether the company's profit covers its dividends."] },
+      { quote: "2222" }
+    ],
+    quiz: [
+      { q: ["سهم سعره 80 ريال ويوزع 4 ريال سنوياً. كم عائد التوزيع؟", "A share at SAR 80 pays SAR 4 a year. What is the dividend yield?"],
+        opts: [["4%", "4%"], ["5%", "5%"], ["20%", "20%"]], a: 1,
+        why: ["4 ÷ 80 × 100 = 5%.", "4 ÷ 80 × 100 = 5%."] },
+      { q: ["اشتريت السهم في اليوم اللي بعد تاريخ الأحقية. هل تستحق التوزيع؟", "You bought the share the day after the eligibility date. Are you entitled to the dividend?"],
+        opts: [["نعم", "Yes"], ["لا", "No"], ["نصه", "Half of it"]], a: 1,
+        why: ["الأحقية لمن يملك السهم بنهاية يوم الأحقية.", "Entitlement goes to whoever holds the share at the end of the eligibility date."] }
+    ] },
+
+  { id: "inv-2-4", track: "inv", level: 2, mins: 8, title: ["ربحية السهم ومكرر الربحية", "Earnings per share and the P/E ratio"],
+    body: [
+      { p: ["سعر السهم لحاله ما يقول لك إذا هو غالي أو رخيص. اللي يهم: كم تدفع مقابل كل ريال تربحه الشركة.", "The share price alone does not tell you whether it is expensive or cheap. What matters is how much you pay for each riyal the company earns."] },
+      { h: ["ربحية السهم (EPS)", "Earnings per share (EPS)"] },
+      { p: ["ربحية السهم = صافي ربح الشركة ÷ عدد الأسهم. شركة ربحت 200 مليون ريال وعندها 100 مليون سهم، ربحية سهمها 2 ريال.", "EPS = the company's net profit ÷ number of shares. A company that earned SAR 200 million with 100 million shares has an EPS of SAR 2."] },
+      { h: ["مكرر الربحية (P/E)", "The price-to-earnings ratio (P/E)"] },
+      { p: ["مكرر الربحية = سعر السهم ÷ ربحية السهم. لو السعر 30 والربحية 2، المكرر 15. معناه إنك تدفع 15 ريال مقابل كل ريال ربح سنوي، أو بمعنى ثاني: لو بقت الأرباح ثابتة، تحتاج 15 سنة عشان ترجع أرباح الشركة سعر السهم.", "P/E = share price ÷ EPS. At a price of 30 and EPS of 2, the P/E is 15. It means you pay SAR 15 for each riyal of annual profit, or put another way: if profit stayed flat, it would take 15 years of earnings to equal the share price."] },
+      { h: ["كيف تقراه؟", "How do you read it?"] },
+      { ul: [
+        ["المكرر العالي معناه إن السوق يتوقع نمو في الأرباح، أو إن السهم مبالغ في سعره.", "A high P/E means the market expects profit growth, or that the share is overpriced."],
+        ["المكرر المنخفض معناه إن السهم رخيص، أو إن السوق يتوقع تراجع الأرباح.", "A low P/E means the share is cheap, or that the market expects profit to fall."],
+        ["قارن المكرر بشركات من نفس القطاع، وبمكرر الشركة نفسها في سنوات سابقة. مقارنة بنك بشركة تقنية ما تعطيك شي.", "Compare the P/E with companies in the same sector, and with the company's own P/E in past years. Comparing a bank with a technology company tells you nothing."],
+        ["الشركة الخاسرة ما لها مكرر، لأن ربحيتها سالبة.", "A loss-making company has no P/E, because its earnings are negative."]
+      ] },
+      { note: ["المكرر يبني على أرباح الماضي، والسعر يبني على توقعات المستقبل. هو بداية السؤال وليس جوابه.", "The ratio rests on past earnings, while the price rests on expectations of the future. It is where the question starts, not its answer."] }
+    ],
+    quiz: [
+      { q: ["سهم سعره 60 ريال وربحيته 4 ريال. كم مكرر الربحية؟", "A share costs SAR 60 and its EPS is SAR 4. What is the P/E?"],
+        opts: [["15", "15"], ["24", "24"], ["240", "240"]], a: 0,
+        why: ["60 ÷ 4 = 15.", "60 ÷ 4 = 15."] },
+      { q: ["مع من تقارن مكرر ربحية شركة؟", "What do you compare a company's P/E with?"],
+        opts: [["أي شركة في السوق", "Any company in the market"], ["شركات من نفس القطاع وتاريخ الشركة نفسها", "Companies in the same sector and the company's own history"], ["سعر السهم", "The share price"]], a: 1,
+        why: ["القطاعات تختلف في نموها ومخاطرها، فمكرراتها تختلف طبيعياً.", "Sectors differ in growth and risk, so their ratios differ naturally."] }
     ] },
 
   /* ---------- المتداول: الدرجة 1 ---------- */
@@ -184,6 +278,33 @@ const LESSONS = [
         why: ["الإطار يتبع مدة الصفقة. الأسابيع تنقرأ على اليومي.", "The timeframe follows the holding period. Weeks are read on the daily."] }
     ] },
 
+  { id: "trd-1-3", track: "trd", level: 1, mins: 8, title: ["ثلاثة نماذج شموع تعرفها", "Three candle patterns to know"],
+    body: [
+      { p: ["بعض أشكال الشموع تتكرر عند نقاط التحول، فالمتداولين عطوها أسماء. تعلم ثلاثة منها يكفي كبداية، بشرط واحد: النموذج ما له قيمة إلا في مكانه.", "Some candle shapes recur at turning points, so traders named them. Learning three is enough to start, on one condition: a pattern only has value in its place."] },
+      { fig: "patterns", cap: ["من اليسار: دوجي بعد شمعة هابطة، مطرقة بعد هبوط، وابتلاع صاعد.", "From the left: a doji after a falling candle, a hammer after a fall, and a bullish engulfing."] },
+      { h: ["الدوجي", "The doji"] },
+      { p: ["الافتتاح والإغلاق تقريباً نفس السعر، فالجسم خط رفيع. معناه إن المشترين والبائعين تعادلوا في هذي الفترة. بعد صعود أو هبوط طويل يدل على تردد، وممكن يسبق تغيّر.", "Open and close are almost the same price, so the body is a thin line. It means buyers and sellers drew level in this period. After a long rise or fall it signals hesitation and may precede a change."] },
+      { h: ["المطرقة", "The hammer"] },
+      { p: ["جسم صغير في الأعلى وذيل سفلي طويل، ضعف الجسم على الأقل. السعر نزل بقوة خلال الفترة ثم رجّعه المشترين قرب الافتتاح. لها معنى لما تجي بعد هبوط وعند منطقة دعم.", "A small body at the top and a long lower wick, at least twice the body. Price fell hard during the period and buyers pushed it back near the open. It matters when it comes after a fall and at a support area."] },
+      { h: ["الابتلاع الصاعد", "The bullish engulfing"] },
+      { p: ["شمعة حمراء، وبعدها شمعة خضراء جسمها يغطي جسم الحمراء كامل. المشترين ما اكتفوا بوقف الهبوط، رجّعوا كل اللي خسره السهم وزيادة. والعكس اسمه ابتلاع هابط.", "A red candle, then a green candle whose body fully covers the red one's body. Buyers did not just halt the fall; they took back everything the share lost and more. The reverse is a bearish engulfing."] },
+      { h: ["الشرط اللي يخلي النموذج ينفع", "The condition that makes a pattern useful"] },
+      { ul: [
+        ["المكان: عند دعم أو مقاومة أو خط اتجاه. مطرقة في نص مسار عرضي ما تعني شي.", "Place: at support, resistance or a trend line. A hammer in the middle of a range means nothing."],
+        ["السياق: نموذج انعكاس يحتاج حركة قبله ينعكس عنها.", "Context: a reversal pattern needs a prior move to reverse."],
+        ["التأكيد: انتظر الشمعة اللي بعدها. إذا أكدت الجهة، الإشارة أقوى.", "Confirmation: wait for the next candle. If it confirms the direction, the signal is stronger."]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["شمعة جسمها صغير في الأعلى وذيلها السفلي طويل، ظهرت بعد هبوط عند دعم. وش اسمها؟", "A candle with a small body at the top and a long lower wick, appearing after a fall at support. What is it called?"],
+        opts: [["دوجي", "Doji"], ["مطرقة", "Hammer"], ["ابتلاع هابط", "Bearish engulfing"]], a: 1,
+        why: ["الذيل السفلي الطويل مع جسم صغير في الأعلى هو وصف المطرقة.", "A long lower wick with a small body at the top describes the hammer."] },
+      { q: ["ظهر ابتلاع صاعد في نص مسار عرضي بعيد عن الدعم. كيف تتعامل معه؟", "A bullish engulfing appears mid-range, far from support. How do you treat it?"],
+        opts: [["إشارة شراء قوية", "A strong buy signal"], ["إشارة ضعيفة لأن المكان ما يدعمها", "A weak signal because the location does not support it"], ["إشارة بيع", "A sell signal"]], a: 1,
+        why: ["النموذج يستمد قوته من مكانه. بدون دعم أو سياق، هو مجرد شمعتين.", "A pattern draws its strength from its location. Without support or context it is just two candles."] }
+    ] },
+
   /* ---------- المتداول: الدرجة 2 ---------- */
   { id: "trd-2-1", track: "trd", level: 2, mins: 8, title: ["الدعم والمقاومة", "Support and resistance"],
     body: [
@@ -228,6 +349,56 @@ const LESSONS = [
       { q: ["وش أول علامة على تغيّر اتجاه صاعد؟", "What is the first sign an uptrend has changed?"],
         opts: [["شمعة حمراء واحدة", "One red candle"], ["كسر خط الاتجاه مع قاع أدنى من السابق", "A break of the trend line with a lower low"], ["ارتفاع الحجم", "A rise in volume"]], a: 1,
         why: ["شمعة حمراء وحدة شي طبيعي داخل أي اتجاه صاعد. التغيّر يبان لما ينكسر تسلسل القيعان.", "One red candle is normal inside any uptrend. The change shows when the sequence of lows breaks."] }
+    ] },
+
+  { id: "trd-2-3", track: "trd", level: 2, mins: 8, title: ["وقف الخسارة والعائد مقابل المخاطرة", "The stop-loss and reward against risk"],
+    body: [
+      { p: ["قبل ما تدخل أي صفقة لازم تعرف ثلاثة أسعار: وين تدخل، وين تطلع لو غلطت، ووين تطلع لو صحّيت.", "Before entering any trade you must know three prices: where you get in, where you get out if wrong, and where you get out if right."] },
+      { fig: "rr", cap: ["صفقة شراء: الهدف فوق الدخول، ووقف الخسارة تحته.", "A buy trade: the target sits above the entry and the stop-loss below it."] },
+      { h: ["وقف الخسارة", "The stop-loss"] },
+      { p: ["هو السعر اللي تطلع عنده وتقبل الخسارة. في صفقة الشراء يكون دائماً تحت سعر الدخول. ومكانه المنطقي تحت الدعم بمسافة بسيطة: لو انكسر الدعم، فالسبب اللي دخلت عشانه انتهى.", "It is the price at which you exit and accept the loss. In a buy trade it is always below the entry. Its logical place is slightly below support: if support breaks, the reason you entered is gone."] },
+      { p: ["الوقف قرار تاخذه وأنت هادي قبل الدخول، عشان ما تاخذه وأنت خايف والسهم نازل.", "The stop is a decision you make calmly before entering, so you do not make it frightened while the share is falling."] },
+      { h: ["الهدف", "The target"] },
+      { p: ["هو السعر اللي تتوقع السهم يوصله، وغالباً يكون عند أقرب مقاومة. وهو دائماً فوق سعر الدخول في صفقة الشراء.", "It is the price you expect the share to reach, usually the nearest resistance. In a buy trade it is always above the entry."] },
+      { h: ["النسبة", "The ratio"] },
+      { p: ["المخاطرة = الدخول − الوقف. العائد = الهدف − الدخول. في الرسم: المخاطرة 2 ريال والعائد 4 ريال، فالنسبة 1 إلى 2.", "Risk = entry − stop. Reward = target − entry. In the figure: risk is SAR 2 and reward SAR 4, so the ratio is 1 to 2."] },
+      { p: ["ليش تهم؟ بنسبة 1 إلى 2، لو صحّيت في 4 صفقات من 10 فقط: تربح 4 × 2 = 8 وتخسر 6 × 1 = 6، والصافي موجب 2. يعني تقدر تغلط أكثر مما تصيب وتطلع رابح. القاعدة العملية: لا تدخل صفقة عائدها أقل من ضعف مخاطرتها.", "Why does it matter? At 1 to 2, if you are right in only 4 trades out of 10: you gain 4 × 2 = 8 and lose 6 × 1 = 6, a net of plus 2. You can be wrong more often than right and still come out ahead. The practical rule: do not enter a trade whose reward is less than twice its risk."] },
+      { note: ["حاسبة \"حجم الصفقة حسب المخاطرة\" في الخدمات تحسب لك كم سهم تشتري بحيث ما تخسر أكثر من 1% من رأس مالك لو ضرب الوقف.", "The \"Position size by risk\" calculator under Services works out how many shares to buy so you lose no more than 1% of your capital if the stop is hit."] }
+    ],
+    quiz: [
+      { q: ["دخلت بسعر 30، والوقف 28.5، والهدف 34.5. كم النسبة؟", "Entry 30, stop 28.5, target 34.5. What is the ratio?"],
+        opts: [["1 إلى 1", "1 to 1"], ["1 إلى 2", "1 to 2"], ["1 إلى 3", "1 to 3"]], a: 2,
+        why: ["المخاطرة 1.5 والعائد 4.5، و 4.5 ÷ 1.5 = 3.", "Risk is 1.5 and reward 4.5, and 4.5 ÷ 1.5 = 3."] },
+      { q: ["في صفقة شراء، وين يكون وقف الخسارة؟", "In a buy trade, where does the stop-loss go?"],
+        opts: [["فوق سعر الدخول", "Above the entry"], ["تحت سعر الدخول", "Below the entry"], ["عند سعر الدخول", "At the entry"]], a: 1,
+        why: ["الوقف يحميك من النزول، فمكانه تحت الدخول. اللي فوق الدخول هو الهدف.", "The stop protects you from a fall, so it sits below the entry. What sits above is the target."] }
+    ] },
+
+  { id: "trd-2-4", track: "trd", level: 2, mins: 7, title: ["خطة الصفقة قبل الدخول", "The trade plan before entry"],
+    body: [
+      { p: ["المتداول اللي يخسر على المدى الطويل غالباً ما تنقصه المعلومة، ينقصه الانضباط. والحل قائمة قصيرة تجاوب عليها قبل كل صفقة. إذا ما قدرت تجاوب على سؤال منها، لا تدخل.", "The trader who loses over time usually lacks discipline, not information. The fix is a short checklist you answer before every trade. If you cannot answer one of its questions, do not enter."] },
+      { h: ["الأسئلة الستة", "The six questions"] },
+      { ul: [
+        ["وش الاتجاه على الإطار اليومي؟ هل أنا معه أو ضده؟", "What is the trend on the daily timeframe? Am I with it or against it?"],
+        ["وين أقرب دعم ومقاومة؟", "Where are the nearest support and resistance?"],
+        ["وش سبب دخولي في جملة وحدة؟", "What is my reason for entering, in one sentence?"],
+        ["وين وقف الخسارة، وليش هناك بالذات؟", "Where is the stop-loss, and why there exactly?"],
+        ["وين الهدف، وهل العائد ضعف المخاطرة على الأقل؟", "Where is the target, and is the reward at least twice the risk?"],
+        ["كم سهم أشتري بحيث ما أخسر أكثر من 1% من رأس مالي؟", "How many shares do I buy so I lose no more than 1% of my capital?"]
+      ] },
+      { h: ["مثال كامل", "A full example"] },
+      { p: ["سهم في اتجاه صاعد، رجع لدعم عند 48 وطلعت شمعة مطرقة. السبب: ارتداد من الدعم مع الاتجاه. الدخول 50، الوقف 47.5 تحت الدعم، الهدف 55 عند المقاومة. المخاطرة 2.5 والعائد 5، والنسبة 1 إلى 2. رأس المال 50,000 ومخاطرة 1% تساوي 500 ريال، فالكمية 500 ÷ 2.5 = 200 سهم.", "A share in an uptrend pulls back to support at 48 and prints a hammer. Reason: a bounce from support with the trend. Entry 50, stop 47.5 below support, target 55 at resistance. Risk is 2.5 and reward 5, a ratio of 1 to 2. Capital is 50,000 and 1% risk is SAR 500, so the size is 500 ÷ 2.5 = 200 shares."] },
+      { h: ["بعد الصفقة", "After the trade"] },
+      { p: ["سجّل النتيجة واكتب وش تعلمت، سواء ربحت أو خسرت. صفقة خاسرة التزمت فيها بخطتك أحسن من صفقة رابحة دخلتها بدون خطة، لأن الأولى تتكرر بنتيجة موجبة والثانية حظ.", "Record the result and write what you learned, win or lose. A losing trade where you followed your plan is better than a winning one entered without a plan, because the first repeats with a positive outcome and the second is luck."] },
+      { note: ["سجل التداول في مِراس مبني على هذي القائمة: فيه خانة للسبب والوقف والهدف، ويرفض وقف فوق سعر الدخول.", "The Meras trading journal is built on this checklist: it has fields for reason, stop and target, and rejects a stop above the entry."] }
+    ],
+    quiz: [
+      { q: ["رأس مالك 20,000 ريال وتبي تخاطر بـ 1%. الدخول 40 والوقف 38. كم سهم تشتري؟", "Your capital is SAR 20,000 and you want to risk 1%. Entry 40, stop 38. How many shares do you buy?"],
+        opts: [["50 سهم", "50 shares"], ["100 سهم", "100 shares"], ["500 سهم", "500 shares"]], a: 1,
+        why: ["المخاطرة 200 ريال، والمخاطرة للسهم 2 ريال: 200 ÷ 2 = 100 سهم.", "Risk is SAR 200 and risk per share is SAR 2: 200 ÷ 2 = 100 shares."] },
+      { q: ["ما قدرت تحدد وين تحط وقف الخسارة. وش تسوي؟", "You cannot decide where to place the stop-loss. What do you do?"],
+        opts: [["أدخل وأحدده بعدين", "Enter and decide later"], ["ما أدخل الصفقة", "Do not enter the trade"], ["أدخل بكمية أكبر", "Enter with a larger size"]], a: 1,
+        why: ["بدون وقف ما تعرف مخاطرتك، وبدونها ما تعرف الكمية ولا النسبة.", "Without a stop you do not know your risk, and without that you know neither the size nor the ratio."] }
     ] },
 
   /* ---------- المتداول: الدرجة 3 ---------- */

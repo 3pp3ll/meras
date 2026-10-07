@@ -144,7 +144,7 @@ document.addEventListener("submit", async (e) => {
   CFG = { owner: v("s-owner"), repo: v("s-repo"), token: v("s-token") };
   try { localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); } catch (err) {}
   if (!CFG.token) { render(); return; }
-  if (await syncNow(false)) { await loadPrices(true); }
+  if (await syncNow(false)) { await loadPrices(true); loadWatch(); }
   render();
 });
 document.addEventListener("click", (e) => {

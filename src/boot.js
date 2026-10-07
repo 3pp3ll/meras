@@ -1,4 +1,4 @@
 /* ===== التشغيل ===== */
 lastRoute = route();
 render();
-if (HOSTED && CFG.token) { syncNow(true).then(() => loadPrices(true)); }
+if (HOSTED && CFG.token) { syncNow(true).then(() => loadPrices(true)).then(() => loadWatch()); }

@@ -269,9 +269,47 @@ td .num,td.num{font-size:13.5px}
 
 /* chart */
 .chartbox{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:10px 10px 4px}
-.ch-scroll{overflow-x:auto}
-.ch-scroll svg{display:block;width:100%;min-width:560px;height:auto;direction:ltr;touch-action:pan-x pan-y;cursor:crosshair}
-.chartbox.drawing svg{cursor:cell}
+.chartbox svg,.ch-fullscreen svg{display:block;max-width:100%;height:auto;direction:ltr;touch-action:pan-y;cursor:crosshair;-webkit-user-select:none;user-select:none}
+.chartbox.drawing svg,.ch-fullscreen.drawing svg{cursor:cell}
+.ch-top{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.ch-top .ch-read{flex:1;min-width:0}
+.ch-fullscreen{position:fixed;inset:0;z-index:40;background:var(--surface);padding:calc(6px + env(safe-area-inset-top,0px)) 8px 8px;overflow:auto}
+.ch-fullscreen svg{touch-action:none;margin-inline:auto}
+.ch-bar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:4px}
+.ch-bar b{font-family:var(--display);font-size:16px}
+@media (max-width:560px){.hide-s{display:none}}
+.reading h3{font-size:19px;display:flex;gap:8px;align-items:center;color:var(--ink)}
+.reading h3 svg{color:var(--amber)}
+.rdlist{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+.rdlist > div{padding-block:10px;border-top:1px solid var(--line)}
+.rdlist > div.try{grid-column:1/-1;background:var(--amber-soft);border:0;border-radius:8px;padding:12px 14px;margin-top:6px}
+.rdlist dt{font-size:12.5px;font-weight:600;color:var(--amber-ink);letter-spacing:.02em}
+.rdlist dd{margin:2px 0 0;font-size:15px;display:flex;flex-direction:column;gap:4px}
+@media (max-width:720px){.rdlist{grid-template-columns:1fr}}
+.draw.auto{stroke:var(--ind3)} .draw-dot.auto{fill:var(--ind3)} .draw-tag.auto{fill:var(--ind3)}
+/* guides */
+.guide-card{display:flex;flex-direction:column;gap:10px;text-decoration:none;align-items:flex-start}
+.guide-card:hover{border-color:var(--amber)}
+.guide-card h3{font-size:22px}
+.guide-thumb{align-self:stretch;background:var(--sunk);border-radius:8px;padding:10px}
+.guide-thumb svg,.gs-fig svg{display:block;width:100%;height:auto;direction:ltr}
+.guide-head{padding-block:34px 18px;max-width:720px}
+.guide-head h1{font-size:clamp(30px,5vw,44px);margin-block:8px 10px}
+.guide-head p{font-size:18px;color:var(--muted)}
+.guide-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.guide-steps li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:center;padding-block:34px;border-top:1px solid var(--line)}
+.guide-steps li:nth-child(even) .gs-text{order:2}
+.gs-n{display:block;font-size:54px;font-weight:600;line-height:1;color:var(--amber);margin-bottom:10px}
+.gs-text h2{font-size:25px;margin-bottom:8px}
+.gs-text p{font-size:17px;color:var(--muted);max-width:52ch}
+.gs-fig{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+@media (max-width:820px){.guide-steps li{grid-template-columns:1fr;gap:16px;padding-block:26px}.guide-steps li:nth-child(even) .gs-text{order:0}.gs-n{font-size:42px}}
+.mock{display:flex;flex-direction:column}
+.mock > div{display:flex;justify-content:space-between;gap:16px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.mock > div:last-child{border-bottom:0}
+.mock span{color:var(--muted);font-size:14.5px}
+.mock b{font-weight:600;font-size:15px;font-variant-numeric:tabular-nums;unicode-bidi:plaintext}
+.mock .pos b{color:var(--up)}
 .ch-read{font-size:13px;line-height:1.9;min-height:25px;padding-inline:4px;display:flex;flex-wrap:wrap;gap:0 14px}
 .c-lab{fill:var(--muted);font-family:var(--body);font-size:12px}
 .ch-read b{font-weight:600}
@@ -394,6 +432,55 @@ const LESSONS = [
         why: ["المؤشر متوسط موزون لحركة السوق، وما يوصف كل سهم لحاله.", "The index is a weighted average of the market and does not describe each share individually."] }
     ] },
 
+  { id: "inv-1-3", track: "inv", level: 1, mins: 7, title: ["أول أمر شراء: كيف تتم الصفقة", "Your first buy order: how a trade happens"],
+    body: [
+      { p: ["عشان تشتري سهم تحتاج محفظة استثمارية عند وسيط مرخص، وغالباً يكون البنك نفسه أو شركة وساطة. تحوّل لها مبلغ، وتدخل أمرك من تطبيق الوسيط. الوسيط يوصل أمرك للسوق وياخذ عمولة على كل عملية شراء وبيع، فاعرف نسبتها عنده قبل ما تبدأ.", "To buy a share you need an investment account with a licensed broker, often your bank or a brokerage firm. You fund it and enter your order in the broker's app. The broker routes your order to the market and charges a commission on every buy and sell, so find out its rate before you start."] },
+      { h: ["العرض والطلب", "Bid and ask"] },
+      { p: ["في أي لحظة فيه سعرين: أعلى سعر مشتري مستعد يدفعه (الطلب)، وأقل سعر بائع مستعد يقبله (العرض). الفرق بينهم اسمه الفارق السعري. في الأسهم النشطة يكون هللة أو هللتين، وفي الأسهم ضعيفة السيولة يتوسع.", "At any moment there are two prices: the highest a buyer will pay (the bid) and the lowest a seller will accept (the ask). The gap between them is the spread. In active shares it is a halala or two; in illiquid shares it widens."] },
+      { h: ["نوعين من الأوامر", "Two kinds of order"] },
+      { ul: [
+        ["أمر سوق: نفّذ الحين بأفضل سعر متاح. يتنفذ فوراً، لكن ما تتحكم في السعر.", "Market order: execute now at the best available price. It fills at once, but you do not control the price."],
+        ["أمر محدد: نفّذ بهذا السعر أو أحسن منه. تتحكم في السعر، لكن ممكن ما يتنفذ إذا السوق ما وصل له.", "Limit order: execute at this price or better. You control the price, but it may not fill if the market does not reach it."]
+      ] },
+      { p: ["للمبتدئ الأمر المحدد أسلم: تعرف بالضبط كم بتدفع.", "For a beginner the limit order is safer: you know exactly what you will pay."] },
+      { h: ["بعد التنفيذ", "After execution"] },
+      { p: ["السهم يظهر في محفظتك مباشرة، لكن التسوية الرسمية (نقل الملكية والمبلغ) تتم بعد يومي عمل، ويرمز لها T+2. وتكلفتك الفعلية هي سعر الشراء × الكمية + العمولة والضريبة عليها.", "The share shows in your account at once, but formal settlement (transfer of ownership and cash) completes two business days later, written T+2. Your true cost is price × quantity plus commission and the tax on it."] },
+      { quote: "7010" },
+      { note: ["جرّبها في سجل التداول أول: اضغط \"تدرّب على هذا السهم\" وسجّل صفقة تدريبية قبل ما تحط ريال حقيقي.", "Try it in the trading journal first: press \"Practise on this share\" and log a practice trade before risking a real riyal."] }
+    ],
+    quiz: [
+      { q: ["تبي تشتري بسعر 40 ريال بالضبط أو أقل. أي أمر تستخدم؟", "You want to buy at exactly SAR 40 or lower. Which order do you use?"],
+        opts: [["أمر سوق", "Market order"], ["أمر محدد بسعر 40", "Limit order at 40"], ["ما فيه طريقة", "There is no way"]], a: 1,
+        why: ["الأمر المحدد يتنفذ بسعرك أو أحسن منه فقط.", "A limit order fills only at your price or better."] },
+      { q: ["وش معنى T+2؟", "What does T+2 mean?"],
+        opts: [["السوق يفتح ساعتين", "The market opens for two hours"], ["التسوية تتم بعد يومي عمل من التنفيذ", "Settlement completes two business days after the trade"], ["العمولة 2%", "Commission is 2%"]], a: 1,
+        why: ["T هو يوم التنفيذ، والتسوية بعده بيومي عمل.", "T is the trade day, and settlement follows two business days later."] }
+    ] },
+
+  { id: "inv-1-4", track: "inv", level: 1, mins: 7, title: ["المخاطرة والتنويع", "Risk and diversification"],
+    body: [
+      { p: ["أول سؤال قبل أي استثمار مو \"كم بربح؟\" لكن \"كم ممكن أخسر، وهل أتحملها؟\". الأسهم ممكن تنزل 30% أو أكثر وتبقى نازلة سنين.", "The first question before any investment is not \"how much will I make?\" but \"how much could I lose, and can I bear it?\". Shares can fall 30% or more and stay down for years."] },
+      { h: ["ثلاث قواعد قبل أول ريال", "Three rules before the first riyal"] },
+      { ul: [
+        ["استثمر المبلغ اللي ما تحتاجه خلال السنوات الجاية. فلوس الإيجار والطوارئ مكانها مو الأسهم.", "Invest money you will not need in the coming years. Rent and emergency money do not belong in shares."],
+        ["لا تستثمر بالدين. الخسارة بفلوسك تنتهي عند الصفر، والخسارة بالدين تلحقك.", "Do not invest with borrowed money. A loss on your own money ends at zero; a loss on debt follows you."],
+        ["لا تحط كل شي في سهم واحد.", "Do not put everything in one share."]
+      ] },
+      { h: ["التنويع", "Diversification"] },
+      { p: ["لو عندك سهم واحد ونزل 40%، نزلت محفظتك 40%. لو عندك خمسة أسهم بمبالغ متساوية ونزل واحد منها 40%، نزلت محفظتك 8% فقط. التنويع ما يمنع الخسارة، لكنه يمنع إن غلطة وحدة تمسح محفظتك.", "With one share that falls 40%, your portfolio falls 40%. With five shares in equal amounts where one falls 40%, your portfolio falls only 8%. Diversification does not prevent loss, but it stops one mistake wiping you out."] },
+      { p: ["والتنويع الحقيقي بين قطاعات مختلفة. خمسة بنوك ما تعتبر تنويع، لأنها تتحرك مع بعض.", "Real diversification is across different sectors. Five banks is not diversification, because they move together."] },
+      { h: ["الخسارة والتعويض", "Loss and recovery"] },
+      { p: ["لو خسرت 50%، تحتاج تربح 100% عشان ترجع لرأس مالك. 100 ريال تصير 50، والـ 50 لازم تتضاعف عشان ترجع 100. لهذا حماية رأس المال تجي قبل تعظيم الربح.", "If you lose 50%, you need to gain 100% to get back to your capital. SAR 100 becomes 50, and the 50 must double to return to 100. That is why protecting capital comes before maximising profit."] }
+    ],
+    quiz: [
+      { q: ["محفظتك أربعة أسهم بمبالغ متساوية، ونزل واحد منها 20%. كم نزلت المحفظة؟", "Your portfolio is four shares in equal amounts and one falls 20%. How much did the portfolio fall?"],
+        opts: [["20%", "20%"], ["5%", "5%"], ["80%", "80%"]], a: 1,
+        why: ["السهم ربع المحفظة: 20% × ¼ = 5%.", "The share is a quarter of the portfolio: 20% × ¼ = 5%."] },
+      { q: ["خسرت 50% من مبلغ. كم تحتاج تربح عشان ترجع له؟", "You lost 50% of an amount. How much must you gain to get back?"],
+        opts: [["50%", "50%"], ["75%", "75%"], ["100%", "100%"]], a: 2,
+        why: ["النص الباقي لازم يتضاعف، يعني ربح 100%.", "The remaining half has to double, a 100% gain."] }
+    ] },
+
   /* ---------- المستثمر: الدرجة 2 ---------- */
   { id: "inv-2-1", track: "inv", level: 2, mins: 8, title: ["كيف تقرأ شاشة السعر", "How to read a quote screen"],
     body: [
@@ -437,6 +524,51 @@ const LESSONS = [
       { q: ["ليش السيولة تهم المستثمر؟", "Why does liquidity matter to an investor?"],
         opts: [["لأنها تضمن الربح", "It guarantees profit"], ["لأنها تسهّل الدخول والخروج بسعر قريب من السوق", "It makes entering and exiting near the market price easier"], ["لأنها ترفع التوزيعات", "It raises dividends"]], a: 1,
         why: ["السيولة ما لها علاقة بالربح أو التوزيعات. فايدتها إنك تلقى طرف ثاني للصفقة بسهولة.", "Liquidity has nothing to do with profit or dividends. Its benefit is finding a counterparty easily."] }
+    ] },
+
+  { id: "inv-2-3", track: "inv", level: 2, mins: 7, title: ["التوزيعات النقدية", "Cash dividends"],
+    body: [
+      { p: ["التوزيعات جزء من أرباح الشركة تدفعه نقداً للمساهمين، عن كل سهم مبلغ. بعض الشركات توزع كل ربع سنة، وبعضها كل نص سنة أو سنة، وبعضها ما توزع وتعيد استثمار أرباحها.", "Dividends are part of a company's profit paid in cash to shareholders, an amount per share. Some companies pay quarterly, some half-yearly or yearly, and some pay nothing and reinvest their profit."] },
+      { h: ["تاريخ الأحقية", "The eligibility date"] },
+      { p: ["الشركة تعلن تاريخ أحقية. اللي يملك السهم بنهاية تداول ذاك اليوم يستحق التوزيع، حتى لو باع اليوم اللي بعده. واللي يشتري بعده ما يستحق.", "The company announces an eligibility date. Whoever holds the share at the end of trading that day is entitled to the dividend, even if they sell the next day. Whoever buys after it is not."] },
+      { p: ["في اليوم اللي بعد الأحقية ينخفض سعر السهم غالباً بمقدار قريب من التوزيع، لأن المبلغ طلع من الشركة. فشراء السهم قبل الأحقية بيوم عشان التوزيع فقط ما يعتبر ربح مجاني.", "The day after eligibility the share price usually drops by roughly the dividend, because the cash has left the company. So buying the day before just for the dividend is not free money."] },
+      { h: ["عائد التوزيع", "Dividend yield"] },
+      { p: ["عائد التوزيع = التوزيع السنوي للسهم ÷ سعر السهم × 100. سهم سعره 50 ريال ويوزع 2 ريال في السنة، عائده 4%. هذا الرقم يخليك تقارن بين الأسهم، وبين الأسهم وبدائل ثانية.", "Dividend yield = annual dividend per share ÷ share price × 100. A share at SAR 50 paying SAR 2 a year yields 4%. This number lets you compare shares with each other and with alternatives."] },
+      { note: ["العائد العالي جداً إنذار مو هدية: ممكن يكون السعر نازل لأن السوق يتوقع إن الشركة بتخفض التوزيع. شيّك هل أرباح الشركة تغطي توزيعاتها.", "A very high yield is a warning, not a gift: the price may be down because the market expects a dividend cut. Check whether the company's profit covers its dividends."] },
+      { quote: "2222" }
+    ],
+    quiz: [
+      { q: ["سهم سعره 80 ريال ويوزع 4 ريال سنوياً. كم عائد التوزيع؟", "A share at SAR 80 pays SAR 4 a year. What is the dividend yield?"],
+        opts: [["4%", "4%"], ["5%", "5%"], ["20%", "20%"]], a: 1,
+        why: ["4 ÷ 80 × 100 = 5%.", "4 ÷ 80 × 100 = 5%."] },
+      { q: ["اشتريت السهم في اليوم اللي بعد تاريخ الأحقية. هل تستحق التوزيع؟", "You bought the share the day after the eligibility date. Are you entitled to the dividend?"],
+        opts: [["نعم", "Yes"], ["لا", "No"], ["نصه", "Half of it"]], a: 1,
+        why: ["الأحقية لمن يملك السهم بنهاية يوم الأحقية.", "Entitlement goes to whoever holds the share at the end of the eligibility date."] }
+    ] },
+
+  { id: "inv-2-4", track: "inv", level: 2, mins: 8, title: ["ربحية السهم ومكرر الربحية", "Earnings per share and the P/E ratio"],
+    body: [
+      { p: ["سعر السهم لحاله ما يقول لك إذا هو غالي أو رخيص. اللي يهم: كم تدفع مقابل كل ريال تربحه الشركة.", "The share price alone does not tell you whether it is expensive or cheap. What matters is how much you pay for each riyal the company earns."] },
+      { h: ["ربحية السهم (EPS)", "Earnings per share (EPS)"] },
+      { p: ["ربحية السهم = صافي ربح الشركة ÷ عدد الأسهم. شركة ربحت 200 مليون ريال وعندها 100 مليون سهم، ربحية سهمها 2 ريال.", "EPS = the company's net profit ÷ number of shares. A company that earned SAR 200 million with 100 million shares has an EPS of SAR 2."] },
+      { h: ["مكرر الربحية (P/E)", "The price-to-earnings ratio (P/E)"] },
+      { p: ["مكرر الربحية = سعر السهم ÷ ربحية السهم. لو السعر 30 والربحية 2، المكرر 15. معناه إنك تدفع 15 ريال مقابل كل ريال ربح سنوي، أو بمعنى ثاني: لو بقت الأرباح ثابتة، تحتاج 15 سنة عشان ترجع أرباح الشركة سعر السهم.", "P/E = share price ÷ EPS. At a price of 30 and EPS of 2, the P/E is 15. It means you pay SAR 15 for each riyal of annual profit, or put another way: if profit stayed flat, it would take 15 years of earnings to equal the share price."] },
+      { h: ["كيف تقراه؟", "How do you read it?"] },
+      { ul: [
+        ["المكرر العالي معناه إن السوق يتوقع نمو في الأرباح، أو إن السهم مبالغ في سعره.", "A high P/E means the market expects profit growth, or that the share is overpriced."],
+        ["المكرر المنخفض معناه إن السهم رخيص، أو إن السوق يتوقع تراجع الأرباح.", "A low P/E means the share is cheap, or that the market expects profit to fall."],
+        ["قارن المكرر بشركات من نفس القطاع، وبمكرر الشركة نفسها في سنوات سابقة. مقارنة بنك بشركة تقنية ما تعطيك شي.", "Compare the P/E with companies in the same sector, and with the company's own P/E in past years. Comparing a bank with a technology company tells you nothing."],
+        ["الشركة الخاسرة ما لها مكرر، لأن ربحيتها سالبة.", "A loss-making company has no P/E, because its earnings are negative."]
+      ] },
+      { note: ["المكرر يبني على أرباح الماضي، والسعر يبني على توقعات المستقبل. هو بداية السؤال وليس جوابه.", "The ratio rests on past earnings, while the price rests on expectations of the future. It is where the question starts, not its answer."] }
+    ],
+    quiz: [
+      { q: ["سهم سعره 60 ريال وربحيته 4 ريال. كم مكرر الربحية؟", "A share costs SAR 60 and its EPS is SAR 4. What is the P/E?"],
+        opts: [["15", "15"], ["24", "24"], ["240", "240"]], a: 0,
+        why: ["60 ÷ 4 = 15.", "60 ÷ 4 = 15."] },
+      { q: ["مع من تقارن مكرر ربحية شركة؟", "What do you compare a company's P/E with?"],
+        opts: [["أي شركة في السوق", "Any company in the market"], ["شركات من نفس القطاع وتاريخ الشركة نفسها", "Companies in the same sector and the company's own history"], ["سعر السهم", "The share price"]], a: 1,
+        why: ["القطاعات تختلف في نموها ومخاطرها، فمكرراتها تختلف طبيعياً.", "Sectors differ in growth and risk, so their ratios differ naturally."] }
     ] },
 
   /* ---------- المتداول: الدرجة 1 ---------- */
@@ -484,6 +616,33 @@ const LESSONS = [
         why: ["الإطار يتبع مدة الصفقة. الأسابيع تنقرأ على اليومي.", "The timeframe follows the holding period. Weeks are read on the daily."] }
     ] },
 
+  { id: "trd-1-3", track: "trd", level: 1, mins: 8, title: ["ثلاثة نماذج شموع تعرفها", "Three candle patterns to know"],
+    body: [
+      { p: ["بعض أشكال الشموع تتكرر عند نقاط التحول، فالمتداولين عطوها أسماء. تعلم ثلاثة منها يكفي كبداية، بشرط واحد: النموذج ما له قيمة إلا في مكانه.", "Some candle shapes recur at turning points, so traders named them. Learning three is enough to start, on one condition: a pattern only has value in its place."] },
+      { fig: "patterns", cap: ["من اليسار: دوجي بعد شمعة هابطة، مطرقة بعد هبوط، وابتلاع صاعد.", "From the left: a doji after a falling candle, a hammer after a fall, and a bullish engulfing."] },
+      { h: ["الدوجي", "The doji"] },
+      { p: ["الافتتاح والإغلاق تقريباً نفس السعر، فالجسم خط رفيع. معناه إن المشترين والبائعين تعادلوا في هذي الفترة. بعد صعود أو هبوط طويل يدل على تردد، وممكن يسبق تغيّر.", "Open and close are almost the same price, so the body is a thin line. It means buyers and sellers drew level in this period. After a long rise or fall it signals hesitation and may precede a change."] },
+      { h: ["المطرقة", "The hammer"] },
+      { p: ["جسم صغير في الأعلى وذيل سفلي طويل، ضعف الجسم على الأقل. السعر نزل بقوة خلال الفترة ثم رجّعه المشترين قرب الافتتاح. لها معنى لما تجي بعد هبوط وعند منطقة دعم.", "A small body at the top and a long lower wick, at least twice the body. Price fell hard during the period and buyers pushed it back near the open. It matters when it comes after a fall and at a support area."] },
+      { h: ["الابتلاع الصاعد", "The bullish engulfing"] },
+      { p: ["شمعة حمراء، وبعدها شمعة خضراء جسمها يغطي جسم الحمراء كامل. المشترين ما اكتفوا بوقف الهبوط، رجّعوا كل اللي خسره السهم وزيادة. والعكس اسمه ابتلاع هابط.", "A red candle, then a green candle whose body fully covers the red one's body. Buyers did not just halt the fall; they took back everything the share lost and more. The reverse is a bearish engulfing."] },
+      { h: ["الشرط اللي يخلي النموذج ينفع", "The condition that makes a pattern useful"] },
+      { ul: [
+        ["المكان: عند دعم أو مقاومة أو خط اتجاه. مطرقة في نص مسار عرضي ما تعني شي.", "Place: at support, resistance or a trend line. A hammer in the middle of a range means nothing."],
+        ["السياق: نموذج انعكاس يحتاج حركة قبله ينعكس عنها.", "Context: a reversal pattern needs a prior move to reverse."],
+        ["التأكيد: انتظر الشمعة اللي بعدها. إذا أكدت الجهة، الإشارة أقوى.", "Confirmation: wait for the next candle. If it confirms the direction, the signal is stronger."]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["شمعة جسمها صغير في الأعلى وذيلها السفلي طويل، ظهرت بعد هبوط عند دعم. وش اسمها؟", "A candle with a small body at the top and a long lower wick, appearing after a fall at support. What is it called?"],
+        opts: [["دوجي", "Doji"], ["مطرقة", "Hammer"], ["ابتلاع هابط", "Bearish engulfing"]], a: 1,
+        why: ["الذيل السفلي الطويل مع جسم صغير في الأعلى هو وصف المطرقة.", "A long lower wick with a small body at the top describes the hammer."] },
+      { q: ["ظهر ابتلاع صاعد في نص مسار عرضي بعيد عن الدعم. كيف تتعامل معه؟", "A bullish engulfing appears mid-range, far from support. How do you treat it?"],
+        opts: [["إشارة شراء قوية", "A strong buy signal"], ["إشارة ضعيفة لأن المكان ما يدعمها", "A weak signal because the location does not support it"], ["إشارة بيع", "A sell signal"]], a: 1,
+        why: ["النموذج يستمد قوته من مكانه. بدون دعم أو سياق، هو مجرد شمعتين.", "A pattern draws its strength from its location. Without support or context it is just two candles."] }
+    ] },
+
   /* ---------- المتداول: الدرجة 2 ---------- */
   { id: "trd-2-1", track: "trd", level: 2, mins: 8, title: ["الدعم والمقاومة", "Support and resistance"],
     body: [
@@ -528,6 +687,56 @@ const LESSONS = [
       { q: ["وش أول علامة على تغيّر اتجاه صاعد؟", "What is the first sign an uptrend has changed?"],
         opts: [["شمعة حمراء واحدة", "One red candle"], ["كسر خط الاتجاه مع قاع أدنى من السابق", "A break of the trend line with a lower low"], ["ارتفاع الحجم", "A rise in volume"]], a: 1,
         why: ["شمعة حمراء وحدة شي طبيعي داخل أي اتجاه صاعد. التغيّر يبان لما ينكسر تسلسل القيعان.", "One red candle is normal inside any uptrend. The change shows when the sequence of lows breaks."] }
+    ] },
+
+  { id: "trd-2-3", track: "trd", level: 2, mins: 8, title: ["وقف الخسارة والعائد مقابل المخاطرة", "The stop-loss and reward against risk"],
+    body: [
+      { p: ["قبل ما تدخل أي صفقة لازم تعرف ثلاثة أسعار: وين تدخل، وين تطلع لو غلطت، ووين تطلع لو صحّيت.", "Before entering any trade you must know three prices: where you get in, where you get out if wrong, and where you get out if right."] },
+      { fig: "rr", cap: ["صفقة شراء: الهدف فوق الدخول، ووقف الخسارة تحته.", "A buy trade: the target sits above the entry and the stop-loss below it."] },
+      { h: ["وقف الخسارة", "The stop-loss"] },
+      { p: ["هو السعر اللي تطلع عنده وتقبل الخسارة. في صفقة الشراء يكون دائماً تحت سعر الدخول. ومكانه المنطقي تحت الدعم بمسافة بسيطة: لو انكسر الدعم، فالسبب اللي دخلت عشانه انتهى.", "It is the price at which you exit and accept the loss. In a buy trade it is always below the entry. Its logical place is slightly below support: if support breaks, the reason you entered is gone."] },
+      { p: ["الوقف قرار تاخذه وأنت هادي قبل الدخول، عشان ما تاخذه وأنت خايف والسهم نازل.", "The stop is a decision you make calmly before entering, so you do not make it frightened while the share is falling."] },
+      { h: ["الهدف", "The target"] },
+      { p: ["هو السعر اللي تتوقع السهم يوصله، وغالباً يكون عند أقرب مقاومة. وهو دائماً فوق سعر الدخول في صفقة الشراء.", "It is the price you expect the share to reach, usually the nearest resistance. In a buy trade it is always above the entry."] },
+      { h: ["النسبة", "The ratio"] },
+      { p: ["المخاطرة = الدخول − الوقف. العائد = الهدف − الدخول. في الرسم: المخاطرة 2 ريال والعائد 4 ريال، فالنسبة 1 إلى 2.", "Risk = entry − stop. Reward = target − entry. In the figure: risk is SAR 2 and reward SAR 4, so the ratio is 1 to 2."] },
+      { p: ["ليش تهم؟ بنسبة 1 إلى 2، لو صحّيت في 4 صفقات من 10 فقط: تربح 4 × 2 = 8 وتخسر 6 × 1 = 6، والصافي موجب 2. يعني تقدر تغلط أكثر مما تصيب وتطلع رابح. القاعدة العملية: لا تدخل صفقة عائدها أقل من ضعف مخاطرتها.", "Why does it matter? At 1 to 2, if you are right in only 4 trades out of 10: you gain 4 × 2 = 8 and lose 6 × 1 = 6, a net of plus 2. You can be wrong more often than right and still come out ahead. The practical rule: do not enter a trade whose reward is less than twice its risk."] },
+      { note: ["حاسبة \"حجم الصفقة حسب المخاطرة\" في الخدمات تحسب لك كم سهم تشتري بحيث ما تخسر أكثر من 1% من رأس مالك لو ضرب الوقف.", "The \"Position size by risk\" calculator under Services works out how many shares to buy so you lose no more than 1% of your capital if the stop is hit."] }
+    ],
+    quiz: [
+      { q: ["دخلت بسعر 30، والوقف 28.5، والهدف 34.5. كم النسبة؟", "Entry 30, stop 28.5, target 34.5. What is the ratio?"],
+        opts: [["1 إلى 1", "1 to 1"], ["1 إلى 2", "1 to 2"], ["1 إلى 3", "1 to 3"]], a: 2,
+        why: ["المخاطرة 1.5 والعائد 4.5، و 4.5 ÷ 1.5 = 3.", "Risk is 1.5 and reward 4.5, and 4.5 ÷ 1.5 = 3."] },
+      { q: ["في صفقة شراء، وين يكون وقف الخسارة؟", "In a buy trade, where does the stop-loss go?"],
+        opts: [["فوق سعر الدخول", "Above the entry"], ["تحت سعر الدخول", "Below the entry"], ["عند سعر الدخول", "At the entry"]], a: 1,
+        why: ["الوقف يحميك من النزول، فمكانه تحت الدخول. اللي فوق الدخول هو الهدف.", "The stop protects you from a fall, so it sits below the entry. What sits above is the target."] }
+    ] },
+
+  { id: "trd-2-4", track: "trd", level: 2, mins: 7, title: ["خطة الصفقة قبل الدخول", "The trade plan before entry"],
+    body: [
+      { p: ["المتداول اللي يخسر على المدى الطويل غالباً ما تنقصه المعلومة، ينقصه الانضباط. والحل قائمة قصيرة تجاوب عليها قبل كل صفقة. إذا ما قدرت تجاوب على سؤال منها، لا تدخل.", "The trader who loses over time usually lacks discipline, not information. The fix is a short checklist you answer before every trade. If you cannot answer one of its questions, do not enter."] },
+      { h: ["الأسئلة الستة", "The six questions"] },
+      { ul: [
+        ["وش الاتجاه على الإطار اليومي؟ هل أنا معه أو ضده؟", "What is the trend on the daily timeframe? Am I with it or against it?"],
+        ["وين أقرب دعم ومقاومة؟", "Where are the nearest support and resistance?"],
+        ["وش سبب دخولي في جملة وحدة؟", "What is my reason for entering, in one sentence?"],
+        ["وين وقف الخسارة، وليش هناك بالذات؟", "Where is the stop-loss, and why there exactly?"],
+        ["وين الهدف، وهل العائد ضعف المخاطرة على الأقل؟", "Where is the target, and is the reward at least twice the risk?"],
+        ["كم سهم أشتري بحيث ما أخسر أكثر من 1% من رأس مالي؟", "How many shares do I buy so I lose no more than 1% of my capital?"]
+      ] },
+      { h: ["مثال كامل", "A full example"] },
+      { p: ["سهم في اتجاه صاعد، رجع لدعم عند 48 وطلعت شمعة مطرقة. السبب: ارتداد من الدعم مع الاتجاه. الدخول 50، الوقف 47.5 تحت الدعم، الهدف 55 عند المقاومة. المخاطرة 2.5 والعائد 5، والنسبة 1 إلى 2. رأس المال 50,000 ومخاطرة 1% تساوي 500 ريال، فالكمية 500 ÷ 2.5 = 200 سهم.", "A share in an uptrend pulls back to support at 48 and prints a hammer. Reason: a bounce from support with the trend. Entry 50, stop 47.5 below support, target 55 at resistance. Risk is 2.5 and reward 5, a ratio of 1 to 2. Capital is 50,000 and 1% risk is SAR 500, so the size is 500 ÷ 2.5 = 200 shares."] },
+      { h: ["بعد الصفقة", "After the trade"] },
+      { p: ["سجّل النتيجة واكتب وش تعلمت، سواء ربحت أو خسرت. صفقة خاسرة التزمت فيها بخطتك أحسن من صفقة رابحة دخلتها بدون خطة، لأن الأولى تتكرر بنتيجة موجبة والثانية حظ.", "Record the result and write what you learned, win or lose. A losing trade where you followed your plan is better than a winning one entered without a plan, because the first repeats with a positive outcome and the second is luck."] },
+      { note: ["سجل التداول في مِراس مبني على هذي القائمة: فيه خانة للسبب والوقف والهدف، ويرفض وقف فوق سعر الدخول.", "The Meras trading journal is built on this checklist: it has fields for reason, stop and target, and rejects a stop above the entry."] }
+    ],
+    quiz: [
+      { q: ["رأس مالك 20,000 ريال وتبي تخاطر بـ 1%. الدخول 40 والوقف 38. كم سهم تشتري؟", "Your capital is SAR 20,000 and you want to risk 1%. Entry 40, stop 38. How many shares do you buy?"],
+        opts: [["50 سهم", "50 shares"], ["100 سهم", "100 shares"], ["500 سهم", "500 shares"]], a: 1,
+        why: ["المخاطرة 200 ريال، والمخاطرة للسهم 2 ريال: 200 ÷ 2 = 100 سهم.", "Risk is SAR 200 and risk per share is SAR 2: 200 ÷ 2 = 100 shares."] },
+      { q: ["ما قدرت تحدد وين تحط وقف الخسارة. وش تسوي؟", "You cannot decide where to place the stop-loss. What do you do?"],
+        opts: [["أدخل وأحدده بعدين", "Enter and decide later"], ["ما أدخل الصفقة", "Do not enter the trade"], ["أدخل بكمية أكبر", "Enter with a larger size"]], a: 1,
+        why: ["بدون وقف ما تعرف مخاطرتك، وبدونها ما تعرف الكمية ولا النسبة.", "Without a stop you do not know your risk, and without that you know neither the size nor the ratio."] }
     ] },
 
   /* ---------- المتداول: الدرجة 3 ---------- */
@@ -933,7 +1142,7 @@ function block(b, lessonId) {
   if (b.code) return '<div class="code"><div class="cap"><span>' + esc(b.name || "code") + '</span><button data-act="copy">' + esc(t("copy")) + "</button></div><pre><code>" + esc(b.code) + "</code></pre></div>";
   if (b.quote) return quoteCard(b.quote, lessonId);
   if (b.open) return '<div><a class="btn primary" href="#chart">' + esc(t("open_chart")) + "</a></div>";
-  if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
+  if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : b.fig === "patterns" ? patternsFig() : b.fig === "rr" ? rrFig() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
   return "";
 }
 
@@ -1088,12 +1297,13 @@ function render() {
 function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
-  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
-  const group = r === "settings" ? "account" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "glossary"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
+  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["guides", "nav_guides"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
+  const group = r === "settings" ? "account" : r.startsWith("g-") ? "guides" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "glossary"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
   $("#top").innerHTML = '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav" aria-label="main">' + nav.map(([h, k]) => '<a href="#' + h + '"' + (group === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</nav><div class="tools"><button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a></div></div>";
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
-  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart }[r] || pageHome)();
+  else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
+  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -1206,15 +1416,15 @@ Object.assign(UI, {
   ch_h: ["الشارت", "Chart"],
   ch_p: ["ارسم مستوياتك، شغّل المؤشرات، وجرّب تتوقع الشمعة الجاية قبل ما تشوفها.", "Draw your levels, switch on indicators, and try to call the next candle before you see it."],
   ch_sym: ["السهم", "Share"], ch_view: ["عدد الشموع", "Candles shown"], ch_all: ["الكل", "All"],
-  ch_practice: ["بيانات تدريبية", "Practice data"], ch_real: ["شموع حقيقية من مستودعك", "Real candles from your repository"],
+  ch_practice: ["بيانات تدريبية", "Practice data"], ch_real: ["أسهمك (شموع حقيقية)", "Your shares (real candles)"],
   ch_pa: ["سهم تدريبي أ (اتجاه صاعد)", "Practice share A (uptrend)"], ch_pb: ["سهم تدريبي ب (مسار عرضي)", "Practice share B (range)"], ch_pc: ["سهم تدريبي ج (هبوط ثم انعكاس)", "Practice share C (fall then reversal)"],
   ch_candles: ["شمعة", "candles"],
   ch_ind: ["المؤشرات", "Indicators"], ch_sma: ["متوسط بسيط", "SMA"], ch_ema: ["متوسط أسي", "EMA"], ch_rsi: ["القوة النسبية", "RSI"], ch_vol: ["الحجم", "Volume"], ch_period: ["الفترة", "Period"],
   ch_tools: ["الرسم", "Drawing"], ch_cursor: ["مؤشر", "Pointer"], ch_hline: ["خط أفقي", "Horizontal line"], ch_tline: ["خط اتجاه", "Trend line"], ch_clear: ["امسح الرسومات", "Clear drawings"],
-  ch_hint_cursor: ["حرّك المؤشر على الشارت عشان تقرأ أرقام كل شمعة.", "Move over the chart to read each candle's numbers."],
-  ch_hint_h: ["اضغط على الشارت عند السعر اللي تبي ترسم عنده الخط.", "Click the chart at the price where you want the line."],
-  ch_hint_t1: ["اضغط على النقطة الأولى، مثلاً أول قاع.", "Click the first point, for example the first low."],
-  ch_hint_t2: ["اضغط على النقطة الثانية على شمعة مختلفة.", "Now click the second point on a different candle."],
+  ch_hint_cursor: ["مرّر على الشارت عشان تقرأ أرقام كل شمعة.", "Move over the chart to read each candle's numbers."],
+  ch_hint_h: ["اضغط على الشارت عند السعر اللي تبي ترسم عنده الخط.", "Tap the chart at the price where you want the line."],
+  ch_hint_t1: ["اضغط على النقطة الأولى، مثلاً أول قاع.", "Tap the first point, for example the first low."],
+  ch_hint_t2: ["اضغط على النقطة الثانية على شمعة مختلفة.", "Now tap the second point on a different candle."],
   ch_replay: ["وضع التوقع", "Prediction mode"], ch_replay_p: ["يخفي آخر الشموع. توقّع الحركة ثم اكشفها شمعة شمعة.", "Hides the latest candles. Call the move, then reveal it candle by candle."],
   ch_next: ["الشمعة التالية", "Next candle"], ch_next5: ["+5 شموع", "+5 candles"], ch_show_all: ["اكشف الكل", "Reveal all"], ch_hidden: ["شموع مخفية", "candles hidden"],
   ch_older: ["أقدم", "Older"], ch_newer: ["أحدث", "Newer"],
@@ -1224,12 +1434,48 @@ Object.assign(UI, {
   ch_o: ["افتتاح", "O"], ch_hi: ["أعلى", "H"], ch_lo: ["أدنى", "L"], ch_c: ["إغلاق", "C"], ch_day: ["يوم", "Day"],
   ch_draws: ["رسوماتك", "Your drawings"], ch_none: ["ما رسمت شي للحين.", "Nothing drawn yet."], ch_h_lbl: ["أفقي", "Horizontal"], ch_t_lbl: ["اتجاه", "Trend"],
   ch_same: ["اختر شمعة مختلفة للنقطة الثانية", "Pick a different candle for the second point"],
+  ch_full: ["تكبير", "Expand"], ch_exit: ["تصغير", "Close"], ch_rotate: ["ميّل الجوال عشان يوسع الشارت", "Rotate your phone to widen the chart"],
+  ch_tv: ["افتحه في TradingView", "Open in TradingView"],
+  ch_read: ["اقرأ الشارت", "Read the chart"], ch_read_h: ["القراءة الآلية", "Automatic reading"],
+  ch_read_p: ["وصف محسوب بقواعد الدروس من الشموع الظاهرة. يوصف اللي صار، وما يتوقع اللي بيصير، وليس توصية.", "A description computed with the lessons' rules from the candles shown. It describes what happened, does not predict what will, and is not a recommendation."],
+  ch_draw_it: ["ارسمها لي على الشارت", "Draw it on the chart for me"], ch_drawn: ["انرسمت. قارنها برسمك.", "Drawn. Compare with your own."],
+  ch_hide_read: ["أخفِ القراءة", "Hide reading"],
+  rd_need: ["القراءة تحتاج 20 شمعة على الأقل، والظاهر {n}.", "A reading needs at least 20 candles; {n} are shown."],
+  rd_trend: ["الاتجاه", "Trend"], rd_ma: ["المتوسطات", "Averages"], rd_mom: ["الزخم", "Momentum"], rd_volume: ["الحجم", "Volume"], rd_levels: ["المستويات", "Levels"], rd_try: ["وش تجرّب هنا", "What to try here"],
+  rd_up: ["صاعد: السعر ارتفع {p}% خلال الشموع الظاهرة، وأغلب الحركة كانت في نفس الجهة.", "Up: price rose {p}% across the candles shown, and most of the movement was in that direction."],
+  rd_down: ["هابط: السعر نزل {p}% خلال الشموع الظاهرة، وأغلب الحركة كانت في نفس الجهة.", "Down: price fell {p}% across the candles shown, and most of the movement was in that direction."],
+  rd_range: ["عرضي: السعر تحرك كثير رايح جاي، لكن محصلته {p}% فقط خلال الشموع الظاهرة.", "Sideways: price moved a lot back and forth, but the net change is only {p}% across the candles shown."],
+  rd_hh: ["آخر قمتين وآخر قاعين كل واحد أعلى من اللي قبله.", "The last two highs and the last two lows are each higher than the one before."],
+  rd_ll: ["آخر قمتين وآخر قاعين كل واحد أدنى من اللي قبله.", "The last two highs and the last two lows are each lower than the one before."],
+  rd_mixed: ["آخر القمم والقيعان ما تمشي في جهة وحدة.", "The latest highs and lows are not moving one way."],
+  rd_ma_above: ["الإغلاق {c} فوق متوسط 20 ({m}) بنسبة {p}%.", "The close {c} is {p}% above the 20 average ({m})."],
+  rd_ma_below: ["الإغلاق {c} تحت متوسط 20 ({m}) بنسبة {p}%.", "The close {c} is {p}% below the 20 average ({m})."],
+  rd_cross_up: ["متوسط 5 قطع متوسط 20 للأعلى قبل {n} شمعة.", "The 5 average crossed above the 20 average {n} candle(s) ago."],
+  rd_cross_down: ["متوسط 5 قطع متوسط 20 للأسفل قبل {n} شمعة.", "The 5 average crossed below the 20 average {n} candle(s) ago."],
+  rd_rsi_hi: ["RSI 14 عند {v}: منطقة تشبع شرائي (فوق 70). الصعود سريع، وما يعني انعكاس لحاله.", "RSI 14 is {v}: overbought (above 70). The rise is fast; that alone does not mean a reversal."],
+  rd_rsi_lo: ["RSI 14 عند {v}: منطقة تشبع بيعي (تحت 30). الهبوط سريع، وما يعني ارتداد لحاله.", "RSI 14 is {v}: oversold (below 30). The fall is fast; that alone does not mean a bounce."],
+  rd_rsi_mid: ["RSI 14 عند {v}: بين 30 و70، ما فيه تشبع.", "RSI 14 is {v}: between 30 and 70, no extreme."],
+  rd_vol_hi: ["متوسط حجم آخر 5 شموع أعلى من متوسط العشرين اللي قبلها بـ {p}%: الحركة الأخيرة معها مشاركة.", "Average volume of the last 5 candles is {p}% above the 20 before them: the latest move has participation."],
+  rd_vol_lo: ["متوسط حجم آخر 5 شموع أقل من متوسط العشرين اللي قبلها بـ {p}%: الحركة الأخيرة بمشاركة ضعيفة.", "Average volume of the last 5 candles is {p}% below the 20 before them: the latest move has weak participation."],
+  rd_vol_same: ["حجم آخر 5 شموع قريب من المعتاد.", "Volume over the last 5 candles is close to normal."],
+  rd_sup: ["أقرب دعم تحت السعر: {v} (لمسه السعر {n} مرة).", "Nearest support below price: {v} (touched {n} time(s))."],
+  rd_res: ["أقرب مقاومة فوق السعر: {v} (لمسها السعر {n} مرة).", "Nearest resistance above price: {v} (touched {n} time(s))."],
+  rd_no_sup: ["ما فيه قاع واضح تحت السعر في الشموع الظاهرة.", "No clear low below price in the candles shown."],
+  rd_no_res: ["السعر عند أعلى مستوياته في الشموع الظاهرة، فما فيه مقاومة فوقه هنا.", "Price is at its highest in the candles shown, so there is no resistance above it here."],
+  rd_try_up: ["ارسم خط اتجاه يوصل آخر قاعين صاعدين. شغّل متوسط 20 وشوف كيف السعر يرتد منه. RSI يبقى مرتفع طويلاً في الاتجاه الصاعد، فلا تعتمد عليه هنا.", "Draw a trend line through the last two rising lows. Switch on the 20 average and watch price bounce from it. RSI stays high for long in an uptrend, so do not lean on it here."],
+  rd_try_down: ["ارسم خط اتجاه يوصل آخر قمتين هابطتين. شغّل متوسط 20 وراقب هل السعر يرجع فوقه. الشراء ضد الاتجاه أصعب تمرين للمبتدئ.", "Draw a trend line through the last two falling highs. Switch on the 20 average and watch whether price reclaims it. Buying against the trend is the hardest exercise for a beginner."],
+  rd_try_range: ["ارسم خط أفقي عند الدعم وخط عند المقاومة. شغّل RSI 14 وشوف قراءته كل مرة يلمس السعر أحد الخطين. تقاطعات المتوسطات تفشل كثير في العرضي.", "Draw one horizontal line at support and one at resistance. Switch on RSI 14 and read it each time price touches a line. Average crossovers fail often in a range."],
+  wl_h: ["قائمة أسهمك", "Your watchlist"], wl_p: ["اكتب رمز السهم أو اسمه. ينضاف للسحب المجدول، وتبدأ شموعه تتراكم من التشغيل الجاي.", "Type the symbol or name. It joins the scheduled fetch and its candles start accumulating from the next run."],
+  wl_ph: ["مثال: 2222 أو الراجحي", "e.g. 2222 or Al Rajhi"], wl_add: ["أضف", "Add"], wl_added: ["انضاف. تظهر شموعه بعد تشغيل الأسعار الجاي.", "Added. Its candles appear after the next price run."],
+  wl_full: ["القائمة وصلت الحد ({n} سهم) عشان ما تتجاوز 100 طلب يومياً. احذف سهم أول.", "The list is at its limit ({n} shares) to stay within 100 requests a day. Remove one first."],
+  wl_dup: ["موجود في القائمة", "Already in the list"], wl_removed: ["انحذف من القائمة", "Removed from the list"], wl_need: ["اربط المنصة بمستودعك أول من صفحة المزامنة.", "Connect the platform to your repository first from the sync page."],
   open_chart: ["افتح الشارت وجرّب", "Open the chart and try it"],
   j_target: ["الهدف", "Target"],
   j_bad_stop: ["وقف الخسارة لازم يكون تحت سعر الدخول", "The stop-loss must be below the entry price"],
   j_bad_target: ["الهدف لازم يكون فوق سعر الدخول", "The target must be above the entry price"]
 });
 
+const WL_MAX = 12;
 const PRACTICE = { "TRN-A": "ch_pa", "TRN-B": "ch_pb", "TRN-C": "ch_pc" };
 const practiceCache = {};
 function practiceSeries(sym) {
@@ -1269,28 +1515,76 @@ function rsi(cl, p) {
   return out;
 }
 
+/* ----- automatic reading: rules from the lessons, applied to candles [s, e) ----- */
+function swings(data, s, e, k) {
+  const hi = [], lo = [];
+  for (let i = s + k; i < e - k; i++) {
+    let isH = true, isL = true;
+    for (let j = i - k; j <= i + k; j++) { if (j === i) continue; if (data[j].h >= data[i].h) isH = false; if (data[j].l <= data[i].l) isL = false; }
+    if (isH) hi.push({ i, p: data[i].h }); if (isL) lo.push({ i, p: data[i].l });
+  }
+  return { hi, lo };
+}
+function analyze(data, s, e) {
+  const n = e - s; if (n < 20) return { need: n };
+  const cl = data.map((r) => r.c), last = e - 1, c = cl[last];
+  const m20 = sma(cl, 20), m5 = sma(cl, 5), r14 = rsi(cl, 14), sw = swings(data, s, e, 3);
+  const h2 = sw.hi.slice(-2), l2 = sw.lo.slice(-2);
+  const hh = h2.length === 2 && h2[1].p > h2[0].p, hl = l2.length === 2 && l2[1].p > l2[0].p, lh = h2.length === 2 && h2[1].p < h2[0].p, ll = l2.length === 2 && l2[1].p < l2[0].p;
+  /* efficiency: net move divided by the total distance travelled (1 = straight line, 0 = pure back-and-forth) */
+  let path = 0; for (let i = s + 1; i < e; i++) path += Math.abs(cl[i] - cl[i - 1]);
+  const net = cl[last] - cl[s], eff = path ? Math.abs(net) / path : 0, pct = Math.abs((net / cl[s]) * 100).toFixed(1);
+  const regime = eff >= 0.3 ? (net > 0 ? "up" : "down") : "range";
+  const out = { regime, items: [], auto: [] }, f = (v) => v.toFixed(2), fill = (k, o) => t(k).replace(/\{(\w+)\}/g, (_, x) => o[x]);
+  out.items.push(["rd_trend", [fill("rd_" + regime, { p: pct }), t(hh && hl ? "rd_hh" : lh && ll ? "rd_ll" : "rd_mixed")]]);
+  const ma = [];
+  if (m20[last] != null) ma.push(fill(c >= m20[last] ? "rd_ma_above" : "rd_ma_below", { c: f(c), m: f(m20[last]), p: Math.abs(((c - m20[last]) / m20[last]) * 100).toFixed(1) }));
+  for (let i = last; i > Math.max(s, last - 15); i--) {
+    if (m5[i] == null || m20[i] == null || m5[i - 1] == null || m20[i - 1] == null) break;
+    const now = m5[i] - m20[i], was = m5[i - 1] - m20[i - 1];
+    if (now > 0 && was <= 0) { ma.push(fill("rd_cross_up", { n: last - i })); break; }
+    if (now < 0 && was >= 0) { ma.push(fill("rd_cross_down", { n: last - i })); break; }
+  }
+  if (ma.length) out.items.push(["rd_ma", ma]);
+  if (r14[last] != null) out.items.push(["rd_mom", [fill(r14[last] > 70 ? "rd_rsi_hi" : r14[last] < 30 ? "rd_rsi_lo" : "rd_rsi_mid", { v: r14[last].toFixed(1) })]]);
+  if (n >= 25) {
+    const avg = (a, b) => { let x = 0; for (let i = a; i < b; i++) x += data[i].v || 0; return x / (b - a); };
+    const recent = avg(e - 5, e), base = avg(e - 25, e - 5), d = base ? ((recent - base) / base) * 100 : 0;
+    if (base) out.items.push(["rd_volume", [d > 15 ? fill("rd_vol_hi", { p: d.toFixed(0) }) : d < -15 ? fill("rd_vol_lo", { p: Math.abs(d).toFixed(0) }) : t("rd_vol_same")]]);
+  }
+  const touches = (list, p) => list.filter((x) => Math.abs(x.p - p) / p <= 0.012).length;
+  const below = sw.lo.filter((x) => x.p < c).sort((a, b) => b.p - a.p)[0], above = sw.hi.filter((x) => x.p > c).sort((a, b) => a.p - b.p)[0];
+  out.items.push(["rd_levels", [below ? fill("rd_sup", { v: f(below.p), n: touches(sw.lo, below.p) }) : t("rd_no_sup"), above ? fill("rd_res", { v: f(above.p), n: touches(sw.hi, above.p) }) : t("rd_no_res")]]);
+  out.items.push(["rd_try", [t("rd_try_" + regime)]]);
+  const r2 = (x) => Math.round(x * 100) / 100;
+  if (regime === "up" && l2.length === 2 && hl) out.auto.push({ t: "t", i1: l2[0].i, p1: r2(l2[0].p), i2: l2[1].i, p2: r2(l2[1].p), auto: 1 });
+  else if (regime === "down" && h2.length === 2 && lh) out.auto.push({ t: "t", i1: h2[0].i, p1: r2(h2[0].p), i2: h2[1].i, p2: r2(h2[1].p), auto: 1 });
+  if (below) out.auto.push({ t: "h", p: r2(below.p), auto: 1 });
+  if (above) out.auto.push({ t: "h", p: r2(above.p), auto: 1 });
+  return out;
+}
+
 const chartDefaults = () => ({ sym: "TRN-A", n: 60, vol: true, sma1: { on: true, p: 5 }, sma2: { on: false, p: 20 }, ema: { on: false, p: 10 }, rsi: { on: false, p: 14 } });
-let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null;
+let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null, chFull = false, chNative = false, chReading = false, WL = null;
 function chartCfg() { if (!S.chart || !S.chart.sma1) S.chart = chartDefaults(); if (!S.drawings) S.drawings = {}; return S.chart; }
 
-function pageChart() {
-  const cfg = chartCfg(), full = chartData(cfg.sym);
-  if (!PRACTICE[cfg.sym] && !full.length) { cfg.sym = "TRN-A"; return pageChart(); }
+function chartSvg(cfg, full) {
   const end = chReplay == null ? full.length : Math.min(chReplay, full.length), data = full.slice(0, end);
   const slots = Math.max(10, Math.min(cfg.n === "all" ? data.length : cfg.n, data.length + 2));
   chOffset = Math.max(0, Math.min(chOffset, Math.max(0, data.length - Math.min(slots, data.length))));
-  const e = data.length - chOffset, s = Math.max(0, e - slots), view = data.slice(s, e);
-  const cl = data.map((r) => r.c);
+  const e = data.length - chOffset, s = Math.max(0, e - slots), view = data.slice(s, e), cl = data.map((r) => r.c);
   const lines = [];
-  if (cfg.sma1.on) lines.push({ k: "sma1", cls: "i1", name: t("ch_sma") + " " + cfg.sma1.p, v: sma(cl, cfg.sma1.p) });
-  if (cfg.sma2.on) lines.push({ k: "sma2", cls: "i2", name: t("ch_sma") + " " + cfg.sma2.p, v: sma(cl, cfg.sma2.p) });
-  if (cfg.ema.on) lines.push({ k: "ema", cls: "i3", name: t("ch_ema") + " " + cfg.ema.p, v: ema(cl, cfg.ema.p) });
-  const rs = cfg.rsi.on ? rsi(cl, cfg.rsi.p) : null;
-  const draws = S.drawings[cfg.sym] || [];
+  if (cfg.sma1.on) lines.push({ cls: "i1", name: t("ch_sma") + " " + cfg.sma1.p, v: sma(cl, cfg.sma1.p) });
+  if (cfg.sma2.on) lines.push({ cls: "i2", name: t("ch_sma") + " " + cfg.sma2.p, v: sma(cl, cfg.sma2.p) });
+  if (cfg.ema.on) lines.push({ cls: "i3", name: t("ch_ema") + " " + cfg.ema.p, v: ema(cl, cfg.ema.p) });
+  const rs = cfg.rsi.on ? rsi(cl, cfg.rsi.p) : null, draws = S.drawings[cfg.sym] || [];
 
-  /* geometry */
-  const W = 920, x0 = 8, x1 = W - 62, top = 10, ph = 320, vh = cfg.vol ? 56 : 0, rh = rs ? 96 : 0;
-  const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), H = (rs ? rtop + rh : vh ? vtop + vh : top + ph) + 22;
+  /* geometry follows the real pixel width, so text never shrinks on a phone */
+  const vw = document.documentElement.clientWidth || 960, vhgt = window.innerHeight || 700;
+  const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62)), axis = W < 520 ? 50 : 62;
+  const x0 = 6, x1 = W - axis, top = 8, vh = cfg.vol ? (W < 520 ? 40 : 56) : 0, rh = rs ? (W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + 20;
+  const ph = chFull ? Math.max(110, vhgt - 108 - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
+  const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), H = top + ph + extra;
   let min = Infinity, max = -Infinity;
   view.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
   lines.forEach((ln) => { for (let i = s; i < e; i++) if (ln.v[i] != null) { min = Math.min(min, ln.v[i]); max = Math.max(max, ln.v[i]); } });
@@ -1298,14 +1592,15 @@ function pageChart() {
   if (max - min < 0.02) { max += 0.5; min -= 0.5; }
   const pad = (max - min) * 0.07; min -= pad; max += pad;
   const bw = (x1 - x0) / slots, X = (i) => x0 + (i - s) * bw + bw / 2, Y = (v) => top + ((max - v) / (max - min)) * ph;
-  CH = { W, H, x0, x1, top, ph, bw, s, e, slots, min, max, data, lines, rs, sym: cfg.sym };
+  CH = { W, H, x0, x1, top, ph, bw, s, e, slots, min, max, data, lines, rs, sym: cfg.sym, fullLen: full.length, end };
 
   let g = '<defs><clipPath id="ch-clip"><rect x="' + x0 + '" y="' + top + '" width="' + (x1 - x0) + '" height="' + ph + '"/></clipPath></defs>';
-  for (let i = 0; i <= 5; i++) { const v = min + ((max - min) * i) / 5, yy = Y(v); g += '<line class="c-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + yy + '" y2="' + yy + '"/><text class="c-text" x="' + (x1 + 6) + '" y="' + (yy + 4) + '">' + v.toFixed(2) + "</text>"; }
+  const ticks = ph < 180 ? 3 : 5;
+  for (let i = 0; i <= ticks; i++) { const v = min + ((max - min) * i) / ticks, yy = Y(v); g += '<line class="c-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + yy + '" y2="' + yy + '"/><text class="c-text" x="' + (x1 + 5) + '" y="' + (yy + 4) + '">' + v.toFixed(2) + "</text>"; }
   const vmax = Math.max(1, ...view.map((r) => r.v || 0));
   view.forEach((r, k) => {
     const i = s + k, cls = r.c >= r.o ? "c-up" : "c-down", bt = Y(Math.max(r.o, r.c)), bb = Y(Math.min(r.o, r.c)), w = Math.min(16, Math.max(1, bw * 0.66));
-    g += '<line class="' + cls + '" x1="' + X(i) + '" x2="' + X(i) + '" y1="' + Y(r.h) + '" y2="' + Y(r.l) + '" stroke-width="1.3"/><rect class="' + cls + '" x="' + (X(i) - w / 2) + '" y="' + bt + '" width="' + w + '" height="' + Math.max(1.2, bb - bt) + '"/>';
+    g += '<line class="' + cls + '" x1="' + X(i) + '" x2="' + X(i) + '" y1="' + Y(r.h) + '" y2="' + Y(r.l) + '" stroke-width="1.2"/><rect class="' + cls + '" x="' + (X(i) - w / 2) + '" y="' + bt + '" width="' + w + '" height="' + Math.max(1.2, bb - bt) + '"/>';
     if (vh) { const hh = ((r.v || 0) / vmax) * vh; g += '<rect class="' + cls + '" opacity=".45" x="' + (X(i) - w / 2) + '" y="' + (vtop + vh - hh) + '" width="' + w + '" height="' + hh + '"/>'; }
   });
   lines.forEach((ln) => {
@@ -1314,43 +1609,73 @@ function pageChart() {
     if (d) g += '<path class="ind ' + ln.cls + '" d="' + d + '" clip-path="url(#ch-clip)"/>';
   });
   draws.forEach((dr) => {
-    if (dr.t === "h") { if (dr.p > min && dr.p < max) g += '<line class="draw" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(dr.p) + '" y2="' + Y(dr.p) + '"/><rect class="draw-tag" x="' + (x1 + 2) + '" y="' + (Y(dr.p) - 9) + '" width="58" height="18" rx="3"/><text class="draw-txt" x="' + (x1 + 6) + '" y="' + (Y(dr.p) + 4) + '">' + dr.p.toFixed(2) + "</text>"; }
-    else { const m = (dr.p2 - dr.p1) / (dr.i2 - dr.i1), iEnd = s + slots, pEnd = dr.p1 + m * (iEnd - dr.i1); g += '<line class="draw" clip-path="url(#ch-clip)" x1="' + X(dr.i1) + '" y1="' + Y(dr.p1) + '" x2="' + X(iEnd) + '" y2="' + Y(pEnd) + '"/><circle class="draw-dot" clip-path="url(#ch-clip)" cx="' + X(dr.i1) + '" cy="' + Y(dr.p1) + '" r="3.5"/><circle class="draw-dot" clip-path="url(#ch-clip)" cx="' + X(dr.i2) + '" cy="' + Y(dr.p2) + '" r="3.5"/>'; }
+    const cls = dr.auto ? "draw auto" : "draw";
+    if (dr.t === "h") { if (dr.p > min && dr.p < max) g += '<line class="' + cls + '" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(dr.p) + '" y2="' + Y(dr.p) + '"/><rect class="draw-tag' + (dr.auto ? " auto" : "") + '" x="' + (x1 + 1) + '" y="' + (Y(dr.p) - 9) + '" width="' + (axis - 2) + '" height="18" rx="3"/><text class="draw-txt" x="' + (x1 + 5) + '" y="' + (Y(dr.p) + 4) + '">' + dr.p.toFixed(2) + "</text>"; }
+    else { const m = (dr.p2 - dr.p1) / (dr.i2 - dr.i1), iEnd = s + slots, pEnd = dr.p1 + m * (iEnd - dr.i1); g += '<line class="' + cls + '" clip-path="url(#ch-clip)" x1="' + X(dr.i1) + '" y1="' + Y(dr.p1) + '" x2="' + X(iEnd) + '" y2="' + Y(pEnd) + '"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i1) + '" cy="' + Y(dr.p1) + '" r="3.5"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i2) + '" cy="' + Y(dr.p2) + '" r="3.5"/>'; }
   });
   if (chPending) g += '<circle class="draw-dot" cx="' + X(chPending.i) + '" cy="' + Y(chPending.p) + '" r="5"/>';
   if (vh) g += '<text class="c-lab" x="' + x0 + '" y="' + (vtop - 2) + '">' + esc(t("ch_vol")) + "</text>";
   if (rs) {
     const RY = (v) => rtop + ((100 - v) / 100) * rh;
     g += '<rect class="pane" x="' + x0 + '" y="' + rtop + '" width="' + (x1 - x0) + '" height="' + rh + '"/>';
-    [70, 30].forEach((v) => { g += '<line class="c-grid" stroke-dasharray="4 4" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(v) + '" y2="' + RY(v) + '"/><text class="c-text" x="' + (x1 + 6) + '" y="' + (RY(v) + 4) + '">' + v + "</text>"; });
+    [70, 30].forEach((v) => { g += '<line class="c-grid" stroke-dasharray="4 4" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(v) + '" y2="' + RY(v) + '"/><text class="c-text" x="' + (x1 + 5) + '" y="' + (RY(v) + 4) + '">' + v + "</text>"; });
     let d = "", pen = false;
     for (let i = s; i < e; i++) { if (rs[i] == null) { pen = false; continue; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + RY(rs[i]).toFixed(1); pen = true; }
     if (d) g += '<path class="ind i2" d="' + d + '"/>';
     g += '<text class="c-lab" x="' + (x0 + 4) + '" y="' + (rtop + 14) + '">' + esc(t("ch_rsi")) + " " + cfg.rsi.p + "</text>";
   }
-  g += '<line id="ch-x" class="cross" x1="0" x2="0" y1="' + top + '" y2="' + (H - 22) + '" visibility="hidden"/><line id="ch-y" class="cross" x1="' + x0 + '" x2="' + x1 + '" y1="0" y2="0" visibility="hidden"/>';
+  g += '<line id="ch-x" class="cross" x1="0" x2="0" y1="' + top + '" y2="' + (H - 20) + '" visibility="hidden"/><line id="ch-y" class="cross" x1="' + x0 + '" x2="' + x1 + '" y1="0" y2="0" visibility="hidden"/>';
+  return '<svg id="ch-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(symName(cfg.sym)) + '">' + g + "</svg>";
+}
 
-  /* controls */
-  const real = Object.keys((LIVE.history) || {}).filter((k) => (LIVE.history[k] || []).length);
+const ICON_FULL = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ICON_READ = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M10 2l1.8 4.7L16.5 8.5l-4.7 1.8L10 15l-1.8-4.7L3.5 8.5l4.7-1.8z" fill="currentColor"/><circle cx="16" cy="15.5" r="1.6" fill="currentColor"/></svg>';
+
+function readingHtml() {
+  const r = analyze(CH.data, CH.s, CH.e);
+  if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p></div>";
+  return '<div class="panel reading stack"><div class="row" style="justify-content:space-between"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><button class="btn sm ghost" data-act="ch-read">' + esc(t("ch_hide_read")) + '</button></div><p class="small muted">' + esc(t("ch_read_p")) + '</p><dl class="rdlist">' +
+    r.items.map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
+    (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + "</div>";
+}
+
+function pageChart() {
+  const cfg = chartCfg(); let full = chartData(cfg.sym);
+  if (!PRACTICE[cfg.sym] && !full.length) { cfg.sym = "TRN-A"; full = chartData(cfg.sym); }
+  const svg = chartSvg(cfg, full), draws = S.drawings[cfg.sym] || [], hidden = CH.fullLen - CH.end, isReal = !PRACTICE[cfg.sym];
+  const tool = (k, label) => '<button class="btn sm' + (chTool === k ? " on" : "") + '" data-act="ch-tool" data-tool="' + k + '" aria-pressed="' + (chTool === k) + '">' + esc(t(label)) + "</button>";
+  const tools = tool("cursor", "ch_cursor") + tool("h", "ch_hline") + tool("t", "ch_tline");
+  const hint = chTool === "h" ? "ch_hint_h" : chTool === "t" ? (chPending ? "ch_hint_t2" : "ch_hint_t1") : "ch_hint_cursor";
+  const read = '<div class="ch-read" id="ch-read">' + chartReadout(CH.e - 1) + "</div>";
+
+  if (chFull) {
+    return '<div class="ch-fullscreen' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-bar"><b>' + esc(symName(cfg.sym)) + '</b><div class="row" style="gap:6px">' + tools + '<button class="btn sm primary" data-act="ch-full">' + esc(t("ch_exit")) + "</button></div></div>" + read + svg +
+      (window.innerHeight > window.innerWidth ? '<p class="small muted" style="text-align:center;margin-top:8px">' + esc(t("ch_rotate")) + "</p>" : "") + "</div>";
+  }
+
+  const real = Object.keys(LIVE.history || {}).filter((k) => (LIVE.history[k] || []).length);
   const opt = (v, label) => '<option value="' + esc(v) + '"' + (String(cfg.sym) === String(v) ? " selected" : "") + ">" + esc(label) + "</option>";
   const symSel = '<div class="field"><label for="ch-sym">' + esc(t("ch_sym")) + '</label><select id="ch-sym" data-ch="sym"><optgroup label="' + esc(t("ch_practice")) + '">' + Object.keys(PRACTICE).map((k) => opt(k, t(PRACTICE[k]))).join("") + "</optgroup>" + (real.length ? '<optgroup label="' + esc(t("ch_real")) + '">' + real.map((k) => opt(k, k + " " + symName(k) + " (" + LIVE.history[k].length + " " + t("ch_candles") + ")")).join("") + "</optgroup>" : "") + "</select></div>";
   const nSel = '<div class="field"><label for="ch-n">' + esc(t("ch_view")) + '</label><select id="ch-n" data-ch="n">' + [20, 40, 60, 100, "all"].map((v) => '<option value="' + v + '"' + (String(cfg.n) === String(v) ? " selected" : "") + ">" + (v === "all" ? esc(t("ch_all")) : v) + "</option>").join("") + "</select></div>";
   const ind = (k, label, cls) => '<label class="indbox"><input type="checkbox" id="ch-' + k + '-on" data-ch="' + k + '.on"' + (cfg[k].on ? " checked" : "") + '><i class="sw ' + cls + '"></i><span>' + esc(label) + '</span><input class="num" type="number" min="2" max="200" step="1" id="ch-' + k + '-p" data-ch="' + k + '.p" value="' + cfg[k].p + '" aria-label="' + esc(t("ch_period")) + '"></label>';
-  const tool = (k, label) => '<button class="btn sm' + (chTool === k ? " on" : "") + '" data-act="ch-tool" data-tool="' + k + '" aria-pressed="' + (chTool === k) + '">' + esc(t(label)) + "</button>";
-  const hint = chTool === "h" ? "ch_hint_h" : chTool === "t" ? (chPending ? "ch_hint_t2" : "ch_hint_t1") : "ch_hint_cursor";
-  const hidden = full.length - end;
   const replay = chReplay == null
     ? '<button class="btn sm" data-act="ch-replay"' + (full.length < 12 ? " disabled" : "") + ">" + esc(t("ch_replay")) + '</button><span class="small muted">' + esc(t("ch_replay_p")) + "</span>"
-    : '<button class="btn sm primary" data-act="ch-step" data-n="1"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next")) + '</button><button class="btn sm" data-act="ch-step" data-n="5"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next5")) + '</button><button class="btn sm" data-act="ch-replay-off">' + esc(t("ch_show_all")) + '</button><span class="tag amber num">' + hidden + "</span><span class=\"small muted\">" + esc(t("ch_hidden")) + "</span>";
+    : '<button class="btn sm primary" data-act="ch-step" data-n="1"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next")) + '</button><button class="btn sm" data-act="ch-step" data-n="5"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next5")) + '</button><button class="btn sm" data-act="ch-replay-off">' + esc(t("ch_show_all")) + '</button><span class="tag amber num">' + hidden + '</span><span class="small muted">' + esc(t("ch_hidden")) + "</span>";
   const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
-  const note = PRACTICE[cfg.sym] ? t("ch_practice_note") : t("ch_few").replace("{n}", full.length);
+  const note = isReal ? t("ch_few").replace("{n}", full.length) : t("ch_practice_note");
+  const step = Math.max(1, Math.round(CH.slots / 3));
+  const canWl = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  const wl = !(typeof HOSTED !== "undefined" && HOSTED) ? "" : '<div class="panel stack"><div><h3 style="font-size:18px">' + esc(t("wl_h")) + (WL ? ' <span class="tag num">' + WL.length + " / " + WL_MAX + "</span>" : "") + '</h3><p class="small muted">' + esc(canWl ? t("wl_p") : t("wl_need")) + "</p></div>" +
+    (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
 
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">' + symSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + ind("sma1", t("ch_sma"), "i1") + ind("sma2", t("ch_sma"), "i2") + ind("ema", t("ch_ema"), "i3") + ind("rsi", t("ch_rsi"), "i2") + '<label class="indbox"><input type="checkbox" id="ch-vol" data-ch="vol"' + (cfg.vol ? " checked" : "") + "><span>" + esc(t("ch_vol")) + "</span></label></div>" +
-    '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tool("cursor", "ch_cursor") + tool("h", "ch_hline") + tool("t", "ch_tline") + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
-    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-read" id="ch-read">' + chartReadout(e - 1) + '</div><div class="ch-scroll"><svg id="ch-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(symName(cfg.sym)) + '">' + g + "</svg></div></div>" +
-    '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + Math.max(1, Math.round(slots / 3)) + '"' + (s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + Math.max(1, Math.round(slots / 3)) + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
-    '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><button class="btn sm primary" data-act="ch-trade"' + (data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div><div class="row">' + drawList + '</div></div><div class="notice">' + esc(note) + " " + esc(t("disclaimer")) + "</div></div></div>";
+    '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
+    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
+    (chReading ? readingHtml() : "") +
+    '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + step + '"' + (CH.s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + step + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
+    '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + "</div></div>" + wl +
+    '<div class="notice">' + esc(note) + " " + esc(t("disclaimer")) + "</div></div></div>";
 }
 
 function chartReadout(i) {
@@ -1368,8 +1693,7 @@ function chartPoint(ev) {
   const i = CH.s + Math.floor((px - CH.x0) / CH.bw), inPrice = py >= CH.top && py <= CH.top + CH.ph;
   return { px, py, i, inPrice, p: Math.round((CH.max - ((py - CH.top) / CH.ph) * (CH.max - CH.min)) * 100) / 100 };
 }
-document.addEventListener("pointermove", (ev) => {
-  if (!ev.target.closest || !ev.target.closest("#ch-svg")) return;
+function chartHover(ev) {
   const pt = chartPoint(ev), cx = document.getElementById("ch-x"), cy = document.getElementById("ch-y"); if (!cx) return;
   if (!pt) { cx.setAttribute("visibility", "hidden"); cy.setAttribute("visibility", "hidden"); return; }
   const snap = CH.x0 + (pt.i - CH.s) * CH.bw + CH.bw / 2;
@@ -1377,7 +1701,43 @@ document.addEventListener("pointermove", (ev) => {
   if (pt.inPrice) { cy.setAttribute("y1", pt.py); cy.setAttribute("y2", pt.py); cy.setAttribute("visibility", "visible"); } else cy.setAttribute("visibility", "hidden");
   const rd = document.getElementById("ch-read");
   if (rd && CH.data[pt.i]) rd.innerHTML = chartReadout(pt.i) + (pt.inPrice && chTool !== "cursor" ? '<span class="rd muted">@ <b class="num">' + pt.p.toFixed(2) + "</b></span>" : "");
-});
+}
+document.addEventListener("pointermove", (ev) => { if (ev.target.closest && ev.target.closest("#ch-svg")) chartHover(ev); });
+document.addEventListener("pointerdown", (ev) => { if (ev.target.closest && ev.target.closest("#ch-svg")) chartHover(ev); });
+
+function setFull(on) {
+  chFull = on; chPending = null;
+  const root = document.documentElement;
+  if (on) {
+    try {
+      const p = root.requestFullscreen ? root.requestFullscreen() : null;
+      if (p && p.then) p.then(() => { chNative = true; try { const o = screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape"); if (o && o.catch) o.catch(() => {}); } catch (e) {} }).catch(() => {});
+    } catch (e) {}
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) {}
+    chNative = false;
+  }
+  render();
+}
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && chFull && chNative) { chNative = false; chFull = false; render(); } else if (chFull) render(); });
+let chResize = null;
+window.addEventListener("resize", () => { if (route() !== "chart") return; if (document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; clearTimeout(chResize); chResize = setTimeout(render, 120); });
+window.addEventListener("hashchange", () => { if (chFull && route() !== "chart") setFull(false); if (route() === "chart" && !WL) loadWatch(); });
+
+async function loadWatch() {
+  if (!(typeof HOSTED !== "undefined" && HOSTED && CFG.token)) return;
+  try { const f = await readJson("watchlist.json"); if (f && Array.isArray(f.data)) { WL = f.data.map(String); if (route() === "chart" && !chFull && !(document.activeElement && /INPUT|SELECT/.test(document.activeElement.tagName))) render(); } } catch (e) {}
+}
+async function saveWatch(next, okMsg) {
+  try {
+    const f = await readJson("watchlist.json");
+    await gh("watchlist.json", "PUT", { message: "watchlist", content: b64e(JSON.stringify(next) + "\n"), sha: f ? f.sha : undefined });
+    WL = next; toast(t(okMsg));
+  } catch (e) { toast(errText(e)); }
+  render();
+}
+
 document.addEventListener("click", (ev) => {
   if (ev.target.closest && ev.target.closest("#ch-svg")) {
     const pt = chartPoint(ev); if (!pt || !pt.inPrice || chTool === "cursor") return;
@@ -1389,9 +1749,17 @@ document.addEventListener("click", (ev) => {
     return;
   }
   const el = ev.target.closest && ev.target.closest("[data-act]"); if (!el) return;
-  const act = el.dataset.act; if (act.slice(0, 3) !== "ch-") return;
+  const act = el.dataset.act;
+  if (act === "wl-del") { if (WL) saveWatch(WL.filter((w) => w !== el.dataset.sym), "wl_removed"); return; }
+  if (act.slice(0, 3) !== "ch-") return;
   const cfg = chartCfg(), full = chartData(cfg.sym);
+  if (act === "ch-full") { setFull(!chFull); return; }
   if (act === "ch-tool") { chTool = el.dataset.tool; chPending = null; }
+  else if (act === "ch-read") chReading = !chReading;
+  else if (act === "ch-auto") {
+    const r = analyze(CH.data, CH.s, CH.e), list = (S.drawings[cfg.sym] || []).filter((d) => !d.auto);
+    S.drawings[cfg.sym] = list.concat(r.auto || []); save(); toast(t("ch_drawn"));
+  }
   else if (act === "ch-clear") { S.drawings[cfg.sym] = []; chPending = null; save(); }
   else if (act === "ch-del") { (S.drawings[cfg.sym] || []).splice(+el.dataset.i, 1); save(); }
   else if (act === "ch-pan") chOffset = Math.max(0, chOffset + +el.dataset.n);
@@ -1414,6 +1782,100 @@ document.addEventListener("change", (ev) => {
   else { const [k, f] = key.split("."); if (f === "on") cfg[k].on = el.checked; else cfg[k].p = Math.max(2, Math.min(200, parseInt(el.value, 10) || cfg[k].p)); }
   save(); render();
 });
+document.addEventListener("submit", (ev) => {
+  const form = ev.target.closest && ev.target.closest('[data-form="watch"]'); if (!form) return;
+  ev.preventDefault();
+  const v = (document.getElementById("wl-new").value || "").trim(); if (!v || !WL) return;
+  if (WL.some((w) => w.toLowerCase() === v.toLowerCase())) { toast(t("wl_dup")); return; }
+  if (WL.length >= WL_MAX) { toast(t("wl_full").replace("{n}", WL_MAX)); return; }
+  saveWatch(WL.concat([v]), "wl_added");
+});
+/* ===== مِراس: الشروحات + رسومات الدروس الإضافية ===== */
+Object.assign(UI, {
+  nav_guides: ["الشروحات", "Guides"],
+  gd_h: ["الشروحات", "Guides"],
+  gd_p: ["أدلة مصوّرة لأدوات المنصة. كل شرح خطوات قصيرة تطبقها وأنت تقرأ.", "Illustrated guides to the platform's tools. Each is a set of short steps you apply as you read."],
+  gd_steps: ["خطوات", "steps"], gd_open: ["افتح الشرح", "Open guide"], gd_all: ["كل الشروحات", "All guides"],
+  gd_go_chart: ["افتح الشارت", "Open the chart"], gd_go_journal: ["افتح السجل", "Open the journal"],
+  fg_doji: ["دوجي", "Doji"], fg_hammer: ["المطرقة", "Hammer"], fg_engulf: ["الابتلاع الصاعد", "Bullish engulfing"],
+  fg_target: ["الهدف", "Target"], fg_entry: ["الدخول", "Entry"], fg_stop: ["وقف الخسارة", "Stop-loss"],
+  fg_reward: ["العائد المتوقع: 4 ريال", "Expected reward: SAR 4"], fg_risk: ["المخاطرة: 2 ريال", "Risk: SAR 2"], fg_ratio: ["النسبة 1 إلى 2", "Ratio 1 to 2"]
+});
+
+/* ----- lesson figures ----- */
+function patternsFig() {
+  const Y = (v) => 190 - v * 1.6;
+  const cd = (x, o, h, l, c, w) => { const cls = c >= o ? "c-up" : "c-down", t1 = Y(Math.max(o, c)), b1 = Y(Math.min(o, c)); return '<line class="' + cls + '" x1="' + x + '" x2="' + x + '" y1="' + Y(h) + '" y2="' + Y(l) + '" stroke-width="2"/><rect class="' + cls + '" x="' + (x - w / 2) + '" y="' + t1 + '" width="' + w + '" height="' + Math.max(2.5, b1 - t1) + '" rx="1.5"/>'; };
+  const lab = (x, k) => '<text class="c-label" x="' + x + '" y="222" text-anchor="middle" font-weight="600">' + esc(t(k)) + "</text>";
+  return '<svg viewBox="0 0 640 234" role="img">' +
+    cd(70, 62, 70, 52, 56, 22) + cd(110, 55, 86, 26, 55.6, 22) + lab(92, "fg_doji") +
+    cd(270, 70, 74, 58, 62, 22) + cd(310, 60, 63, 20, 62, 22) + lab(292, "fg_hammer") +
+    cd(480, 62, 66, 44, 48, 20) + cd(526, 44, 82, 40, 78, 30) + lab(504, "fg_engulf") + "</svg>";
+}
+function rrFig() {
+  const Y = (p) => 196 - (p - 47) * 22, x0 = 40, x1 = 400;
+  const line = (p, cls, k, v) => '<line class="' + cls + '" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(p) + '" y2="' + Y(p) + '"/><text class="c-label" x="' + (x1 + 12) + '" y="' + (Y(p) + 5) + '" text-anchor="start">' + esc(t(k)) + " " + v + "</text>";
+  return '<svg viewBox="0 0 640 220" role="img"><rect x="' + x0 + '" y="' + Y(54) + '" width="' + (x1 - x0) + '" height="' + (Y(50) - Y(54)) + '" fill="var(--up-soft)"/><rect x="' + x0 + '" y="' + Y(50) + '" width="' + (x1 - x0) + '" height="' + (Y(48) - Y(50)) + '" fill="var(--down-soft)"/>' +
+    line(54, "c-sup", "fg_target", "54.00") + line(50, "c-trend", "fg_entry", "50.00") + line(48, "c-res", "fg_stop", "48.00") +
+    '<text class="c-label" x="' + (x0 + 14) + '" y="' + (Y(52) + 5) + '" text-anchor="start">' + esc(t("fg_reward")) + '</text><text class="c-label" x="' + (x0 + 14) + '" y="' + (Y(49) + 5) + '" text-anchor="start">' + esc(t("fg_risk")) + '</text><text class="c-label" x="' + (x1 + 12) + '" y="' + (Y(52) + 5) + '" text-anchor="start" font-weight="600">' + esc(t("fg_ratio")) + "</text></svg>";
+}
+
+/* ----- small chart used as a guide illustration ----- */
+function miniChart(o) {
+  const all = practiceSeries(o.sym), s = o.from, e = o.from + o.n, d = all.slice(s, e), W = 400, H = 190, x0 = 6, x1 = W - 8, top = 8, ph = H - 16;
+  const cl = all.map((r) => r.c), ma = (o.sma || []).map((p) => sma(cl, p));
+  let min = Infinity, max = -Infinity; d.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
+  const pad = (max - min) * 0.08; min -= pad; max += pad;
+  const bw = (x1 - x0) / o.n, X = (i) => x0 + (i - s) * bw + bw / 2, Y = (v) => top + ((max - v) / (max - min)) * ph;
+  const shown = o.hide ? o.n - o.hide : o.n; let g = "";
+  d.forEach((r, k) => {
+    if (k >= shown) return;
+    const i = s + k, cls = r.c >= r.o ? "c-up" : "c-down", a = Y(Math.max(r.o, r.c)), b = Y(Math.min(r.o, r.c)), w = bw * 0.62;
+    g += '<line class="' + cls + '" x1="' + X(i) + '" x2="' + X(i) + '" y1="' + Y(r.h) + '" y2="' + Y(r.l) + '" stroke-width="1.1"/><rect class="' + cls + '" x="' + (X(i) - w / 2) + '" y="' + a + '" width="' + w + '" height="' + Math.max(1.2, b - a) + '"/>';
+  });
+  ma.forEach((v, k) => { let p = "", pen = false; for (let i = s; i < s + shown; i++) { if (v[i] == null) { pen = false; continue; } p += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v[i]).toFixed(1); pen = true; } g += '<path class="ind i' + (k + 1) + '" d="' + p + '"/>'; });
+  (o.h || []).forEach((p) => { g += '<line class="draw" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(p) + '" y2="' + Y(p) + '"/>'; });
+  if (o.t) { const a = all[o.t[0]], b = all[o.t[1]], m = (b.l - a.l) / (o.t[1] - o.t[0]); g += '<line class="draw" x1="' + X(o.t[0]) + '" y1="' + Y(a.l) + '" x2="' + X(e - 1) + '" y2="' + Y(a.l + m * (e - 1 - o.t[0])) + '"/><circle class="draw-dot" cx="' + X(o.t[0]) + '" cy="' + Y(a.l) + '" r="4"/><circle class="draw-dot" cx="' + X(o.t[1]) + '" cy="' + Y(b.l) + '" r="4"/>'; }
+  if (o.cross != null) g += '<line class="cross" x1="' + X(o.cross) + '" x2="' + X(o.cross) + '" y1="' + top + '" y2="' + (top + ph) + '"/>';
+  if (o.hide) g += '<rect class="pane" x="' + (X(s + shown) - bw / 2) + '" y="' + top + '" width="' + (x1 - X(s + shown) + bw / 2) + '" height="' + ph + '"/><text class="c-label" x="' + (X(s + shown) + (x1 - X(s + shown)) / 2) + '" y="' + (top + ph / 2) + '" text-anchor="middle" style="font-size:34px;font-weight:600">?</text>';
+  return '<svg viewBox="0 0 ' + W + " " + H + '" role="img">' + g + "</svg>";
+}
+const lowIn = (sym, a, b) => { const d = practiceSeries(sym); let k = a; for (let i = a; i < b; i++) if (d[i].l < d[k].l) k = i; return k; };
+const mock = (rows) => '<div class="mock">' + rows.map((r) => '<div class="' + (r[2] || "") + '"><span>' + esc(L(r[0])) + "</span><b>" + esc(typeof r[1] === "string" ? r[1] : L(r[1])) + "</b></div>").join("") + "</div>";
+
+const GUIDES = [
+  { id: "chart", go: ["#chart", "gd_go_chart"], title: ["الشارت من الصفر", "The chart from scratch"],
+    intro: ["من أول نظرة على الشموع إلى صفقة مسجلة في سجلك، في سبع خطوات.", "From a first look at the candles to a trade logged in your journal, in seven steps."],
+    steps: [
+      { h: ["اختر السهم وعدد الشموع", "Pick the share and how many candles"], p: ["ابدأ بسهم تدريبي. عدد الشموع يحدد كم ترجع ورا: 20 تشوف التفاصيل، و100 تشوف الصورة الكبيرة. ابدأ دائماً بالصورة الكبيرة ثم قرّب.", "Start with a practice share. The candle count sets how far back you look: 20 shows detail, 100 shows the big picture. Always start wide, then zoom in."], fig: () => miniChart({ sym: "TRN-A", from: 60, n: 60 }) },
+      { h: ["اقرأ الشمعة", "Read a candle"], p: ["مرّر على أي شمعة ويطلع لك فوق الشارت افتتاحها وأعلاها وأدناها وإغلاقها. على الجوال اضغط على الشمعة. هذي أول عادة: لا تحكم على شمعة قبل ما تقرأ أرقامها.", "Move over any candle and its open, high, low and close appear above the chart. On a phone, tap the candle. This is the first habit: do not judge a candle before reading its numbers."], fig: () => miniChart({ sym: "TRN-A", from: 90, n: 30, cross: 108 }) },
+      { h: ["شغّل مؤشر وغيّر فترته", "Switch on an indicator and change its period"], p: ["علّم على المتوسط البسيط واكتب الفترة اللي تبيها في الخانة جنبه. جرّب 5 ثم 20 على نفس الشارت وشوف الفرق: القصير يلحق السعر، والطويل يرسم الاتجاه.", "Tick the simple average and type the period you want in the box beside it. Try 5 then 20 on the same chart and see the difference: the short one chases price, the long one draws the trend."], fig: () => miniChart({ sym: "TRN-A", from: 60, n: 60, sma: [5, 20] }) },
+      { h: ["ارسم الدعم والمقاومة", "Draw support and resistance"], p: ["اختر \"خط أفقي\" واضغط عند المستوى اللي ارتد منه السعر أكثر من مرة. خط تحت للدعم وخط فوق للمقاومة. إذا غلطت، احذف الخط من قائمة رسوماتك تحت الشارت.", "Choose \"Horizontal line\" and tap at the level price bounced from more than once. One line below for support, one above for resistance. If you slip, delete the line from your drawings list under the chart."], fig: () => { const d = practiceSeries("TRN-B").slice(70, 130), q = (a, f) => a.slice().sort((x, y) => x - y)[Math.floor(a.length * f)]; return miniChart({ sym: "TRN-B", from: 70, n: 60, h: [q(d.map((r) => r.l), 0.06), q(d.map((r) => r.h), 0.94)] }); } },
+      { h: ["ارسم خط الاتجاه", "Draw the trend line"], p: ["اختر \"خط اتجاه\" واضغط على قاع، ثم على قاع أعلى منه بعده. الخط يمتد لحاله لليمين. طول ما السعر فوقه، الاتجاه الصاعد قائم.", "Choose \"Trend line\" and tap a low, then a higher low after it. The line extends to the right by itself. While price stays above it, the uptrend stands."], fig: () => { const a = lowIn("TRN-A", 100, 112), b = lowIn("TRN-A", 118, 132); return miniChart({ sym: "TRN-A", from: 95, n: 60, t: [a, b] }); } },
+      { h: ["قارن رسمك بالقراءة الآلية", "Compare your drawing with the automatic reading"], p: ["ارسم أنت أول، ثم اضغط \"اقرأ الشارت\". يطلع لك وصف للاتجاه والمتوسطات والزخم والمستويات، وزر يرسمها على الشارت بلون مختلف. الفرق بين رسمك ورسمها هو درسك.", "Draw first, then press \"Read the chart\". You get a description of trend, averages, momentum and levels, and a button that draws them in a different colour. The gap between your drawing and its drawing is your lesson."], fig: () => mock([[["الاتجاه", "Trend"], ["صاعد", "Up"]], [["RSI 14", "RSI 14"], "64.2"], [["أقرب دعم", "Nearest support"], "51.80"], [["أقرب مقاومة", "Nearest resistance"], "57.40"]]) },
+      { h: ["توقّع ثم اكشف، ثم سجّل", "Predict, reveal, then log"], p: ["\"وضع التوقع\" يخفي آخر الشموع. قرر: طالع ولا نازل، وليش؟ ثم اكشف شمعة شمعة. ولما تلقى فرصة تقنعك، اضغط \"سجّل صفقة من الشارت\" واكتب سببك في السجل.", "\"Prediction mode\" hides the latest candles. Decide: up or down, and why? Then reveal candle by candle. When you find a setup that convinces you, press \"Log a trade from the chart\" and write your reason in the journal."], fig: () => miniChart({ sym: "TRN-C", from: 80, n: 60, hide: 22 }) }
+    ] },
+  { id: "journal", go: ["#journal", "gd_go_journal"], title: ["سجل التداول: من الفكرة إلى المراجعة", "The trading journal: from idea to review"],
+    intro: ["السجل هو اللي يحول التداول من مزاج إلى مهارة. خمس خطوات لكل صفقة.", "The journal is what turns trading from mood into skill. Five steps for every trade."],
+    steps: [
+      { h: ["اكتب السبب قبل ما تدخل", "Write the reason before you enter"], p: ["جملة وحدة تكفي: \"ارتداد من دعم 48 مع RSI تحت 30\". إذا ما قدرت تكتب السبب، فأنت ما عندك صفقة، عندك إحساس.", "One sentence is enough: \"Bounce from support at 48 with RSI below 30\". If you cannot write the reason, you do not have a trade, you have a feeling."], fig: () => mock([[["الرمز", "Symbol"], "2222"], [["الكمية", "Quantity"], "100"], [["سعر الدخول", "Entry"], "50.00"], [["سبب الدخول", "Reason"], ["ارتداد من الدعم", "Bounce from support"]]]) },
+      { h: ["حدد الوقف والهدف", "Set the stop and the target"], p: ["وقف الخسارة تحت سعر الدخول: السعر اللي تعترف عنده إن فكرتك غلط. الهدف فوقه: المكان اللي تتوقع توصل له. إذا العائد أقل من ضعف المخاطرة، الصفقة ما تستاهل. والسجل يرفض وقف فوق سعر الدخول.", "The stop-loss goes below the entry: the price at which you admit the idea was wrong. The target goes above: where you expect it to reach. If the reward is less than twice the risk, the trade is not worth it. The journal rejects a stop above the entry."], fig: rrFig },
+      { h: ["سجّل الخروج واكتب وش تعلمت", "Record the exit and what you learned"], p: ["لما تطلع اضغط \"إغلاق\" واكتب سعر الخروج. خانة \"وش تعلمت\" أهم خانة في السجل، خصوصاً في الصفقة الخاسرة: هل الفكرة غلط، ولا التنفيذ؟", "When you leave, press \"Close\" and enter the exit price. The \"What did you learn\" box is the most important in the journal, especially on a losing trade: was the idea wrong, or the execution?"], fig: () => mock([[["سعر الخروج", "Exit"], "53.20"], [["الربح/الخسارة", "P/L"], "+320.00", "pos"], [["النسبة", "Return"], "+6.40%", "pos"], [["وش تعلمت", "Lesson"], ["طلعت قبل الهدف", "Left before target"]]]) },
+      { h: ["اقرأ أرقامك", "Read your numbers"], p: ["فوق الجدول أربعة أرقام. نسبة الصفقات الرابحة لحالها تخدع: تقدر تربح 40% من صفقاتك وتطلع رابح إذا أرباحك ضعف خسايرك. الرقم اللي يحكم هو الصافي.", "Four numbers sit above the table. Win rate alone misleads: you can win 40% of your trades and come out ahead if your wins are twice your losses. The number that rules is the net."], fig: () => mock([[["عدد الصفقات", "Trades"], "10"], [["نسبة الرابحة", "Win rate"], "40%"], [["صافي الربح/الخسارة", "Net P/L"], "+400.00", "pos"]]) },
+      { h: ["صدّر وراجع كل أسبوع", "Export and review weekly"], p: ["زر \"تصدير Excel\" يعطيك ملف بكل صفقاتك. احفظه في مجلدك، وراجعه نهاية كل أسبوع: أي سبب دخول تكرر في الرابحة؟ وأي واحد تكرر في الخاسرة؟", "\"Export to Excel\" gives you a file of all your trades. Save it in your folder and review it at the end of each week: which entry reason recurs in the winners? And which in the losers?"], fig: () => mock([[["meras-journal.xlsx", "meras-journal.xlsx"], ["14 عمود", "14 columns"]], [["المراجعة", "Review"], ["نهاية كل أسبوع", "End of each week"]]]) }
+    ] }
+];
+
+function pageGuides() {
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("gd_h")) + "</h1><p>" + esc(t("gd_p")) + '</p></div><div class="grid2" style="padding-block:20px">' +
+    GUIDES.map((g) => '<a class="panel guide-card" href="#g-' + g.id + '"><div class="guide-thumb">' + g.steps[Math.min(2, g.steps.length - 1)].fig() + '</div><span class="tag amber">' + g.steps.length + " " + esc(t("gd_steps")) + "</span><h3>" + esc(L(g.title)) + '</h3><p class="muted">' + esc(L(g.intro)) + "</p></a>").join("") + "</div></div>";
+}
+function pageGuide(id) {
+  const g = GUIDES.find((x) => x.id === id); if (!g) return pageGuides();
+  return '<div class="wrap"><div class="guide-head"><div class="crumbs"><a href="#guides">' + esc(t("gd_h")) + "</a> / " + esc(L(g.title)) + "</div><h1>" + esc(L(g.title)) + "</h1><p>" + esc(L(g.intro)) + '</p></div><ol class="guide-steps">' +
+    g.steps.map((s, i) => '<li><div class="gs-text"><span class="gs-n num">' + (i + 1) + "</span><h2>" + esc(L(s.h)) + "</h2><p>" + esc(L(s.p)) + '</p></div><div class="gs-fig">' + s.fig() + "</div></li>").join("") +
+    '</ol><div class="row" style="justify-content:space-between;padding-block:8px 40px"><a class="btn" href="#guides">' + esc(t("gd_all")) + '</a><a class="btn primary" href="' + g.go[0] + '">' + esc(t(g.go[1])) + "</a></div></div>";
+}
 /* ===== مِراس: المزامنة مع مستودع البيانات الخاص + الأسعار الحقيقية =====
    تشتغل فقط لما الموقع منشور (GitHub Pages أو أي استضافة). */
 const HOSTED = !window.claude && /^https?:$/.test(location.protocol);
@@ -1560,7 +2022,7 @@ document.addEventListener("submit", async (e) => {
   CFG = { owner: v("s-owner"), repo: v("s-repo"), token: v("s-token") };
   try { localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); } catch (err) {}
   if (!CFG.token) { render(); return; }
-  if (await syncNow(false)) { await loadPrices(true); }
+  if (await syncNow(false)) { await loadPrices(true); loadWatch(); }
   render();
 });
 document.addEventListener("click", (e) => {
@@ -1573,7 +2035,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 /* ===== التشغيل ===== */
 lastRoute = route();
 render();
-if (HOSTED && CFG.token) { syncNow(true).then(() => loadPrices(true)); }
+if (HOSTED && CFG.token) { syncNow(true).then(() => loadPrices(true)).then(() => loadWatch()); }
 </script>
 <script>if ("serviceWorker" in navigator) { window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); }); }</script>
 </body>
