@@ -230,6 +230,68 @@ const LESSONS = [
         why: ["شمعة حمراء وحدة شي طبيعي داخل أي اتجاه صاعد. التغيّر يبان لما ينكسر تسلسل القيعان.", "One red candle is normal inside any uptrend. The change shows when the sequence of lows breaks."] }
     ] },
 
+  /* ---------- المتداول: الدرجة 3 ---------- */
+  { id: "trd-3-1", track: "trd", level: 3, mins: 9, title: ["المتوسطات المتحركة", "Moving averages"],
+    body: [
+      { p: ["المتوسط المتحرك البسيط (SMA) هو متوسط إغلاقات آخر عدد من الشموع. متوسط 5 يعني: اجمع آخر خمس إغلاقات واقسم على خمسة. مع كل شمعة جديدة تدخل إغلاقها وتطلع أقدم وحدة، فيتحرك المتوسط مع السعر.", "A simple moving average (SMA) is the average of the closes of the last several candles. A 5-period average means: add the last five closes and divide by five. With each new candle its close comes in and the oldest drops out, so the average moves with price."] },
+      { h: ["احسبها بيدك مرة", "Work one out by hand"] },
+      { p: ["آخر خمس إغلاقات: 50 و51 و53 و52 و54. المجموع 260، والمتوسط 260 ÷ 5 = 52. لو أغلقت الشمعة الجاية على 56، تطلع الـ 50 وتدخل الـ 56: المجموع 266 والمتوسط 53.2.", "The last five closes: 50, 51, 53, 52, 54. The sum is 260 and the average is 260 ÷ 5 = 52. If the next candle closes at 56, the 50 leaves and the 56 enters: the sum is 266 and the average 53.2."] },
+      { h: ["وش يفيدك؟", "What is it for?"] },
+      { ul: [
+        ["ينعّم الحركة: يشيل ضجيج الشموع اليومية ويبيّن الجهة العامة.", "It smooths movement: it removes the noise of daily candles and shows the general direction."],
+        ["السعر فوق متوسط صاعد: الاتجاه صاعد على هذا المدى. تحت متوسط هابط: الاتجاه هابط.", "Price above a rising average: the trend is up on that horizon. Below a falling average: the trend is down."],
+        ["الفترة القصيرة (5 أو 10) سريعة وتعطي إشارات كثيرة بعضها كاذب. الفترة الطويلة (20 أو 50) أهدأ وأبطأ.", "A short period (5 or 10) is fast and gives many signals, some false. A long period (20 or 50) is calmer and slower."]
+      ] },
+      { h: ["التقاطع", "The crossover"] },
+      { p: ["لما يقطع المتوسط القصير المتوسط الطويل من تحت لفوق، فمعناه إن الحركة الأخيرة أقوى من الحركة الأقدم، وكثير من المتداولين يعتبرونها إشارة صعود. والعكس إشارة هبوط. في المسار العرضي التقاطعات تكثر وتفشل، فلا تعتمد عليها هناك.", "When the short average crosses the long one from below, recent movement is stronger than older movement, and many traders read it as a bullish signal. The reverse is bearish. In a range, crossovers multiply and fail, so do not rely on them there."] },
+      { note: ["المتوسط مؤشر متأخر: يأكد حركة صارت وما يتنبأ بحركة جاية. ومتوسط 20 ما يظهر إلا بعد 20 شمعة، فلو عندك شموع قليلة ابدأ بفترة 3 أو 5.", "An average lags: it confirms a move that has happened and does not predict the next one. A 20-period average only appears after 20 candles, so with few candles start with a period of 3 or 5."] },
+      { h: ["تمرين على الشارت", "Exercise on the chart"] },
+      { ul: [
+        ["افتح السهم التدريبي أ وشغّل متوسط 5 ومتوسط 20.", "Open practice share A and switch on the 5 and 20 averages."],
+        ["دوّر على مكان قطع فيه متوسط 5 متوسط 20 للأعلى. وش صار للسعر بعدها؟", "Find where the 5 crossed above the 20. What did price do afterwards?"],
+        ["بدّل للسهم التدريبي ب (العرضي) ولاحظ كم تقاطع فشل.", "Switch to practice share B (the range) and notice how many crossovers failed."]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["آخر ثلاث إغلاقات: 20 و22 و24. كم متوسط 3؟", "The last three closes: 20, 22, 24. What is the 3-period average?"],
+        opts: [["21", "21"], ["22", "22"], ["24", "24"]], a: 1,
+        why: ["(20 + 22 + 24) ÷ 3 = 22.", "(20 + 22 + 24) ÷ 3 = 22."] },
+      { q: ["ليش تقاطعات المتوسطات تفشل كثير في المسار العرضي؟", "Why do crossovers often fail in a range?"],
+        opts: [["لأن السعر يتذبذب بدون اتجاه، فالمتوسطات تتقاطع رايح جاي", "Price oscillates with no direction, so the averages keep crossing back and forth"], ["لأن الحجم قليل", "Because volume is low"], ["لأن المتوسط ما ينحسب في العرضي", "Because averages are not calculated in a range"]], a: 0,
+        why: ["المتوسطات تتبع الاتجاه. إذا ما فيه اتجاه، إشاراتها ضجيج.", "Averages follow trend. With no trend their signals are noise."] }
+    ] },
+
+  { id: "trd-3-2", track: "trd", level: 3, mins: 9, title: ["مؤشر القوة النسبية RSI", "The relative strength index (RSI)"],
+    body: [
+      { p: ["RSI رقم بين 0 و100 يقيس قوة الصعود مقابل قوة الهبوط خلال عدد من الشموع، والفترة المعتادة 14. يقارن متوسط مكاسب الشموع الصاعدة بمتوسط خسائر الشموع الهابطة. كل ما غلبت المكاسب، قرب الرقم من 100.", "RSI is a number between 0 and 100 measuring the strength of rises against falls over a number of candles; the usual period is 14. It compares the average gain of rising candles with the average loss of falling ones. The more gains dominate, the closer it gets to 100."] },
+      { h: ["المناطق", "The zones"] },
+      { ul: [
+        ["فوق 70: تشبع شرائي. السعر صعد بسرعة، واحتمال التهدئة أو التصحيح يزيد.", "Above 70: overbought. Price has risen fast and the chance of a pause or pullback grows."],
+        ["تحت 30: تشبع بيعي. السعر نزل بسرعة، واحتمال الارتداد يزيد.", "Below 30: oversold. Price has fallen fast and the chance of a bounce grows."],
+        ["حول 50: ما فيه غلبة واضحة.", "Around 50: neither side dominates."]
+      ] },
+      { h: ["الخطأ الشائع", "The common mistake"] },
+      { p: ["فوق 70 ما تعني بيع، وتحت 30 ما تعني شراء. في اتجاه صاعد قوي يبقى RSI فوق 70 أسابيع والسعر يكمل صعود. المؤشر يشتغل أحسن شي في المسار العرضي، لما يتحرك السعر بين دعم ومقاومة: تشبع بيعي عند الدعم يقوّي فكرة الشراء، وتشبع شرائي عند المقاومة يقوّي فكرة الخروج.", "Above 70 does not mean sell, and below 30 does not mean buy. In a strong uptrend RSI stays above 70 for weeks while price keeps rising. The indicator works best in a range, when price moves between support and resistance: oversold at support strengthens the case to buy, overbought at resistance strengthens the case to exit."] },
+      { h: ["الفترة", "The period"] },
+      { p: ["فترة 14 تحتاج 15 شمعة قبل ما يظهر أول رقم. فترة أقصر مثل 5 تظهر أسرع وتتحرك بعنف وتوصل 70 و30 كثير، فإشاراتها أقل موثوقية. جرّب الفرق بنفسك.", "A period of 14 needs 15 candles before the first value appears. A shorter period such as 5 appears sooner, swings harder and hits 70 and 30 often, so its signals are less reliable. Try the difference yourself."] },
+      { h: ["تمرين على الشارت", "Exercise on the chart"] },
+      { ul: [
+        ["افتح السهم التدريبي ب وشغّل RSI بفترة 14.", "Open practice share B and switch on RSI with period 14."],
+        ["ارسم خط الدعم وخط المقاومة بالخط الأفقي.", "Draw support and resistance with the horizontal line."],
+        ["شوف قراءة RSI كل مرة لمس السعر الدعم. ثم غيّر الفترة إلى 5 وقارن.", "Read RSI each time price touched support. Then change the period to 5 and compare."]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["RSI وصل 78 في سهم باتجاه صاعد قوي. وش القراءة الأنسب؟", "RSI reads 78 on a share in a strong uptrend. What is the sensible reading?"],
+        opts: [["بيع فوراً", "Sell at once"], ["الزخم قوي، وممكن يستمر، فلا تعتمد على الرقم لحاله", "Momentum is strong and may continue, so do not rely on the number alone"], ["السهم بينزل أكيد", "The share will certainly fall"]], a: 1,
+        why: ["التشبع الشرائي في اتجاه قوي يستمر طويلاً. يحتاج تأكيد من السعر نفسه.", "Overbought can persist for a long time in a strong trend. It needs confirmation from price itself."] },
+      { q: ["وين تكون إشارات RSI أكثر فايدة؟", "Where are RSI signals most useful?"],
+        opts: [["في المسار العرضي عند الدعم والمقاومة", "In a range, at support and resistance"], ["في أي وقت", "At any time"], ["في الاتجاه القوي فقط", "Only in a strong trend"]], a: 0,
+        why: ["في العرضي السعر يرتد بين حدين، والتشبع عند الحد يأكد الارتداد.", "In a range price bounces between two bounds, and an extreme reading at the bound confirms the bounce."] }
+    ] },
+
   /* ---------- المبرمج: الدرجة 1 ---------- */
   { id: "dev-1-1", track: "dev", level: 1, mins: 6, title: ["ما هو الـ API ومفتاحك", "What an API is, and your key"],
     body: [

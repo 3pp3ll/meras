@@ -3,7 +3,7 @@
 const HOSTED = !window.claude && /^https?:$/.test(location.protocol);
 const CFG_KEY = "meras.sync", PX_KEY = "meras.prices";
 let CFG = { owner: "3pp3ll", repo: "meras-data", token: "" };
-let LIVE = { quotes: {}, fetchedAt: null };
+let LIVE = { quotes: {}, fetchedAt: null, history: {} };
 let SYNC = { state: "off", at: null, msg: "" };
 try { Object.assign(CFG, JSON.parse(localStorage.getItem(CFG_KEY) || "{}")); } catch (e) {}
 try { Object.assign(LIVE, JSON.parse(localStorage.getItem(PX_KEY) || "{}")); } catch (e) {}
@@ -56,7 +56,7 @@ async function readJson(path) {
 const errText = (e) => t({ "401": "e_401", "404": "e_404", "403": "e_403", net: "e_net" }[e && e.code] || "e_net");
 
 /* ما يتزامن: التقدم، السجل، الباقة، الحساب. اللغة وحالة الدخول تبقى لكل جهاز. */
-const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort() });
+const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null });
 function mergeState(local, remote) {
   if (!remote || typeof remote !== "object") return local;
   const newer = (local.updatedAt || 0) >= (remote.updatedAt || 0) ? local : remote;
@@ -104,7 +104,9 @@ async function loadPrices(quiet) {
   try {
     const f = await readJson("prices.json");
     if (!f || !f.data || !f.data.quotes) { if (!quiet) toast(t("no_prices")); return; }
-    LIVE = { quotes: f.data.quotes, fetchedAt: f.data.fetched_at || null };
+    let hist = LIVE.history || {};
+    try { const h = await readJson("history.json"); if (h && h.data && typeof h.data === "object") hist = h.data; } catch (e) {}
+    LIVE = { quotes: f.data.quotes, fetchedAt: f.data.fetched_at || null, history: hist };
     try { localStorage.setItem(PX_KEY, JSON.stringify(LIVE)); } catch (e) {}
     if (!quiet) toast(t("px_ok"));
     if (!document.activeElement || !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) render();

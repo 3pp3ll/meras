@@ -26,6 +26,7 @@
   --amber:#E09A1A; --amber-ink:#8A5300; --amber-soft:#FBEFD6; --on-amber:#1A1300;
   --up:#0B7F57; --up-soft:#DDF3EA; --down:#BE3329; --down-soft:#FBE3E0;
   --code-bg:#0E1B36; --code-fg:#DCE6FA;
+  --ind1:#C77F00; --ind2:#2563C9; --ind3:#8A3FC4; --draw:#0F1F3D;
   --display:"Reem Kufi","IBM Plex Sans Arabic",system-ui,sans-serif;
   --body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
@@ -39,6 +40,7 @@
     --amber:#F0A93A; --amber-ink:#F3B75A; --amber-soft:#3A2C0E; --on-amber:#1A1300;
     --up:#3FCB96; --up-soft:#0F3328; --down:#F27C72; --down-soft:#3D1B19;
     --code-bg:#07101F; --code-fg:#DCE6FA;
+    --ind1:#F0A93A; --ind2:#7FB0FF; --ind3:#C59BF7; --draw:#E8EDF8;
     color-scheme:dark;
   }
 }
@@ -49,6 +51,7 @@
   --amber:#F0A93A; --amber-ink:#F3B75A; --amber-soft:#3A2C0E; --on-amber:#1A1300;
   --up:#3FCB96; --up-soft:#0F3328; --down:#F27C72; --down-soft:#3D1B19;
   --code-bg:#07101F; --code-fg:#DCE6FA;
+    --ind1:#F0A93A; --ind2:#7FB0FF; --ind3:#C59BF7; --draw:#E8EDF8;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -263,6 +266,34 @@ td .num,td.num{font-size:13.5px}
 #toast{position:fixed;inset-inline:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:50}
 #toast span{background:var(--navy);color:var(--navy-fg);padding:9px 18px;border-radius:99px;font-size:14.5px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
 @media (prefers-reduced-motion:no-preference){.step{transition:background .2s,border-color .2s}}
+
+/* chart */
+.chartbox{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:10px 10px 4px}
+.ch-scroll{overflow-x:auto}
+.ch-scroll svg{display:block;width:100%;min-width:560px;height:auto;direction:ltr;touch-action:pan-x pan-y;cursor:crosshair}
+.chartbox.drawing svg{cursor:cell}
+.ch-read{font-size:13px;line-height:1.9;min-height:25px;padding-inline:4px;display:flex;flex-wrap:wrap;gap:0 14px}
+.c-lab{fill:var(--muted);font-family:var(--body);font-size:12px}
+.ch-read b{font-weight:600}
+.rd{white-space:nowrap}
+.rd.i1{color:var(--ind1)} .rd.i2{color:var(--ind2)} .rd.i3{color:var(--ind3)}
+.ind{fill:none;stroke-width:1.8;stroke-linejoin:round}
+.ind.i1{stroke:var(--ind1)} .ind.i2{stroke:var(--ind2)} .ind.i3{stroke:var(--ind3)}
+.draw{stroke:var(--draw);stroke-width:1.4;stroke-dasharray:7 4;fill:none}
+.draw-dot{fill:var(--draw);stroke:none}
+.draw-tag{fill:var(--draw);stroke:none}
+.draw-txt{fill:var(--surface);font-family:var(--mono);font-size:11px}
+.cross{stroke:var(--muted);stroke-width:.8;stroke-dasharray:3 3;pointer-events:none}
+.pane{fill:var(--sunk);stroke:none;opacity:.6}
+.indbox{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:13.5px;cursor:pointer;background:var(--surface)}
+.indbox input[type="checkbox"]{accent-color:var(--amber)}
+.indbox input[type="number"]{width:54px;border:1px solid var(--line);border-radius:6px;padding:1px 6px;background:var(--bg);font-size:13px}
+.sw{width:14px;height:3px;border-radius:2px;display:inline-block}
+.sw.i1{background:var(--ind1)} .sw.i2{background:var(--ind2)} .sw.i3{background:var(--ind3)}
+.btn.on{background:var(--navy);border-color:var(--navy);color:var(--navy-fg)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:2px 4px 2px 10px;font-size:13.5px}
+[dir="rtl"] .chip{padding:2px 10px 2px 4px}
+.chip button{border:0;background:var(--sunk);border-radius:50%;width:22px;height:22px;cursor:pointer;line-height:1;font-size:15px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -499,6 +530,68 @@ const LESSONS = [
         why: ["شمعة حمراء وحدة شي طبيعي داخل أي اتجاه صاعد. التغيّر يبان لما ينكسر تسلسل القيعان.", "One red candle is normal inside any uptrend. The change shows when the sequence of lows breaks."] }
     ] },
 
+  /* ---------- المتداول: الدرجة 3 ---------- */
+  { id: "trd-3-1", track: "trd", level: 3, mins: 9, title: ["المتوسطات المتحركة", "Moving averages"],
+    body: [
+      { p: ["المتوسط المتحرك البسيط (SMA) هو متوسط إغلاقات آخر عدد من الشموع. متوسط 5 يعني: اجمع آخر خمس إغلاقات واقسم على خمسة. مع كل شمعة جديدة تدخل إغلاقها وتطلع أقدم وحدة، فيتحرك المتوسط مع السعر.", "A simple moving average (SMA) is the average of the closes of the last several candles. A 5-period average means: add the last five closes and divide by five. With each new candle its close comes in and the oldest drops out, so the average moves with price."] },
+      { h: ["احسبها بيدك مرة", "Work one out by hand"] },
+      { p: ["آخر خمس إغلاقات: 50 و51 و53 و52 و54. المجموع 260، والمتوسط 260 ÷ 5 = 52. لو أغلقت الشمعة الجاية على 56، تطلع الـ 50 وتدخل الـ 56: المجموع 266 والمتوسط 53.2.", "The last five closes: 50, 51, 53, 52, 54. The sum is 260 and the average is 260 ÷ 5 = 52. If the next candle closes at 56, the 50 leaves and the 56 enters: the sum is 266 and the average 53.2."] },
+      { h: ["وش يفيدك؟", "What is it for?"] },
+      { ul: [
+        ["ينعّم الحركة: يشيل ضجيج الشموع اليومية ويبيّن الجهة العامة.", "It smooths movement: it removes the noise of daily candles and shows the general direction."],
+        ["السعر فوق متوسط صاعد: الاتجاه صاعد على هذا المدى. تحت متوسط هابط: الاتجاه هابط.", "Price above a rising average: the trend is up on that horizon. Below a falling average: the trend is down."],
+        ["الفترة القصيرة (5 أو 10) سريعة وتعطي إشارات كثيرة بعضها كاذب. الفترة الطويلة (20 أو 50) أهدأ وأبطأ.", "A short period (5 or 10) is fast and gives many signals, some false. A long period (20 or 50) is calmer and slower."]
+      ] },
+      { h: ["التقاطع", "The crossover"] },
+      { p: ["لما يقطع المتوسط القصير المتوسط الطويل من تحت لفوق، فمعناه إن الحركة الأخيرة أقوى من الحركة الأقدم، وكثير من المتداولين يعتبرونها إشارة صعود. والعكس إشارة هبوط. في المسار العرضي التقاطعات تكثر وتفشل، فلا تعتمد عليها هناك.", "When the short average crosses the long one from below, recent movement is stronger than older movement, and many traders read it as a bullish signal. The reverse is bearish. In a range, crossovers multiply and fail, so do not rely on them there."] },
+      { note: ["المتوسط مؤشر متأخر: يأكد حركة صارت وما يتنبأ بحركة جاية. ومتوسط 20 ما يظهر إلا بعد 20 شمعة، فلو عندك شموع قليلة ابدأ بفترة 3 أو 5.", "An average lags: it confirms a move that has happened and does not predict the next one. A 20-period average only appears after 20 candles, so with few candles start with a period of 3 or 5."] },
+      { h: ["تمرين على الشارت", "Exercise on the chart"] },
+      { ul: [
+        ["افتح السهم التدريبي أ وشغّل متوسط 5 ومتوسط 20.", "Open practice share A and switch on the 5 and 20 averages."],
+        ["دوّر على مكان قطع فيه متوسط 5 متوسط 20 للأعلى. وش صار للسعر بعدها؟", "Find where the 5 crossed above the 20. What did price do afterwards?"],
+        ["بدّل للسهم التدريبي ب (العرضي) ولاحظ كم تقاطع فشل.", "Switch to practice share B (the range) and notice how many crossovers failed."]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["آخر ثلاث إغلاقات: 20 و22 و24. كم متوسط 3؟", "The last three closes: 20, 22, 24. What is the 3-period average?"],
+        opts: [["21", "21"], ["22", "22"], ["24", "24"]], a: 1,
+        why: ["(20 + 22 + 24) ÷ 3 = 22.", "(20 + 22 + 24) ÷ 3 = 22."] },
+      { q: ["ليش تقاطعات المتوسطات تفشل كثير في المسار العرضي؟", "Why do crossovers often fail in a range?"],
+        opts: [["لأن السعر يتذبذب بدون اتجاه، فالمتوسطات تتقاطع رايح جاي", "Price oscillates with no direction, so the averages keep crossing back and forth"], ["لأن الحجم قليل", "Because volume is low"], ["لأن المتوسط ما ينحسب في العرضي", "Because averages are not calculated in a range"]], a: 0,
+        why: ["المتوسطات تتبع الاتجاه. إذا ما فيه اتجاه، إشاراتها ضجيج.", "Averages follow trend. With no trend their signals are noise."] }
+    ] },
+
+  { id: "trd-3-2", track: "trd", level: 3, mins: 9, title: ["مؤشر القوة النسبية RSI", "The relative strength index (RSI)"],
+    body: [
+      { p: ["RSI رقم بين 0 و100 يقيس قوة الصعود مقابل قوة الهبوط خلال عدد من الشموع، والفترة المعتادة 14. يقارن متوسط مكاسب الشموع الصاعدة بمتوسط خسائر الشموع الهابطة. كل ما غلبت المكاسب، قرب الرقم من 100.", "RSI is a number between 0 and 100 measuring the strength of rises against falls over a number of candles; the usual period is 14. It compares the average gain of rising candles with the average loss of falling ones. The more gains dominate, the closer it gets to 100."] },
+      { h: ["المناطق", "The zones"] },
+      { ul: [
+        ["فوق 70: تشبع شرائي. السعر صعد بسرعة، واحتمال التهدئة أو التصحيح يزيد.", "Above 70: overbought. Price has risen fast and the chance of a pause or pullback grows."],
+        ["تحت 30: تشبع بيعي. السعر نزل بسرعة، واحتمال الارتداد يزيد.", "Below 30: oversold. Price has fallen fast and the chance of a bounce grows."],
+        ["حول 50: ما فيه غلبة واضحة.", "Around 50: neither side dominates."]
+      ] },
+      { h: ["الخطأ الشائع", "The common mistake"] },
+      { p: ["فوق 70 ما تعني بيع، وتحت 30 ما تعني شراء. في اتجاه صاعد قوي يبقى RSI فوق 70 أسابيع والسعر يكمل صعود. المؤشر يشتغل أحسن شي في المسار العرضي، لما يتحرك السعر بين دعم ومقاومة: تشبع بيعي عند الدعم يقوّي فكرة الشراء، وتشبع شرائي عند المقاومة يقوّي فكرة الخروج.", "Above 70 does not mean sell, and below 30 does not mean buy. In a strong uptrend RSI stays above 70 for weeks while price keeps rising. The indicator works best in a range, when price moves between support and resistance: oversold at support strengthens the case to buy, overbought at resistance strengthens the case to exit."] },
+      { h: ["الفترة", "The period"] },
+      { p: ["فترة 14 تحتاج 15 شمعة قبل ما يظهر أول رقم. فترة أقصر مثل 5 تظهر أسرع وتتحرك بعنف وتوصل 70 و30 كثير، فإشاراتها أقل موثوقية. جرّب الفرق بنفسك.", "A period of 14 needs 15 candles before the first value appears. A shorter period such as 5 appears sooner, swings harder and hits 70 and 30 often, so its signals are less reliable. Try the difference yourself."] },
+      { h: ["تمرين على الشارت", "Exercise on the chart"] },
+      { ul: [
+        ["افتح السهم التدريبي ب وشغّل RSI بفترة 14.", "Open practice share B and switch on RSI with period 14."],
+        ["ارسم خط الدعم وخط المقاومة بالخط الأفقي.", "Draw support and resistance with the horizontal line."],
+        ["شوف قراءة RSI كل مرة لمس السعر الدعم. ثم غيّر الفترة إلى 5 وقارن.", "Read RSI each time price touched support. Then change the period to 5 and compare."]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["RSI وصل 78 في سهم باتجاه صاعد قوي. وش القراءة الأنسب؟", "RSI reads 78 on a share in a strong uptrend. What is the sensible reading?"],
+        opts: [["بيع فوراً", "Sell at once"], ["الزخم قوي، وممكن يستمر، فلا تعتمد على الرقم لحاله", "Momentum is strong and may continue, so do not rely on the number alone"], ["السهم بينزل أكيد", "The share will certainly fall"]], a: 1,
+        why: ["التشبع الشرائي في اتجاه قوي يستمر طويلاً. يحتاج تأكيد من السعر نفسه.", "Overbought can persist for a long time in a strong trend. It needs confirmation from price itself."] },
+      { q: ["وين تكون إشارات RSI أكثر فايدة؟", "Where are RSI signals most useful?"],
+        opts: [["في المسار العرضي عند الدعم والمقاومة", "In a range, at support and resistance"], ["في أي وقت", "At any time"], ["في الاتجاه القوي فقط", "Only in a strong trend"]], a: 0,
+        why: ["في العرضي السعر يرتد بين حدين، والتشبع عند الحد يأكد الارتداد.", "In a range price bounces between two bounds, and an extreme reading at the bound confirms the bounce."] }
+    ] },
+
   /* ---------- المبرمج: الدرجة 1 ---------- */
   { id: "dev-1-1", track: "dev", level: 1, mins: 6, title: ["ما هو الـ API ومفتاحك", "What an API is, and your key"],
     body: [
@@ -619,7 +712,7 @@ const GLOSSARY = [
 ];
 /* ===== مِراس: التطبيق ===== */
 const KEY = "meras.v1";
-const blank = () => ({ lang: "ar", account: null, signedIn: false, plan: "free", done: {}, journal: [], deleted: [], updatedAt: 0 });
+const blank = () => ({ lang: "ar", account: null, signedIn: false, plan: "free", done: {}, journal: [], deleted: [], drawings: {}, chart: null, updatedAt: 0 });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch (e) {}
 const save = () => { S.updatedAt = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} queueSync(); };
@@ -722,7 +815,9 @@ const lessonsOf = (track, level) => LESSONS.filter((l) => l.track === track && (
 const isDone = (id) => !!S.done[id];
 const levelDone = (track, level) => { const ls = lessonsOf(track, level); return ls.length > 0 && ls.every((l) => isDone(l.id)); };
 const trackPct = (track) => { const ls = lessonsOf(track); return Math.round((ls.filter((l) => isDone(l.id)).length / ls.length) * 100); };
-const nextLesson = (track) => lessonsOf(track).find((l) => !isDone(l.id));
+const unlocked = () => S.plan === "full" || (typeof HOSTED !== "undefined" && HOSTED && !!CFG.token);
+const canOpen = (l) => l.level <= 2 || unlocked();
+const nextLesson = (track) => lessonsOf(track).find((l) => !isDone(l.id) && canOpen(l));
 const trackById = (id) => TRACKS.find((x) => x.id === id);
 
 function toast(msg) {
@@ -751,7 +846,7 @@ function stairs(track, inHero) {
   return '<div class="stairs" role="img" aria-label="' + esc(t("tracks_h")) + '">' + [1, 2, 3, 4, 5].map((n) => {
     const free = n <= 2, done = track && levelDone(track, n);
     const cls = done ? "done" : free ? "free" : "locked";
-    const label = inHero ? (free ? t("free") : t("paid")) : (done ? t("done") : free ? t("free") : t("soon"));
+    const label = inHero ? (free ? t("free") : t("paid")) : (done ? t("done") : free ? t("free") : track && lessonsOf(track, n).length ? t("paid") : t("soon"));
     return '<div class="step ' + cls + '" style="--n:' + n + '" title="' + (names ? esc(L(names[n - 1])) : "") + '"><b>' + n + "</b><span>" + esc(label) + "</span></div>";
   }).join("") + "</div>";
 }
@@ -837,6 +932,7 @@ function block(b, lessonId) {
   if (b.note) return '<div class="notice">' + esc(L(b.note)) + "</div>";
   if (b.code) return '<div class="code"><div class="cap"><span>' + esc(b.name || "code") + '</span><button data-act="copy">' + esc(t("copy")) + "</button></div><pre><code>" + esc(b.code) + "</code></pre></div>";
   if (b.quote) return quoteCard(b.quote, lessonId);
+  if (b.open) return '<div><a class="btn primary" href="#chart">' + esc(t("open_chart")) + "</a></div>";
   if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
   return "";
 }
@@ -855,8 +951,8 @@ function pageHome() {
 
 function levelBlock(tr, n) {
   const ls = lessonsOf(tr.id, n), name = L(LEVELS[tr.id][n - 1]);
-  if (n > 2) return '<div class="level locked"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag">' + esc(S.plan === "full" ? t("soon") : t("locked")) + "</span></div></div>";
-  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : t("free")) + '</span></div><ul class="lessons">' +
+  if (n > 2 && !(ls.length && unlocked())) return '<div class="level locked"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag">' + esc(ls.length ? t("locked") : t("soon")) + "</span></div></div>";
+  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : n > 2 ? t("paid") : t("free")) + '</span></div><ul class="lessons">' +
     ls.map((l) => '<li><a href="#l-' + l.id + '"><span class="dot ' + (isDone(l.id) ? "done" : "") + '">' + (isDone(l.id) ? "✓" : "") + "</span><span>" + esc(L(l.title)) + '</span><span class="small muted" style="margin-inline-start:auto">' + l.mins + " " + esc(t("mins")) + "</span></a></li>").join("") + "</ul></div>";
 }
 
@@ -869,6 +965,7 @@ function pageTracks() {
 let quizState = {};
 function pageLesson(id) {
   const l = LESSONS.find((x) => x.id === id); if (!l) return pageTracks();
+  if (!canOpen(l)) return '<div class="wrap"><div class="page-head"><h1>' + esc(L(l.title)) + '</h1></div><div class="panel row" style="justify-content:space-between;margin-block:18px"><div><h3>' + esc(t("level_locked_h")) + '</h3><p class="muted">' + esc(t("level_locked_p")) + '</p></div><a class="btn primary" href="#plans">' + esc(t("see_plans")) + "</a></div></div>";
   const tr = trackById(l.track), all = lessonsOf(l.track), i = all.indexOf(l), prev = all[i - 1], next = all[i + 1];
   const qs = quizState[id] || (quizState[id] = { picks: {}, checked: false });
   const quiz = l.quiz.map((q, qi) => {
@@ -899,8 +996,8 @@ function pageJournal() {
   const closed = S.journal.filter((j) => j.exit != null), wins = closed.filter((j) => plOf(j) > 0).length, net = closed.reduce((a, j) => a + plOf(j), 0);
   const f = (id, k, val, extra) => '<div class="field"><label for="' + id + '">' + esc(t(k)) + '</label><input id="' + id + '" ' + (extra || "") + ' value="' + esc(val ?? "") + '"></div>';
   const form = '<form class="panel stack" data-form="journal" novalidate><h3>' + esc(t("j_new")) + (d.lesson ? ' <span class="tag amber">' + esc(t("from_lesson")) + ": " + esc(d.lessonTitle) + "</span>" : "") + '</h3><div class="form-grid">' +
-    f("j-symbol", "j_symbol", d.symbol, 'class="num" inputmode="numeric" maxlength="8"') + f("j-name", "j_name", d.name, "") + f("j-qty", "j_qty", d.qty ?? 100, 'class="num" type="number" min="1" step="1"') +
-    f("j-entry", "j_entry", d.entry, 'class="num" type="number" min="0" step="0.01"') + f("j-stop", "j_stop", "", 'class="num" type="number" min="0" step="0.01"') + f("j-date", "j_date", today(), 'type="date"') +
+    f("j-symbol", "j_symbol", d.symbol, 'class="num" inputmode="numeric" maxlength="10"') + f("j-name", "j_name", d.name, "") + f("j-qty", "j_qty", d.qty ?? 100, 'class="num" type="number" min="1" step="1"') +
+    f("j-entry", "j_entry", d.entry, 'class="num" type="number" min="0" step="0.01"') + f("j-stop", "j_stop", "", 'class="num" type="number" min="0" step="0.01"') + f("j-target", "j_target", "", 'class="num" type="number" min="0" step="0.01"') + f("j-date", "j_date", today(), 'type="date"') +
     '</div><div class="field"><label for="j-reason">' + esc(t("j_reason")) + '</label><textarea id="j-reason" rows="2"></textarea></div><input type="hidden" id="j-lesson" value="' + esc(d.lesson || "") + '"><div><button class="btn primary" type="submit">' + esc(t("j_add")) + "</button></div></form>";
   const stats = '<div class="stats"><div><span>' + esc(t("st_trades")) + "</span><b>" + S.journal.length + "</b></div><div><span>" + esc(t("st_open")) + "</span><b>" + (S.journal.length - closed.length) + "</b></div><div><span>" + esc(t("st_win")) + "</span><b>" + (closed.length ? Math.round((wins / closed.length) * 100) + "%" : "–") + "</b></div><div><span>" + esc(t("st_pl")) + '</span><b class="' + (net > 0 ? "pos" : net < 0 ? "neg" : "") + '">' + (closed.length ? (net > 0 ? "+" : "") + fmt(net) : "–") + "</b></div></div>";
   let table;
@@ -912,9 +1009,9 @@ function pageJournal() {
       if (closing === j.id) actions = '<form class="row" data-form="close" data-id="' + j.id + '" style="flex-wrap:nowrap"><input id="c-exit" class="num" type="number" step="0.01" min="0" placeholder="' + esc(t("j_exit")) + '" style="width:92px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface)"><input id="c-note" placeholder="' + esc(t("j_note")) + '" style="width:150px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface)"><button class="btn sm primary" type="submit">' + esc(t("j_confirm_close")) + '</button><button class="btn sm" type="button" data-act="j-cancel">' + esc(t("j_cancel")) + "</button></form>";
       else if (deleting === j.id) actions = '<div class="row" style="flex-wrap:nowrap"><button class="btn sm danger" data-act="j-del-yes" data-id="' + j.id + '">' + esc(t("j_sure")) + '</button><button class="btn sm" data-act="j-cancel">' + esc(t("j_cancel")) + "</button></div>";
       else actions = '<div class="row" style="flex-wrap:nowrap">' + (j.exit == null ? '<button class="btn sm" data-act="j-close" data-id="' + j.id + '">' + esc(t("j_close")) + "</button>" : "") + '<button class="btn sm ghost" data-act="j-del" data-id="' + j.id + '">' + esc(t("j_del")) + "</button></div>";
-      return "<tr><td><span class=\"num\">" + esc(j.symbol) + "</span> " + esc(j.name || "") + '</td><td class="num">' + esc(j.entryDate) + '</td><td class="num">' + int(j.qty) + '</td><td class="num">' + fmt(j.entry) + '</td><td class="num">' + (j.stop ? fmt(j.stop) : "–") + '</td><td class="num">' + (j.exit != null ? fmt(j.exit) : "–") + '</td><td class="num ' + cls + '">' + (pl == null ? "–" : (pl > 0 ? "+" : "") + fmt(pl)) + '</td><td class="num ' + cls + '">' + (pct == null ? "–" : (pct > 0 ? "+" : "") + fmt(pct) + "%") + '</td><td><span class="tag ' + (j.exit == null ? "amber" : "") + '">' + esc(j.exit == null ? t("j_open") : t("j_closed")) + '</span></td><td class="note">' + esc(j.reason || "") + (j.note ? '<br><span class="muted">' + esc(j.note) + "</span>" : "") + "</td><td>" + actions + "</td></tr>";
+      return "<tr><td><span class=\"num\">" + esc(j.symbol) + "</span> " + esc(j.name || "") + '</td><td class="num">' + esc(j.entryDate) + '</td><td class="num">' + int(j.qty) + '</td><td class="num">' + fmt(j.entry) + '</td><td class="num">' + (j.stop ? fmt(j.stop) : "–") + '</td><td class="num">' + (j.target ? fmt(j.target) : "–") + '</td><td class="num">' + (j.exit != null ? fmt(j.exit) : "–") + '</td><td class="num ' + cls + '">' + (pl == null ? "–" : (pl > 0 ? "+" : "") + fmt(pl)) + '</td><td class="num ' + cls + '">' + (pct == null ? "–" : (pct > 0 ? "+" : "") + fmt(pct) + "%") + '</td><td><span class="tag ' + (j.exit == null ? "amber" : "") + '">' + esc(j.exit == null ? t("j_open") : t("j_closed")) + '</span></td><td class="note">' + esc(j.reason || "") + (j.note ? '<br><span class="muted">' + esc(j.note) + "</span>" : "") + "</td><td>" + actions + "</td></tr>";
     }).join("");
-    table = '<div class="tablewrap"><table><thead><tr>' + ["j_symbol", "j_date", "j_qty", "j_entry", "j_stop", "j_exit", "j_pl", "j_plpct", "j_status", "j_reason"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "<th></th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+    table = '<div class="tablewrap"><table><thead><tr>' + ["j_symbol", "j_date", "j_qty", "j_entry", "j_stop", "j_target", "j_exit", "j_pl", "j_plpct", "j_status", "j_reason"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "<th></th></tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
   return svcShell("journal", '<p class="muted" style="max-width:64ch">' + esc(t("journal_p")) + "</p>" + form + stats + '<div class="row" style="justify-content:space-between"><h3 style="font-size:20px">' + esc(t("tab_journal")) + '</h3><button class="btn" data-act="export-xlsx"' + (S.journal.length ? "" : " disabled") + ">" + esc(t("j_export")) + "</button></div>" + table + '<p class="small muted">' + esc(t("disclaimer")) + "</p>");
 }
@@ -948,8 +1045,8 @@ function pageGlossary() {
 
 function pageProgress() {
   const doneN = LESSONS.filter((l) => isDone(l.id)).length;
-  let steps = 0; TRACKS.forEach((tr) => [1, 2].forEach((n) => { if (levelDone(tr.id, n)) steps++; }));
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("progress_h")) + "</h1><p>" + esc(t("progress_p")) + '</p></div><div class="stack" style="padding-block:18px;gap:22px"><div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><span>' + esc(t("p_lessons")) + "</span><b>" + doneN + " / " + LESSONS.length + "</b></div><div><span>" + esc(t("p_steps")) + "</span><b>" + steps + " / 6</b></div><div><span>" + esc(t("p_trades")) + "</span><b>" + S.journal.length + '</b></div></div><div class="grid3">' +
+  let steps = 0, stepsAll = 0; TRACKS.forEach((tr) => [1, 2, 3, 4, 5].forEach((n) => { if (lessonsOf(tr.id, n).length) { stepsAll++; if (levelDone(tr.id, n)) steps++; } }));
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("progress_h")) + "</h1><p>" + esc(t("progress_p")) + '</p></div><div class="stack" style="padding-block:18px;gap:22px"><div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><span>' + esc(t("p_lessons")) + "</span><b>" + doneN + " / " + LESSONS.length + "</b></div><div><span>" + esc(t("p_steps")) + "</span><b>" + steps + " / " + stepsAll + "</b></div><div><span>" + esc(t("p_trades")) + "</span><b>" + S.journal.length + '</b></div></div><div class="grid3">' +
     TRACKS.map((tr) => { const n = nextLesson(tr.id); return '<div class="panel stack"><h3>' + esc(L(tr.name)) + "</h3>" + stairs(tr.id) + '<div class="meter"><i style="width:' + trackPct(tr.id) + '%"></i></div>' + (n ? '<a class="btn" href="#l-' + n.id + '">' + esc(t("continue")) + ": " + esc(L(n.title)) + "</a>" : '<span class="tag up">' + esc(t("all_done")) + "</span>") + "</div>"; }).join("") +
     '</div><div class="panel stack"><h3>' + esc(t("backup_h")) + '</h3><p class="muted">' + esc(t("backup_p")) + '</p><div class="row"><button class="btn" data-act="export-json">' + esc(t("export")) + '</button><label class="btn" for="import-file">' + esc(t("import")) + '</label><input id="import-file" type="file" accept="application/json,.json" hidden>' + (HOSTED ? '<a class="btn" href="#settings">' + esc(t("set_h")) + "</a>" : "") + "</div></div></div></div>";
 }
@@ -982,15 +1079,21 @@ function pageAccount() {
 
 /* ---------- shell & router ---------- */
 function route() { return (location.hash || "").replace(/^#/, ""); }
+let rendering = false;
 function render() {
+  if (rendering) return;
+  rendering = true;
+  try { renderNow(); } finally { rendering = false; }
+}
+function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
-  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
+  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
   const group = r === "settings" ? "account" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "glossary"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
   $("#top").innerHTML = '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav" aria-label="main">' + nav.map(([h, k]) => '<a href="#' + h + '"' + (group === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</nav><div class="tools"><button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a></div></div>";
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
-  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings }[r] || pageHome)();
+  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -1060,8 +1163,11 @@ document.addEventListener("submit", (e) => {
   if (kind === "journal") {
     const symbol = val("j-symbol").trim(), qty = parseFloat(val("j-qty")), entry = parseFloat(val("j-entry"));
     if (!symbol || !(qty > 0) || !(entry > 0)) { toast(t("j_need")); return; }
+    const stopV = parseFloat(val("j-stop")) || null, targetV = parseFloat(val("j-target")) || null;
+    if (stopV && stopV >= entry) { toast(t("j_bad_stop")); return; }
+    if (targetV && targetV <= entry) { toast(t("j_bad_target")); return; }
     const known = SAMPLE_QUOTES[symbol];
-    S.journal.push({ id: "t" + Date.now().toString(36), symbol, name: val("j-name").trim() || (known ? L(known.name) : ""), qty, entry, stop: parseFloat(val("j-stop")) || null, entryDate: val("j-date") || today(), reason: val("j-reason").trim(), lesson: val("j-lesson"), exit: null, exitDate: null, note: "", updated: Date.now() });
+    S.journal.push({ id: "t" + Date.now().toString(36), symbol, name: val("j-name").trim() || (known ? L(known.name) : ""), qty, entry, stop: stopV, target: targetV, entryDate: val("j-date") || today(), reason: val("j-reason").trim(), lesson: val("j-lesson"), exit: null, exitDate: null, note: "", updated: Date.now() });
     save(); toast(t("j_saved")); render();
   } else if (kind === "close") {
     const j = S.journal.find((x) => x.id === form.dataset.id), exit = parseFloat(val("c-exit"));
@@ -1080,13 +1186,13 @@ document.addEventListener("submit", (e) => {
 
 function exportXlsx() {
   if (!window.XLSX) { toast(t("save_fail")); return; }
-  const head = ["j_symbol", "j_name", "j_qty", "j_entry", "j_date", "j_stop", "j_reason", "j_exit", "j_exit_date", "j_pl", "j_plpct", "j_status", "j_note", "from_lesson"].map(t);
+  const head = ["j_symbol", "j_name", "j_qty", "j_entry", "j_date", "j_stop", "j_target", "j_reason", "j_exit", "j_exit_date", "j_pl", "j_plpct", "j_status", "j_note", "from_lesson"].map(t);
   const rows = S.journal.map((j) => {
     const pl = plOf(j), ls = LESSONS.find((x) => x.id === j.lesson);
-    return [j.symbol, j.name, j.qty, j.entry, j.entryDate, j.stop ?? "", j.reason, j.exit ?? "", j.exitDate ?? "", pl == null ? "" : +pl.toFixed(2), pl == null ? "" : +(((j.exit - j.entry) / j.entry) * 100).toFixed(2), j.exit == null ? t("j_open") : t("j_closed"), j.note, ls ? L(ls.title) : ""];
+    return [j.symbol, j.name, j.qty, j.entry, j.entryDate, j.stop ?? "", j.target ?? "", j.reason, j.exit ?? "", j.exitDate ?? "", pl == null ? "" : +pl.toFixed(2), pl == null ? "" : +(((j.exit - j.entry) / j.entry) * 100).toFixed(2), j.exit == null ? t("j_open") : t("j_closed"), j.note, ls ? L(ls.title) : ""];
   });
   const ws = XLSX.utils.aoa_to_sheet([head].concat(rows));
-  ws["!cols"] = head.map((h, i) => ({ wch: [6, 12].includes(i) ? 34 : i === 1 || i === 13 ? 22 : 13 }));
+  ws["!cols"] = head.map((h, i) => ({ wch: [7, 13].includes(i) ? 34 : i === 1 || i === 14 ? 22 : 13 }));
   if (S.lang === "ar") ws["!views"] = [{ RTL: true }];
   const wb = XLSX.utils.book_new();
   if (S.lang === "ar") wb.Workbook = { Views: [{ RTL: true }] };
@@ -1094,12 +1200,226 @@ function exportXlsx() {
   const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   saveFile("meras-journal-" + today() + ".xlsx", new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
 }
+/* ===== مِراس: الشارت التفاعلي ===== */
+Object.assign(UI, {
+  nav_chart: ["الشارت", "Chart"],
+  ch_h: ["الشارت", "Chart"],
+  ch_p: ["ارسم مستوياتك، شغّل المؤشرات، وجرّب تتوقع الشمعة الجاية قبل ما تشوفها.", "Draw your levels, switch on indicators, and try to call the next candle before you see it."],
+  ch_sym: ["السهم", "Share"], ch_view: ["عدد الشموع", "Candles shown"], ch_all: ["الكل", "All"],
+  ch_practice: ["بيانات تدريبية", "Practice data"], ch_real: ["شموع حقيقية من مستودعك", "Real candles from your repository"],
+  ch_pa: ["سهم تدريبي أ (اتجاه صاعد)", "Practice share A (uptrend)"], ch_pb: ["سهم تدريبي ب (مسار عرضي)", "Practice share B (range)"], ch_pc: ["سهم تدريبي ج (هبوط ثم انعكاس)", "Practice share C (fall then reversal)"],
+  ch_candles: ["شمعة", "candles"],
+  ch_ind: ["المؤشرات", "Indicators"], ch_sma: ["متوسط بسيط", "SMA"], ch_ema: ["متوسط أسي", "EMA"], ch_rsi: ["القوة النسبية", "RSI"], ch_vol: ["الحجم", "Volume"], ch_period: ["الفترة", "Period"],
+  ch_tools: ["الرسم", "Drawing"], ch_cursor: ["مؤشر", "Pointer"], ch_hline: ["خط أفقي", "Horizontal line"], ch_tline: ["خط اتجاه", "Trend line"], ch_clear: ["امسح الرسومات", "Clear drawings"],
+  ch_hint_cursor: ["حرّك المؤشر على الشارت عشان تقرأ أرقام كل شمعة.", "Move over the chart to read each candle's numbers."],
+  ch_hint_h: ["اضغط على الشارت عند السعر اللي تبي ترسم عنده الخط.", "Click the chart at the price where you want the line."],
+  ch_hint_t1: ["اضغط على النقطة الأولى، مثلاً أول قاع.", "Click the first point, for example the first low."],
+  ch_hint_t2: ["اضغط على النقطة الثانية على شمعة مختلفة.", "Now click the second point on a different candle."],
+  ch_replay: ["وضع التوقع", "Prediction mode"], ch_replay_p: ["يخفي آخر الشموع. توقّع الحركة ثم اكشفها شمعة شمعة.", "Hides the latest candles. Call the move, then reveal it candle by candle."],
+  ch_next: ["الشمعة التالية", "Next candle"], ch_next5: ["+5 شموع", "+5 candles"], ch_show_all: ["اكشف الكل", "Reveal all"], ch_hidden: ["شموع مخفية", "candles hidden"],
+  ch_older: ["أقدم", "Older"], ch_newer: ["أحدث", "Newer"],
+  ch_trade: ["سجّل صفقة من الشارت", "Log a trade from the chart"],
+  ch_few: ["عندك {n} شمعة حقيقية لهذا السهم. تزيد شمعة كل يوم تداول، والمؤشر يحتاج عدد شموع يساوي فترته على الأقل.", "You have {n} real candle(s) for this share. One is added each trading day, and an indicator needs at least as many candles as its period."],
+  ch_practice_note: ["هذي بيانات تدريبية مولّدة، وليست أسعار سهم حقيقي.", "This is generated practice data, not the prices of a real share."],
+  ch_o: ["افتتاح", "O"], ch_hi: ["أعلى", "H"], ch_lo: ["أدنى", "L"], ch_c: ["إغلاق", "C"], ch_day: ["يوم", "Day"],
+  ch_draws: ["رسوماتك", "Your drawings"], ch_none: ["ما رسمت شي للحين.", "Nothing drawn yet."], ch_h_lbl: ["أفقي", "Horizontal"], ch_t_lbl: ["اتجاه", "Trend"],
+  ch_same: ["اختر شمعة مختلفة للنقطة الثانية", "Pick a different candle for the second point"],
+  open_chart: ["افتح الشارت وجرّب", "Open the chart and try it"],
+  j_target: ["الهدف", "Target"],
+  j_bad_stop: ["وقف الخسارة لازم يكون تحت سعر الدخول", "The stop-loss must be below the entry price"],
+  j_bad_target: ["الهدف لازم يكون فوق سعر الدخول", "The target must be above the entry price"]
+});
+
+const PRACTICE = { "TRN-A": "ch_pa", "TRN-B": "ch_pb", "TRN-C": "ch_pc" };
+const practiceCache = {};
+function practiceSeries(sym) {
+  if (practiceCache[sym]) return practiceCache[sym];
+  let seed = { "TRN-A": 11, "TRN-B": 29, "TRN-C": 53 }[sym];
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const out = []; let c = { "TRN-A": 30, "TRN-B": 51, "TRN-C": 72 }[sym];
+  for (let i = 0; i < 160; i++) {
+    let drift;
+    if (sym === "TRN-A") drift = 0.0028 + Math.sin(i / 7) * 0.0075;
+    else if (sym === "TRN-B") drift = (51 - c) * 0.012 + Math.cos(i / 6.5) * 0.0085;
+    else drift = (i < 85 ? -0.0042 : i < 110 ? 0 : 0.0048) + Math.sin(i / 6) * 0.006;
+    const o = c, ret = drift + (rnd() - 0.5) * 0.022; c = Math.max(1, o * (1 + ret));
+    const h = Math.max(o, c) * (1 + rnd() * 0.008), l = Math.min(o, c) * (1 - rnd() * 0.008);
+    const r2 = (x) => Math.round(x * 100) / 100;
+    out.push({ o: r2(o), h: r2(h), l: r2(l), c: r2(c), v: Math.round(400000 * (0.6 + rnd() * 0.8) * (1 + Math.abs(ret) * 45)), d: null });
+    c = r2(c);
+  }
+  return (practiceCache[sym] = out);
+}
+function chartData(sym) {
+  if (PRACTICE[sym]) return practiceSeries(sym);
+  return ((LIVE.history && LIVE.history[sym]) || []).filter((r) => r && isFinite(r.o) && isFinite(r.c));
+}
+const symName = (sym) => (PRACTICE[sym] ? t(PRACTICE[sym]) : (quoteOf(sym) ? L(quoteOf(sym).name) : sym));
+
+/* ----- indicator maths (null until enough candles) ----- */
+function sma(cl, p) { const out = []; let sum = 0; for (let i = 0; i < cl.length; i++) { sum += cl[i]; if (i >= p) sum -= cl[i - p]; out.push(i >= p - 1 ? sum / p : null); } return out; }
+function ema(cl, p) { const out = [], k = 2 / (p + 1); let prev = null, sum = 0; for (let i = 0; i < cl.length; i++) { if (i < p - 1) { sum += cl[i]; out.push(null); } else if (i === p - 1) { sum += cl[i]; prev = sum / p; out.push(prev); } else { prev = cl[i] * k + prev * (1 - k); out.push(prev); } } return out; }
+function rsi(cl, p) {
+  const out = [null]; let ag = 0, al = 0;
+  for (let i = 1; i < cl.length; i++) {
+    const ch = cl[i] - cl[i - 1], g = Math.max(ch, 0), l = Math.max(-ch, 0);
+    if (i <= p) { ag += g; al += l; if (i === p) { ag /= p; al /= p; out.push(al === 0 ? 100 : 100 - 100 / (1 + ag / al)); } else out.push(null); }
+    else { ag = (ag * (p - 1) + g) / p; al = (al * (p - 1) + l) / p; out.push(al === 0 ? 100 : 100 - 100 / (1 + ag / al)); }
+  }
+  return out;
+}
+
+const chartDefaults = () => ({ sym: "TRN-A", n: 60, vol: true, sma1: { on: true, p: 5 }, sma2: { on: false, p: 20 }, ema: { on: false, p: 10 }, rsi: { on: false, p: 14 } });
+let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null;
+function chartCfg() { if (!S.chart || !S.chart.sma1) S.chart = chartDefaults(); if (!S.drawings) S.drawings = {}; return S.chart; }
+
+function pageChart() {
+  const cfg = chartCfg(), full = chartData(cfg.sym);
+  if (!PRACTICE[cfg.sym] && !full.length) { cfg.sym = "TRN-A"; return pageChart(); }
+  const end = chReplay == null ? full.length : Math.min(chReplay, full.length), data = full.slice(0, end);
+  const slots = Math.max(10, Math.min(cfg.n === "all" ? data.length : cfg.n, data.length + 2));
+  chOffset = Math.max(0, Math.min(chOffset, Math.max(0, data.length - Math.min(slots, data.length))));
+  const e = data.length - chOffset, s = Math.max(0, e - slots), view = data.slice(s, e);
+  const cl = data.map((r) => r.c);
+  const lines = [];
+  if (cfg.sma1.on) lines.push({ k: "sma1", cls: "i1", name: t("ch_sma") + " " + cfg.sma1.p, v: sma(cl, cfg.sma1.p) });
+  if (cfg.sma2.on) lines.push({ k: "sma2", cls: "i2", name: t("ch_sma") + " " + cfg.sma2.p, v: sma(cl, cfg.sma2.p) });
+  if (cfg.ema.on) lines.push({ k: "ema", cls: "i3", name: t("ch_ema") + " " + cfg.ema.p, v: ema(cl, cfg.ema.p) });
+  const rs = cfg.rsi.on ? rsi(cl, cfg.rsi.p) : null;
+  const draws = S.drawings[cfg.sym] || [];
+
+  /* geometry */
+  const W = 920, x0 = 8, x1 = W - 62, top = 10, ph = 320, vh = cfg.vol ? 56 : 0, rh = rs ? 96 : 0;
+  const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), H = (rs ? rtop + rh : vh ? vtop + vh : top + ph) + 22;
+  let min = Infinity, max = -Infinity;
+  view.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
+  lines.forEach((ln) => { for (let i = s; i < e; i++) if (ln.v[i] != null) { min = Math.min(min, ln.v[i]); max = Math.max(max, ln.v[i]); } });
+  if (!isFinite(min)) { min = 0; max = 1; }
+  if (max - min < 0.02) { max += 0.5; min -= 0.5; }
+  const pad = (max - min) * 0.07; min -= pad; max += pad;
+  const bw = (x1 - x0) / slots, X = (i) => x0 + (i - s) * bw + bw / 2, Y = (v) => top + ((max - v) / (max - min)) * ph;
+  CH = { W, H, x0, x1, top, ph, bw, s, e, slots, min, max, data, lines, rs, sym: cfg.sym };
+
+  let g = '<defs><clipPath id="ch-clip"><rect x="' + x0 + '" y="' + top + '" width="' + (x1 - x0) + '" height="' + ph + '"/></clipPath></defs>';
+  for (let i = 0; i <= 5; i++) { const v = min + ((max - min) * i) / 5, yy = Y(v); g += '<line class="c-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + yy + '" y2="' + yy + '"/><text class="c-text" x="' + (x1 + 6) + '" y="' + (yy + 4) + '">' + v.toFixed(2) + "</text>"; }
+  const vmax = Math.max(1, ...view.map((r) => r.v || 0));
+  view.forEach((r, k) => {
+    const i = s + k, cls = r.c >= r.o ? "c-up" : "c-down", bt = Y(Math.max(r.o, r.c)), bb = Y(Math.min(r.o, r.c)), w = Math.min(16, Math.max(1, bw * 0.66));
+    g += '<line class="' + cls + '" x1="' + X(i) + '" x2="' + X(i) + '" y1="' + Y(r.h) + '" y2="' + Y(r.l) + '" stroke-width="1.3"/><rect class="' + cls + '" x="' + (X(i) - w / 2) + '" y="' + bt + '" width="' + w + '" height="' + Math.max(1.2, bb - bt) + '"/>';
+    if (vh) { const hh = ((r.v || 0) / vmax) * vh; g += '<rect class="' + cls + '" opacity=".45" x="' + (X(i) - w / 2) + '" y="' + (vtop + vh - hh) + '" width="' + w + '" height="' + hh + '"/>'; }
+  });
+  lines.forEach((ln) => {
+    let d = "", pen = false;
+    for (let i = s; i < e; i++) { if (ln.v[i] == null) { pen = false; continue; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(ln.v[i]).toFixed(1); pen = true; }
+    if (d) g += '<path class="ind ' + ln.cls + '" d="' + d + '" clip-path="url(#ch-clip)"/>';
+  });
+  draws.forEach((dr) => {
+    if (dr.t === "h") { if (dr.p > min && dr.p < max) g += '<line class="draw" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(dr.p) + '" y2="' + Y(dr.p) + '"/><rect class="draw-tag" x="' + (x1 + 2) + '" y="' + (Y(dr.p) - 9) + '" width="58" height="18" rx="3"/><text class="draw-txt" x="' + (x1 + 6) + '" y="' + (Y(dr.p) + 4) + '">' + dr.p.toFixed(2) + "</text>"; }
+    else { const m = (dr.p2 - dr.p1) / (dr.i2 - dr.i1), iEnd = s + slots, pEnd = dr.p1 + m * (iEnd - dr.i1); g += '<line class="draw" clip-path="url(#ch-clip)" x1="' + X(dr.i1) + '" y1="' + Y(dr.p1) + '" x2="' + X(iEnd) + '" y2="' + Y(pEnd) + '"/><circle class="draw-dot" clip-path="url(#ch-clip)" cx="' + X(dr.i1) + '" cy="' + Y(dr.p1) + '" r="3.5"/><circle class="draw-dot" clip-path="url(#ch-clip)" cx="' + X(dr.i2) + '" cy="' + Y(dr.p2) + '" r="3.5"/>'; }
+  });
+  if (chPending) g += '<circle class="draw-dot" cx="' + X(chPending.i) + '" cy="' + Y(chPending.p) + '" r="5"/>';
+  if (vh) g += '<text class="c-lab" x="' + x0 + '" y="' + (vtop - 2) + '">' + esc(t("ch_vol")) + "</text>";
+  if (rs) {
+    const RY = (v) => rtop + ((100 - v) / 100) * rh;
+    g += '<rect class="pane" x="' + x0 + '" y="' + rtop + '" width="' + (x1 - x0) + '" height="' + rh + '"/>';
+    [70, 30].forEach((v) => { g += '<line class="c-grid" stroke-dasharray="4 4" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(v) + '" y2="' + RY(v) + '"/><text class="c-text" x="' + (x1 + 6) + '" y="' + (RY(v) + 4) + '">' + v + "</text>"; });
+    let d = "", pen = false;
+    for (let i = s; i < e; i++) { if (rs[i] == null) { pen = false; continue; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + RY(rs[i]).toFixed(1); pen = true; }
+    if (d) g += '<path class="ind i2" d="' + d + '"/>';
+    g += '<text class="c-lab" x="' + (x0 + 4) + '" y="' + (rtop + 14) + '">' + esc(t("ch_rsi")) + " " + cfg.rsi.p + "</text>";
+  }
+  g += '<line id="ch-x" class="cross" x1="0" x2="0" y1="' + top + '" y2="' + (H - 22) + '" visibility="hidden"/><line id="ch-y" class="cross" x1="' + x0 + '" x2="' + x1 + '" y1="0" y2="0" visibility="hidden"/>';
+
+  /* controls */
+  const real = Object.keys((LIVE.history) || {}).filter((k) => (LIVE.history[k] || []).length);
+  const opt = (v, label) => '<option value="' + esc(v) + '"' + (String(cfg.sym) === String(v) ? " selected" : "") + ">" + esc(label) + "</option>";
+  const symSel = '<div class="field"><label for="ch-sym">' + esc(t("ch_sym")) + '</label><select id="ch-sym" data-ch="sym"><optgroup label="' + esc(t("ch_practice")) + '">' + Object.keys(PRACTICE).map((k) => opt(k, t(PRACTICE[k]))).join("") + "</optgroup>" + (real.length ? '<optgroup label="' + esc(t("ch_real")) + '">' + real.map((k) => opt(k, k + " " + symName(k) + " (" + LIVE.history[k].length + " " + t("ch_candles") + ")")).join("") + "</optgroup>" : "") + "</select></div>";
+  const nSel = '<div class="field"><label for="ch-n">' + esc(t("ch_view")) + '</label><select id="ch-n" data-ch="n">' + [20, 40, 60, 100, "all"].map((v) => '<option value="' + v + '"' + (String(cfg.n) === String(v) ? " selected" : "") + ">" + (v === "all" ? esc(t("ch_all")) : v) + "</option>").join("") + "</select></div>";
+  const ind = (k, label, cls) => '<label class="indbox"><input type="checkbox" id="ch-' + k + '-on" data-ch="' + k + '.on"' + (cfg[k].on ? " checked" : "") + '><i class="sw ' + cls + '"></i><span>' + esc(label) + '</span><input class="num" type="number" min="2" max="200" step="1" id="ch-' + k + '-p" data-ch="' + k + '.p" value="' + cfg[k].p + '" aria-label="' + esc(t("ch_period")) + '"></label>';
+  const tool = (k, label) => '<button class="btn sm' + (chTool === k ? " on" : "") + '" data-act="ch-tool" data-tool="' + k + '" aria-pressed="' + (chTool === k) + '">' + esc(t(label)) + "</button>";
+  const hint = chTool === "h" ? "ch_hint_h" : chTool === "t" ? (chPending ? "ch_hint_t2" : "ch_hint_t1") : "ch_hint_cursor";
+  const hidden = full.length - end;
+  const replay = chReplay == null
+    ? '<button class="btn sm" data-act="ch-replay"' + (full.length < 12 ? " disabled" : "") + ">" + esc(t("ch_replay")) + '</button><span class="small muted">' + esc(t("ch_replay_p")) + "</span>"
+    : '<button class="btn sm primary" data-act="ch-step" data-n="1"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next")) + '</button><button class="btn sm" data-act="ch-step" data-n="5"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next5")) + '</button><button class="btn sm" data-act="ch-replay-off">' + esc(t("ch_show_all")) + '</button><span class="tag amber num">' + hidden + "</span><span class=\"small muted\">" + esc(t("ch_hidden")) + "</span>";
+  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
+  const note = PRACTICE[cfg.sym] ? t("ch_practice_note") : t("ch_few").replace("{n}", full.length);
+
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
+    '<div class="panel stack"><div class="form-grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">' + symSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + ind("sma1", t("ch_sma"), "i1") + ind("sma2", t("ch_sma"), "i2") + ind("ema", t("ch_ema"), "i3") + ind("rsi", t("ch_rsi"), "i2") + '<label class="indbox"><input type="checkbox" id="ch-vol" data-ch="vol"' + (cfg.vol ? " checked" : "") + "><span>" + esc(t("ch_vol")) + "</span></label></div>" +
+    '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tool("cursor", "ch_cursor") + tool("h", "ch_hline") + tool("t", "ch_tline") + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
+    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-read" id="ch-read">' + chartReadout(e - 1) + '</div><div class="ch-scroll"><svg id="ch-svg" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(symName(cfg.sym)) + '">' + g + "</svg></div></div>" +
+    '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + Math.max(1, Math.round(slots / 3)) + '"' + (s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + Math.max(1, Math.round(slots / 3)) + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
+    '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><button class="btn sm primary" data-act="ch-trade"' + (data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div><div class="row">' + drawList + '</div></div><div class="notice">' + esc(note) + " " + esc(t("disclaimer")) + "</div></div></div>";
+}
+
+function chartReadout(i) {
+  if (!CH || !CH.data[i]) return "&nbsp;";
+  const r = CH.data[i], f = (v) => (v == null ? "–" : v.toFixed(2)), n = (v, cls) => '<b class="num ' + (cls || "") + '">' + v + "</b>";
+  let h = '<span class="rd muted">' + (r.d ? '<span class="num">' + esc(r.d) + "</span>" : esc(t("ch_day")) + " " + n(i + 1)) + '</span><span class="rd">' + esc(t("ch_o")) + " " + n(f(r.o)) + '</span><span class="rd">' + esc(t("ch_hi")) + " " + n(f(r.h)) + '</span><span class="rd">' + esc(t("ch_lo")) + " " + n(f(r.l)) + '</span><span class="rd">' + esc(t("ch_c")) + " " + n(f(r.c), r.c >= r.o ? "pos" : "neg") + "</span>";
+  CH.lines.forEach((ln) => { h += '<span class="rd ' + ln.cls + '">' + esc(ln.name) + ": " + n(f(ln.v[i])) + "</span>"; });
+  if (CH.rs) h += '<span class="rd i2">' + esc(t("ch_rsi")) + ": " + n(CH.rs[i] == null ? "–" : CH.rs[i].toFixed(1)) + "</span>";
+  return h;
+}
+function chartPoint(ev) {
+  const svg = document.getElementById("ch-svg"); if (!svg || !CH) return null;
+  const b = svg.getBoundingClientRect(), px = ((ev.clientX - b.left) * CH.W) / b.width, py = ((ev.clientY - b.top) * CH.H) / b.height;
+  if (px < CH.x0 || px > CH.x1) return null;
+  const i = CH.s + Math.floor((px - CH.x0) / CH.bw), inPrice = py >= CH.top && py <= CH.top + CH.ph;
+  return { px, py, i, inPrice, p: Math.round((CH.max - ((py - CH.top) / CH.ph) * (CH.max - CH.min)) * 100) / 100 };
+}
+document.addEventListener("pointermove", (ev) => {
+  if (!ev.target.closest || !ev.target.closest("#ch-svg")) return;
+  const pt = chartPoint(ev), cx = document.getElementById("ch-x"), cy = document.getElementById("ch-y"); if (!cx) return;
+  if (!pt) { cx.setAttribute("visibility", "hidden"); cy.setAttribute("visibility", "hidden"); return; }
+  const snap = CH.x0 + (pt.i - CH.s) * CH.bw + CH.bw / 2;
+  cx.setAttribute("x1", snap); cx.setAttribute("x2", snap); cx.setAttribute("visibility", "visible");
+  if (pt.inPrice) { cy.setAttribute("y1", pt.py); cy.setAttribute("y2", pt.py); cy.setAttribute("visibility", "visible"); } else cy.setAttribute("visibility", "hidden");
+  const rd = document.getElementById("ch-read");
+  if (rd && CH.data[pt.i]) rd.innerHTML = chartReadout(pt.i) + (pt.inPrice && chTool !== "cursor" ? '<span class="rd muted">@ <b class="num">' + pt.p.toFixed(2) + "</b></span>" : "");
+});
+document.addEventListener("click", (ev) => {
+  if (ev.target.closest && ev.target.closest("#ch-svg")) {
+    const pt = chartPoint(ev); if (!pt || !pt.inPrice || chTool === "cursor") return;
+    const cfg = chartCfg(), list = S.drawings[cfg.sym] || (S.drawings[cfg.sym] = []);
+    if (chTool === "h") { list.push({ t: "h", p: pt.p }); save(); render(); }
+    else if (!chPending) { chPending = { i: pt.i, p: pt.p }; render(); }
+    else if (pt.i === chPending.i) toast(t("ch_same"));
+    else { const a = chPending, b = { i: pt.i, p: pt.p }, first = a.i < b.i ? a : b, second = a.i < b.i ? b : a; list.push({ t: "t", i1: first.i, p1: first.p, i2: second.i, p2: second.p }); chPending = null; save(); render(); }
+    return;
+  }
+  const el = ev.target.closest && ev.target.closest("[data-act]"); if (!el) return;
+  const act = el.dataset.act; if (act.slice(0, 3) !== "ch-") return;
+  const cfg = chartCfg(), full = chartData(cfg.sym);
+  if (act === "ch-tool") { chTool = el.dataset.tool; chPending = null; }
+  else if (act === "ch-clear") { S.drawings[cfg.sym] = []; chPending = null; save(); }
+  else if (act === "ch-del") { (S.drawings[cfg.sym] || []).splice(+el.dataset.i, 1); save(); }
+  else if (act === "ch-pan") chOffset = Math.max(0, chOffset + +el.dataset.n);
+  else if (act === "ch-replay") { chReplay = Math.max(10, Math.floor(full.length * 0.6)); chOffset = 0; }
+  else if (act === "ch-step") { chReplay = Math.min(full.length, chReplay + +el.dataset.n); chOffset = 0; }
+  else if (act === "ch-replay-off") chReplay = null;
+  else if (act === "ch-trade") {
+    const last = CH && CH.data[CH.data.length - 1]; if (!last) return;
+    draft = { symbol: cfg.sym, name: symName(cfg.sym), entry: last.c, qty: 100, lesson: "", lessonTitle: "" };
+    location.hash = "journal"; return;
+  }
+  render();
+});
+document.addEventListener("change", (ev) => {
+  const key = ev.target.dataset && ev.target.dataset.ch; if (!key) return;
+  const cfg = chartCfg(), el = ev.target;
+  if (key === "sym") { cfg.sym = el.value; chOffset = 0; chReplay = null; chPending = null; }
+  else if (key === "n") { cfg.n = el.value === "all" ? "all" : +el.value; chOffset = 0; }
+  else if (key === "vol") cfg.vol = el.checked;
+  else { const [k, f] = key.split("."); if (f === "on") cfg[k].on = el.checked; else cfg[k].p = Math.max(2, Math.min(200, parseInt(el.value, 10) || cfg[k].p)); }
+  save(); render();
+});
 /* ===== مِراس: المزامنة مع مستودع البيانات الخاص + الأسعار الحقيقية =====
    تشتغل فقط لما الموقع منشور (GitHub Pages أو أي استضافة). */
 const HOSTED = !window.claude && /^https?:$/.test(location.protocol);
 const CFG_KEY = "meras.sync", PX_KEY = "meras.prices";
 let CFG = { owner: "3pp3ll", repo: "meras-data", token: "" };
-let LIVE = { quotes: {}, fetchedAt: null };
+let LIVE = { quotes: {}, fetchedAt: null, history: {} };
 let SYNC = { state: "off", at: null, msg: "" };
 try { Object.assign(CFG, JSON.parse(localStorage.getItem(CFG_KEY) || "{}")); } catch (e) {}
 try { Object.assign(LIVE, JSON.parse(localStorage.getItem(PX_KEY) || "{}")); } catch (e) {}
@@ -1152,7 +1472,7 @@ async function readJson(path) {
 const errText = (e) => t({ "401": "e_401", "404": "e_404", "403": "e_403", net: "e_net" }[e && e.code] || "e_net");
 
 /* ما يتزامن: التقدم، السجل، الباقة، الحساب. اللغة وحالة الدخول تبقى لكل جهاز. */
-const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort() });
+const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null });
 function mergeState(local, remote) {
   if (!remote || typeof remote !== "object") return local;
   const newer = (local.updatedAt || 0) >= (remote.updatedAt || 0) ? local : remote;
@@ -1200,7 +1520,9 @@ async function loadPrices(quiet) {
   try {
     const f = await readJson("prices.json");
     if (!f || !f.data || !f.data.quotes) { if (!quiet) toast(t("no_prices")); return; }
-    LIVE = { quotes: f.data.quotes, fetchedAt: f.data.fetched_at || null };
+    let hist = LIVE.history || {};
+    try { const h = await readJson("history.json"); if (h && h.data && typeof h.data === "object") hist = h.data; } catch (e) {}
+    LIVE = { quotes: f.data.quotes, fetchedAt: f.data.fetched_at || null, history: hist };
     try { localStorage.setItem(PX_KEY, JSON.stringify(LIVE)); } catch (e) {}
     if (!quiet) toast(t("px_ok"));
     if (!document.activeElement || !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) render();

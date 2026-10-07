@@ -1,6 +1,6 @@
 /* ===== مِراس: التطبيق ===== */
 const KEY = "meras.v1";
-const blank = () => ({ lang: "ar", account: null, signedIn: false, plan: "free", done: {}, journal: [], deleted: [], updatedAt: 0 });
+const blank = () => ({ lang: "ar", account: null, signedIn: false, plan: "free", done: {}, journal: [], deleted: [], drawings: {}, chart: null, updatedAt: 0 });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch (e) {}
 const save = () => { S.updatedAt = Date.now(); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} queueSync(); };
@@ -103,7 +103,9 @@ const lessonsOf = (track, level) => LESSONS.filter((l) => l.track === track && (
 const isDone = (id) => !!S.done[id];
 const levelDone = (track, level) => { const ls = lessonsOf(track, level); return ls.length > 0 && ls.every((l) => isDone(l.id)); };
 const trackPct = (track) => { const ls = lessonsOf(track); return Math.round((ls.filter((l) => isDone(l.id)).length / ls.length) * 100); };
-const nextLesson = (track) => lessonsOf(track).find((l) => !isDone(l.id));
+const unlocked = () => S.plan === "full" || (typeof HOSTED !== "undefined" && HOSTED && !!CFG.token);
+const canOpen = (l) => l.level <= 2 || unlocked();
+const nextLesson = (track) => lessonsOf(track).find((l) => !isDone(l.id) && canOpen(l));
 const trackById = (id) => TRACKS.find((x) => x.id === id);
 
 function toast(msg) {
@@ -132,7 +134,7 @@ function stairs(track, inHero) {
   return '<div class="stairs" role="img" aria-label="' + esc(t("tracks_h")) + '">' + [1, 2, 3, 4, 5].map((n) => {
     const free = n <= 2, done = track && levelDone(track, n);
     const cls = done ? "done" : free ? "free" : "locked";
-    const label = inHero ? (free ? t("free") : t("paid")) : (done ? t("done") : free ? t("free") : t("soon"));
+    const label = inHero ? (free ? t("free") : t("paid")) : (done ? t("done") : free ? t("free") : track && lessonsOf(track, n).length ? t("paid") : t("soon"));
     return '<div class="step ' + cls + '" style="--n:' + n + '" title="' + (names ? esc(L(names[n - 1])) : "") + '"><b>' + n + "</b><span>" + esc(label) + "</span></div>";
   }).join("") + "</div>";
 }
@@ -218,6 +220,7 @@ function block(b, lessonId) {
   if (b.note) return '<div class="notice">' + esc(L(b.note)) + "</div>";
   if (b.code) return '<div class="code"><div class="cap"><span>' + esc(b.name || "code") + '</span><button data-act="copy">' + esc(t("copy")) + "</button></div><pre><code>" + esc(b.code) + "</code></pre></div>";
   if (b.quote) return quoteCard(b.quote, lessonId);
+  if (b.open) return '<div><a class="btn primary" href="#chart">' + esc(t("open_chart")) + "</a></div>";
   if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
   return "";
 }
@@ -236,8 +239,8 @@ function pageHome() {
 
 function levelBlock(tr, n) {
   const ls = lessonsOf(tr.id, n), name = L(LEVELS[tr.id][n - 1]);
-  if (n > 2) return '<div class="level locked"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag">' + esc(S.plan === "full" ? t("soon") : t("locked")) + "</span></div></div>";
-  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : t("free")) + '</span></div><ul class="lessons">' +
+  if (n > 2 && !(ls.length && unlocked())) return '<div class="level locked"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag">' + esc(ls.length ? t("locked") : t("soon")) + "</span></div></div>";
+  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : n > 2 ? t("paid") : t("free")) + '</span></div><ul class="lessons">' +
     ls.map((l) => '<li><a href="#l-' + l.id + '"><span class="dot ' + (isDone(l.id) ? "done" : "") + '">' + (isDone(l.id) ? "✓" : "") + "</span><span>" + esc(L(l.title)) + '</span><span class="small muted" style="margin-inline-start:auto">' + l.mins + " " + esc(t("mins")) + "</span></a></li>").join("") + "</ul></div>";
 }
 
@@ -250,6 +253,7 @@ function pageTracks() {
 let quizState = {};
 function pageLesson(id) {
   const l = LESSONS.find((x) => x.id === id); if (!l) return pageTracks();
+  if (!canOpen(l)) return '<div class="wrap"><div class="page-head"><h1>' + esc(L(l.title)) + '</h1></div><div class="panel row" style="justify-content:space-between;margin-block:18px"><div><h3>' + esc(t("level_locked_h")) + '</h3><p class="muted">' + esc(t("level_locked_p")) + '</p></div><a class="btn primary" href="#plans">' + esc(t("see_plans")) + "</a></div></div>";
   const tr = trackById(l.track), all = lessonsOf(l.track), i = all.indexOf(l), prev = all[i - 1], next = all[i + 1];
   const qs = quizState[id] || (quizState[id] = { picks: {}, checked: false });
   const quiz = l.quiz.map((q, qi) => {
@@ -280,8 +284,8 @@ function pageJournal() {
   const closed = S.journal.filter((j) => j.exit != null), wins = closed.filter((j) => plOf(j) > 0).length, net = closed.reduce((a, j) => a + plOf(j), 0);
   const f = (id, k, val, extra) => '<div class="field"><label for="' + id + '">' + esc(t(k)) + '</label><input id="' + id + '" ' + (extra || "") + ' value="' + esc(val ?? "") + '"></div>';
   const form = '<form class="panel stack" data-form="journal" novalidate><h3>' + esc(t("j_new")) + (d.lesson ? ' <span class="tag amber">' + esc(t("from_lesson")) + ": " + esc(d.lessonTitle) + "</span>" : "") + '</h3><div class="form-grid">' +
-    f("j-symbol", "j_symbol", d.symbol, 'class="num" inputmode="numeric" maxlength="8"') + f("j-name", "j_name", d.name, "") + f("j-qty", "j_qty", d.qty ?? 100, 'class="num" type="number" min="1" step="1"') +
-    f("j-entry", "j_entry", d.entry, 'class="num" type="number" min="0" step="0.01"') + f("j-stop", "j_stop", "", 'class="num" type="number" min="0" step="0.01"') + f("j-date", "j_date", today(), 'type="date"') +
+    f("j-symbol", "j_symbol", d.symbol, 'class="num" inputmode="numeric" maxlength="10"') + f("j-name", "j_name", d.name, "") + f("j-qty", "j_qty", d.qty ?? 100, 'class="num" type="number" min="1" step="1"') +
+    f("j-entry", "j_entry", d.entry, 'class="num" type="number" min="0" step="0.01"') + f("j-stop", "j_stop", "", 'class="num" type="number" min="0" step="0.01"') + f("j-target", "j_target", "", 'class="num" type="number" min="0" step="0.01"') + f("j-date", "j_date", today(), 'type="date"') +
     '</div><div class="field"><label for="j-reason">' + esc(t("j_reason")) + '</label><textarea id="j-reason" rows="2"></textarea></div><input type="hidden" id="j-lesson" value="' + esc(d.lesson || "") + '"><div><button class="btn primary" type="submit">' + esc(t("j_add")) + "</button></div></form>";
   const stats = '<div class="stats"><div><span>' + esc(t("st_trades")) + "</span><b>" + S.journal.length + "</b></div><div><span>" + esc(t("st_open")) + "</span><b>" + (S.journal.length - closed.length) + "</b></div><div><span>" + esc(t("st_win")) + "</span><b>" + (closed.length ? Math.round((wins / closed.length) * 100) + "%" : "–") + "</b></div><div><span>" + esc(t("st_pl")) + '</span><b class="' + (net > 0 ? "pos" : net < 0 ? "neg" : "") + '">' + (closed.length ? (net > 0 ? "+" : "") + fmt(net) : "–") + "</b></div></div>";
   let table;
@@ -293,9 +297,9 @@ function pageJournal() {
       if (closing === j.id) actions = '<form class="row" data-form="close" data-id="' + j.id + '" style="flex-wrap:nowrap"><input id="c-exit" class="num" type="number" step="0.01" min="0" placeholder="' + esc(t("j_exit")) + '" style="width:92px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface)"><input id="c-note" placeholder="' + esc(t("j_note")) + '" style="width:150px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface)"><button class="btn sm primary" type="submit">' + esc(t("j_confirm_close")) + '</button><button class="btn sm" type="button" data-act="j-cancel">' + esc(t("j_cancel")) + "</button></form>";
       else if (deleting === j.id) actions = '<div class="row" style="flex-wrap:nowrap"><button class="btn sm danger" data-act="j-del-yes" data-id="' + j.id + '">' + esc(t("j_sure")) + '</button><button class="btn sm" data-act="j-cancel">' + esc(t("j_cancel")) + "</button></div>";
       else actions = '<div class="row" style="flex-wrap:nowrap">' + (j.exit == null ? '<button class="btn sm" data-act="j-close" data-id="' + j.id + '">' + esc(t("j_close")) + "</button>" : "") + '<button class="btn sm ghost" data-act="j-del" data-id="' + j.id + '">' + esc(t("j_del")) + "</button></div>";
-      return "<tr><td><span class=\"num\">" + esc(j.symbol) + "</span> " + esc(j.name || "") + '</td><td class="num">' + esc(j.entryDate) + '</td><td class="num">' + int(j.qty) + '</td><td class="num">' + fmt(j.entry) + '</td><td class="num">' + (j.stop ? fmt(j.stop) : "–") + '</td><td class="num">' + (j.exit != null ? fmt(j.exit) : "–") + '</td><td class="num ' + cls + '">' + (pl == null ? "–" : (pl > 0 ? "+" : "") + fmt(pl)) + '</td><td class="num ' + cls + '">' + (pct == null ? "–" : (pct > 0 ? "+" : "") + fmt(pct) + "%") + '</td><td><span class="tag ' + (j.exit == null ? "amber" : "") + '">' + esc(j.exit == null ? t("j_open") : t("j_closed")) + '</span></td><td class="note">' + esc(j.reason || "") + (j.note ? '<br><span class="muted">' + esc(j.note) + "</span>" : "") + "</td><td>" + actions + "</td></tr>";
+      return "<tr><td><span class=\"num\">" + esc(j.symbol) + "</span> " + esc(j.name || "") + '</td><td class="num">' + esc(j.entryDate) + '</td><td class="num">' + int(j.qty) + '</td><td class="num">' + fmt(j.entry) + '</td><td class="num">' + (j.stop ? fmt(j.stop) : "–") + '</td><td class="num">' + (j.target ? fmt(j.target) : "–") + '</td><td class="num">' + (j.exit != null ? fmt(j.exit) : "–") + '</td><td class="num ' + cls + '">' + (pl == null ? "–" : (pl > 0 ? "+" : "") + fmt(pl)) + '</td><td class="num ' + cls + '">' + (pct == null ? "–" : (pct > 0 ? "+" : "") + fmt(pct) + "%") + '</td><td><span class="tag ' + (j.exit == null ? "amber" : "") + '">' + esc(j.exit == null ? t("j_open") : t("j_closed")) + '</span></td><td class="note">' + esc(j.reason || "") + (j.note ? '<br><span class="muted">' + esc(j.note) + "</span>" : "") + "</td><td>" + actions + "</td></tr>";
     }).join("");
-    table = '<div class="tablewrap"><table><thead><tr>' + ["j_symbol", "j_date", "j_qty", "j_entry", "j_stop", "j_exit", "j_pl", "j_plpct", "j_status", "j_reason"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "<th></th></tr></thead><tbody>" + rows + "</tbody></table></div>";
+    table = '<div class="tablewrap"><table><thead><tr>' + ["j_symbol", "j_date", "j_qty", "j_entry", "j_stop", "j_target", "j_exit", "j_pl", "j_plpct", "j_status", "j_reason"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "<th></th></tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
   return svcShell("journal", '<p class="muted" style="max-width:64ch">' + esc(t("journal_p")) + "</p>" + form + stats + '<div class="row" style="justify-content:space-between"><h3 style="font-size:20px">' + esc(t("tab_journal")) + '</h3><button class="btn" data-act="export-xlsx"' + (S.journal.length ? "" : " disabled") + ">" + esc(t("j_export")) + "</button></div>" + table + '<p class="small muted">' + esc(t("disclaimer")) + "</p>");
 }
@@ -329,8 +333,8 @@ function pageGlossary() {
 
 function pageProgress() {
   const doneN = LESSONS.filter((l) => isDone(l.id)).length;
-  let steps = 0; TRACKS.forEach((tr) => [1, 2].forEach((n) => { if (levelDone(tr.id, n)) steps++; }));
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("progress_h")) + "</h1><p>" + esc(t("progress_p")) + '</p></div><div class="stack" style="padding-block:18px;gap:22px"><div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><span>' + esc(t("p_lessons")) + "</span><b>" + doneN + " / " + LESSONS.length + "</b></div><div><span>" + esc(t("p_steps")) + "</span><b>" + steps + " / 6</b></div><div><span>" + esc(t("p_trades")) + "</span><b>" + S.journal.length + '</b></div></div><div class="grid3">' +
+  let steps = 0, stepsAll = 0; TRACKS.forEach((tr) => [1, 2, 3, 4, 5].forEach((n) => { if (lessonsOf(tr.id, n).length) { stepsAll++; if (levelDone(tr.id, n)) steps++; } }));
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("progress_h")) + "</h1><p>" + esc(t("progress_p")) + '</p></div><div class="stack" style="padding-block:18px;gap:22px"><div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div><span>' + esc(t("p_lessons")) + "</span><b>" + doneN + " / " + LESSONS.length + "</b></div><div><span>" + esc(t("p_steps")) + "</span><b>" + steps + " / " + stepsAll + "</b></div><div><span>" + esc(t("p_trades")) + "</span><b>" + S.journal.length + '</b></div></div><div class="grid3">' +
     TRACKS.map((tr) => { const n = nextLesson(tr.id); return '<div class="panel stack"><h3>' + esc(L(tr.name)) + "</h3>" + stairs(tr.id) + '<div class="meter"><i style="width:' + trackPct(tr.id) + '%"></i></div>' + (n ? '<a class="btn" href="#l-' + n.id + '">' + esc(t("continue")) + ": " + esc(L(n.title)) + "</a>" : '<span class="tag up">' + esc(t("all_done")) + "</span>") + "</div>"; }).join("") +
     '</div><div class="panel stack"><h3>' + esc(t("backup_h")) + '</h3><p class="muted">' + esc(t("backup_p")) + '</p><div class="row"><button class="btn" data-act="export-json">' + esc(t("export")) + '</button><label class="btn" for="import-file">' + esc(t("import")) + '</label><input id="import-file" type="file" accept="application/json,.json" hidden>' + (HOSTED ? '<a class="btn" href="#settings">' + esc(t("set_h")) + "</a>" : "") + "</div></div></div></div>";
 }
@@ -363,15 +367,21 @@ function pageAccount() {
 
 /* ---------- shell & router ---------- */
 function route() { return (location.hash || "").replace(/^#/, ""); }
+let rendering = false;
 function render() {
+  if (rendering) return;
+  rendering = true;
+  try { renderNow(); } finally { rendering = false; }
+}
+function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
-  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
+  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
   const group = r === "settings" ? "account" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "glossary"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
   $("#top").innerHTML = '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav" aria-label="main">' + nav.map(([h, k]) => '<a href="#' + h + '"' + (group === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</nav><div class="tools"><button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a></div></div>";
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
-  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings }[r] || pageHome)();
+  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -441,8 +451,11 @@ document.addEventListener("submit", (e) => {
   if (kind === "journal") {
     const symbol = val("j-symbol").trim(), qty = parseFloat(val("j-qty")), entry = parseFloat(val("j-entry"));
     if (!symbol || !(qty > 0) || !(entry > 0)) { toast(t("j_need")); return; }
+    const stopV = parseFloat(val("j-stop")) || null, targetV = parseFloat(val("j-target")) || null;
+    if (stopV && stopV >= entry) { toast(t("j_bad_stop")); return; }
+    if (targetV && targetV <= entry) { toast(t("j_bad_target")); return; }
     const known = SAMPLE_QUOTES[symbol];
-    S.journal.push({ id: "t" + Date.now().toString(36), symbol, name: val("j-name").trim() || (known ? L(known.name) : ""), qty, entry, stop: parseFloat(val("j-stop")) || null, entryDate: val("j-date") || today(), reason: val("j-reason").trim(), lesson: val("j-lesson"), exit: null, exitDate: null, note: "", updated: Date.now() });
+    S.journal.push({ id: "t" + Date.now().toString(36), symbol, name: val("j-name").trim() || (known ? L(known.name) : ""), qty, entry, stop: stopV, target: targetV, entryDate: val("j-date") || today(), reason: val("j-reason").trim(), lesson: val("j-lesson"), exit: null, exitDate: null, note: "", updated: Date.now() });
     save(); toast(t("j_saved")); render();
   } else if (kind === "close") {
     const j = S.journal.find((x) => x.id === form.dataset.id), exit = parseFloat(val("c-exit"));
@@ -461,13 +474,13 @@ document.addEventListener("submit", (e) => {
 
 function exportXlsx() {
   if (!window.XLSX) { toast(t("save_fail")); return; }
-  const head = ["j_symbol", "j_name", "j_qty", "j_entry", "j_date", "j_stop", "j_reason", "j_exit", "j_exit_date", "j_pl", "j_plpct", "j_status", "j_note", "from_lesson"].map(t);
+  const head = ["j_symbol", "j_name", "j_qty", "j_entry", "j_date", "j_stop", "j_target", "j_reason", "j_exit", "j_exit_date", "j_pl", "j_plpct", "j_status", "j_note", "from_lesson"].map(t);
   const rows = S.journal.map((j) => {
     const pl = plOf(j), ls = LESSONS.find((x) => x.id === j.lesson);
-    return [j.symbol, j.name, j.qty, j.entry, j.entryDate, j.stop ?? "", j.reason, j.exit ?? "", j.exitDate ?? "", pl == null ? "" : +pl.toFixed(2), pl == null ? "" : +(((j.exit - j.entry) / j.entry) * 100).toFixed(2), j.exit == null ? t("j_open") : t("j_closed"), j.note, ls ? L(ls.title) : ""];
+    return [j.symbol, j.name, j.qty, j.entry, j.entryDate, j.stop ?? "", j.target ?? "", j.reason, j.exit ?? "", j.exitDate ?? "", pl == null ? "" : +pl.toFixed(2), pl == null ? "" : +(((j.exit - j.entry) / j.entry) * 100).toFixed(2), j.exit == null ? t("j_open") : t("j_closed"), j.note, ls ? L(ls.title) : ""];
   });
   const ws = XLSX.utils.aoa_to_sheet([head].concat(rows));
-  ws["!cols"] = head.map((h, i) => ({ wch: [6, 12].includes(i) ? 34 : i === 1 || i === 13 ? 22 : 13 }));
+  ws["!cols"] = head.map((h, i) => ({ wch: [7, 13].includes(i) ? 34 : i === 1 || i === 14 ? 22 : 13 }));
   if (S.lang === "ar") ws["!views"] = [{ RTL: true }];
   const wb = XLSX.utils.book_new();
   if (S.lang === "ar") wb.Workbook = { Views: [{ RTL: true }] };
