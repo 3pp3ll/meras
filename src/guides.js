@@ -30,7 +30,7 @@ function rrFig() {
 
 /* ----- small chart used as a guide illustration ----- */
 function miniChart(o) {
-  const all = practiceSeries(o.sym), s = o.from, e = o.from + o.n, d = all.slice(s, e), W = 400, H = 190, x0 = 6, x1 = W - 8, top = 8, ph = H - 16;
+  const all = practiceSeries(o.sym), s = o.from, e = o.from + o.n, d = all.slice(s, e), W = 400, H = 190, x0 = 6, x1 = W - 8, top = 8, pane = o.pane ? 46 : 0, ph = H - 16 - (pane ? pane + 8 : 0), ptop = top + ph + 8;
   const cl = all.map((r) => r.c), ma = (o.sma || []).map((p) => sma(cl, p));
   let min = Infinity, max = -Infinity; d.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
   const pad = (max - min) * 0.08; min -= pad; max += pad;
@@ -44,6 +44,17 @@ function miniChart(o) {
   ma.forEach((v, k) => { let p = "", pen = false; for (let i = s; i < s + shown; i++) { if (v[i] == null) { pen = false; continue; } p += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v[i]).toFixed(1); pen = true; } g += '<path class="ind i' + (k + 1) + '" d="' + p + '"/>'; });
   (o.h || []).forEach((p) => { g += '<line class="draw" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(p) + '" y2="' + Y(p) + '"/>'; });
   if (o.t) { const a = all[o.t[0]], b = all[o.t[1]], m = (b.l - a.l) / (o.t[1] - o.t[0]); g += '<line class="draw" x1="' + X(o.t[0]) + '" y1="' + Y(a.l) + '" x2="' + X(e - 1) + '" y2="' + Y(a.l + m * (e - 1 - o.t[0])) + '"/><circle class="draw-dot" cx="' + X(o.t[0]) + '" cy="' + Y(a.l) + '" r="4"/><circle class="draw-dot" cx="' + X(o.t[1]) + '" cy="' + Y(b.l) + '" r="4"/>'; }
+  if (o.fib) {
+    const a = all[o.fib[0]].l, b = all[o.fib[1]].h, xa = X(o.fib[0]) - bw / 2;
+    [0, 0.382, 0.5, 0.618, 1].forEach((r) => { const pr = b - (b - a) * r; g += '<line class="fib' + (r === 0.5 || r === 0.618 ? " key" : "") + '" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r * 100).toFixed(1).replace(".0", "") + "%</text>"; });
+  }
+  if (o.pane === "vol") { const vm = Math.max(...d.map((r) => r.v)); d.forEach((r, k) => { const hh = (r.v / vm) * pane, w = bw * 0.62; g += '<rect class="' + (r.c >= r.o ? "c-up" : "c-down") + '" opacity=".5" x="' + (X(s + k) - w / 2) + '" y="' + (ptop + pane - hh) + '" width="' + w + '" height="' + hh + '"/>'; }); }
+  if (o.pane === "rsi") {
+    const rs = rsi(cl, 14), RY = (v) => ptop + ((100 - v) / 100) * pane; let pth = "", pen = false;
+    g += '<rect class="pane" x="' + x0 + '" y="' + ptop + '" width="' + (x1 - x0) + '" height="' + pane + '"/><line class="c-grid" stroke-dasharray="3 3" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(70) + '" y2="' + RY(70) + '"/><line class="c-grid" stroke-dasharray="3 3" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(30) + '" y2="' + RY(30) + '"/>';
+    for (let i = s; i < e; i++) { if (rs[i] == null) { pen = false; continue; } pth += (pen ? "L" : "M") + X(i).toFixed(1) + " " + RY(rs[i]).toFixed(1); pen = true; }
+    g += '<path class="ind i2" d="' + pth + '"/>';
+  }
   if (o.cross != null) g += '<line class="cross" x1="' + X(o.cross) + '" x2="' + X(o.cross) + '" y1="' + top + '" y2="' + (top + ph) + '"/>';
   if (o.hide) g += '<rect class="pane" x="' + (X(s + shown) - bw / 2) + '" y="' + top + '" width="' + (x1 - X(s + shown) + bw / 2) + '" height="' + ph + '"/><text class="c-label" x="' + (X(s + shown) + (x1 - X(s + shown)) / 2) + '" y="' + (top + ph / 2) + '" text-anchor="middle" style="font-size:34px;font-weight:600">?</text>';
   return '<svg viewBox="0 0 ' + W + " " + H + '" role="img">' + g + "</svg>";
@@ -75,10 +86,12 @@ const GUIDES = [
 ];
 
 function pageGuides() {
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("gd_h")) + "</h1><p>" + esc(t("gd_p")) + '</p></div><div class="grid2" style="padding-block:20px">' +
-    GUIDES.map((g) => '<a class="panel guide-card" href="#g-' + g.id + '"><div class="guide-thumb">' + g.steps[Math.min(2, g.steps.length - 1)].fig() + '</div><span class="tag amber">' + g.steps.length + " " + esc(t("gd_steps")) + "</span><h3>" + esc(L(g.title)) + '</h3><p class="muted">' + esc(L(g.intro)) + "</p></a>").join("") + "</div></div>";
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("gd_h")) + "</h1><p>" + esc(t("gd_p")) + '</p></div><div class="grid3" style="padding-block:20px">' +
+    GUIDES.map((g) => '<a class="panel guide-card" href="#g-' + g.id + '"><div class="guide-thumb">' + g.steps[Math.min(2, g.steps.length - 1)].fig() + '</div><span class="tag amber">' + g.steps.length + " " + esc(t("gd_steps")) + "</span><h3>" + esc(L(g.title)) + '</h3><p class="muted">' + esc(L(g.intro)) + "</p></a>").join("") +
+    '<a class="panel guide-card" href="#g-indicators"><div class="guide-thumb">' + fibFig() + '</div><span class="tag amber">' + esc(t("il_count")) + "</span><h3>" + esc(t("il_title")) + '</h3><p class="muted">' + esc(t("il_intro")) + "</p></a></div></div>";
 }
 function pageGuide(id) {
+  if (id === "indicators") return pageIndicators();
   const g = GUIDES.find((x) => x.id === id); if (!g) return pageGuides();
   return '<div class="wrap"><div class="guide-head"><div class="crumbs"><a href="#guides">' + esc(t("gd_h")) + "</a> / " + esc(L(g.title)) + "</div><h1>" + esc(L(g.title)) + "</h1><p>" + esc(L(g.intro)) + '</p></div><ol class="guide-steps">' +
     g.steps.map((s, i) => '<li><div class="gs-text"><span class="gs-n num">' + (i + 1) + "</span><h2>" + esc(L(s.h)) + "</h2><p>" + esc(L(s.p)) + '</p></div><div class="gs-fig">' + s.fig() + "</div></li>").join("") +

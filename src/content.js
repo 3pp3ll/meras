@@ -463,6 +463,45 @@ const LESSONS = [
         why: ["في العرضي السعر يرتد بين حدين، والتشبع عند الحد يأكد الارتداد.", "In a range price bounces between two bounds, and an extreme reading at the bound confirms the bounce."] }
     ] },
 
+  { id: "trd-3-3", track: "trd", level: 3, mins: 9, title: ["تصحيحات فيبوناتشي", "Fibonacci retracement"],
+    body: [
+      { p: ["السعر ما يصعد في خط مستقيم. يصعد، ثم يرجع جزء من صعوده، ثم يكمل. هذا الرجوع اسمه تصحيح. وسؤال المتداول: وين ممكن يوقف التصحيح؟ فيبوناتشي أداة تعطيك مناطق مرشحة.", "Price does not rise in a straight line. It rises, gives back part of the rise, then continues. That giving back is a pullback. The trader's question: where might the pullback stop? Fibonacci is a tool that gives candidate areas."] },
+      { fig: "fib", cap: ["حركة صاعدة من القاع (100%) إلى القمة (0%)، والمستويات بينهم.", "An up move from the low (100%) to the high (0%), with the levels between."] },
+      { h: ["المستويات", "The levels"] },
+      { p: ["الأداة تاخذ حركة من قاع إلى قمة وتقسمها بنسب: 23.6% و38.2% و50% و61.8% و78.6%. النسبة تعني كم رجع السعر من الحركة. تصحيح 50% يعني السهم رجّع نص اللي صعده.", "The tool takes a move from a low to a high and divides it by ratios: 23.6%, 38.2%, 50%, 61.8% and 78.6%. The ratio is how much of the move price gave back. A 50% pullback means the share returned half of what it gained."] },
+      { p: ["مثال: سهم صعد من 40 إلى 60، يعني الحركة 20 ريال. مستوى 38.2% عند 60 − 7.64 = 52.36. مستوى 50% عند 50. مستوى 61.8% عند 60 − 12.36 = 47.64.", "Example: a share rose from 40 to 60, a move of SAR 20. The 38.2% level is at 60 − 7.64 = 52.36. The 50% level is at 50. The 61.8% level is at 60 − 12.36 = 47.64."] },
+      { h: ["من وين جات الأرقام؟", "Where do the numbers come from?"] },
+      { p: ["من متتالية فيبوناتشي (1، 1، 2، 3، 5، 8، 13، 21...) اللي كل رقم فيها مجموع الرقمين قبله. قسمة أي رقم على اللي بعده تقترب من 0.618، وهذي النسبة الذهبية. أما 50% فمو من المتتالية، انضافت لأن المتداولين يراقبون منتصف الحركة.", "From the Fibonacci sequence (1, 1, 2, 3, 5, 8, 13, 21...) where each number is the sum of the two before. Dividing any number by the next approaches 0.618, the golden ratio. The 50% level is not from the sequence; it was added because traders watch the midpoint of a move."] },
+      { h: ["كيف ترسمها", "How to draw it"] },
+      { ul: [
+        ["حركة صاعدة: النقطة الأولى على القاع والثانية على القمة.", "Up move: first point on the low, second on the high."],
+        ["حركة هابطة: النقطة الأولى على القمة والثانية على القاع. المستويات تصير مقاومات محتملة للارتداد.", "Down move: first point on the high, second on the low. The levels become possible resistances for the bounce."],
+        ["اختر حركة واضحة وكبيرة. فيبوناتشي على حركة صغيرة داخل مسار عرضي ما يعطي شي.", "Pick a clear, large move. Fibonacci on a small move inside a range gives nothing."]
+      ] },
+      { h: ["كيف تقراها", "How to read it"] },
+      { ul: [
+        ["تصحيح خفيف (23.6% إلى 38.2%) يدل على اتجاه قوي: المشترين ما صبروا.", "A shallow pullback (23.6% to 38.2%) suggests a strong trend: buyers did not wait."],
+        ["المنطقة بين 50% و61.8% أشهر منطقة يراقبها المتداولين.", "The zone between 50% and 61.8% is the most watched by traders."],
+        ["كسر 78.6% يعني غالباً إن الحركة الأصلية انتهت.", "A break of 78.6% usually means the original move is over."]
+      ] },
+      { note: ["فيبوناتشي ما يشتغل لحاله. قوته لما يتطابق مستوى منه مع شي ثاني: دعم سابق، متوسط 20، أو شمعة انعكاس. ولأن اختيار القاع والقمة يرجع لك، شخصين ممكن يطلعون بمستويات مختلفة على نفس الشارت.", "Fibonacci does not work alone. Its strength comes when one of its levels lines up with something else: a prior support, the 20 average, or a reversal candle. And because the choice of low and high is yours, two people can get different levels on the same chart."] },
+      { h: ["تمرين على الشارت", "Exercise on the chart"] },
+      { ul: [
+        ["افتح السهم التدريبي أ وفعّل وضع التوقع.", "Open practice share A and turn on prediction mode."],
+        ["اختر أداة فيبوناتشي وارسمها من آخر قاع واضح إلى آخر قمة.", "Choose the Fibonacci tool and draw from the last clear low to the last high."],
+        ["اكشف الشموع وحدة وحدة. عند أي مستوى وقف التصحيح؟", "Reveal the candles one by one. At which level did the pullback stop?"]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["سهم صعد من 20 إلى 30. وين مستوى تصحيح 50%؟", "A share rose from 20 to 30. Where is the 50% retracement level?"],
+        opts: [["22", "22"], ["25", "25"], ["28", "28"]], a: 1,
+        why: ["الحركة 10 ريال ونصها 5: 30 − 5 = 25.", "The move is SAR 10 and half is 5: 30 − 5 = 25."] },
+      { q: ["متى يكون مستوى فيبوناتشي أقوى؟", "When is a Fibonacci level strongest?"],
+        opts: [["لما يكون لحاله", "When it stands alone"], ["لما يتطابق مع دعم سابق أو متوسط متحرك", "When it lines up with a prior support or a moving average"], ["في المسار العرضي", "In a range"]], a: 1,
+        why: ["تطابق أكثر من سبب عند نفس السعر يزيد عدد اللي يراقبونه.", "Several reasons at the same price mean more people are watching it."] }
+    ] },
+
   /* ---------- المبرمج: الدرجة 1 ---------- */
   { id: "dev-1-1", track: "dev", level: 1, mins: 6, title: ["ما هو الـ API ومفتاحك", "What an API is, and your key"],
     body: [

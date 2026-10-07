@@ -221,7 +221,7 @@ function block(b, lessonId) {
   if (b.code) return '<div class="code"><div class="cap"><span>' + esc(b.name || "code") + '</span><button data-act="copy">' + esc(t("copy")) + "</button></div><pre><code>" + esc(b.code) + "</code></pre></div>";
   if (b.quote) return quoteCard(b.quote, lessonId);
   if (b.open) return '<div><a class="btn primary" href="#chart">' + esc(t("open_chart")) + "</a></div>";
-  if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : b.fig === "patterns" ? patternsFig() : b.fig === "rr" ? rrFig() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
+  if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : b.fig === "patterns" ? patternsFig() : b.fig === "rr" ? rrFig() : b.fig === "fib" ? fibFig() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
   return "";
 }
 

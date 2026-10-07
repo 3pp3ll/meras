@@ -11,6 +11,10 @@ Object.assign(UI, {
   ch_tools: ["الرسم", "Drawing"], ch_cursor: ["مؤشر", "Pointer"], ch_hline: ["خط أفقي", "Horizontal line"], ch_tline: ["خط اتجاه", "Trend line"], ch_clear: ["امسح الرسومات", "Clear drawings"],
   ch_hint_cursor: ["مرّر على الشارت عشان تقرأ أرقام كل شمعة.", "Move over the chart to read each candle's numbers."],
   ch_hint_h: ["اضغط على الشارت عند السعر اللي تبي ترسم عنده الخط.", "Tap the chart at the price where you want the line."],
+  ch_fib: ["فيبوناتشي", "Fibonacci"], ch_f_lbl: ["فيبوناتشي", "Fibonacci"],
+  ch_hint_f1: ["اضغط على بداية الحركة: القاع إذا الحركة صاعدة، أو القمة إذا هابطة.", "Tap the start of the move: the low if the move is up, or the high if it is down."],
+  ch_hint_f2: ["اضغط على نهاية الحركة. المستويات تنرسم بينهم.", "Now tap the end of the move. The levels are drawn between the two."],
+  ch_ind_guide: ["دليل المؤشرات", "Indicator guide"], ch_short_sma: ["متوسط", "SMA"], ch_short_ema: ["أسي", "EMA"],
   ch_hint_t1: ["اضغط على النقطة الأولى، مثلاً أول قاع.", "Tap the first point, for example the first low."],
   ch_hint_t2: ["اضغط على النقطة الثانية على شمعة مختلفة.", "Now tap the second point on a different candle."],
   ch_replay: ["وضع التوقع", "Prediction mode"], ch_replay_p: ["يخفي آخر الشموع. توقّع الحركة ثم اكشفها شمعة شمعة.", "Hides the latest candles. Call the move, then reveal it candle by candle."],
@@ -206,7 +210,7 @@ function parseHistory(buf) {
 }
 
 const chartDefaults = () => ({ sym: "TRN-A", n: 60, vol: true, sma1: { on: true, p: 5 }, sma2: { on: false, p: 20 }, ema: { on: false, p: 10 }, rsi: { on: false, p: 14 } });
-let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null, chFull = false, chNative = false, chReading = false, WL = null;
+let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null, chFull = false, chNative = false, chFullPad = 108, chFitTries = 0, chReading = false, WL = null;
 function chartCfg() { if (!S.chart || !S.chart.sma1) S.chart = chartDefaults(); if (!S.drawings) S.drawings = {}; return S.chart; }
 
 function chartSvg(cfg, full) {
@@ -223,8 +227,8 @@ function chartSvg(cfg, full) {
   /* geometry follows the real pixel width, so text never shrinks on a phone */
   const vw = document.documentElement.clientWidth || 960, vhgt = window.innerHeight || 700;
   const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62)), axis = W < 520 ? 50 : 62;
-  const x0 = 6, x1 = W - axis, top = 8, vh = cfg.vol ? (W < 520 ? 40 : 56) : 0, rh = rs ? (W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + 20;
-  const ph = chFull ? Math.max(110, vhgt - 108 - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
+  const x0 = 6, x1 = W - axis, top = 8, tight = chFull && vhgt < 460, vh = cfg.vol ? (tight ? 26 : W < 520 ? 40 : 56) : 0, rh = rs ? (tight ? 50 : W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + 20;
+  const ph = chFull ? Math.max(70, vhgt - chFullPad - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
   const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), H = top + ph + extra;
   let min = Infinity, max = -Infinity;
   view.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
@@ -252,6 +256,13 @@ function chartSvg(cfg, full) {
   draws.forEach((dr) => {
     const cls = dr.auto ? "draw auto" : "draw";
     if (dr.t === "h") { if (dr.p > min && dr.p < max) g += '<line class="' + cls + '" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(dr.p) + '" y2="' + Y(dr.p) + '"/><rect class="draw-tag' + (dr.auto ? " auto" : "") + '" x="' + (x1 + 1) + '" y="' + (Y(dr.p) - 9) + '" width="' + (axis - 2) + '" height="18" rx="3"/><text class="draw-txt" x="' + (x1 + 5) + '" y="' + (Y(dr.p) + 4) + '">' + dr.p.toFixed(2) + "</text>"; }
+    else if (dr.t === "f") {
+      const xa = Math.max(x0, X(Math.min(dr.i1, dr.i2)) - bw / 2);
+      [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1].forEach((r) => {
+        const pr = dr.p2 - (dr.p2 - dr.p1) * r; if (pr <= min || pr >= max) return;
+        g += '<line class="fib' + (r === 0.5 || r === 0.618 ? " key" : "") + '" clip-path="url(#ch-clip)" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt" clip-path="url(#ch-clip)" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r * 100).toFixed(1).replace(".0", "") + "%  " + pr.toFixed(2) + "</text>";
+      });
+    }
     else { const m = (dr.p2 - dr.p1) / (dr.i2 - dr.i1), iEnd = s + slots, pEnd = dr.p1 + m * (iEnd - dr.i1); g += '<line class="' + cls + '" clip-path="url(#ch-clip)" x1="' + X(dr.i1) + '" y1="' + Y(dr.p1) + '" x2="' + X(iEnd) + '" y2="' + Y(pEnd) + '"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i1) + '" cy="' + Y(dr.p1) + '" r="3.5"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i2) + '" cy="' + Y(dr.p2) + '" r="3.5"/>'; }
   });
   if (chPending) g += '<circle class="draw-dot" cx="' + X(chPending.i) + '" cy="' + Y(chPending.p) + '" r="5"/>';
@@ -285,13 +296,15 @@ function pageChart() {
   if (!PRACTICE[cfg.sym] && !full.length) { cfg.sym = "TRN-A"; full = chartData(cfg.sym); }
   const svg = chartSvg(cfg, full), draws = S.drawings[cfg.sym] || [], hidden = CH.fullLen - CH.end, isReal = !PRACTICE[cfg.sym];
   const tool = (k, label) => '<button class="btn sm' + (chTool === k ? " on" : "") + '" data-act="ch-tool" data-tool="' + k + '" aria-pressed="' + (chTool === k) + '">' + esc(t(label)) + "</button>";
-  const tools = tool("cursor", "ch_cursor") + tool("h", "ch_hline") + tool("t", "ch_tline");
-  const hint = chTool === "h" ? "ch_hint_h" : chTool === "t" ? (chPending ? "ch_hint_t2" : "ch_hint_t1") : "ch_hint_cursor";
+  const tools = tool("cursor", "ch_cursor") + tool("h", "ch_hline") + tool("t", "ch_tline") + tool("f", "ch_fib");
+  const tg = (k, label, on) => '<button class="btn sm tgl' + (on ? " on" : "") + '" data-act="ch-ind" data-k="' + k + '" aria-pressed="' + !!on + '">' + esc(label) + "</button>";
+  const toggles = tg("sma1", t("ch_short_sma") + " " + cfg.sma1.p, cfg.sma1.on) + tg("sma2", t("ch_short_sma") + " " + cfg.sma2.p, cfg.sma2.on) + tg("ema", t("ch_short_ema") + " " + cfg.ema.p, cfg.ema.on) + tg("rsi", "RSI " + cfg.rsi.p, cfg.rsi.on) + tg("vol", t("ch_vol"), cfg.vol);
+  const hint = chTool === "h" ? "ch_hint_h" : chTool === "t" ? (chPending ? "ch_hint_t2" : "ch_hint_t1") : chTool === "f" ? (chPending ? "ch_hint_f2" : "ch_hint_f1") : "ch_hint_cursor";
   const read = '<div class="ch-read" id="ch-read">' + chartReadout(CH.e - 1) + "</div>";
 
   if (chFull) {
-    return '<div class="ch-fullscreen' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-bar"><b>' + esc(symName(cfg.sym)) + '</b><div class="row" style="gap:6px">' + tools + '<button class="btn sm primary" data-act="ch-full">' + esc(t("ch_exit")) + "</button></div></div>" + read + svg +
-      (window.innerHeight > window.innerWidth ? '<p class="small muted" style="text-align:center;margin-top:8px">' + esc(t("ch_rotate")) + "</p>" : "") + "</div>";
+    requestAnimationFrame(chartFit);
+    return '<div class="ch-fullscreen' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-bar"><b>' + esc(symName(cfg.sym)) + '</b><div class="ch-bar-scroll">' + tools + '<i class="sep"></i>' + toggles + '</div><button class="btn sm primary" data-act="ch-full">' + esc(t("ch_exit")) + "</button></div>" + (chTool !== "cursor" ? '<p class="small muted" style="margin:0 4px 2px">' + esc(t(hint)) + "</p>" : "") + read + svg + "</div>";
   }
 
   const real = Object.keys(LIVE.history || {}).filter((k) => (LIVE.history[k] || []).length);
@@ -302,7 +315,7 @@ function pageChart() {
   const replay = chReplay == null
     ? '<button class="btn sm" data-act="ch-replay"' + (full.length < 12 ? " disabled" : "") + ">" + esc(t("ch_replay")) + '</button><span class="small muted">' + esc(t("ch_replay_p")) + "</span>"
     : '<button class="btn sm primary" data-act="ch-step" data-n="1"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next")) + '</button><button class="btn sm" data-act="ch-step" data-n="5"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next5")) + '</button><button class="btn sm" data-act="ch-replay-off">' + esc(t("ch_show_all")) + '</button><span class="tag amber num">' + hidden + '</span><span class="small muted">' + esc(t("ch_hidden")) + "</span>";
-  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
+  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : dr.t === "f" ? t("ch_f_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
   const note = isReal ? t("ch_few").replace("{n}", full.length) : t("ch_practice_note");
   const step = Math.max(1, Math.round(CH.slots / 3));
   const canWl = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
@@ -310,7 +323,7 @@ function pageChart() {
     (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" + importHtml() : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
 
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
-    '<div class="panel stack"><div class="form-grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">' + symSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + ind("sma1", t("ch_sma"), "i1") + ind("sma2", t("ch_sma"), "i2") + ind("ema", t("ch_ema"), "i3") + ind("rsi", t("ch_rsi"), "i2") + '<label class="indbox"><input type="checkbox" id="ch-vol" data-ch="vol"' + (cfg.vol ? " checked" : "") + "><span>" + esc(t("ch_vol")) + "</span></label></div>" +
+    '<div class="panel stack"><div class="form-grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">' + symSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + ind("sma1", t("ch_sma"), "i1") + ind("sma2", t("ch_sma"), "i2") + ind("ema", t("ch_ema"), "i3") + ind("rsi", t("ch_rsi"), "i2") + '<label class="indbox"><input type="checkbox" id="ch-vol" data-ch="vol"' + (cfg.vol ? " checked" : "") + "><span>" + esc(t("ch_vol")) + '</span></label><a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
     '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
     '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
     (chReading ? readingHtml() : "") +
@@ -378,7 +391,14 @@ function chartHover(ev) {
 document.addEventListener("pointermove", (ev) => { if (ev.target.closest && ev.target.closest("#ch-svg")) chartHover(ev); });
 document.addEventListener("pointerdown", (ev) => { if (ev.target.closest && ev.target.closest("#ch-svg")) chartHover(ev); });
 
+/* after a fullscreen render, measure the real space and correct the chart height (at most twice) */
+function chartFit() {
+  const svg = document.getElementById("ch-svg"); if (!chFull || !svg || chFitTries >= 2) return;
+  const over = svg.getBoundingClientRect().bottom - (window.innerHeight - 6);
+  if (over > 3 || over < -30) { chFitTries++; chFullPad = Math.max(60, chFullPad + over); render(); }
+}
 function setFull(on) {
+  chFitTries = 0;
   chFull = on; chPending = null;
   const root = document.documentElement;
   if (on) {
@@ -395,7 +415,7 @@ function setFull(on) {
 }
 document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && chFull && chNative) { chNative = false; chFull = false; render(); } else if (chFull) render(); });
 let chResize = null;
-window.addEventListener("resize", () => { if (route() !== "chart") return; if (document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; clearTimeout(chResize); chResize = setTimeout(render, 120); });
+window.addEventListener("resize", () => { if (route() !== "chart") return; if (document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; clearTimeout(chResize); chResize = setTimeout(() => { chFitTries = 0; render(); }, 120); });
 window.addEventListener("hashchange", () => { if (chFull && route() !== "chart") setFull(false); if (route() === "chart" && !WL) loadWatch(); });
 
 async function loadWatch() {
@@ -418,6 +438,7 @@ document.addEventListener("click", (ev) => {
     if (chTool === "h") { list.push({ t: "h", p: pt.p }); save(); render(); }
     else if (!chPending) { chPending = { i: pt.i, p: pt.p }; render(); }
     else if (pt.i === chPending.i) toast(t("ch_same"));
+    else if (chTool === "f") { list.push({ t: "f", i1: chPending.i, p1: chPending.p, i2: pt.i, p2: pt.p }); chPending = null; chFitTries = 0; save(); render(); }
     else { const a = chPending, b = { i: pt.i, p: pt.p }, first = a.i < b.i ? a : b, second = a.i < b.i ? b : a; list.push({ t: "t", i1: first.i, p1: first.p, i2: second.i, p2: second.p }); chPending = null; save(); render(); }
     return;
   }
@@ -429,7 +450,8 @@ document.addEventListener("click", (ev) => {
   if (act.slice(0, 3) !== "ch-") return;
   const cfg = chartCfg(), full = chartData(cfg.sym);
   if (act === "ch-full") { setFull(!chFull); return; }
-  if (act === "ch-tool") { chTool = el.dataset.tool; chPending = null; }
+  if (act === "ch-tool") { chTool = el.dataset.tool; chPending = null; chFitTries = 0; }
+  else if (act === "ch-ind") { const k = el.dataset.k; if (k === "vol") cfg.vol = !cfg.vol; else cfg[k].on = !cfg[k].on; chFitTries = 0; save(); }
   else if (act === "ch-read") chReading = !chReading;
   else if (act === "ch-auto") {
     const r = analyze(CH.data, CH.s, CH.e), list = (S.drawings[cfg.sym] || []).filter((d) => !d.auto);

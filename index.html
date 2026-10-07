@@ -337,6 +337,28 @@ td .num,td.num{font-size:13.5px}
 .ai-box input{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .ai-box .btn svg{flex:none}
 .ai-out{background:var(--sunk);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:16px}
+.fib{stroke:var(--ind1);stroke-width:1;stroke-dasharray:2 3;fill:none}
+.fib.key{stroke-width:1.6;stroke-dasharray:none}
+.fib-txt{fill:var(--ind1);font-family:var(--mono);font-size:10.5px}
+.ch-bar{flex-wrap:nowrap}
+.ch-bar > b{white-space:nowrap;max-width:28vw;overflow:hidden;text-overflow:ellipsis}
+.ch-bar-scroll{display:flex;gap:6px;align-items:center;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding-block:2px}
+.ch-bar-scroll::-webkit-scrollbar{display:none}
+.ch-bar-scroll .btn,.ch-bar > .btn{white-space:nowrap;flex:none}
+.ch-bar .sep{width:1px;height:22px;background:var(--line);flex:none}
+.btn.tgl.on{background:var(--amber-soft);border-color:var(--amber);color:var(--amber-ink)}
+/* indicator library */
+.lib{display:flex;flex-direction:column}
+.lib > section{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;padding-block:34px;border-top:1px solid var(--line);align-items:start}
+.lib h2{font-size:27px;margin-block:6px 10px}
+.lib h2 small{font-family:var(--mono);font-weight:400;font-size:14px;color:var(--muted);margin-inline-start:8px}
+.lib dl{margin:0;display:flex;flex-direction:column;gap:12px}
+.lib dt{font-size:12.5px;font-weight:600;color:var(--amber-ink)}
+.lib dd{margin:2px 0 0;font-size:16px}
+.lib .gs-fig{position:sticky;top:90px}
+@media (max-width:820px){.lib > section{grid-template-columns:1fr;gap:16px}.lib .gs-fig{position:static}}
+.prose-wide{max-width:70ch;display:flex;flex-direction:column;gap:12px;font-size:17px}
+.prose-wide h2{font-size:25px;margin-top:8px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -806,6 +828,45 @@ const LESSONS = [
         why: ["في العرضي السعر يرتد بين حدين، والتشبع عند الحد يأكد الارتداد.", "In a range price bounces between two bounds, and an extreme reading at the bound confirms the bounce."] }
     ] },
 
+  { id: "trd-3-3", track: "trd", level: 3, mins: 9, title: ["تصحيحات فيبوناتشي", "Fibonacci retracement"],
+    body: [
+      { p: ["السعر ما يصعد في خط مستقيم. يصعد، ثم يرجع جزء من صعوده، ثم يكمل. هذا الرجوع اسمه تصحيح. وسؤال المتداول: وين ممكن يوقف التصحيح؟ فيبوناتشي أداة تعطيك مناطق مرشحة.", "Price does not rise in a straight line. It rises, gives back part of the rise, then continues. That giving back is a pullback. The trader's question: where might the pullback stop? Fibonacci is a tool that gives candidate areas."] },
+      { fig: "fib", cap: ["حركة صاعدة من القاع (100%) إلى القمة (0%)، والمستويات بينهم.", "An up move from the low (100%) to the high (0%), with the levels between."] },
+      { h: ["المستويات", "The levels"] },
+      { p: ["الأداة تاخذ حركة من قاع إلى قمة وتقسمها بنسب: 23.6% و38.2% و50% و61.8% و78.6%. النسبة تعني كم رجع السعر من الحركة. تصحيح 50% يعني السهم رجّع نص اللي صعده.", "The tool takes a move from a low to a high and divides it by ratios: 23.6%, 38.2%, 50%, 61.8% and 78.6%. The ratio is how much of the move price gave back. A 50% pullback means the share returned half of what it gained."] },
+      { p: ["مثال: سهم صعد من 40 إلى 60، يعني الحركة 20 ريال. مستوى 38.2% عند 60 − 7.64 = 52.36. مستوى 50% عند 50. مستوى 61.8% عند 60 − 12.36 = 47.64.", "Example: a share rose from 40 to 60, a move of SAR 20. The 38.2% level is at 60 − 7.64 = 52.36. The 50% level is at 50. The 61.8% level is at 60 − 12.36 = 47.64."] },
+      { h: ["من وين جات الأرقام؟", "Where do the numbers come from?"] },
+      { p: ["من متتالية فيبوناتشي (1، 1، 2، 3، 5، 8، 13، 21...) اللي كل رقم فيها مجموع الرقمين قبله. قسمة أي رقم على اللي بعده تقترب من 0.618، وهذي النسبة الذهبية. أما 50% فمو من المتتالية، انضافت لأن المتداولين يراقبون منتصف الحركة.", "From the Fibonacci sequence (1, 1, 2, 3, 5, 8, 13, 21...) where each number is the sum of the two before. Dividing any number by the next approaches 0.618, the golden ratio. The 50% level is not from the sequence; it was added because traders watch the midpoint of a move."] },
+      { h: ["كيف ترسمها", "How to draw it"] },
+      { ul: [
+        ["حركة صاعدة: النقطة الأولى على القاع والثانية على القمة.", "Up move: first point on the low, second on the high."],
+        ["حركة هابطة: النقطة الأولى على القمة والثانية على القاع. المستويات تصير مقاومات محتملة للارتداد.", "Down move: first point on the high, second on the low. The levels become possible resistances for the bounce."],
+        ["اختر حركة واضحة وكبيرة. فيبوناتشي على حركة صغيرة داخل مسار عرضي ما يعطي شي.", "Pick a clear, large move. Fibonacci on a small move inside a range gives nothing."]
+      ] },
+      { h: ["كيف تقراها", "How to read it"] },
+      { ul: [
+        ["تصحيح خفيف (23.6% إلى 38.2%) يدل على اتجاه قوي: المشترين ما صبروا.", "A shallow pullback (23.6% to 38.2%) suggests a strong trend: buyers did not wait."],
+        ["المنطقة بين 50% و61.8% أشهر منطقة يراقبها المتداولين.", "The zone between 50% and 61.8% is the most watched by traders."],
+        ["كسر 78.6% يعني غالباً إن الحركة الأصلية انتهت.", "A break of 78.6% usually means the original move is over."]
+      ] },
+      { note: ["فيبوناتشي ما يشتغل لحاله. قوته لما يتطابق مستوى منه مع شي ثاني: دعم سابق، متوسط 20، أو شمعة انعكاس. ولأن اختيار القاع والقمة يرجع لك، شخصين ممكن يطلعون بمستويات مختلفة على نفس الشارت.", "Fibonacci does not work alone. Its strength comes when one of its levels lines up with something else: a prior support, the 20 average, or a reversal candle. And because the choice of low and high is yours, two people can get different levels on the same chart."] },
+      { h: ["تمرين على الشارت", "Exercise on the chart"] },
+      { ul: [
+        ["افتح السهم التدريبي أ وفعّل وضع التوقع.", "Open practice share A and turn on prediction mode."],
+        ["اختر أداة فيبوناتشي وارسمها من آخر قاع واضح إلى آخر قمة.", "Choose the Fibonacci tool and draw from the last clear low to the last high."],
+        ["اكشف الشموع وحدة وحدة. عند أي مستوى وقف التصحيح؟", "Reveal the candles one by one. At which level did the pullback stop?"]
+      ] },
+      { open: "chart" }
+    ],
+    quiz: [
+      { q: ["سهم صعد من 20 إلى 30. وين مستوى تصحيح 50%؟", "A share rose from 20 to 30. Where is the 50% retracement level?"],
+        opts: [["22", "22"], ["25", "25"], ["28", "28"]], a: 1,
+        why: ["الحركة 10 ريال ونصها 5: 30 − 5 = 25.", "The move is SAR 10 and half is 5: 30 − 5 = 25."] },
+      { q: ["متى يكون مستوى فيبوناتشي أقوى؟", "When is a Fibonacci level strongest?"],
+        opts: [["لما يكون لحاله", "When it stands alone"], ["لما يتطابق مع دعم سابق أو متوسط متحرك", "When it lines up with a prior support or a moving average"], ["في المسار العرضي", "In a range"]], a: 1,
+        why: ["تطابق أكثر من سبب عند نفس السعر يزيد عدد اللي يراقبونه.", "Several reasons at the same price mean more people are watching it."] }
+    ] },
+
   /* ---------- المبرمج: الدرجة 1 ---------- */
   { id: "dev-1-1", track: "dev", level: 1, mins: 6, title: ["ما هو الـ API ومفتاحك", "What an API is, and your key"],
     body: [
@@ -1147,7 +1208,7 @@ function block(b, lessonId) {
   if (b.code) return '<div class="code"><div class="cap"><span>' + esc(b.name || "code") + '</span><button data-act="copy">' + esc(t("copy")) + "</button></div><pre><code>" + esc(b.code) + "</code></pre></div>";
   if (b.quote) return quoteCard(b.quote, lessonId);
   if (b.open) return '<div><a class="btn primary" href="#chart">' + esc(t("open_chart")) + "</a></div>";
-  if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : b.fig === "patterns" ? patternsFig() : b.fig === "rr" ? rrFig() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
+  if (b.fig) return '<figure class="figure">' + (b.fig === "anatomy" ? anatomy() : b.fig === "patterns" ? patternsFig() : b.fig === "rr" ? rrFig() : b.fig === "fib" ? fibFig() : candleChart(b.fig)) + "<figcaption>" + esc(L(b.cap)) + "</figcaption></figure>";
   return "";
 }
 
@@ -1428,6 +1489,10 @@ Object.assign(UI, {
   ch_tools: ["الرسم", "Drawing"], ch_cursor: ["مؤشر", "Pointer"], ch_hline: ["خط أفقي", "Horizontal line"], ch_tline: ["خط اتجاه", "Trend line"], ch_clear: ["امسح الرسومات", "Clear drawings"],
   ch_hint_cursor: ["مرّر على الشارت عشان تقرأ أرقام كل شمعة.", "Move over the chart to read each candle's numbers."],
   ch_hint_h: ["اضغط على الشارت عند السعر اللي تبي ترسم عنده الخط.", "Tap the chart at the price where you want the line."],
+  ch_fib: ["فيبوناتشي", "Fibonacci"], ch_f_lbl: ["فيبوناتشي", "Fibonacci"],
+  ch_hint_f1: ["اضغط على بداية الحركة: القاع إذا الحركة صاعدة، أو القمة إذا هابطة.", "Tap the start of the move: the low if the move is up, or the high if it is down."],
+  ch_hint_f2: ["اضغط على نهاية الحركة. المستويات تنرسم بينهم.", "Now tap the end of the move. The levels are drawn between the two."],
+  ch_ind_guide: ["دليل المؤشرات", "Indicator guide"], ch_short_sma: ["متوسط", "SMA"], ch_short_ema: ["أسي", "EMA"],
   ch_hint_t1: ["اضغط على النقطة الأولى، مثلاً أول قاع.", "Tap the first point, for example the first low."],
   ch_hint_t2: ["اضغط على النقطة الثانية على شمعة مختلفة.", "Now tap the second point on a different candle."],
   ch_replay: ["وضع التوقع", "Prediction mode"], ch_replay_p: ["يخفي آخر الشموع. توقّع الحركة ثم اكشفها شمعة شمعة.", "Hides the latest candles. Call the move, then reveal it candle by candle."],
@@ -1623,7 +1688,7 @@ function parseHistory(buf) {
 }
 
 const chartDefaults = () => ({ sym: "TRN-A", n: 60, vol: true, sma1: { on: true, p: 5 }, sma2: { on: false, p: 20 }, ema: { on: false, p: 10 }, rsi: { on: false, p: 14 } });
-let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null, chFull = false, chNative = false, chReading = false, WL = null;
+let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = null, chFull = false, chNative = false, chFullPad = 108, chFitTries = 0, chReading = false, WL = null;
 function chartCfg() { if (!S.chart || !S.chart.sma1) S.chart = chartDefaults(); if (!S.drawings) S.drawings = {}; return S.chart; }
 
 function chartSvg(cfg, full) {
@@ -1640,8 +1705,8 @@ function chartSvg(cfg, full) {
   /* geometry follows the real pixel width, so text never shrinks on a phone */
   const vw = document.documentElement.clientWidth || 960, vhgt = window.innerHeight || 700;
   const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62)), axis = W < 520 ? 50 : 62;
-  const x0 = 6, x1 = W - axis, top = 8, vh = cfg.vol ? (W < 520 ? 40 : 56) : 0, rh = rs ? (W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + 20;
-  const ph = chFull ? Math.max(110, vhgt - 108 - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
+  const x0 = 6, x1 = W - axis, top = 8, tight = chFull && vhgt < 460, vh = cfg.vol ? (tight ? 26 : W < 520 ? 40 : 56) : 0, rh = rs ? (tight ? 50 : W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + 20;
+  const ph = chFull ? Math.max(70, vhgt - chFullPad - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
   const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), H = top + ph + extra;
   let min = Infinity, max = -Infinity;
   view.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
@@ -1669,6 +1734,13 @@ function chartSvg(cfg, full) {
   draws.forEach((dr) => {
     const cls = dr.auto ? "draw auto" : "draw";
     if (dr.t === "h") { if (dr.p > min && dr.p < max) g += '<line class="' + cls + '" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(dr.p) + '" y2="' + Y(dr.p) + '"/><rect class="draw-tag' + (dr.auto ? " auto" : "") + '" x="' + (x1 + 1) + '" y="' + (Y(dr.p) - 9) + '" width="' + (axis - 2) + '" height="18" rx="3"/><text class="draw-txt" x="' + (x1 + 5) + '" y="' + (Y(dr.p) + 4) + '">' + dr.p.toFixed(2) + "</text>"; }
+    else if (dr.t === "f") {
+      const xa = Math.max(x0, X(Math.min(dr.i1, dr.i2)) - bw / 2);
+      [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1].forEach((r) => {
+        const pr = dr.p2 - (dr.p2 - dr.p1) * r; if (pr <= min || pr >= max) return;
+        g += '<line class="fib' + (r === 0.5 || r === 0.618 ? " key" : "") + '" clip-path="url(#ch-clip)" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt" clip-path="url(#ch-clip)" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r * 100).toFixed(1).replace(".0", "") + "%  " + pr.toFixed(2) + "</text>";
+      });
+    }
     else { const m = (dr.p2 - dr.p1) / (dr.i2 - dr.i1), iEnd = s + slots, pEnd = dr.p1 + m * (iEnd - dr.i1); g += '<line class="' + cls + '" clip-path="url(#ch-clip)" x1="' + X(dr.i1) + '" y1="' + Y(dr.p1) + '" x2="' + X(iEnd) + '" y2="' + Y(pEnd) + '"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i1) + '" cy="' + Y(dr.p1) + '" r="3.5"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i2) + '" cy="' + Y(dr.p2) + '" r="3.5"/>'; }
   });
   if (chPending) g += '<circle class="draw-dot" cx="' + X(chPending.i) + '" cy="' + Y(chPending.p) + '" r="5"/>';
@@ -1702,13 +1774,15 @@ function pageChart() {
   if (!PRACTICE[cfg.sym] && !full.length) { cfg.sym = "TRN-A"; full = chartData(cfg.sym); }
   const svg = chartSvg(cfg, full), draws = S.drawings[cfg.sym] || [], hidden = CH.fullLen - CH.end, isReal = !PRACTICE[cfg.sym];
   const tool = (k, label) => '<button class="btn sm' + (chTool === k ? " on" : "") + '" data-act="ch-tool" data-tool="' + k + '" aria-pressed="' + (chTool === k) + '">' + esc(t(label)) + "</button>";
-  const tools = tool("cursor", "ch_cursor") + tool("h", "ch_hline") + tool("t", "ch_tline");
-  const hint = chTool === "h" ? "ch_hint_h" : chTool === "t" ? (chPending ? "ch_hint_t2" : "ch_hint_t1") : "ch_hint_cursor";
+  const tools = tool("cursor", "ch_cursor") + tool("h", "ch_hline") + tool("t", "ch_tline") + tool("f", "ch_fib");
+  const tg = (k, label, on) => '<button class="btn sm tgl' + (on ? " on" : "") + '" data-act="ch-ind" data-k="' + k + '" aria-pressed="' + !!on + '">' + esc(label) + "</button>";
+  const toggles = tg("sma1", t("ch_short_sma") + " " + cfg.sma1.p, cfg.sma1.on) + tg("sma2", t("ch_short_sma") + " " + cfg.sma2.p, cfg.sma2.on) + tg("ema", t("ch_short_ema") + " " + cfg.ema.p, cfg.ema.on) + tg("rsi", "RSI " + cfg.rsi.p, cfg.rsi.on) + tg("vol", t("ch_vol"), cfg.vol);
+  const hint = chTool === "h" ? "ch_hint_h" : chTool === "t" ? (chPending ? "ch_hint_t2" : "ch_hint_t1") : chTool === "f" ? (chPending ? "ch_hint_f2" : "ch_hint_f1") : "ch_hint_cursor";
   const read = '<div class="ch-read" id="ch-read">' + chartReadout(CH.e - 1) + "</div>";
 
   if (chFull) {
-    return '<div class="ch-fullscreen' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-bar"><b>' + esc(symName(cfg.sym)) + '</b><div class="row" style="gap:6px">' + tools + '<button class="btn sm primary" data-act="ch-full">' + esc(t("ch_exit")) + "</button></div></div>" + read + svg +
-      (window.innerHeight > window.innerWidth ? '<p class="small muted" style="text-align:center;margin-top:8px">' + esc(t("ch_rotate")) + "</p>" : "") + "</div>";
+    requestAnimationFrame(chartFit);
+    return '<div class="ch-fullscreen' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-bar"><b>' + esc(symName(cfg.sym)) + '</b><div class="ch-bar-scroll">' + tools + '<i class="sep"></i>' + toggles + '</div><button class="btn sm primary" data-act="ch-full">' + esc(t("ch_exit")) + "</button></div>" + (chTool !== "cursor" ? '<p class="small muted" style="margin:0 4px 2px">' + esc(t(hint)) + "</p>" : "") + read + svg + "</div>";
   }
 
   const real = Object.keys(LIVE.history || {}).filter((k) => (LIVE.history[k] || []).length);
@@ -1719,7 +1793,7 @@ function pageChart() {
   const replay = chReplay == null
     ? '<button class="btn sm" data-act="ch-replay"' + (full.length < 12 ? " disabled" : "") + ">" + esc(t("ch_replay")) + '</button><span class="small muted">' + esc(t("ch_replay_p")) + "</span>"
     : '<button class="btn sm primary" data-act="ch-step" data-n="1"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next")) + '</button><button class="btn sm" data-act="ch-step" data-n="5"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next5")) + '</button><button class="btn sm" data-act="ch-replay-off">' + esc(t("ch_show_all")) + '</button><span class="tag amber num">' + hidden + '</span><span class="small muted">' + esc(t("ch_hidden")) + "</span>";
-  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
+  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : dr.t === "f" ? t("ch_f_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
   const note = isReal ? t("ch_few").replace("{n}", full.length) : t("ch_practice_note");
   const step = Math.max(1, Math.round(CH.slots / 3));
   const canWl = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
@@ -1727,7 +1801,7 @@ function pageChart() {
     (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" + importHtml() : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
 
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
-    '<div class="panel stack"><div class="form-grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">' + symSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + ind("sma1", t("ch_sma"), "i1") + ind("sma2", t("ch_sma"), "i2") + ind("ema", t("ch_ema"), "i3") + ind("rsi", t("ch_rsi"), "i2") + '<label class="indbox"><input type="checkbox" id="ch-vol" data-ch="vol"' + (cfg.vol ? " checked" : "") + "><span>" + esc(t("ch_vol")) + "</span></label></div>" +
+    '<div class="panel stack"><div class="form-grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)">' + symSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + ind("sma1", t("ch_sma"), "i1") + ind("sma2", t("ch_sma"), "i2") + ind("ema", t("ch_ema"), "i3") + ind("rsi", t("ch_rsi"), "i2") + '<label class="indbox"><input type="checkbox" id="ch-vol" data-ch="vol"' + (cfg.vol ? " checked" : "") + "><span>" + esc(t("ch_vol")) + '</span></label><a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
     '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
     '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
     (chReading ? readingHtml() : "") +
@@ -1795,7 +1869,14 @@ function chartHover(ev) {
 document.addEventListener("pointermove", (ev) => { if (ev.target.closest && ev.target.closest("#ch-svg")) chartHover(ev); });
 document.addEventListener("pointerdown", (ev) => { if (ev.target.closest && ev.target.closest("#ch-svg")) chartHover(ev); });
 
+/* after a fullscreen render, measure the real space and correct the chart height (at most twice) */
+function chartFit() {
+  const svg = document.getElementById("ch-svg"); if (!chFull || !svg || chFitTries >= 2) return;
+  const over = svg.getBoundingClientRect().bottom - (window.innerHeight - 6);
+  if (over > 3 || over < -30) { chFitTries++; chFullPad = Math.max(60, chFullPad + over); render(); }
+}
 function setFull(on) {
+  chFitTries = 0;
   chFull = on; chPending = null;
   const root = document.documentElement;
   if (on) {
@@ -1812,7 +1893,7 @@ function setFull(on) {
 }
 document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && chFull && chNative) { chNative = false; chFull = false; render(); } else if (chFull) render(); });
 let chResize = null;
-window.addEventListener("resize", () => { if (route() !== "chart") return; if (document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; clearTimeout(chResize); chResize = setTimeout(render, 120); });
+window.addEventListener("resize", () => { if (route() !== "chart") return; if (document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return; clearTimeout(chResize); chResize = setTimeout(() => { chFitTries = 0; render(); }, 120); });
 window.addEventListener("hashchange", () => { if (chFull && route() !== "chart") setFull(false); if (route() === "chart" && !WL) loadWatch(); });
 
 async function loadWatch() {
@@ -1835,6 +1916,7 @@ document.addEventListener("click", (ev) => {
     if (chTool === "h") { list.push({ t: "h", p: pt.p }); save(); render(); }
     else if (!chPending) { chPending = { i: pt.i, p: pt.p }; render(); }
     else if (pt.i === chPending.i) toast(t("ch_same"));
+    else if (chTool === "f") { list.push({ t: "f", i1: chPending.i, p1: chPending.p, i2: pt.i, p2: pt.p }); chPending = null; chFitTries = 0; save(); render(); }
     else { const a = chPending, b = { i: pt.i, p: pt.p }, first = a.i < b.i ? a : b, second = a.i < b.i ? b : a; list.push({ t: "t", i1: first.i, p1: first.p, i2: second.i, p2: second.p }); chPending = null; save(); render(); }
     return;
   }
@@ -1846,7 +1928,8 @@ document.addEventListener("click", (ev) => {
   if (act.slice(0, 3) !== "ch-") return;
   const cfg = chartCfg(), full = chartData(cfg.sym);
   if (act === "ch-full") { setFull(!chFull); return; }
-  if (act === "ch-tool") { chTool = el.dataset.tool; chPending = null; }
+  if (act === "ch-tool") { chTool = el.dataset.tool; chPending = null; chFitTries = 0; }
+  else if (act === "ch-ind") { const k = el.dataset.k; if (k === "vol") cfg.vol = !cfg.vol; else cfg[k].on = !cfg[k].on; chFitTries = 0; save(); }
   else if (act === "ch-read") chReading = !chReading;
   else if (act === "ch-auto") {
     const r = analyze(CH.data, CH.s, CH.e), list = (S.drawings[cfg.sym] || []).filter((d) => !d.auto);
@@ -1914,7 +1997,7 @@ function rrFig() {
 
 /* ----- small chart used as a guide illustration ----- */
 function miniChart(o) {
-  const all = practiceSeries(o.sym), s = o.from, e = o.from + o.n, d = all.slice(s, e), W = 400, H = 190, x0 = 6, x1 = W - 8, top = 8, ph = H - 16;
+  const all = practiceSeries(o.sym), s = o.from, e = o.from + o.n, d = all.slice(s, e), W = 400, H = 190, x0 = 6, x1 = W - 8, top = 8, pane = o.pane ? 46 : 0, ph = H - 16 - (pane ? pane + 8 : 0), ptop = top + ph + 8;
   const cl = all.map((r) => r.c), ma = (o.sma || []).map((p) => sma(cl, p));
   let min = Infinity, max = -Infinity; d.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
   const pad = (max - min) * 0.08; min -= pad; max += pad;
@@ -1928,6 +2011,17 @@ function miniChart(o) {
   ma.forEach((v, k) => { let p = "", pen = false; for (let i = s; i < s + shown; i++) { if (v[i] == null) { pen = false; continue; } p += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v[i]).toFixed(1); pen = true; } g += '<path class="ind i' + (k + 1) + '" d="' + p + '"/>'; });
   (o.h || []).forEach((p) => { g += '<line class="draw" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(p) + '" y2="' + Y(p) + '"/>'; });
   if (o.t) { const a = all[o.t[0]], b = all[o.t[1]], m = (b.l - a.l) / (o.t[1] - o.t[0]); g += '<line class="draw" x1="' + X(o.t[0]) + '" y1="' + Y(a.l) + '" x2="' + X(e - 1) + '" y2="' + Y(a.l + m * (e - 1 - o.t[0])) + '"/><circle class="draw-dot" cx="' + X(o.t[0]) + '" cy="' + Y(a.l) + '" r="4"/><circle class="draw-dot" cx="' + X(o.t[1]) + '" cy="' + Y(b.l) + '" r="4"/>'; }
+  if (o.fib) {
+    const a = all[o.fib[0]].l, b = all[o.fib[1]].h, xa = X(o.fib[0]) - bw / 2;
+    [0, 0.382, 0.5, 0.618, 1].forEach((r) => { const pr = b - (b - a) * r; g += '<line class="fib' + (r === 0.5 || r === 0.618 ? " key" : "") + '" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r * 100).toFixed(1).replace(".0", "") + "%</text>"; });
+  }
+  if (o.pane === "vol") { const vm = Math.max(...d.map((r) => r.v)); d.forEach((r, k) => { const hh = (r.v / vm) * pane, w = bw * 0.62; g += '<rect class="' + (r.c >= r.o ? "c-up" : "c-down") + '" opacity=".5" x="' + (X(s + k) - w / 2) + '" y="' + (ptop + pane - hh) + '" width="' + w + '" height="' + hh + '"/>'; }); }
+  if (o.pane === "rsi") {
+    const rs = rsi(cl, 14), RY = (v) => ptop + ((100 - v) / 100) * pane; let pth = "", pen = false;
+    g += '<rect class="pane" x="' + x0 + '" y="' + ptop + '" width="' + (x1 - x0) + '" height="' + pane + '"/><line class="c-grid" stroke-dasharray="3 3" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(70) + '" y2="' + RY(70) + '"/><line class="c-grid" stroke-dasharray="3 3" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(30) + '" y2="' + RY(30) + '"/>';
+    for (let i = s; i < e; i++) { if (rs[i] == null) { pen = false; continue; } pth += (pen ? "L" : "M") + X(i).toFixed(1) + " " + RY(rs[i]).toFixed(1); pen = true; }
+    g += '<path class="ind i2" d="' + pth + '"/>';
+  }
   if (o.cross != null) g += '<line class="cross" x1="' + X(o.cross) + '" x2="' + X(o.cross) + '" y1="' + top + '" y2="' + (top + ph) + '"/>';
   if (o.hide) g += '<rect class="pane" x="' + (X(s + shown) - bw / 2) + '" y="' + top + '" width="' + (x1 - X(s + shown) + bw / 2) + '" height="' + ph + '"/><text class="c-label" x="' + (X(s + shown) + (x1 - X(s + shown)) / 2) + '" y="' + (top + ph / 2) + '" text-anchor="middle" style="font-size:34px;font-weight:600">?</text>';
   return '<svg viewBox="0 0 ' + W + " " + H + '" role="img">' + g + "</svg>";
@@ -1959,14 +2053,69 @@ const GUIDES = [
 ];
 
 function pageGuides() {
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("gd_h")) + "</h1><p>" + esc(t("gd_p")) + '</p></div><div class="grid2" style="padding-block:20px">' +
-    GUIDES.map((g) => '<a class="panel guide-card" href="#g-' + g.id + '"><div class="guide-thumb">' + g.steps[Math.min(2, g.steps.length - 1)].fig() + '</div><span class="tag amber">' + g.steps.length + " " + esc(t("gd_steps")) + "</span><h3>" + esc(L(g.title)) + '</h3><p class="muted">' + esc(L(g.intro)) + "</p></a>").join("") + "</div></div>";
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("gd_h")) + "</h1><p>" + esc(t("gd_p")) + '</p></div><div class="grid3" style="padding-block:20px">' +
+    GUIDES.map((g) => '<a class="panel guide-card" href="#g-' + g.id + '"><div class="guide-thumb">' + g.steps[Math.min(2, g.steps.length - 1)].fig() + '</div><span class="tag amber">' + g.steps.length + " " + esc(t("gd_steps")) + "</span><h3>" + esc(L(g.title)) + '</h3><p class="muted">' + esc(L(g.intro)) + "</p></a>").join("") +
+    '<a class="panel guide-card" href="#g-indicators"><div class="guide-thumb">' + fibFig() + '</div><span class="tag amber">' + esc(t("il_count")) + "</span><h3>" + esc(t("il_title")) + '</h3><p class="muted">' + esc(t("il_intro")) + "</p></a></div></div>";
 }
 function pageGuide(id) {
+  if (id === "indicators") return pageIndicators();
   const g = GUIDES.find((x) => x.id === id); if (!g) return pageGuides();
   return '<div class="wrap"><div class="guide-head"><div class="crumbs"><a href="#guides">' + esc(t("gd_h")) + "</a> / " + esc(L(g.title)) + "</div><h1>" + esc(L(g.title)) + "</h1><p>" + esc(L(g.intro)) + '</p></div><ol class="guide-steps">' +
     g.steps.map((s, i) => '<li><div class="gs-text"><span class="gs-n num">' + (i + 1) + "</span><h2>" + esc(L(s.h)) + "</h2><p>" + esc(L(s.p)) + '</p></div><div class="gs-fig">' + s.fig() + "</div></li>").join("") +
     '</ol><div class="row" style="justify-content:space-between;padding-block:8px 40px"><a class="btn" href="#guides">' + esc(t("gd_all")) + '</a><a class="btn primary" href="' + g.go[0] + '">' + esc(t(g.go[1])) + "</a></div></div>";
+}
+/* ===== مِراس: دليل المؤشرات ===== */
+Object.assign(UI, {
+  il_title: ["دليل المؤشرات", "Indicator guide"],
+  il_intro: ["كل مؤشر في شارت مِراس: وش يقيس، كيف تقراه، متى ينفع ومتى يخدع، وهل يشتغل على أي سوق.", "Every indicator on the Meras chart: what it measures, how to read it, when it helps and when it misleads, and whether it works on any market."],
+  il_what: ["وش يقيس", "What it measures"], il_how: ["كيف تستخدمه", "How to use it"], il_when: ["متى ينفع", "When it helps"], il_trap: ["متى يخدع", "When it misleads"],
+  il_cmp: ["الفرق بينها", "How they differ"], il_c1: ["المؤشر", "Indicator"], il_c2: ["النوع", "Type"], il_c3: ["أفضل وقت له", "Best when"], il_c4: ["أضعف وقت له", "Weakest when"],
+  il_any: ["هل تشتغل على أي سهم وأي سوق؟", "Do they work on any share and any market?"],
+  il_combo: ["كيف تجمع بينها", "How to combine them"], il_count: ["5 مؤشرات", "5 indicators"]
+});
+const highIn = (sym, a, b) => { const d = practiceSeries(sym); let k = a; for (let i = a; i < b; i++) if (d[i].h > d[k].h) k = i; return k; };
+function fibFig() { return miniChart({ sym: "TRN-A", from: 96, n: 64, fib: [lowIn("TRN-A", 98, 116), highIn("TRN-A", 130, 158)] }); }
+
+const IND_LIB = [
+  { n: ["المتوسط المتحرك البسيط", "Simple moving average"], c: "SMA", type: ["اتجاه", "Trend"], fig: () => miniChart({ sym: "TRN-A", from: 60, n: 70, sma: [5, 20] }),
+    what: ["متوسط إغلاقات آخر عدد من الشموع. يشيل ضجيج الحركة اليومية ويبيّن الجهة العامة.", "The average of the closes of the last several candles. It removes daily noise and shows the general direction."],
+    how: ["السعر فوق متوسط صاعد يعني اتجاه صاعد على هذا المدى. فترة 20 للمدى القصير، و50 و200 للمدى الأطول. تقاطع القصير فوق الطويل يعتبره كثير إشارة صعود.", "Price above a rising average means an uptrend on that horizon. Period 20 for the short term, 50 and 200 for longer. Many read the short crossing above the long as bullish."],
+    when: ["في الاتجاه الواضح، صاعد أو هابط. يشتغل كدعم متحرك يرتد منه السعر.", "In a clear trend, up or down. It acts as a moving support that price bounces from."],
+    trap: ["في المسار العرضي يتقاطع رايح جاي ويعطي إشارات كاذبة. وهو متأخر دائماً: يأكد الحركة بعد ما تبدأ.", "In a range it crosses back and forth and gives false signals. It always lags: it confirms a move after it has begun."], best: ["اتجاه واضح", "Clear trend"], worst: ["مسار عرضي", "Range"] },
+  { n: ["المتوسط المتحرك الأسي", "Exponential moving average"], c: "EMA", type: ["اتجاه", "Trend"], fig: () => miniChart({ sym: "TRN-C", from: 95, n: 60, sma: [20] }),
+    what: ["متوسط مثل البسيط، لكنه يعطي الشموع الأخيرة وزن أكبر، فيستجيب لتغير السعر أسرع.", "An average like the simple one, but it weights recent candles more heavily, so it responds to price changes sooner."],
+    how: ["نفس قراءة المتوسط البسيط. شغّل الاثنين بنفس الفترة على الشارت وشوف كيف الأسي يلف قبل البسيط عند تغير الاتجاه.", "Read it like the simple average. Switch both on with the same period and watch the exponential turn before the simple one when the trend changes."],
+    when: ["لما تبي إشارة أبكر، مثل المضاربة القصيرة أو سهم سريع الحركة.", "When you want an earlier signal, such as short-term trading or a fast-moving share."],
+    trap: ["سرعته تخليه يعطي إشارات كاذبة أكثر من البسيط. الأسرع ما يعني الأصح.", "Its speed makes it give more false signals than the simple one. Faster does not mean more accurate."], best: ["بداية اتجاه جديد", "Start of a new trend"], worst: ["سوق متذبذب", "Choppy market"] },
+  { n: ["مؤشر القوة النسبية", "Relative strength index"], c: "RSI", type: ["زخم", "Momentum"], fig: () => miniChart({ sym: "TRN-B", from: 60, n: 70, pane: "rsi" }),
+    what: ["رقم بين 0 و100 يقارن قوة الشموع الصاعدة بقوة الهابطة خلال فترة، غالباً 14. يقيس سرعة الحركة، مو جهتها.", "A number from 0 to 100 comparing the strength of rising candles with falling ones over a period, usually 14. It measures the speed of a move, not its direction."],
+    how: ["فوق 70 تشبع شرائي، وتحت 30 تشبع بيعي. استخدمه كتأكيد عند مستوى: تشبع بيعي عند دعم يقوّي فكرة الارتداد.", "Above 70 is overbought, below 30 oversold. Use it as confirmation at a level: oversold at support strengthens the case for a bounce."],
+    when: ["في المسار العرضي، لما يتحرك السعر بين دعم ومقاومة.", "In a range, when price moves between support and resistance."],
+    trap: ["في الاتجاه القوي يبقى فوق 70 أسابيع والسعر يكمل. التشبع لحاله مو إشارة عكس.", "In a strong trend it stays above 70 for weeks while price continues. An extreme reading alone is not a reversal signal."], best: ["مسار عرضي", "Range"], worst: ["اتجاه قوي", "Strong trend"] },
+  { n: ["الحجم", "Volume"], c: "VOL", type: ["مشاركة", "Participation"], fig: () => miniChart({ sym: "TRN-A", from: 95, n: 60, pane: "vol" }),
+    what: ["عدد الأسهم المتداولة في كل شمعة. يقول لك كم واحد شارك في الحركة.", "The number of shares traded in each candle. It tells you how many took part in the move."],
+    how: ["قارن حجم الشمعة بمتوسط الشموع اللي قبلها. حركة بحجم أعلى من المعتاد وراها قناعة، وحركة بحجم ضعيف هشة.", "Compare a candle's volume with the average of those before it. A move on above-normal volume has conviction; a move on weak volume is fragile."],
+    when: ["عند الاختراقات: اختراق مقاومة بحجم عالي أقوى بكثير من اختراق بحجم عادي.", "At breakouts: a break of resistance on high volume is far stronger than one on normal volume."],
+    trap: ["حجم عالي في يوم واحد ممكن يكون صفقة خاصة أو خبر، مو تغير في الاتجاه. والحجم ما يقول لك مين اللي اشترى ومين اللي باع.", "High volume on one day may be a block trade or news, not a change of trend. Volume does not tell you who bought and who sold."], best: ["تأكيد اختراق", "Confirming a breakout"], worst: ["أسهم ضعيفة السيولة", "Illiquid shares"] },
+  { n: ["تصحيحات فيبوناتشي", "Fibonacci retracement"], c: "FIB", type: ["مستويات", "Levels"], fig: fibFig,
+    what: ["أداة رسم تقسّم حركة سعرية إلى نسب: 23.6% و38.2% و50% و61.8% و78.6%. تبيّن وين ممكن يوقف التصحيح قبل ما تكمل الحركة.", "A drawing tool that divides a price move into ratios: 23.6%, 38.2%, 50%, 61.8% and 78.6%. It shows where a pullback may stop before the move resumes."],
+    how: ["في حركة صاعدة: اضغط على القاع ثم القمة. المستويات اللي تطلع هي مناطق دعم محتملة للتصحيح. أشهرها 50% و61.8%. في حركة هابطة اعكس: القمة ثم القاع.", "In an up move: tap the low then the high. The levels that appear are possible support areas for the pullback. The best known are 50% and 61.8%. In a down move reverse it: high then low."],
+    when: ["بعد حركة واضحة وقوية بدأت تصحح. وأقوى ما يكون لما يتطابق مستوى فيبوناتشي مع دعم سابق أو متوسط متحرك.", "After a clear, strong move that has started to pull back. It is strongest when a Fibonacci level lines up with a prior support or a moving average."],
+    trap: ["النتيجة تتغير حسب أي قاع وقمة تختار، فشخصين يرسمونها مختلف. والمستويات تشتغل لأن كثير يراقبونها، مو لأنها قانون. و50% أصلاً مو من أرقام فيبوناتشي.", "The result changes with which low and high you pick, so two people draw it differently. The levels work because many watch them, not because they are a law. And 50% is not a Fibonacci number at all."], best: ["تصحيح داخل اتجاه", "Pullback within a trend"], worst: ["مسار عرضي بدون حركة واضحة", "A range with no clear move"] }
+];
+
+const IL_TEXT = {
+  any1: ["نعم. كل هذي المؤشرات حسابات على السعر والحجم فقط، فتشتغل على أي شارت: أسهم سعودية أو أمريكية، عملات، ذهب، أو عملات رقمية، وعلى أي إطار زمني من الدقيقة إلى الشهر. ما فيه مؤشر خاص بسوق معين.", "Yes. All of these are calculations on price and volume only, so they work on any chart: Saudi or US shares, currencies, gold or crypto, and on any timeframe from a minute to a month. No indicator belongs to one market."],
+  any2: ["لكن فيه ثلاث فروقات تنتبه لها. الأولى السيولة: المؤشرات تعتمد على إن السعر يعكس تداول كثير، فتضعف في الأسهم قليلة التداول لأن صفقة وحدة تحرك السعر. الثانية الحجم: في سوق العملات ما فيه حجم مركزي حقيقي، فمؤشر الحجم هناك تقريبي. الثالثة قواعد السوق: في السوق السعودي السهم ما يتحرك أكثر من 10% في اليوم، والسوق يقفل نهاية الأسبوع، فتظهر فجوات ما تظهر في سوق يشتغل 24 ساعة.", "But watch three differences. First, liquidity: indicators assume price reflects plenty of trading, so they weaken in thinly traded shares where one trade moves the price. Second, volume: the currency market has no true central volume, so a volume indicator there is approximate. Third, market rules: on the Saudi market a share cannot move more than 10% in a day and the market closes at weekends, so gaps appear that do not in a 24-hour market."],
+  combo1: ["لا تجمع مؤشرين من نفس النوع: متوسطين وأسي يقولون لك نفس المعلومة ثلاث مرات. اجمع من أنواع مختلفة: واحد للاتجاه (متوسط 20)، واحد للزخم (RSI)، والحجم للتأكيد، ومستويات ترسمها بيدك. وإذا تعارضوا، فالتعارض نفسه معلومة: السوق ما حسم أمره.", "Do not stack two indicators of the same type: two simple averages and an exponential tell you the same thing three times. Combine different types: one for trend (the 20 average), one for momentum (RSI), volume for confirmation, and levels you draw by hand. If they disagree, the disagreement is itself information: the market has not made up its mind."],
+  combo2: ["والمؤشر ما يتوقع. كل المؤشرات تحسب من أسعار صارت، فهي توصف الماضي القريب. قرارك يجي من خطتك: السبب، الوقف، الهدف.", "And an indicator does not predict. Every indicator is computed from prices that already happened, so it describes the recent past. Your decision comes from your plan: reason, stop, target."]
+};
+function pageIndicators() {
+  const dd = (k, v) => "<div><dt>" + esc(t(k)) + "</dt><dd>" + esc(L(v)) + "</dd></div>", para = (k) => "<p>" + esc(L(IL_TEXT[k])) + "</p>";
+  return '<div class="wrap"><div class="guide-head"><div class="crumbs"><a href="#guides">' + esc(t("gd_h")) + "</a> / " + esc(t("il_title")) + "</div><h1>" + esc(t("il_title")) + "</h1><p>" + esc(t("il_intro")) + '</p></div><div class="lib">' +
+    IND_LIB.map((x) => '<section><div><span class="tag amber">' + esc(L(x.type)) + "</span><h2>" + esc(L(x.n)) + '<small dir="ltr">' + x.c + "</small></h2><dl>" + dd("il_what", x.what) + dd("il_how", x.how) + dd("il_when", x.when) + dd("il_trap", x.trap) + '</dl></div><div class="gs-fig">' + x.fig() + "</div></section>").join("") + "</div>" +
+    '<div class="prose-wide" style="padding-block:10px 16px"><h2>' + esc(t("il_cmp")) + '</h2></div><div class="tablewrap"><table><thead><tr>' + ["il_c1", "il_c2", "il_c3", "il_c4"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "</tr></thead><tbody>" + IND_LIB.map((x) => "<tr><td><b>" + esc(L(x.n)) + "</b></td><td>" + esc(L(x.type)) + "</td><td>" + esc(L(x.best)) + "</td><td>" + esc(L(x.worst)) + "</td></tr>").join("") + "</tbody></table></div>" +
+    '<div class="prose-wide" style="padding-block:26px"><h2>' + esc(t("il_any")) + "</h2>" + para("any1") + para("any2") + "<h2>" + esc(t("il_combo")) + "</h2>" + para("combo1") + para("combo2") + '</div><div class="row" style="justify-content:space-between;padding-block:8px 40px"><a class="btn" href="#guides">' + esc(t("gd_all")) + '</a><a class="btn primary" href="#chart">' + esc(t("gd_go_chart")) + "</a></div></div>";
 }
 /* ===== مِراس: المزامنة مع مستودع البيانات الخاص + الأسعار الحقيقية =====
    تشتغل فقط لما الموقع منشور (GitHub Pages أو أي استضافة). */

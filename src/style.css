@@ -317,3 +317,25 @@ td .num,td.num{font-size:13.5px}
 .ai-box input{flex:1;min-width:160px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .ai-box .btn svg{flex:none}
 .ai-out{background:var(--sunk);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:16px}
+.fib{stroke:var(--ind1);stroke-width:1;stroke-dasharray:2 3;fill:none}
+.fib.key{stroke-width:1.6;stroke-dasharray:none}
+.fib-txt{fill:var(--ind1);font-family:var(--mono);font-size:10.5px}
+.ch-bar{flex-wrap:nowrap}
+.ch-bar > b{white-space:nowrap;max-width:28vw;overflow:hidden;text-overflow:ellipsis}
+.ch-bar-scroll{display:flex;gap:6px;align-items:center;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding-block:2px}
+.ch-bar-scroll::-webkit-scrollbar{display:none}
+.ch-bar-scroll .btn,.ch-bar > .btn{white-space:nowrap;flex:none}
+.ch-bar .sep{width:1px;height:22px;background:var(--line);flex:none}
+.btn.tgl.on{background:var(--amber-soft);border-color:var(--amber);color:var(--amber-ink)}
+/* indicator library */
+.lib{display:flex;flex-direction:column}
+.lib > section{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;padding-block:34px;border-top:1px solid var(--line);align-items:start}
+.lib h2{font-size:27px;margin-block:6px 10px}
+.lib h2 small{font-family:var(--mono);font-weight:400;font-size:14px;color:var(--muted);margin-inline-start:8px}
+.lib dl{margin:0;display:flex;flex-direction:column;gap:12px}
+.lib dt{font-size:12.5px;font-weight:600;color:var(--amber-ink)}
+.lib dd{margin:2px 0 0;font-size:16px}
+.lib .gs-fig{position:sticky;top:90px}
+@media (max-width:820px){.lib > section{grid-template-columns:1fr;gap:16px}.lib .gs-fig{position:static}}
+.prose-wide{max-width:70ch;display:flex;flex-direction:column;gap:12px;font-size:17px}
+.prose-wide h2{font-size:25px;margin-top:8px}
