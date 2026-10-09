@@ -66,7 +66,7 @@ function aiPayload(question) {
   if (CH.rs) active["RSI " + cfg.rsi.p] = { last: f2(CH.rs[last]), last_30: series(CH.rs) };
   if (CH.md) active["MACD 12/26/9"] = { macd: f2(CH.md.line[last]), signal: f2(CH.md.sig[last]), histogram: f2(CH.md.hist[last]), histogram_last_10: CH.md.hist.slice(Math.max(CH.s, CH.e - 10), CH.e).map(f2) };
   if (cfg.vol) { let a = 0, n = 0; for (let i = Math.max(CH.s, CH.e - 21); i < CH.e - 1; i++) { a += CH.data[i].v || 0; n++; } active.volume = { last: CH.data[last].v, avg_previous_20: n ? Math.round(a / n) : null }; }
-  const draws = (S.drawings[cfg.sym] || []).map((d) => (d.t === "h" ? { type: "horizontal line", price: d.p } : d.t === "f" ? { type: "fibonacci", from: d.p1, to: d.p2, levels: [0, 23.6, 38.2, 50, 61.8, 78.6, 100].map((x) => ({ pct: x, price: f2(d.p2 - (d.p2 - d.p1) * (x / 100)) })) } : { type: "trend line", from_price: d.p1, to_price: d.p2, candles_apart: d.i2 - d.i1 }));
+  const draws = (S.drawings[cfg.sym] || []).map((d) => (d.t === "h" ? { type: "horizontal line", price: d.p } : d.t === "f" ? { type: "fibonacci", from: d.p1, to: d.p2, levels: (d.ext ? [-61.8, -27.2, 0, 23.6, 38.2, 50, 61.8, 78.6, 100] : [0, 23.6, 38.2, 50, 61.8, 78.6, 100]).map((x) => ({ level: x < 0 ? "extension " + (100 - x).toFixed(1) + "%" : x + "%", price: f2(d.p2 - (d.p2 - d.p1) * (x / 100)) })), drawn_automatically: !!d.auto } : { type: "trend line", from_price: d.p1, to_price: d.p2, candles_apart: d.i2 - d.i1 }));
   return {
     share: PRACTICE[cfg.sym] ? "practice data (generated, not a real share)" : cfg.sym + " " + symName(cfg.sym) + " (Saudi market, daily candles, prices delayed)",
     chart_type: cfg.type, candles_shown: CH.e - CH.s,
@@ -93,6 +93,7 @@ const AI_SYSTEM = (lang) => [
   "2. Never predict a future price, direction, target or probability. Never invent a confidence or success percentage; the only percentages you may quote are those in signal_record, and you must say they are small-sample counts of the past.",
   "3. Use only the numbers in the JSON. Do not recalculate indicators and do not introduce numbers that are not there.",
   "4. If the data is practice data, say so once.",
+  "6. Fibonacci extension levels may be called targets by traders; describe them only as areas the market watches if the move continues, never as where price will go.",
   "5. Only discuss the indicators listed in indicators_on_chart and the learner_drawings; if the learner asks about an indicator that is not on the chart, explain what it is in general and suggest adding it to the chart.",
   "What to write: explain what the chart shows and why the rule-based reading says what it says, connect the observations to each other (trend, averages, momentum, volume, levels), point out one thing a beginner would likely miss, and end with one small exercise to try on the chart. If learner_question is present, answer it first, within the rules; if it asks for advice or a prediction, say you can only explain what the chart shows.",
   "Style: " + (lang === "ar" ? "simple Arabic in a friendly Saudi tone" : "plain English") + ", 4 short paragraphs at most, under 180 words, plain text with no markdown, no bullet symbols and no headings."

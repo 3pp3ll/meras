@@ -386,6 +386,7 @@ function renderNow() {
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
+  if (r === "chart" && typeof maybeAutoAnalysis === "function") setTimeout(maybeAutoAnalysis, 0);
 }
 let lastRoute = null;
 window.addEventListener("hashchange", () => { closing = deleting = null; resetArmed = false; render(); if (route() !== lastRoute) window.scrollTo(0, 0); lastRoute = route(); });

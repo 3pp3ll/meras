@@ -286,6 +286,7 @@ function chartSvg(cfg, full) {
   view.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
   lines.forEach((ln) => { for (let i = s; i < e; i++) if (ln.v[i] != null) { min = Math.min(min, ln.v[i]); max = Math.max(max, ln.v[i]); } });
   if (bb) for (let i = s; i < e; i++) if (bb.up[i] != null) { min = Math.min(min, bb.lo[i]); max = Math.max(max, bb.up[i]); }
+  draws.forEach((dr) => { if (dr.t === "f" && dr.ext) { const span = dr.p2 - dr.p1; [dr.p2 + span * 0.272, dr.p1].forEach((v) => { min = Math.min(min, v); max = Math.max(max, v); }); } });
   if (!isFinite(min)) { min = 0; max = 1; }
   if (max - min < 0.02) { max += 0.5; min -= 0.5; }
   const pad = (max - min) * 0.07; min -= pad; max += pad;
@@ -323,9 +324,9 @@ function chartSvg(cfg, full) {
     if (dr.t === "h") { if (dr.p > min && dr.p < max) g += '<line class="' + cls + '" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(dr.p) + '" y2="' + Y(dr.p) + '"/><rect class="draw-tag' + (dr.auto ? " auto" : "") + '" x="' + (x1 + 1) + '" y="' + (Y(dr.p) - 9) + '" width="' + (axis - 2) + '" height="18" rx="3"/><text class="draw-txt" x="' + (x1 + 5) + '" y="' + (Y(dr.p) + 4) + '">' + dr.p.toFixed(2) + "</text>"; }
     else if (dr.t === "f") {
       const xa = Math.max(x0, X(Math.min(dr.i1, dr.i2)) - bw / 2);
-      [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1].forEach((r) => {
+      (dr.ext ? [-0.618, -0.272, 0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] : [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]).forEach((r) => {
         const pr = dr.p2 - (dr.p2 - dr.p1) * r; if (pr <= min || pr >= max) return;
-        g += '<line class="fib' + (r === 0.5 || r === 0.618 ? " key" : "") + '" clip-path="url(#ch-clip)" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt" clip-path="url(#ch-clip)" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r * 100).toFixed(1).replace(".0", "") + "%  " + pr.toFixed(2) + "</text>";
+        g += '<line class="fib' + (r < 0 ? " ext" : r === 0.5 || r === 0.618 ? " key" : "") + '" clip-path="url(#ch-clip)" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt' + (r < 0 ? " ext" : "") + '" clip-path="url(#ch-clip)" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r < 0 ? 100 + Math.abs(r) * 100 : r * 100).toFixed(1).replace(".0", "") + "%  " + pr.toFixed(2) + "</text>";
       });
     }
     else { const m = (dr.p2 - dr.p1) / (dr.i2 - dr.i1), iEnd = s + slots, pEnd = dr.p1 + m * (iEnd - dr.i1); g += '<line class="' + cls + '" clip-path="url(#ch-clip)" x1="' + X(dr.i1) + '" y1="' + Y(dr.p1) + '" x2="' + X(iEnd) + '" y2="' + Y(pEnd) + '"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i1) + '" cy="' + Y(dr.p1) + '" r="3.5"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i2) + '" cy="' + Y(dr.p2) + '" r="3.5"/>'; }
@@ -358,10 +359,10 @@ const ICON_READ = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="
 
 function readingHtml() {
   const r = analyze(CH.data, CH.s, CH.e);
-  if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p>" + aiPanel() + "</div>";
+  if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p>" + fibSection() + aiPanel() + "</div>";
   return '<div class="panel reading stack"><div class="row" style="justify-content:space-between"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><button class="btn sm ghost" data-act="ch-read">' + esc(t("ch_hide_read")) + '</button></div><p class="small muted">' + esc(t("ch_read_p")) + '</p><dl class="rdlist">' +
     r.items.slice(0, -1).concat([["rd_stats", statsLines(signalStats(CH.data, CH.e))]], r.items.slice(-1)).map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : k === "rd_stats" ? "wide" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
-    (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + aiPanel() + "</div>";
+    (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + fibSection() + aiPanel() + "</div>";
 }
 
 function pageChart() {
@@ -392,7 +393,7 @@ function pageChart() {
   const replay = chReplay == null
     ? '<button class="btn sm" data-act="ch-replay"' + (full.length < 12 ? " disabled" : "") + ">" + esc(t("ch_replay")) + '</button><span class="small muted">' + esc(t("ch_replay_p")) + "</span>"
     : '<button class="btn sm primary" data-act="ch-step" data-n="1"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next")) + '</button><button class="btn sm" data-act="ch-step" data-n="5"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next5")) + '</button><button class="btn sm" data-act="ch-replay-off">' + esc(t("ch_show_all")) + '</button><span class="tag amber num">' + hidden + '</span><span class="small muted">' + esc(t("ch_hidden")) + "</span>";
-  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : dr.t === "f" ? t("ch_f_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
+  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : dr.t === "f" ? t("ch_f_lbl") + (dr.auto ? " ✦" : "") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
   const note = isReal ? t("ch_few").replace("{n}", full.length) : t("ch_practice_note");
   const step = Math.max(1, Math.round(CH.slots / 3));
   const canWl = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
@@ -402,10 +403,10 @@ function pageChart() {
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
     '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
-    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
+    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
     (chReading ? readingHtml() : "") +
     '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + step + '"' + (CH.s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + step + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
-    '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + "</div></div>" + wl +
+    '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + '</div>' + (isReal ? '<label class="row small" style="gap:8px"><input type="checkbox" id="fb-auto"' + (cfg.autoAI ? " checked" : "") + ">" + esc(t("fb_auto")) + '</label><p class="small muted" style="margin-top:-6px">' + esc(t("fb_auto_note")) + "</p>" : "") + "</div>" + wl +
     '<div class="notice">' + esc(note) + " " + esc(t("disclaimer")) + "</div></div></div>";
 }
 

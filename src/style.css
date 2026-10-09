@@ -368,3 +368,12 @@ td .num,td.num{font-size:13.5px}
 .mk-in{fill:var(--ind2)} .mk-out.win{fill:var(--up)} .mk-out.loss{fill:var(--down)}
 .lg-sw.i1{fill:var(--ind1)} .lg-sw.i2{fill:var(--ind2)}
 .labfig svg{display:block;width:100%;height:auto;direction:ltr}
+.fib.ext{stroke:var(--ind3);stroke-dasharray:6 3;stroke-width:1.2}
+.fib-txt.ext{fill:var(--ind3)}
+.fibbox{border-top:1px solid var(--line);padding-top:14px}
+.fibbox h3{font-size:18px}
+.fibtbl td,.fibtbl th{white-space:nowrap}
+.fibtbl td.note{white-space:normal;min-width:220px}
+.fibtbl tr.key td{background:var(--amber-soft)}
+.fibtbl tr.ext td:first-child b{color:var(--ind3)}
+.conf{background:var(--up-soft);border-radius:8px;padding:8px 12px;font-size:14.5px}

@@ -388,6 +388,15 @@ td .num,td.num{font-size:13.5px}
 .mk-in{fill:var(--ind2)} .mk-out.win{fill:var(--up)} .mk-out.loss{fill:var(--down)}
 .lg-sw.i1{fill:var(--ind1)} .lg-sw.i2{fill:var(--ind2)}
 .labfig svg{display:block;width:100%;height:auto;direction:ltr}
+.fib.ext{stroke:var(--ind3);stroke-dasharray:6 3;stroke-width:1.2}
+.fib-txt.ext{fill:var(--ind3)}
+.fibbox{border-top:1px solid var(--line);padding-top:14px}
+.fibbox h3{font-size:18px}
+.fibtbl td,.fibtbl th{white-space:nowrap}
+.fibtbl td.note{white-space:normal;min-width:220px}
+.fibtbl tr.key td{background:var(--amber-soft)}
+.fibtbl tr.ext td:first-child b{color:var(--ind3)}
+.conf{background:var(--up-soft);border-radius:8px;padding:8px 12px;font-size:14.5px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1445,6 +1454,7 @@ function renderNow() {
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
+  if (r === "chart" && typeof maybeAutoAnalysis === "function") setTimeout(maybeAutoAnalysis, 0);
 }
 let lastRoute = null;
 window.addEventListener("hashchange", () => { closing = deleting = null; resetArmed = false; render(); if (route() !== lastRoute) window.scrollTo(0, 0); lastRoute = route(); });
@@ -1836,6 +1846,7 @@ function chartSvg(cfg, full) {
   view.forEach((r) => { min = Math.min(min, r.l); max = Math.max(max, r.h); });
   lines.forEach((ln) => { for (let i = s; i < e; i++) if (ln.v[i] != null) { min = Math.min(min, ln.v[i]); max = Math.max(max, ln.v[i]); } });
   if (bb) for (let i = s; i < e; i++) if (bb.up[i] != null) { min = Math.min(min, bb.lo[i]); max = Math.max(max, bb.up[i]); }
+  draws.forEach((dr) => { if (dr.t === "f" && dr.ext) { const span = dr.p2 - dr.p1; [dr.p2 + span * 0.272, dr.p1].forEach((v) => { min = Math.min(min, v); max = Math.max(max, v); }); } });
   if (!isFinite(min)) { min = 0; max = 1; }
   if (max - min < 0.02) { max += 0.5; min -= 0.5; }
   const pad = (max - min) * 0.07; min -= pad; max += pad;
@@ -1873,9 +1884,9 @@ function chartSvg(cfg, full) {
     if (dr.t === "h") { if (dr.p > min && dr.p < max) g += '<line class="' + cls + '" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(dr.p) + '" y2="' + Y(dr.p) + '"/><rect class="draw-tag' + (dr.auto ? " auto" : "") + '" x="' + (x1 + 1) + '" y="' + (Y(dr.p) - 9) + '" width="' + (axis - 2) + '" height="18" rx="3"/><text class="draw-txt" x="' + (x1 + 5) + '" y="' + (Y(dr.p) + 4) + '">' + dr.p.toFixed(2) + "</text>"; }
     else if (dr.t === "f") {
       const xa = Math.max(x0, X(Math.min(dr.i1, dr.i2)) - bw / 2);
-      [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1].forEach((r) => {
+      (dr.ext ? [-0.618, -0.272, 0, 0.236, 0.382, 0.5, 0.618, 0.786, 1] : [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]).forEach((r) => {
         const pr = dr.p2 - (dr.p2 - dr.p1) * r; if (pr <= min || pr >= max) return;
-        g += '<line class="fib' + (r === 0.5 || r === 0.618 ? " key" : "") + '" clip-path="url(#ch-clip)" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt" clip-path="url(#ch-clip)" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r * 100).toFixed(1).replace(".0", "") + "%  " + pr.toFixed(2) + "</text>";
+        g += '<line class="fib' + (r < 0 ? " ext" : r === 0.5 || r === 0.618 ? " key" : "") + '" clip-path="url(#ch-clip)" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt' + (r < 0 ? " ext" : "") + '" clip-path="url(#ch-clip)" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r < 0 ? 100 + Math.abs(r) * 100 : r * 100).toFixed(1).replace(".0", "") + "%  " + pr.toFixed(2) + "</text>";
       });
     }
     else { const m = (dr.p2 - dr.p1) / (dr.i2 - dr.i1), iEnd = s + slots, pEnd = dr.p1 + m * (iEnd - dr.i1); g += '<line class="' + cls + '" clip-path="url(#ch-clip)" x1="' + X(dr.i1) + '" y1="' + Y(dr.p1) + '" x2="' + X(iEnd) + '" y2="' + Y(pEnd) + '"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i1) + '" cy="' + Y(dr.p1) + '" r="3.5"/><circle class="draw-dot' + (dr.auto ? " auto" : "") + '" clip-path="url(#ch-clip)" cx="' + X(dr.i2) + '" cy="' + Y(dr.p2) + '" r="3.5"/>'; }
@@ -1908,10 +1919,10 @@ const ICON_READ = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="
 
 function readingHtml() {
   const r = analyze(CH.data, CH.s, CH.e);
-  if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p>" + aiPanel() + "</div>";
+  if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p>" + fibSection() + aiPanel() + "</div>";
   return '<div class="panel reading stack"><div class="row" style="justify-content:space-between"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><button class="btn sm ghost" data-act="ch-read">' + esc(t("ch_hide_read")) + '</button></div><p class="small muted">' + esc(t("ch_read_p")) + '</p><dl class="rdlist">' +
     r.items.slice(0, -1).concat([["rd_stats", statsLines(signalStats(CH.data, CH.e))]], r.items.slice(-1)).map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : k === "rd_stats" ? "wide" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
-    (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + aiPanel() + "</div>";
+    (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + fibSection() + aiPanel() + "</div>";
 }
 
 function pageChart() {
@@ -1942,7 +1953,7 @@ function pageChart() {
   const replay = chReplay == null
     ? '<button class="btn sm" data-act="ch-replay"' + (full.length < 12 ? " disabled" : "") + ">" + esc(t("ch_replay")) + '</button><span class="small muted">' + esc(t("ch_replay_p")) + "</span>"
     : '<button class="btn sm primary" data-act="ch-step" data-n="1"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next")) + '</button><button class="btn sm" data-act="ch-step" data-n="5"' + (hidden ? "" : " disabled") + ">" + esc(t("ch_next5")) + '</button><button class="btn sm" data-act="ch-replay-off">' + esc(t("ch_show_all")) + '</button><span class="tag amber num">' + hidden + '</span><span class="small muted">' + esc(t("ch_hidden")) + "</span>";
-  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : dr.t === "f" ? t("ch_f_lbl") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
+  const drawList = draws.length ? draws.map((dr, i) => '<span class="chip">' + esc(dr.t === "h" ? t("ch_h_lbl") : dr.t === "f" ? t("ch_f_lbl") + (dr.auto ? " ✦" : "") : t("ch_t_lbl")) + ' <span class="num">' + (dr.t === "h" ? dr.p.toFixed(2) : dr.p1.toFixed(2) + " → " + dr.p2.toFixed(2)) + '</span><button data-act="ch-del" data-i="' + i + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") : '<span class="small muted">' + esc(t("ch_none")) + "</span>";
   const note = isReal ? t("ch_few").replace("{n}", full.length) : t("ch_practice_note");
   const step = Math.max(1, Math.round(CH.slots / 3));
   const canWl = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
@@ -1952,10 +1963,10 @@ function pageChart() {
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
     '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
-    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
+    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
     (chReading ? readingHtml() : "") +
     '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + step + '"' + (CH.s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + step + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
-    '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + "</div></div>" + wl +
+    '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + '</div>' + (isReal ? '<label class="row small" style="gap:8px"><input type="checkbox" id="fb-auto"' + (cfg.autoAI ? " checked" : "") + ">" + esc(t("fb_auto")) + '</label><p class="small muted" style="margin-top:-6px">' + esc(t("fb_auto_note")) + "</p>" : "") + "</div>" + wl +
     '<div class="notice">' + esc(note) + " " + esc(t("disclaimer")) + "</div></div></div>";
 }
 
@@ -2307,6 +2318,111 @@ document.addEventListener("change", (ev) => {
   else if (k === "sym" || k === "entry" || k === "exit") c[k] = el.value;
   else { const v = parseFloat(el.value); if (isFinite(v) && v >= 0) c[k] = ["ea", "eb", "ep", "xp", "hold"].includes(k) ? Math.round(v) : v; }
   save(); render();
+});
+/* ===== مِراس: تحليل فيبوناتشي التلقائي =====
+   يلقى آخر حركة واضحة في الشموع الظاهرة، يرسم مستويات التصحيح والامتداد،
+   ويشرح كل مستوى ويقارنه بالمؤشرات المفعّلة. يوصف مستويات يراقبها السوق، وما يتوقع السعر. */
+Object.assign(UI, {
+  fb_btn: ["حلّل", "Analyse"], fb_h: ["تحليل فيبوناتشي", "Fibonacci analysis"],
+  fb_p_up: ["الحركة المختارة صاعدة: من القاع {a} ({da}) إلى القمة {b} ({db}). مستويات التصحيح تحت القمة مناطق دعم محتملة لو رجع السعر، والامتداد فوقها مناطق يراقبها المتداولين لو كمّل.", "The selected move is up: from the low {a} ({da}) to the high {b} ({db}). Retracement levels below the high are possible support if price pulls back; extensions above it are areas traders watch if it continues."],
+  fb_p_down: ["الحركة المختارة هابطة: من القمة {a} ({da}) إلى القاع {b} ({db}). مستويات التصحيح فوق القاع مناطق مقاومة محتملة لو ارتد السعر، والامتداد تحتها مناطق يراقبها المتداولين لو كمّل النزول.", "The selected move is down: from the high {a} ({da}) to the low {b} ({db}). Retracement levels above the low are possible resistance if price bounces; extensions below it are areas traders watch if the fall continues."],
+  fb_none: ["ما لقيت حركة واضحة في الشموع الظاهرة. زد عدد الشموع أو اختر سهم ثاني.", "No clear move in the candles shown. Show more candles or pick another share."],
+  fb_lvl: ["المستوى", "Level"], fb_px: ["السعر", "Price"], fb_now: ["مكان السعر الحين", "Where price is now"], fb_mean: ["وش يعني", "What it means"],
+  fb_above: ["السعر فوقه بـ {p}%", "Price is {p}% above"], fb_below: ["السعر تحته بـ {p}%", "Price is {p}% below"], fb_at: ["السعر عنده", "Price is at it"],
+  fb_ext_note: ["مستويات الامتداد (127.2% و161.8%) يسميها كثير من المتداولين \"أهداف\". هي أماكن يراقبها السوق لو كمّلت الحركة، مو توقع إن السعر بيوصلها.", "Extension levels (127.2% and 161.8%) are called \"targets\" by many traders. They are places the market watches if the move continues, not a forecast that price will reach them."],
+  fb_conf_h: ["فيبوناتشي مقابل باقي المؤشرات", "Fibonacci against the other indicators"],
+  fb_conf_p: ["فيبوناتشي يعطيك أماكن ثابتة على السعر، والمؤشرات الثانية تتحرك مع كل شمعة. لما يتلاقى مستوى فيبوناتشي مع مؤشر ثاني عند نفس السعر تقريباً، هذي المنطقة يراقبها عدد أكبر من المتداولين.", "Fibonacci gives you fixed places on price, while the other indicators move with every candle. When a Fibonacci level meets another indicator at roughly the same price, more traders are watching that area."],
+  fb_conf: ["تلاقي: مستوى {l} ({p}) قريب من {n} ({v})، الفرق {d}%.", "Confluence: the {l} level ({p}) is close to {n} ({v}), {d}% apart."],
+  fb_conf_none: ["ما فيه تلاقي واضح (أقل من 1%) بين مستويات فيبوناتشي والمؤشرات المفعّلة. أضف متوسط 20 أو بولنجر وشوف.", "No clear confluence (under 1%) between the Fibonacci levels and the active indicators. Add the 20 average or Bollinger and look again."],
+  fb_cmp: [
+    ["المتوسطات المتحركة تتبع السعر وتتأخر عنه، وفيبوناتشي ثابت على حركة اخترتها. المتوسط يجاوب: وين الاتجاه؟ وفيبوناتشي يجاوب: وين ممكن يوقف التصحيح؟", "Moving averages follow price with a lag, while Fibonacci is fixed on a move you chose. The average answers: where is the trend? Fibonacci answers: where might the pullback stop?"],
+    ["بولنجر يتسع ويضيق مع التذبذب. لو خطه السفلي قريب من مستوى فيبوناتشي، المنطقة أقوى.", "Bollinger widens and narrows with volatility. If its lower line is near a Fibonacci level, the area is stronger."],
+    ["RSI والماكد يقيسون الزخم وما يعطونك أسعار. استخدمهم كتأكيد عند وصول السعر لمستوى فيبوناتشي: تشبع بيعي عند 61.8% أقوى من 61.8% لحاله.", "RSI and MACD measure momentum and give no prices. Use them as confirmation when price reaches a Fibonacci level: oversold at 61.8% is stronger than 61.8% alone."]
+  ],
+  fb_auto: ["حلّل تلقائياً لما توصل أسعار جديدة", "Analyse automatically when new prices arrive"],
+  fb_auto_note: ["يشتغل لما تفتح الشارت على سهم حقيقي وفيه شمعة جديدة. شرح الذكاء الاصطناعي ينطلب مرة وحدة لكل شمعة جديدة وينحفظ.", "Runs when you open the chart on a real share that has a new candle. The AI explanation is requested once per new candle and saved."],
+  fb_cached: ["من تحليل محفوظ", "From a saved analysis"],
+  fb_q: ["اشرح مستويات فيبوناتشي المرسومة على هذا الشارت: وش معنى كل مستوى، وأي مستوى السعر قريب منه الحين، وكيف تتفق أو تختلف مع المؤشرات الثانية المفعّلة.", "Explain the Fibonacci levels drawn on this chart: what each level means, which level price is near now, and how they agree or disagree with the other active indicators."]
+});
+
+const FIB_R = [-0.618, -0.272, 0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+const fibLabel = (r) => (r < 0 ? 100 + Math.abs(r) * 100 : r * 100).toFixed(1).replace(".0", "") + "%";
+const FIB_MEAN = {
+  "0": ["نهاية الحركة. السعر لو تجاوزها، الحركة مستمرة.", "The end of the move. If price goes past it, the move is continuing."],
+  "0.236": ["تصحيح خفيف. الارتداد من هنا يدل على حركة قوية ما صبر فيها المتداولين.", "A shallow pullback. A turn here suggests a strong move where traders did not wait."],
+  "0.382": ["أول منطقة تصحيح مهمة. كثير من الاتجاهات الصحية ترتد منها.", "The first important pullback area. Many healthy trends turn here."],
+  "0.5": ["منتصف الحركة. مو من أرقام فيبوناتشي، لكنه مستوى نفسي يراقبه الكل.", "The middle of the move. Not a Fibonacci number, but a psychological level everyone watches."],
+  "0.618": ["النسبة الذهبية وأشهر مستوى. ثبات السعر عنده يحافظ على الحركة الأصلية.", "The golden ratio and the best-known level. Price holding here keeps the original move alive."],
+  "0.786": ["آخر خط دفاع. كسره غالباً يعني إن الحركة الأصلية انتهت.", "The last line of defence. Breaking it usually means the original move is over."],
+  "1": ["بداية الحركة. الرجوع لها يلغي الحركة كاملة.", "The start of the move. Returning here cancels the whole move."],
+  "-0.272": ["الامتداد الأول. لو كمّل السعر بعد نهاية الحركة، أول منطقة يراقبها المتداولين لجني الأرباح.", "The first extension. If price continues past the end of the move, the first area traders watch for taking profit."],
+  "-0.618": ["الامتداد الذهبي. منطقة شائعة في الحركات القوية، ويوصلها السعر أقل من غيرها.", "The golden extension. A common area in strong moves, and one price reaches less often."]
+};
+
+/* the dominant move among the candles shown: lowest low and highest high, ordered by which came first */
+function autoFib(data, s, e) {
+  if (e - s < 15) return null;
+  let lo = s, hi = s;
+  for (let i = s; i < e; i++) { if (data[i].l < data[lo].l) lo = i; if (data[i].h > data[hi].h) hi = i; }
+  if (lo === hi || data[hi].h - data[lo].l <= 0) return null;
+  const r2 = (x) => Math.round(x * 100) / 100;
+  return lo < hi ? { t: "f", i1: lo, p1: r2(data[lo].l), i2: hi, p2: r2(data[hi].h), auto: 1, ext: 1 } : { t: "f", i1: hi, p1: r2(data[hi].h), i2: lo, p2: r2(data[lo].l), auto: 1, ext: 1 };
+}
+
+function fibSection() {
+  const cfg = chartCfg(), list = S.drawings[cfg.sym] || [], f = list.filter((d) => d.t === "f").slice(-1)[0];
+  if (!f || !CH) return "";
+  const last = CH.data[CH.e - 1]; if (!last) return "";
+  const c = last.c, up = f.p2 > f.p1, rs = f.ext ? FIB_R : FIB_R.filter((r) => r >= 0), price = (r) => f.p2 - (f.p2 - f.p1) * r;
+  const day = (i) => (CH.data[i] && CH.data[i].d) || t("ch_day") + " " + (i + 1);
+  const head = t(up ? "fb_p_up" : "fb_p_down").replace("{a}", f.p1.toFixed(2)).replace("{da}", day(f.i1)).replace("{b}", f.p2.toFixed(2)).replace("{db}", day(f.i2));
+  const rows = rs.slice().sort((a, b) => price(b) - price(a)).map((r) => {
+    const p = price(r), d = ((c - p) / p) * 100, st = Math.abs(d) < 0.3 ? t("fb_at") : t(d > 0 ? "fb_above" : "fb_below").replace("{p}", Math.abs(d).toFixed(1));
+    return '<tr class="' + (r < 0 ? "ext" : r === 0.5 || r === 0.618 ? "key" : "") + '"><td class="num"><b>' + fibLabel(r) + '</b></td><td class="num">' + p.toFixed(2) + '</td><td class="small">' + esc(st) + '</td><td class="note">' + esc(L(FIB_MEAN[String(r)])) + "</td></tr>";
+  }).join("");
+  /* confluence: fibonacci levels within 1% of an indicator value or a drawn line */
+  const refs = [], li = CH.e - 1;
+  CH.lines.forEach((ln) => { if (ln.v[li] != null) refs.push([ln.name, ln.v[li]]); });
+  if (CH.bb && CH.bb.up[li] != null) { refs.push([t("ch_bb") + " " + t("ch_up"), CH.bb.up[li]]); refs.push([t("ch_bb") + " " + t("ch_low"), CH.bb.lo[li]]); }
+  list.filter((d) => d.t === "h").forEach((d) => refs.push([t("ch_h_lbl") + " " + d.p.toFixed(2), d.p]));
+  const conf = [];
+  rs.forEach((r) => refs.forEach(([n, v]) => { const p = price(r), dd = Math.abs(p - v) / p * 100; if (dd < 1) conf.push(t("fb_conf").replace("{l}", fibLabel(r)).replace("{p}", p.toFixed(2)).replace("{n}", n).replace("{v}", v.toFixed(2)).replace("{d}", dd.toFixed(2))); }));
+  return '<div class="fibbox stack"><h3>' + esc(t("fb_h")) + '</h3><p class="small">' + esc(head) + '</p><div class="tablewrap"><table class="fibtbl"><thead><tr><th>' + esc(t("fb_lvl")) + "</th><th>" + esc(t("fb_px")) + "</th><th>" + esc(t("fb_now")) + "</th><th>" + esc(t("fb_mean")) + "</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
+    (f.ext ? '<p class="small muted">' + esc(t("fb_ext_note")) + "</p>" : "") +
+    '<div class="stack" style="gap:8px"><b>' + esc(t("fb_conf_h")) + '</b><p class="small muted">' + esc(t("fb_conf_p")) + "</p>" + (conf.length ? conf.slice(0, 5).map((x) => '<p class="conf">' + esc(x) + "</p>").join("") : '<p class="small">' + esc(t("fb_conf_none")) + "</p>") + "<ul class=\"small\" style=\"margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px\">" + UI.fb_cmp.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul></div></div>";
+}
+
+/* ----- analysis: draw the auto fib, open the reading, ask the model once per candle ----- */
+const AIC_KEY = "meras.aicache";
+let aiCache = {}; try { aiCache = JSON.parse(localStorage.getItem(AIC_KEY) || "{}"); } catch (e) {}
+const analysisKey = () => { const cfg = chartCfg(), d = chartData(cfg.sym), l = d[d.length - 1]; return l ? cfg.sym + "|" + (l.d || d.length) + "|" + l.c + "|" + (cfg.n || "") + "|" + S.lang : null; };
+async function runAnalysis(force) {
+  const cfg = chartCfg();
+  if (!CH) return;
+  const f = autoFib(CH.data, CH.s, CH.e);
+  if (!f) { toast(t("fb_none")); return; }
+  S.drawings[cfg.sym] = (S.drawings[cfg.sym] || []).filter((d) => !(d.t === "f" && d.auto)).concat([f]);
+  chReading = true; save(); render();
+  if (!(typeof aiReady === "function" && aiReady() && AI.model)) return;
+  const key = analysisKey();
+  if (!force && key && aiCache[key]) { aiState = { busy: false, text: aiCache[key].text, err: "", model: aiCache[key].model + " · " + t("fb_cached") }; render(); return; }
+  await aiExplain(t("fb_q"));
+  if (aiState.text && key) { aiCache[key] = { text: aiState.text, model: aiState.model, at: Date.now() }; const ks = Object.keys(aiCache).sort((a, b) => aiCache[a].at - aiCache[b].at); while (ks.length > 30) delete aiCache[ks.shift()]; try { localStorage.setItem(AIC_KEY, JSON.stringify(aiCache)); } catch (e) {} }
+}
+let autoDone = {};
+function maybeAutoAnalysis() {
+  const cfg = chartCfg(); if (!cfg.autoAI || PRACTICE[cfg.sym] || route() !== "chart") return;
+  const key = analysisKey(); if (!key || autoDone[key]) return;
+  const d = chartData(cfg.sym); if (d.length < 20) return;
+  autoDone[key] = true; runAnalysis(false);
+}
+document.addEventListener("click", (ev) => {
+  const el = ev.target.closest && ev.target.closest('[data-act="ch-analyze"]'); if (!el) return;
+  runAnalysis(ev.shiftKey);
+});
+document.addEventListener("change", (ev) => {
+  if (ev.target.id !== "fb-auto") return;
+  chartCfg().autoAI = ev.target.checked; save(); render(); maybeAutoAnalysis();
 });
 /* ===== مِراس: الشروحات + رسومات الدروس الإضافية ===== */
 Object.assign(UI, {
@@ -2706,7 +2822,7 @@ function aiPayload(question) {
   if (CH.rs) active["RSI " + cfg.rsi.p] = { last: f2(CH.rs[last]), last_30: series(CH.rs) };
   if (CH.md) active["MACD 12/26/9"] = { macd: f2(CH.md.line[last]), signal: f2(CH.md.sig[last]), histogram: f2(CH.md.hist[last]), histogram_last_10: CH.md.hist.slice(Math.max(CH.s, CH.e - 10), CH.e).map(f2) };
   if (cfg.vol) { let a = 0, n = 0; for (let i = Math.max(CH.s, CH.e - 21); i < CH.e - 1; i++) { a += CH.data[i].v || 0; n++; } active.volume = { last: CH.data[last].v, avg_previous_20: n ? Math.round(a / n) : null }; }
-  const draws = (S.drawings[cfg.sym] || []).map((d) => (d.t === "h" ? { type: "horizontal line", price: d.p } : d.t === "f" ? { type: "fibonacci", from: d.p1, to: d.p2, levels: [0, 23.6, 38.2, 50, 61.8, 78.6, 100].map((x) => ({ pct: x, price: f2(d.p2 - (d.p2 - d.p1) * (x / 100)) })) } : { type: "trend line", from_price: d.p1, to_price: d.p2, candles_apart: d.i2 - d.i1 }));
+  const draws = (S.drawings[cfg.sym] || []).map((d) => (d.t === "h" ? { type: "horizontal line", price: d.p } : d.t === "f" ? { type: "fibonacci", from: d.p1, to: d.p2, levels: (d.ext ? [-61.8, -27.2, 0, 23.6, 38.2, 50, 61.8, 78.6, 100] : [0, 23.6, 38.2, 50, 61.8, 78.6, 100]).map((x) => ({ level: x < 0 ? "extension " + (100 - x).toFixed(1) + "%" : x + "%", price: f2(d.p2 - (d.p2 - d.p1) * (x / 100)) })), drawn_automatically: !!d.auto } : { type: "trend line", from_price: d.p1, to_price: d.p2, candles_apart: d.i2 - d.i1 }));
   return {
     share: PRACTICE[cfg.sym] ? "practice data (generated, not a real share)" : cfg.sym + " " + symName(cfg.sym) + " (Saudi market, daily candles, prices delayed)",
     chart_type: cfg.type, candles_shown: CH.e - CH.s,
@@ -2733,6 +2849,7 @@ const AI_SYSTEM = (lang) => [
   "2. Never predict a future price, direction, target or probability. Never invent a confidence or success percentage; the only percentages you may quote are those in signal_record, and you must say they are small-sample counts of the past.",
   "3. Use only the numbers in the JSON. Do not recalculate indicators and do not introduce numbers that are not there.",
   "4. If the data is practice data, say so once.",
+  "6. Fibonacci extension levels may be called targets by traders; describe them only as areas the market watches if the move continues, never as where price will go.",
   "5. Only discuss the indicators listed in indicators_on_chart and the learner_drawings; if the learner asks about an indicator that is not on the chart, explain what it is in general and suggest adding it to the chart.",
   "What to write: explain what the chart shows and why the rule-based reading says what it says, connect the observations to each other (trend, averages, momentum, volume, levels), point out one thing a beginner would likely miss, and end with one small exercise to try on the chart. If learner_question is present, answer it first, within the rules; if it asks for advice or a prediction, say you can only explain what the chart shows.",
   "Style: " + (lang === "ar" ? "simple Arabic in a friendly Saudi tone" : "plain English") + ", 4 short paragraphs at most, under 180 words, plain text with no markdown, no bullet symbols and no headings."
