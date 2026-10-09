@@ -1646,7 +1646,7 @@ function analyze(data, s, e) {
 }
 
 let chImport = null;
-const IM_COLS = { d: ["date", "التاريخ", "تاريخ", "time"], o: ["open", "افتتاح", "الافتتاح"], h: ["high", "اعلى", "الاعلى"], l: ["low", "ادنى", "الادنى"], c: ["close", "اغلاق", "الاغلاق", "price", "last", "السعر"], v: ["volume", "vol", "الكمية", "الحجم", "حجم"] };
+const IM_COLS = { d: ["date", "التاريخ", "تاريخ", "time"], o: ["open", "افتتاح", "الافتتاح"], h: ["high", "اعلى", "الاعلى"], l: ["low", "ادنى", "الادنى"], c: ["close", "اغلاق", "الاغلاق", "اقفال", "الاقفال", "price", "last", "السعر"], v: ["volume", "vol", "الكمية", "الحجم", "حجم"] };
 function imNum(x) {
   if (typeof x === "number") return x; if (x == null) return NaN;
   let s = String(x).replace(/[\u0660-\u0669]/g, (d) => d.charCodeAt(0) - 0x660).replace(/[,\s\u066C]/g, "").replace("\u066B", "."), mul = 1;
@@ -1672,7 +1672,15 @@ function parseHistory(buf) {
 }
 /* a table copied from a web page: one row per line, cells separated by tabs (or runs of spaces) */
 function parsePasted(text) {
-  const lines = String(text || "").replace(/\r/g, "").split("\n").map((x) => x.trim()).filter(Boolean);
+  /* cells with an arrow (change, change %) copy as their own lines, so one table row can span several lines:
+     a new row starts only at a line that begins with a date; everything until the next date line belongs to it */
+  const raw = String(text || "").replace(/\r/g, "").replace(/\u00a0/g, " ").split("\n"), isDate = (x) => /^\s*(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}|[A-Za-z]{3}\s+\d{1,2},?\s+\d{4})/.test(x);
+  const groups = [];
+  raw.forEach((ln) => {
+    if (!groups.length || isDate(ln) || (!groups.some((g) => isDate(g)) && /[^\s\d.,\-+%▲▼]/.test(ln) && ln.includes("\t"))) groups.push(ln);
+    else { const prev = groups[groups.length - 1]; groups[groups.length - 1] = prev + (/\t$/.test(prev) || /^\t/.test(ln) || !ln.trim() ? "" : "\t") + ln; }
+  });
+  const lines = groups.map((x) => x.trim()).filter(Boolean);
   const tabs = lines.some((x) => x.includes("\t"));
   return parseRows(lines.map((x) => (tabs ? x.split("\t") : x.split(/\s{2,}|\s(?=[\d\-+▲▼])/)).map((c) => c.trim())));
 }
