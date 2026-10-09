@@ -502,6 +502,49 @@ const LESSONS = [
         why: ["تطابق أكثر من سبب عند نفس السعر يزيد عدد اللي يراقبونه.", "Several reasons at the same price mean more people are watching it."] }
     ] },
 
+  { id: "trd-3-4", track: "trd", level: 3, mins: 10, title: ["من فكرة إلى استراتيجية مختبرة", "From an idea to a tested strategy"],
+    body: [
+      { p: ["الفرق بين المتداول والمقامر مو إن الأول يربح دائماً. الفرق إن الأول عنده قواعد مكتوبة قبل ما يدخل، ويعرف من التجربة كيف تتصرف قواعده في السوق.", "The difference between a trader and a gambler is not that the first always wins. It is that the first has written rules before entering, and knows from testing how those rules behave in the market."] },
+      { h: ["الأسئلة الأربعة", "The four questions"] },
+      { ul: [
+        ["متى أدخل؟ شرط واضح يقدر أي أحد يتحقق منه على الشارت.", "When do I enter? A clear condition anyone can check on the chart."],
+        ["متى أطلع لو غلطت؟ وقف خسارة محدد قبل الدخول.", "When do I exit if wrong? A stop-loss set before entering."],
+        ["متى أطلع لو صحّيت؟ إشارة خروج، أو هدف، أو مدة.", "When do I exit if right? An exit signal, a target, or a time limit."],
+        ["كم أشتري؟ بحيث خسارة وحدة ما تهز رأس مالك.", "How much do I buy? So that one loss does not shake your capital."]
+      ] },
+      { p: ["مثال مكتوب: \"أشتري لما يقطع متوسط 5 متوسط 20 للأعلى والسعر فوق متوسط 50. أطلع لما يقطع للأسفل، أو لو نزل السعر 5% عن دخولي.\" هذي استراتيجية، لأن كل جزء فيها له جواب واحد.", "A written example: \"I buy when the 5 average crosses above the 20 and price is above the 50 average. I exit when it crosses back below, or if price falls 5% from my entry.\" That is a strategy, because every part of it has a single answer."] },
+      { h: ["الاختبار على التاريخ", "Testing on history"] },
+      { p: ["مختبر مِراس يمشي على شموع السهم يوم يوم، ويطبق قواعدك بدون عاطفة. الإشارة تنحسب على إغلاق اليوم، والدخول على افتتاح اليوم اللي بعده، لأنك في الواقع ما تعرف الإغلاق إلا بعد ما يصير.", "The Meras lab walks through the share's candles day by day and applies your rules without emotion. The signal is computed on the day's close and the entry happens at the next day's open, because in reality you only know the close after it happens."] },
+      { h: ["كيف تقرا النتيجة", "How to read the result"] },
+      { ul: [
+        ["قارن بالشراء والاحتفاظ دائماً. لو ما تفوقت عليه، فقواعدك كلفتك تعب وعمولات بدون فايدة.", "Always compare with buy and hold. If you did not beat it, your rules cost you effort and commissions for nothing."],
+        ["أكبر هبوط أهم من العائد. استراتيجية ربحت 30% بس نزلت 25% في الطريق، تقدر تتحملها نفسياً؟", "Maximum drawdown matters more than return. A strategy that made 30% but fell 25% along the way: could you stomach it?"],
+        ["معامل الربح فوق 1 يعني الأرباح أكبر من الخسائر. تحت 1 الاستراتيجية خسرانة.", "A profit factor above 1 means gains exceed losses. Below 1 the strategy loses."],
+        ["عدد الصفقات: أقل من 30 صفقة ممكن تكون النتيجة حظ.", "Number of trades: under 30, the result may be luck."]
+      ] },
+      { h: ["ثلاث فخاخ", "Three traps"] },
+      { ul: [
+        ["مطابقة الماضي: تعدّل الأرقام (6 بدل 5، 22 بدل 20) لين تطلع النتيجة حلوة. الاستراتيجية كذا تحفظ الماضي وما تفهمه، وتفشل على الجديد. الحل: اختبرها بنفس الأرقام على سهم ثاني.", "Curve fitting: tweaking the numbers (6 instead of 5, 22 instead of 20) until the result looks good. The strategy then memorises the past without understanding it, and fails on new data. The fix: test it with the same numbers on another share."],
+        ["تجاهل التكلفة: العمولة على الدخول والخروج. استراتيجية تتداول كل أسبوع تاكلها العمولات.", "Ignoring cost: commission is paid on entry and exit. A strategy that trades every week gets eaten by commissions."],
+        ["ظروف السوق تتغير: اللي اشتغل في سنة صاعدة ممكن يخسر في سنة عرضية.", "Conditions change: what worked in a rising year can lose in a sideways one."]
+      ] },
+      { h: ["خصوصية السوق السعودي", "Saudi market specifics"] },
+      { ul: [
+        ["الاستراتيجيات هنا غالباً شراء فقط، والمختبر مبني كذا.", "Strategies here are mostly long-only, and the lab is built that way."],
+        ["حد 10% اليومي: ممكن السهم يفتح تحت وقفك، والمختبر يحسب الخروج على سعر الافتتاح في هذي الحالة، مو على سعر الوقف.", "The 10% daily limit: a share can open below your stop, and the lab then exits at the open price, not at the stop."],
+        ["السيولة: جرّب استراتيجيتك على الأسهم النشطة قبل الأسهم الخفيفة.", "Liquidity: test your strategy on active shares before thin ones."]
+      ] },
+      { note: ["بعد المختبر: تابع الاستراتيجية في سجل التداول أسابيع بصفقات تدريبية. لو التزمت فيها ونتيجتها قريبة من الاختبار، وقتها جرّبها بمبلغ صغير.", "After the lab: follow the strategy in the trading journal for weeks with practice trades. If you stick to it and the results are close to the test, then try it with a small amount."] }
+    ],
+    quiz: [
+      { q: ["استراتيجيتك ربحت 12% والشراء والاحتفاظ ربح 20% على نفس الفترة. وش تستنتج؟", "Your strategy made 12% while buy and hold made 20% over the same period. What do you conclude?"],
+        opts: [["الاستراتيجية ممتازة لأنها ربحت", "The strategy is excellent because it made money"], ["القواعد كلفتك أكثر مما أفادتك على هذا السهم", "The rules cost you more than they helped on this share"], ["لازم أزيد عدد الصفقات", "I must trade more"]], a: 1,
+        why: ["المقياس الصحيح هو الفرق عن البديل الأبسط. لو بقيت ماسك السهم كان طلعت أحسن.", "The right yardstick is the gap to the simplest alternative. Simply holding the share would have done better."] },
+      { q: ["عدلت متوسط 5 إلى 6 ثم 7 لين صار العائد أعلى شي. وش اسم هذا الخطأ؟", "You changed the 5 average to 6 then 7 until the return peaked. What is this mistake called?"],
+        opts: [["مطابقة الماضي", "Curve fitting"], ["تنويع", "Diversification"], ["إدارة مخاطر", "Risk management"]], a: 0,
+        why: ["الأرقام صارت مفصلة على شموع معينة، فاحتمال تنجح على بيانات جديدة ضعيف.", "The numbers are now tailored to particular candles, so they are unlikely to work on new data."] }
+    ] },
+
   /* ---------- المبرمج: الدرجة 1 ---------- */
   { id: "dev-1-1", track: "dev", level: 1, mins: 6, title: ["ما هو الـ API ومفتاحك", "What an API is, and your key"],
     body: [

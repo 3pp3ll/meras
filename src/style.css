@@ -354,3 +354,17 @@ td .num,td.num{font-size:13.5px}
 .ai-chips{display:flex;flex-wrap:wrap;gap:6px}
 .ai-chips button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 12px;font-size:13px;cursor:pointer}
 .ai-chips button:hover{border-color:var(--amber)}
+/* lab */
+.lab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.lab-grid > div{border-top:2px solid var(--amber);padding-top:12px}
+.lab-k{font-family:var(--display);font-size:17px}
+@media (max-width:900px){.lab-grid{grid-template-columns:1fr}}
+.lab-sum{font-size:17px;max-width:70ch}
+.lab-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+.lab-stats div:nth-child(n+5){border-top:1px solid var(--line)}
+.lab-stats div:nth-child(5){border-inline-start:0}
+@media (max-width:620px){.lab-stats{grid-template-columns:1fr 1fr}.lab-stats div:nth-child(odd){border-inline-start:0}.lab-stats div:nth-child(n+3){border-top:1px solid var(--line)}}
+.tr-win{fill:var(--up);opacity:.09} .tr-loss{fill:var(--down);opacity:.09}
+.mk-in{fill:var(--ind2)} .mk-out.win{fill:var(--up)} .mk-out.loss{fill:var(--down)}
+.lg-sw.i1{fill:var(--ind1)} .lg-sw.i2{fill:var(--ind2)}
+.labfig svg{display:block;width:100%;height:auto;direction:ltr}

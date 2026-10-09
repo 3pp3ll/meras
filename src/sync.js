@@ -56,7 +56,7 @@ async function readJson(path) {
 const errText = (e) => t({ "401": "e_401", "404": "e_404", "403": "e_403", net: "e_net" }[e && e.code] || "e_net");
 
 /* ما يتزامن: التقدم، السجل، الباقة، الحساب. اللغة وحالة الدخول تبقى لكل جهاز. */
-const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null });
+const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null, lb: s.lab || null });
 function mergeState(local, remote) {
   if (!remote || typeof remote !== "object") return local;
   const newer = (local.updatedAt || 0) >= (remote.updatedAt || 0) ? local : remote;
