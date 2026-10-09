@@ -5,7 +5,7 @@ Object.assign(UI, {
   il_what: ["وش يقيس", "What it measures"], il_how: ["كيف تستخدمه", "How to use it"], il_when: ["متى ينفع", "When it helps"], il_trap: ["متى يخدع", "When it misleads"],
   il_cmp: ["الفرق بينها", "How they differ"], il_c1: ["المؤشر", "Indicator"], il_c2: ["النوع", "Type"], il_c3: ["أفضل وقت له", "Best when"], il_c4: ["أضعف وقت له", "Weakest when"],
   il_any: ["هل تشتغل على أي سهم وأي سوق؟", "Do they work on any share and any market?"],
-  il_combo: ["كيف تجمع بينها", "How to combine them"], il_count: ["5 مؤشرات", "5 indicators"]
+  il_combo: ["كيف تجمع بينها", "How to combine them"], il_count: ["7 مؤشرات", "7 indicators"]
 });
 const highIn = (sym, a, b) => { const d = practiceSeries(sym); let k = a; for (let i = a; i < b; i++) if (d[i].h > d[k].h) k = i; return k; };
 function fibFig() { return miniChart({ sym: "TRN-A", from: 96, n: 64, fib: [lowIn("TRN-A", 98, 116), highIn("TRN-A", 130, 158)] }); }
@@ -26,6 +26,16 @@ const IND_LIB = [
     how: ["فوق 70 تشبع شرائي، وتحت 30 تشبع بيعي. استخدمه كتأكيد عند مستوى: تشبع بيعي عند دعم يقوّي فكرة الارتداد.", "Above 70 is overbought, below 30 oversold. Use it as confirmation at a level: oversold at support strengthens the case for a bounce."],
     when: ["في المسار العرضي، لما يتحرك السعر بين دعم ومقاومة.", "In a range, when price moves between support and resistance."],
     trap: ["في الاتجاه القوي يبقى فوق 70 أسابيع والسعر يكمل. التشبع لحاله مو إشارة عكس.", "In a strong trend it stays above 70 for weeks while price continues. An extreme reading alone is not a reversal signal."], best: ["مسار عرضي", "Range"], worst: ["اتجاه قوي", "Strong trend"] },
+  { n: ["نطاقات بولنجر", "Bollinger Bands"], c: "BB", type: ["تذبذب", "Volatility"], fig: () => miniChart({ sym: "TRN-B", from: 60, n: 70, bb: true }),
+    what: ["ثلاث خطوط: متوسط 20 في النص، وفوقه وتحته خطين يبعدون عنه مرتين الانحراف المعياري. لما السعر يتذبذب بقوة النطاق يتوسع، ولما يهدأ يضيق.", "Three lines: a 20 average in the middle, with a line above and below at two standard deviations. When price swings hard the band widens; when it calms the band narrows."],
+    how: ["لمس الخط العلوي يعني السعر مرتفع مقارنة بحركته الأخيرة، والسفلي منخفض. والأهم الانضغاط: نطاق ضيق جداً غالباً يسبق حركة قوية، بس ما يقول لك في أي جهة.", "Touching the upper line means price is high relative to its recent movement; the lower, low. More important is the squeeze: a very narrow band often precedes a strong move, but it does not tell you which way."],
+    when: ["في المسار العرضي يشتغل مثل الدعم والمقاومة المتحركة. والانضغاط ينفع في أي وقت كتنبيه إن الهدوء ما بيطول.", "In a range it acts like moving support and resistance. The squeeze is useful at any time as a warning that the calm will not last."],
+    trap: ["في الاتجاه القوي السعر يمشي ملاصق للخط العلوي أيام، فبيع كل لمسة للعلوي غلط. الخط مو حاجز.", "In a strong trend price can ride the upper line for days, so selling every touch of it is a mistake. The line is not a wall."], best: ["مسار عرضي وانضغاط", "Range and squeezes"], worst: ["اتجاه قوي", "Strong trend"] },
+  { n: ["الماكد", "MACD"], c: "MACD", type: ["زخم واتجاه", "Momentum and trend"], fig: () => miniChart({ sym: "TRN-C", from: 70, n: 80, pane: "macd" }),
+    what: ["الفرق بين متوسطين أسيين (12 و26)، ومعه خط إشارة هو متوسط أسي 9 للفرق نفسه. الأعمدة تبيّن المسافة بين الخطين.", "The difference between two exponential averages (12 and 26), with a signal line that is a 9-period exponential average of that difference. The bars show the gap between the two lines."],
+    how: ["قطع الماكد لخط الإشارة للأعلى يعتبر إشارة زخم صاعد، وللأسفل هابط. فوق الصفر يعني المتوسط القصير فوق الطويل. والأعمدة اللي تصغر تقول إن الزخم يضعف قبل ما يتقاطعون.", "MACD crossing above its signal line is read as rising momentum; below, falling. Above zero means the short average is above the long one. Shrinking bars say momentum is fading before the lines cross."],
+    when: ["في الأسهم اللي تمشي في موجات واضحة، وعلى الإطار اليومي أو أطول.", "On shares that move in clear swings, on the daily timeframe or longer."],
+    trap: ["مبني على متوسطات، فهو متأخر مرتين. في المسار العرضي يتقاطع كثير بدون معنى. ومع شموع قليلة ما يظهر: يحتاج 34 شمعة على الأقل عشان يكتمل.", "Built on averages, it lags twice over. In a range it crosses often without meaning. And with few candles it does not appear: it needs at least 34 candles to form."], best: ["موجات واضحة", "Clear swings"], worst: ["مسار عرضي", "Range"] },
   { n: ["الحجم", "Volume"], c: "VOL", type: ["مشاركة", "Participation"], fig: () => miniChart({ sym: "TRN-A", from: 95, n: 60, pane: "vol" }),
     what: ["عدد الأسهم المتداولة في كل شمعة. يقول لك كم واحد شارك في الحركة.", "The number of shares traded in each candle. It tells you how many took part in the move."],
     how: ["قارن حجم الشمعة بمتوسط الشموع اللي قبلها. حركة بحجم أعلى من المعتاد وراها قناعة، وحركة بحجم ضعيف هشة.", "Compare a candle's volume with the average of those before it. A move on above-normal volume has conviction; a move on weak volume is fragile."],

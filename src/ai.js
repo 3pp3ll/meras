@@ -54,21 +54,36 @@ function aiPanel() {
   if (aiState.busy) body = '<p class="muted">' + esc(t("ai_busy")) + "</p>";
   else if (aiState.err) body = '<p class="neg">' + esc(aiState.err) + "</p>";
   else if (aiState.text) body = '<div class="ai-out"><div class="row" style="justify-content:space-between"><b>' + esc(t("ai_title")) + '</b><span class="tag num">' + esc(aiState.model) + "</span></div>" + aiState.text.split(/\n{2,}|\n/).filter((x) => x.trim()).map((x) => "<p>" + esc(x.trim()) + "</p>").join("") + '<p class="small muted">' + esc(t("ai_warn")) + "</p></div>";
-  return '<form class="ai-box stack" data-form="ai" novalidate><div class="row"><input id="ai-q" maxlength="300" placeholder="' + esc(t("ai_ask_ph")) + '"' + (aiState.busy ? " disabled" : "") + '><button class="btn primary" type="submit"' + (aiState.busy ? " disabled" : "") + ">" + ICON_READ + " " + esc(t("ai_explain")) + "</button></div>" + body + "</form>";
+  return '<form class="ai-box stack" data-form="ai" novalidate><div class="row"><input id="ai-q" maxlength="300" placeholder="' + esc(t("ai_ask_ph")) + '"' + (aiState.busy ? " disabled" : "") + '><button class="btn primary" type="submit"' + (aiState.busy ? " disabled" : "") + ">" + ICON_READ + " " + esc(t("ai_explain")) + "</button></div>" + aiChips() + body + "</form>";
 }
 
 function aiPayload(question) {
-  const r = analyze(CH.data, CH.s, CH.e), cfg = chartCfg(), cl = CH.data.map((x) => x.c), last = CH.e - 1;
-  const m5 = sma(cl, 5), m20 = sma(cl, 20), r14 = rsi(cl, 14), f2 = (v) => (v == null ? null : +v.toFixed(2));
+  const r = analyze(CH.data, CH.s, CH.e), cfg = chartCfg(), last = CH.e - 1, f2 = (v) => (v == null ? null : +v.toFixed(2)), from = Math.max(CH.s, CH.e - 30);
+  const series = (arr) => arr.slice(from, CH.e).map(f2);
+  const active = {};
+  CH.lines.forEach((ln) => { active[ln.name] = { last: f2(ln.v[last]), last_30: series(ln.v) }; });
+  if (CH.bb) active[t("ch_bb") + " " + cfg.bb.p + " (2 std)"] = { upper: f2(CH.bb.up[last]), middle: f2(CH.bb.mid[last]), lower: f2(CH.bb.lo[last]), width_pct: CH.bb.up[last] != null ? +(((CH.bb.up[last] - CH.bb.lo[last]) / CH.bb.mid[last]) * 100).toFixed(2) : null };
+  if (CH.rs) active["RSI " + cfg.rsi.p] = { last: f2(CH.rs[last]), last_30: series(CH.rs) };
+  if (CH.md) active["MACD 12/26/9"] = { macd: f2(CH.md.line[last]), signal: f2(CH.md.sig[last]), histogram: f2(CH.md.hist[last]), histogram_last_10: CH.md.hist.slice(Math.max(CH.s, CH.e - 10), CH.e).map(f2) };
+  if (cfg.vol) { let a = 0, n = 0; for (let i = Math.max(CH.s, CH.e - 21); i < CH.e - 1; i++) { a += CH.data[i].v || 0; n++; } active.volume = { last: CH.data[last].v, avg_previous_20: n ? Math.round(a / n) : null }; }
+  const draws = (S.drawings[cfg.sym] || []).map((d) => (d.t === "h" ? { type: "horizontal line", price: d.p } : d.t === "f" ? { type: "fibonacci", from: d.p1, to: d.p2, levels: [0, 23.6, 38.2, 50, 61.8, 78.6, 100].map((x) => ({ pct: x, price: f2(d.p2 - (d.p2 - d.p1) * (x / 100)) })) } : { type: "trend line", from_price: d.p1, to_price: d.p2, candles_apart: d.i2 - d.i1 }));
   return {
     share: PRACTICE[cfg.sym] ? "practice data (generated, not a real share)" : cfg.sym + " " + symName(cfg.sym) + " (Saudi market, daily candles, prices delayed)",
-    candles_shown: CH.e - CH.s,
-    last_30_candles: CH.data.slice(Math.max(CH.s, CH.e - 30), CH.e).map((x) => ({ o: x.o, h: x.h, l: x.l, c: x.c, v: x.v })),
-    indicators_at_last_candle: { close: f2(cl[last]), sma5: f2(m5[last]), sma20: f2(m20[last]), rsi14: r14[last] == null ? null : +r14[last].toFixed(1) },
-    rule_based_reading: r.items.map(([k, lines]) => ({ topic: t(k), notes: lines })),
+    chart_type: cfg.type, candles_shown: CH.e - CH.s,
+    last_30_candles: CH.data.slice(from, CH.e).map((x) => ({ d: x.d || undefined, o: x.o, h: x.h, l: x.l, c: x.c, v: x.v })),
+    indicators_on_chart: active,
+    learner_drawings: draws,
+    rule_based_reading: r.need != null ? "not enough candles for the rule-based reading" : r.items.map(([k, lines]) => ({ topic: t(k), notes: lines })),
     signal_record: statsLines(signalStats(CH.data, CH.e)),
     learner_question: question || null
   };
+}
+function aiChips() {
+  const cfg = chartCfg(), names = IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => t(d[1])), q = [];
+  names.slice(0, 3).forEach((n) => { q.push(L(["وش يقول " + n + " هنا؟", "What is the " + n + " saying here?"])); q.push(L(["متى أستخدم " + n + "؟", "When should I use the " + n + "?"])); });
+  if ((S.drawings[cfg.sym] || []).length) q.push(L(["هل رسمي للمستويات منطقي؟", "Do my drawn levels make sense?"]));
+  q.push(L(["وش أهم شي ألاحظه في هذا الشارت؟", "What is the main thing to notice on this chart?"]));
+  return '<div class="ai-chips">' + q.slice(0, 6).map((x) => '<button type="button" data-act="ai-chip" data-q="' + esc(x) + '"' + (aiState.busy ? " disabled" : "") + ">" + esc(x) + "</button>").join("") + "</div>";
 }
 const AI_SYSTEM = (lang) => [
   "You are a teaching assistant inside Meras, a learning platform for beginners studying the Saudi stock market.",
@@ -78,6 +93,7 @@ const AI_SYSTEM = (lang) => [
   "2. Never predict a future price, direction, target or probability. Never invent a confidence or success percentage; the only percentages you may quote are those in signal_record, and you must say they are small-sample counts of the past.",
   "3. Use only the numbers in the JSON. Do not recalculate indicators and do not introduce numbers that are not there.",
   "4. If the data is practice data, say so once.",
+  "5. Only discuss the indicators listed in indicators_on_chart and the learner_drawings; if the learner asks about an indicator that is not on the chart, explain what it is in general and suggest adding it to the chart.",
   "What to write: explain what the chart shows and why the rule-based reading says what it says, connect the observations to each other (trend, averages, momentum, volume, levels), point out one thing a beginner would likely miss, and end with one small exercise to try on the chart. If learner_question is present, answer it first, within the rules; if it asks for advice or a prediction, say you can only explain what the chart shows.",
   "Style: " + (lang === "ar" ? "simple Arabic in a friendly Saudi tone" : "plain English") + ", 4 short paragraphs at most, under 180 words, plain text with no markdown, no bullet symbols and no headings."
 ].join("\n");
@@ -109,6 +125,8 @@ document.addEventListener("submit", (ev) => {
   else if (!aiState.busy) aiExplain((document.getElementById("ai-q").value || "").trim());
 });
 document.addEventListener("click", (ev) => {
+  const chipEl = ev.target.closest && ev.target.closest('[data-act="ai-chip"]');
+  if (chipEl) { if (!aiState.busy) aiExplain(chipEl.dataset.q); return; }
   const el = ev.target.closest && ev.target.closest('[data-act="ai-forget"]'); if (!el) return;
   AI.key = ""; aiStore(); aiState = { busy: false, text: "", err: "", model: "" }; render();
 });

@@ -49,6 +49,18 @@ function miniChart(o) {
     [0, 0.382, 0.5, 0.618, 1].forEach((r) => { const pr = b - (b - a) * r; g += '<line class="fib' + (r === 0.5 || r === 0.618 ? " key" : "") + '" x1="' + xa + '" x2="' + x1 + '" y1="' + Y(pr) + '" y2="' + Y(pr) + '"/><text class="fib-txt" x="' + (xa + 4) + '" y="' + (Y(pr) - 3) + '">' + (r * 100).toFixed(1).replace(".0", "") + "%</text>"; });
   }
   if (o.pane === "vol") { const vm = Math.max(...d.map((r) => r.v)); d.forEach((r, k) => { const hh = (r.v / vm) * pane, w = bw * 0.62; g += '<rect class="' + (r.c >= r.o ? "c-up" : "c-down") + '" opacity=".5" x="' + (X(s + k) - w / 2) + '" y="' + (ptop + pane - hh) + '" width="' + w + '" height="' + hh + '"/>'; }); }
+  if (o.bb) {
+    const b = bollinger(cl, 20, 2); let up = "", lo = "", pen = false;
+    for (let i = s; i < e; i++) { if (b.up[i] == null) continue; up += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(b.up[i]).toFixed(1); lo += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(b.lo[i]).toFixed(1); pen = true; }
+    g += '<path class="ind i4 thin" d="' + up + '"/><path class="ind i4 thin" d="' + lo + '"/>';
+  }
+  if (o.pane === "macd") {
+    const m = macd(cl, 12, 26, 9); let amax = 0; for (let i = s; i < e; i++) [m.line[i], m.sig[i]].forEach((x) => { if (x != null) amax = Math.max(amax, Math.abs(x)); });
+    amax = amax || 1; const MY = (v) => ptop + pane / 2 - (v / amax) * (pane / 2 - 3);
+    g += '<rect class="pane" x="' + x0 + '" y="' + ptop + '" width="' + (x1 - x0) + '" height="' + pane + '"/><line class="c-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + MY(0) + '" y2="' + MY(0) + '"/>';
+    for (let i = s; i < e; i++) if (m.hist[i] != null) { const a = MY(0), b2 = MY(m.hist[i]); g += '<rect class="' + (m.hist[i] >= 0 ? "c-up" : "c-down") + '" opacity=".5" x="' + (X(i) - bw * 0.25) + '" y="' + Math.min(a, b2) + '" width="' + bw * 0.5 + '" height="' + Math.max(0.6, Math.abs(b2 - a)) + '"/>'; }
+    [["line", "i2"], ["sig", "i1"]].forEach(([k, c]) => { let d = "", pen = false; for (let i = s; i < e; i++) { if (m[k][i] == null) { pen = false; continue; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + MY(m[k][i]).toFixed(1); pen = true; } g += '<path class="ind ' + c + ' thin" d="' + d + '"/>'; });
+  }
   if (o.pane === "rsi") {
     const rs = rsi(cl, 14), RY = (v) => ptop + ((100 - v) / 100) * pane; let pth = "", pen = false;
     g += '<rect class="pane" x="' + x0 + '" y="' + ptop + '" width="' + (x1 - x0) + '" height="' + pane + '"/><line class="c-grid" stroke-dasharray="3 3" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(70) + '" y2="' + RY(70) + '"/><line class="c-grid" stroke-dasharray="3 3" x1="' + x0 + '" x2="' + x1 + '" y1="' + RY(30) + '" y2="' + RY(30) + '"/>';
