@@ -425,6 +425,20 @@ td .num,td.num{font-size:13.5px}
   #dv-print .pr-notes b{color:#0F1F3D}
   #dv-print *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+/* التحليل الفني */
+.tc-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+@media (max-width:820px){.tc-gauges{grid-template-columns:1fr}}
+.tc-g{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tc-g h3{font-size:17px}
+.tc-g svg{width:100%;max-width:240px;height:auto;direction:ltr}
+.tc-ends{display:flex;justify-content:space-between;width:100%;max-width:240px;direction:ltr}
+.tc-lbl{font-size:20px}
+.tc-lbl.up{color:var(--up)} .tc-lbl.down{color:var(--down)}
+.tc-n{display:flex;gap:14px;justify-content:center}
+.tc-chips{gap:6px}
+.tc-piv th,.tc-piv td{text-align:center}
+.tc-mean{white-space:normal;min-width:150px}
+.grid2>*{min-width:0}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1369,7 +1383,7 @@ function pageLesson(id) {
 
 /* ----- services ----- */
 function svcShell(tab, inner) {
-  const tabs = [["journal", "tab_journal"], ["calc", "tab_calc"], ["dividends", "tab_div"], ["glossary", "tab_gloss"]];
+  const tabs = [["journal", "tab_journal"], ["invest", "tab_inv"], ["tech", "tab_tech"], ["dividends", "tab_div"], ["calc", "tab_calc"], ["glossary", "tab_gloss"]];
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("services_h")) + '</h1></div><div class="tabs">' + tabs.map(([h, k]) => '<a href="#' + h + '"' + (h === tab ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</div><div class="stack" style="padding-block:22px">' + inner + "</div></div>";
 }
 const plOf = (j) => (j.exit == null ? null : (j.exit - j.entry) * j.qty);
@@ -1473,12 +1487,12 @@ function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
   const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["lab", "nav_lab"], ["guides", "nav_guides"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
-  const group = r === "settings" ? "account" : r.startsWith("g-") ? "guides" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "dividends", "glossary"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
+  const group = r === "settings" ? "account" : r.startsWith("g-") ? "guides" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "dividends", "glossary", "tech", "invest"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
   $("#top").innerHTML = '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav" aria-label="main">' + nav.map(([h, k]) => '<a href="#' + h + '"' + (group === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</nav><div class="tools"><button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a></div></div>";
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -2685,7 +2699,7 @@ async function readJson(path) {
 const errText = (e) => t({ "401": "e_401", "404": "e_404", "403": "e_403", net: "e_net" }[e && e.code] || "e_net");
 
 /* ما يتزامن: التقدم، السجل، الباقة، الحساب. اللغة وحالة الدخول تبقى لكل جهاز. */
-const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null, lb: s.lab || null });
+const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null, lb: s.lab || null, iv: s.invest || null });
 function mergeState(local, remote) {
   if (!remote || typeof remote !== "object") return local;
   const newer = (local.updatedAt || 0) >= (remote.updatedAt || 0) ? local : remote;
@@ -2695,6 +2709,11 @@ function mergeState(local, remote) {
   const byId = {};
   [].concat(remote.journal || [], local.journal || []).forEach((j) => { const p = byId[j.id]; if (!p || (j.updated || 0) >= (p.updated || 0)) byId[j.id] = j; });
   out.journal = Object.values(byId).filter((j) => !out.deleted.includes(j.id)).sort((a, b) => (a.entryDate + a.id < b.entryDate + b.id ? -1 : 1));
+  if (local.invest || remote.invest) {
+    const li = local.invest || {}, ri = remote.invest || {}, del = Array.from(new Set([].concat(li.del || [], ri.del || []))), byB = {};
+    [].concat(ri.buys || [], li.buys || []).forEach((b) => { const p = byB[b.id]; if (!p || (b.updated || 0) >= (p.updated || 0)) byB[b.id] = b; });
+    out.invest = Object.assign({}, newer.invest || li || ri, { buys: Object.values(byB).filter((b) => !del.includes(b.id)), del });
+  }
   if (!out.account && (remote.account || local.account)) out.account = local.account || remote.account;
   return out;
 }
@@ -3072,6 +3091,310 @@ function exportDivPdf() {
   const old = document.title; document.title = t("dv_pdf_h") + " " + stamp;
   setTimeout(() => { try { window.print(); } catch (e) { toast(t("dv_pdf_frame")); } document.title = old; setTimeout(done, 500); }, 60);
 }
+/* ===== مِراس: التحليل الفني =====
+   نفس فكرة صفحة "التحليل الفني" في TradingView: 3 عدادات (المذبذبات، الملخص، المتوسطات المتحركة)،
+   جداول المؤشرات مع الإشارة، ونقاط الارتكاز. البيانات من technicals.json في مستودعك الخاص،
+   يحدثها سكربت (scripts/fetch_technicals.py) 3 مرات في أيام التداول. الأسهم تنضاف في techlist.json. */
+Object.assign(UI, {
+  tab_tech: ["التحليل الفني", "Technicals"],
+  tc_p: ["ملخص فني لكل سهم تتابعه، بنفس طريقة TradingView: 26 مؤشر، كل واحد يعطي شراء أو محايد أو بيع، والعداد يجمعها. هذا وصف آلي لحالة السعر، مو توصية.", "A technical summary for every share you follow, the TradingView way: 26 indicators, each saying buy, neutral or sell, and the gauge adds them up. It describes the price mechanically; it is not a recommendation."],
+  tc_osc: ["المذبذبات", "Oscillators"], tc_sum: ["الملخص", "Summary"], tc_ma: ["المتوسطات المتحركة", "Moving averages"],
+  tc_ema: ["المتوسط المتحرك الأسي", "Exponential Moving Average"], tc_sma: ["المتوسط المتحرك البسيط", "Simple Moving Average"],
+  tc_d: ["يومي", "Daily"], tc_w: ["أسبوعي", "Weekly"],
+  tc_sb: ["شراء قوي", "Strong buy"], tc_b: ["شراء", "Buy"], tc_n: ["محايد", "Neutral"], tc_s: ["بيع", "Sell"], tc_ss: ["بيع قوي", "Strong sell"],
+  tc_name: ["الاسم", "Name"], tc_val: ["القيمة", "Value"], tc_act: ["الإشارة", "Action"], tc_mean: ["يعني إيش؟", "What it means"],
+  tc_piv: ["نقاط الارتكاز (شهرية)", "Pivot points (monthly)"], tc_piv_p: ["مستويات دعم (S) ومقاومة (R) محسوبة من أعلى وأدنى وإغلاق الشهر الماضي. P هي النقطة الوسط. كثير من المتداولين يراقبونها، فالسعر يتفاعل عندها أحياناً.", "Support (S) and resistance (R) levels worked out from last month's high, low and close. P is the middle. Many traders watch them, so price sometimes reacts there."],
+  tc_all: ["أسهمي بنظرة وحدة", "All my shares at a glance"], tc_close: ["السعر", "Price"], tc_chg: ["التغير", "Change"],
+  tc_add: ["أضف سهم (الرمز)", "Add a share (code)"], tc_add_btn: ["أضف", "Add"], tc_rm: ["شيل هذا السهم من القائمة", "Remove this share"],
+  tc_added: ["انضاف. يظهر تحليله بعد دقيقتين تقريباً (بعد ما يشتغل السكربت).", "Added. Its analysis appears in about two minutes, once the script runs."], tc_removed: ["انشال من القائمة", "Removed"],
+  tc_bad: ["اكتب رمز من 4 أرقام، مثل 1120", "Enter a 4-digit code, like 1120"],
+  tc_updated: ["آخر تحديث {d} · {n} سهم", "Updated {d} · {n} shares"],
+  tc_sample: ["هذي بيانات نموذجية لسهم واحد. التحليل الحقيقي لكل أسهمك يظهر في النسخة المنشورة بعد ربط مستودعك.", "This is sample data for one share. The real analysis for all your shares appears in the published version once your repository is linked."],
+  tc_how_h: ["كيف تقرأ الصفحة؟", "How to read this page"],
+  tc_how: ["المذبذبات تقيس الزخم: هل السهم مبالغ في بيعه أو شرائه. المتوسطات تقيس الاتجاه: لو السعر فوق المتوسط فهي \"شراء\". الملخص يجمع الاثنين. الأسبوعي أبطأ وأهم للمستثمر، واليومي للمضارب. لما الأسبوعي واليومي يتفقون على شراء تكون الصورة أوضح، وهذا نفس تأكيد الفريمات في Shark PRO.", "Oscillators measure momentum: is the share oversold or overbought. Moving averages measure trend: price above the average counts as \"buy\". The summary combines both. Weekly is slower and matters more to an investor; daily is for traders. When weekly and daily agree on buy, the picture is clearer, which is the same timeframe confirmation Shark PRO uses."],
+  tc_warn_h: ["انتبه", "Careful"],
+  tc_warn: ["\"بيع قوي\" على المتوسطات غالباً معناها إن السهم نازل من فترة، مو إنه لازم تبيع. للمستثمر الطويل، النزول ممكن يكون فرصة شراء بسعر أقل لو الشركة نفسها ما تغيرت. العدادات ما تعرف شي عن أرباح الشركة أو توزيعاتها.", "\"Strong sell\" on the moving averages usually means the share has been falling for a while, not that you must sell. For a long-term investor a decline can be a chance to buy cheaper if the company itself hasn't changed. The gauges know nothing about the company's earnings or dividends."],
+  tc_src: ["المصدر: شاشة أسهم TradingView، يتحدث 3 مرات في أيام التداول (10:30 ص، 1 م، 3:20 م). الإشارات بنفس قواعد TradingView المعروفة، وممكن تختلف شوي عن الموقع.", "Source: the TradingView stock screener, refreshed 3 times on trading days (10:30, 13:00, 15:20). Signals follow TradingView's published rules and may differ slightly from the site."]
+});
+
+const TC_NAMES = {
+  rsi: [["مؤشر القوة النسبية (14)", "Relative Strength Index (14)"], ["تحت 30 مبالغ في بيعه، فوق 70 مبالغ في شرائه", "Below 30 oversold, above 70 overbought"]],
+  stoch: [["ستوكاستيك ‎%K (14، 3، 3)", "Stochastic %K (14, 3, 3)"], ["أين الإغلاق بين أعلى وأدنى 14 يوم", "Where the close sits in the 14-day range"]],
+  cci: [["مؤشر قناة السلع (20)", "Commodity Channel Index (20)"], ["بعد السعر عن متوسطه. تحت ‎-100 ضعف زائد", "Distance from the average. Below -100 is stretched low"]],
+  adx: [["مؤشر متوسط الاتجاه (14)", "Average Directional Index (14)"], ["قوة الاتجاه. فوق 20 يعني فيه اتجاه واضح", "Trend strength. Above 20 means a clear trend"]],
+  ao: [["المذبذب الرائع", "Awesome Oscillator"], ["زخم قصير مقابل طويل", "Short versus long momentum"]],
+  mom: [["الزخم (10)", "Momentum (10)"], ["الفرق عن سعر قبل 10 أيام", "Change from 10 days ago"]],
+  macd: [["الماكد (12، 26)", "MACD Level (12, 26)"], ["فوق خط الإشارة شراء، تحته بيع", "Above its signal line buy, below sell"]],
+  stochrsi: [["ستوكاستيك RSI السريع", "Stochastic RSI Fast (3, 3, 14, 14)"], ["نسخة أسرع وأحسّ من RSI", "A faster, more sensitive RSI"]],
+  wr: [["ويليامز ‎%R (14)", "Williams Percent Range (14)"], ["قريب من ‎-100 مبالغ في بيعه", "Near -100 is oversold"]],
+  bbp: [["قوة الثيران والدببة", "Bull Bear Power"], ["مين أقوى: المشترين أو البايعين", "Who is stronger: buyers or sellers"]],
+  uo: [["المذبذب النهائي (7، 14، 28)", "Ultimate Oscillator (7, 14, 28)"], ["زخم على 3 فترات مع بعض", "Momentum over three periods combined"]],
+  ichimoku: [["خط أساس إيشيموكو (9، 26، 52، 26)", "Ichimoku Base Line (9, 26, 52, 26)"]],
+  vwma: [["المتوسط المرجح بالحجم (20)", "Volume Weighted Moving Average (20)"]],
+  hma: [["متوسط هال (9)", "Hull Moving Average (9)"]]
+};
+const tcName = (k) => {
+  const m = /^(ema|sma)(\d+)$/.exec(k);
+  if (m) return [(m[1] === "ema" ? t("tc_ema") : t("tc_sma")) + " (" + m[2] + ")", ""];
+  const n = TC_NAMES[k]; return n ? [L(n[0]), n[1] ? L(n[1]) : ""] : [k, ""];
+};
+const tcLabel = (v) => (v == null ? "tc_n" : v >= 0.5 ? "tc_sb" : v >= 0.1 ? "tc_b" : v > -0.1 ? "tc_n" : v > -0.5 ? "tc_s" : "tc_ss");
+const tcCls = (v) => (v == null ? "" : v >= 0.1 ? "up" : v <= -0.1 ? "down" : "");
+const tcAct = (a) => (a == null ? '<span class="muted">–</span>' : '<span class="tag ' + (a > 0 ? "up" : a < 0 ? "down" : "") + '">' + esc(t(a > 0 ? "tc_b" : a < 0 ? "tc_s" : "tc_n")) + "</span>");
+
+/* بيانات نموذجية لسهم واحد (الراجحي، 13 أكتوبر 2026) للمعاينة قبل الربط. */
+const TECH_SAMPLE = {"fetched_at":null,"stocks":[{"s":"1120","tf":{"1D":{"close":62.05,"change":0.161,"all":-0.355,"osc":0.091,"ma":-0.8,"osc_rows":[{"k":"rsi","v":36.456,"a":0},{"k":"stoch","v":7.939,"a":1},{"k":"cci","v":-114.818,"a":1},{"k":"adx","v":22.843,"a":0},{"k":"ao","v":-2.762,"a":0},{"k":"mom","v":-1.2,"a":1},{"k":"macd","v":-0.93,"a":-1},{"k":"stochrsi","v":31.358,"a":0},{"k":"wr","v":-91.667,"a":1},{"k":"bbp","v":-2.09,"a":0},{"k":"uo","v":31.165,"a":0}],"ma_rows":[{"k":"ema10","v":62.873,"a":-1},{"k":"sma10","v":62.905,"a":-1},{"k":"ema20","v":63.667,"a":-1},{"k":"sma20","v":63.935,"a":-1},{"k":"ema30","v":64.151,"a":-1},{"k":"sma30","v":64.732,"a":-1},{"k":"ema50","v":64.689,"a":-1},{"k":"sma50","v":65.106,"a":-1},{"k":"ema100","v":65.475,"a":-1},{"k":"sma100","v":65.433,"a":-1},{"k":"ema200","v":66.019,"a":-1},{"k":"sma200","v":67.049,"a":-1},{"k":"ichimoku","v":64.5,"a":0},{"k":"vwma","v":63.938,"a":-1},{"k":"hma","v":61.791,"a":1}],"osc_n":{"buy":4,"neutral":6,"sell":1},"ma_n":{"buy":1,"neutral":1,"sell":13},"pivots":{"classic":{"S3":55.033,"S2":59.933,"S1":61.617,"P":64.833,"R1":66.517,"R2":69.733,"R3":74.633},"fibonacci":{"S3":59.933,"S2":61.805,"S1":62.962,"P":64.833,"R1":66.705,"R2":67.862,"R3":69.733},"camarilla":{"S3":61.953,"S2":62.402,"S1":62.851,"P":64.833,"R1":63.749,"R2":64.198,"R3":64.647},"woodie":{"S3":56.0,"S2":59.575,"S1":60.9,"P":64.475,"R1":65.8,"R2":69.375,"R3":70.7},"demark":{"S1":60.775,"P":64.412,"R1":65.675}}},"1W":{"close":62.05,"change":-0.401,"all":-0.403,"osc":-0.273,"ma":-0.533,"osc_rows":[{"k":"rsi","v":37.195,"a":0},{"k":"stoch","v":6.815,"a":0},{"k":"cci","v":-150.422,"a":0},{"k":"adx","v":18.571,"a":0},{"k":"ao","v":-2.67,"a":0},{"k":"mom","v":-2.5,"a":-1},{"k":"macd","v":-1.08,"a":-1},{"k":"stochrsi","v":25.629,"a":0},{"k":"wr","v":-96.774,"a":0},{"k":"bbp","v":-4.158,"a":0},{"k":"uo","v":19.868,"a":-1}],"ma_rows":[{"k":"ema10","v":63.988,"a":-1},{"k":"sma10","v":64.6,"a":-1},{"k":"ema20","v":64.939,"a":-1},{"k":"sma20","v":64.968,"a":-1},{"k":"ema30","v":65.474,"a":-1},{"k":"sma30","v":66.292,"a":-1},{"k":"ema50","v":65.722,"a":-1},{"k":"sma50","v":66.753,"a":-1},{"k":"ema100","v":64.366,"a":-1},{"k":"sma100","v":65.686,"a":-1},{"k":"ema200","v":59.917,"a":1},{"k":"sma200","v":59.082,"a":1},{"k":"ichimoku","v":67.6,"a":0},{"k":"vwma","v":65.271,"a":-1},{"k":"hma","v":61.591,"a":1}],"osc_n":{"buy":0,"neutral":8,"sell":3},"ma_n":{"buy":3,"neutral":1,"sell":11},"pivots":{"classic":{"S3":32.733,"S2":49.533,"S1":57.333,"P":66.333,"R1":74.133,"R2":83.133,"R3":99.933},"fibonacci":{"S3":49.533,"S2":55.951,"S1":59.916,"P":66.333,"R1":72.751,"R2":76.716,"R3":83.133},"camarilla":{"S3":60.513,"S2":62.053,"S1":63.593,"P":66.333,"R1":66.673,"R2":68.213,"R3":69.753},"woodie":{"S3":39.8,"S2":49.167,"S1":56.6,"P":65.967,"R1":73.4,"R2":82.767,"R3":90.2},"demark":{"S1":61.833,"P":68.583,"R1":78.633}}}},"name":"الراجحي"}]};
+const TECH_KEY = "meras.tech";
+let TECH = null, TECHL = null, techLoading = false;
+try { TECH = JSON.parse(localStorage.getItem(TECH_KEY) || "null"); } catch (e) {}
+const techCfg = () => { if (!S.tech) S.tech = {}; if (!S.tech.tf) S.tech.tf = "1D"; return S.tech; };
+const techList = () => (TECH && Array.isArray(TECH.stocks) && TECH.stocks.length ? TECH.stocks : TECH_SAMPLE.stocks);
+const techCan = () => typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+function techPrice(sym) { const s = (TECH && TECH.stocks || []).find((x) => x.s === sym); return s && s.tf && s.tf["1D"] ? s.tf["1D"].close : null; }
+
+async function loadTech() {
+  if (techLoading || !techCan()) return;
+  techLoading = true;
+  try {
+    const f = await readJson("technicals.json");
+    if (f && f.data && Array.isArray(f.data.stocks)) { TECH = f.data; try { localStorage.setItem(TECH_KEY, JSON.stringify(TECH)); } catch (e) {} }
+    const l = await readJson("techlist.json");
+    TECHL = l && Array.isArray(l.data) ? l.data.map(String) : [];
+  } catch (e) {}
+  techLoading = false;
+  if (["tech", "invest"].includes(route()) && !(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))) render();
+}
+async function techListEdit(sym, add) {
+  if (!techCan()) { toast(t("wl_need")); return; }
+  try {
+    const f = await readJson("techlist.json"), cur = f && Array.isArray(f.data) ? f.data.map(String) : [];
+    const next = add ? (cur.includes(sym) ? cur : cur.concat([sym])) : cur.filter((x) => x !== sym);
+    await gh("techlist.json", "PUT", { message: "techlist", content: b64e(JSON.stringify(next) + "\n"), sha: f ? f.sha : undefined });
+    TECHL = next; toast(t(add ? "tc_added" : "tc_removed"));
+  } catch (e) { toast(errText(e)); }
+  render();
+}
+
+/* عداد نصف دائري. القيمة من -1 (بيع قوي) إلى 1 (شراء قوي). */
+function gauge(v, title, n) {
+  const cx = 110, cy = 104, r = 84, pt = (deg, rr) => [cx + rr * Math.cos((deg * Math.PI) / 180), cy - rr * Math.sin((deg * Math.PI) / 180)];
+  const seg = (a0, a1, col) => { const [x0, y0] = pt(a0, r), [x1, y1] = pt(a1, r); return '<path d="M' + x0.toFixed(1) + " " + y0.toFixed(1) + " A" + r + " " + r + " 0 0 1 " + x1.toFixed(1) + " " + y1.toFixed(1) + '" stroke="' + col + '" stroke-width="14" fill="none"/>'; };
+  const cols = ["var(--down)", "var(--down-soft)", "var(--line)", "var(--up-soft)", "var(--up)"];
+  const arcs = cols.map((c, i) => seg(180 - i * 36 - 1, 180 - (i + 1) * 36 + 1, c)).join("");
+  const val = v == null ? 0 : Math.max(-1, Math.min(1, v)), ang = 90 - val * 90, [nx, ny] = pt(ang, r - 22);
+  const lbl = tcLabel(v), cls = tcCls(v);
+  return '<div class="tc-g"><h3>' + esc(title) + '</h3><svg viewBox="0 0 220 120" role="img" aria-label="' + esc(title + ": " + t(lbl)) + '">' + arcs +
+    '<line x1="' + cx + '" y1="' + cy + '" x2="' + nx.toFixed(1) + '" y2="' + ny.toFixed(1) + '" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><circle cx="' + cx + '" cy="' + cy + '" r="6" fill="var(--ink)"/></svg>' +
+    '<div class="tc-ends small muted"><span>' + esc(t("tc_ss")) + "</span><span>" + esc(t("tc_sb")) + '</span></div><b class="tc-lbl ' + cls + '">' + esc(t(lbl)) + "</b>" +
+    (n ? '<div class="tc-n small"><span class="neg">' + esc(t("tc_s")) + " <b>" + n.sell + '</b></span><span class="muted">' + esc(t("tc_n")) + " <b>" + n.neutral + '</b></span><span class="pos">' + esc(t("tc_b")) + " <b>" + n.buy + "</b></span></div>" : "") + "</div>";
+}
+
+function pageTech() {
+  const c = techCfg(), list = techList(), real = list !== TECH_SAMPLE.stocks;
+  if (techCan() && TECHL == null) setTimeout(loadTech, 0);
+  let cur = list.find((x) => x.s === c.s) || list[0];
+  const tf = cur && cur.tf[c.tf] ? c.tf : "1D", d = cur && cur.tf[tf];
+  const chips = list.map((x) => '<button type="button" class="btn sm tgl' + (cur && x.s === cur.s ? " on" : "") + '" data-act="tc-s" data-s="' + esc(x.s) + '" aria-pressed="' + !!(cur && x.s === cur.s) + '"><span class="num">' + esc(x.s) + "</span> " + esc(x.name || "") + "</button>").join("");
+  const tfb = (v, k) => '<button type="button" class="btn sm tgl' + (tf === v ? " on" : "") + '" data-act="tc-tf" data-tf="' + v + '" aria-pressed="' + (tf === v) + '">' + esc(t(k)) + "</button>";
+  const add = techCan() ? '<form class="row" data-form="tc-add" style="gap:8px"><label class="small muted" for="tc-new">' + esc(t("tc_add")) + '</label><input id="tc-new" class="num" inputmode="numeric" maxlength="4" style="width:90px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)"><button class="btn sm" type="submit">' + esc(t("tc_add_btn")) + "</button>" + (cur && TECHL && TECHL.includes(cur.s) ? '<button type="button" class="btn sm ghost" data-act="tc-rm" data-s="' + esc(cur.s) + '">' + esc(t("tc_rm")) + "</button>" : "") + "</form>" : "";
+  const upd = real ? '<span class="small muted">' + esc(t("tc_updated").replace("{d}", whenText(TECH.fetched_at)).replace("{n}", list.length)) + "</span>" : "";
+  if (!d) return svcShell("tech", '<div class="panel">' + esc(t("tc_sample")) + "</div>");
+  const tbl = (rows, withMean) => '<div class="tablewrap"><table><thead><tr><th>' + esc(t("tc_name")) + "</th><th>" + esc(t("tc_val")) + "</th><th>" + esc(t("tc_act")) + "</th>" + (withMean ? "<th>" + esc(t("tc_mean")) + "</th>" : "") + "</tr></thead><tbody>" +
+    rows.map((r) => { const [nm, mean] = tcName(r.k); return "<tr><td>" + esc(nm) + '</td><td class="num">' + (r.v == null ? "–" : fmt(r.v, Math.abs(r.v) >= 100 ? 1 : Math.abs(r.v) < 1 ? 3 : 2)) + "</td><td>" + tcAct(r.a) + "</td>" + (withMean ? '<td class="small muted tc-mean">' + esc(mean) + "</td>" : "") + "</tr>"; }).join("") + "</tbody></table></div>";
+  const pv = d.pivots || {}, kinds = ["classic", "fibonacci", "camarilla", "woodie", "demark"].filter((k) => pv[k]);
+  const pivT = kinds.length ? '<div class="tablewrap"><table class="tc-piv"><thead><tr><th></th>' + kinds.map((k) => "<th>" + esc(k[0].toUpperCase() + k.slice(1)) + "</th>").join("") + "</tr></thead><tbody>" +
+    ["R3", "R2", "R1", "P", "S1", "S2", "S3"].map((p) => '<tr><th class="num ' + (p[0] === "R" ? "neg" : p[0] === "S" ? "pos" : "") + '">' + p + "</th>" + kinds.map((k) => '<td class="num">' + (pv[k][p] == null ? "–" : fmt(pv[k][p])) + "</td>").join("") + "</tr>").join("") + "</tbody></table></div>" : "";
+  const allRows = list.map((x) => { const a = x.tf["1D"] || {}, w = x.tf["1W"] || {}; const tg = (v) => '<span class="tag ' + tcCls(v) + '">' + esc(t(tcLabel(v))) + "</span>";
+    return '<tr data-act="tc-s" data-s="' + esc(x.s) + '" style="cursor:pointer"><td><span class="num">' + esc(x.s) + "</span> " + esc(x.name || "") + '</td><td class="num">' + (a.close != null ? fmt(a.close) : "–") + '</td><td class="num ' + (a.change > 0 ? "pos" : a.change < 0 ? "neg" : "") + '">' + (a.change != null ? (a.change > 0 ? "+" : "") + fmt(a.change) + "%" : "–") + "</td><td>" + tg(a.all) + "</td><td>" + tg(w.all) + "</td></tr>"; }).join("");
+  return svcShell("tech",
+    '<p class="muted" style="max-width:64ch">' + esc(t("tc_p")) + "</p>" + (real ? "" : '<div class="notice">' + esc(t("tc_sample")) + "</div>") +
+    '<div class="panel stack"><div class="row tc-chips">' + chips + "</div>" + add + "</div>" +
+    '<div class="row" style="justify-content:space-between"><h2 style="font-size:24px"><span class="num">' + esc(cur.s) + "</span> " + esc(cur.name || "") + ' <span class="num muted" style="font-size:18px">' + (d.close != null ? fmt(d.close) : "") + '</span> <span class="num ' + (d.change > 0 ? "pos" : d.change < 0 ? "neg" : "") + '" style="font-size:16px">' + (d.change != null ? (d.change > 0 ? "+" : "") + fmt(d.change) + "%" : "") + '</span></h2><div class="row">' + tfb("1D", "tc_d") + tfb("1W", "tc_w") + upd + "</div></div>" +
+    '<div class="tc-gauges">' + gauge(d.osc, t("tc_osc"), d.osc_n) + gauge(d.all, t("tc_sum"), { buy: d.osc_n.buy + d.ma_n.buy, neutral: d.osc_n.neutral + d.ma_n.neutral, sell: d.osc_n.sell + d.ma_n.sell }) + gauge(d.ma, t("tc_ma"), d.ma_n) + "</div>" +
+    '<div class="grid2"><div class="stack"><h3>' + esc(t("tc_osc")) + "</h3>" + tbl(d.osc_rows, true) + '</div><div class="stack"><h3>' + esc(t("tc_ma")) + "</h3>" + tbl(d.ma_rows, false) + "</div></div>" +
+    (pivT ? '<div class="stack"><h3>' + esc(t("tc_piv")) + '</h3><p class="small muted" style="max-width:70ch">' + esc(t("tc_piv_p")) + "</p>" + pivT + "</div>" : "") +
+    (list.length > 1 ? '<div class="stack"><h3>' + esc(t("tc_all")) + '</h3><div class="tablewrap"><table><thead><tr><th>' + esc(t("dv_sym")) + "</th><th>" + esc(t("tc_close")) + "</th><th>" + esc(t("tc_chg")) + "</th><th>" + esc(t("tc_d")) + "</th><th>" + esc(t("tc_w")) + "</th></tr></thead><tbody>" + allRows + "</tbody></table></div></div>" : "") +
+    '<div class="grid2"><div class="panel stack"><h3>' + esc(t("tc_how_h")) + "</h3><p>" + esc(t("tc_how")) + '</p></div><div class="panel stack"><h3>' + esc(t("tc_warn_h")) + "</h3><p>" + esc(t("tc_warn")) + "</p></div></div>" +
+    '<p class="small muted">' + esc(t("tc_src")) + " " + esc(t("disclaimer")) + "</p>");
+}
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act="tc-s"],[data-act="tc-tf"],[data-act="tc-rm"]'); if (!el) return;
+  const c = techCfg();
+  if (el.dataset.act === "tc-s") { c.s = el.dataset.s; save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  else if (el.dataset.act === "tc-tf") { c.tf = el.dataset.tf; save(); render(); }
+  else techListEdit(el.dataset.s, false);
+});
+document.addEventListener("submit", (e) => {
+  if (!e.target.matches || !e.target.matches('[data-form="tc-add"]')) return;
+  e.preventDefault();
+  const v = (document.getElementById("tc-new") || {}).value || "", code = v.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).trim();
+  if (!/^\d{4}$/.test(code)) { toast(t("tc_bad")); return; }
+  techCfg().s = code; save(); techListEdit(code, true);
+});
+window.addEventListener("hashchange", () => { if (["tech", "invest"].includes(route())) loadTech(); });
+if (["tech", "invest"].includes(route())) setTimeout(loadTech, 0);
+/* ===== مِراس: خطتي الشهرية =====
+   استثمار شهري ثابت موزع على أسهم تختارها بنسب. تسجل كل شراء، والصفحة تحسب لك متوسط التكلفة،
+   قيمة محفظتك الحين، الربح أو الخسارة، والتوزيعات المتوقعة. الحالة في S.invest وتتزامن مع state.json،
+   فسكربت التحليل الفني يضيف أسهم خطتك تلقائياً. */
+Object.assign(UI, {
+  tab_inv: ["خطتي الشهرية", "My monthly plan"],
+  iv_p: ["مبلغ ثابت كل شهر، موزع على أسهم تختارها. الفكرة إنك تشتري بانتظام بدون ما تحاول تتوقع السوق: لما السعر ينزل نفس المبلغ يشتري أسهم أكثر، فيتحسن متوسط تكلفتك مع الوقت.", "A fixed amount every month, split across shares you choose. You buy regularly without trying to time the market: when the price drops the same money buys more shares, so your average cost improves over time."],
+  iv_set: ["الإعدادات", "Settings"], iv_monthly: ["المبلغ الشهري (ريال)", "Monthly amount (SAR)"],
+  iv_fee: ["عمولة الوسيط %", "Broker commission %"], iv_min: ["أقل عمولة للأمر (ريال)", "Minimum per order (SAR)"],
+  iv_vat_note: ["تنضاف ضريبة 15% على العمولة تلقائياً.", "15% VAT on the commission is added automatically."],
+  iv_preset: ["جاهز:", "Presets:"], iv_p_rajhi: ["الراجحي 0.155%", "Al Rajhi 0.155%"], iv_p_derayah: ["دراية 0.12% (أقل شي 12)", "Derayah 0.12% (min 12)"],
+  iv_targets: ["أسهم الخطة ونسبها", "Plan shares and weights"], iv_pct: ["النسبة %", "Weight %"], iv_amt: ["مبلغه هالشهر", "This month"],
+  iv_est: ["تقريباً", "About"], iv_sh: ["سهم", "shares"], iv_comm: ["العمولة", "Commission"], iv_comm_pct: ["العمولة من الصفقة", "Commission share"],
+  iv_add_t: ["أضف سهم للخطة", "Add a share"], iv_code: ["الرمز", "Code"], iv_name: ["الاسم (اختياري)", "Name (optional)"],
+  iv_add: ["أضف", "Add"], iv_rm: ["شيل", "Remove"], iv_bought: ["سجّل شراء", "Log a buy"],
+  iv_sum_bad: ["مجموع النسب {p}%، خله 100% عشان يتوزع المبلغ كامل.", "Weights add up to {p}%; make it 100% so the whole amount is used."],
+  iv_example: ["عبّها بمثال توضيحي (4 قطاعات)", "Fill with an illustrative example (4 sectors)"],
+  iv_example_note: ["المثال: بنك + اتصالات + طاقة + أغذية، 25% لكل واحد. هذا مثال على التنويع بين قطاعات مختلفة، مو توصية بأسهم معينة. غيّره براحتك.", "Example: a bank, telecom, energy and food, 25% each. It shows diversifying across sectors; it is not a recommendation of specific shares. Change it freely."],
+  iv_new: ["سجّل عملية", "Log a trade"], iv_side: ["النوع", "Type"], iv_buy: ["شراء", "Buy"], iv_sell: ["بيع", "Sell"],
+  iv_date: ["التاريخ", "Date"], iv_qty: ["الكمية", "Quantity"], iv_price: ["السعر", "Price"], iv_fee_amt: ["العمولة الفعلية (ريال)", "Actual commission (SAR)"],
+  iv_fee_auto: ["تلقائي", "Auto"], iv_save: ["احفظ", "Save"],
+  iv_need: ["اكتب رمز من 4 أرقام وكمية وسعر", "Enter a 4-digit code, quantity and price"], iv_saved: ["انحفظت", "Saved"],
+  iv_too_many: ["ما عندك هالكمية من السهم عشان تبيعها", "You don't hold that many shares to sell"],
+  iv_hold: ["محفظتي", "My holdings"], iv_avg: ["متوسط التكلفة", "Average cost"], iv_cost: ["المدفوع", "Invested"], iv_now: ["السعر الحين", "Price now"],
+  iv_val: ["القيمة الحين", "Value now"], iv_pl: ["الربح/الخسارة", "P/L"], iv_w: ["الوزن", "Weight"], iv_dv: ["توزيعات سنوية متوقعة", "Expected yearly dividends"], iv_next: ["التوزيع القادم", "Next dividend"],
+  iv_px_old: ["سعر قديم: ما فيه سعر حديث لهذا السهم", "Stale price: no fresh quote for this share"],
+  iv_t_cost: ["إجمالي المدفوع", "Total invested"], iv_t_val: ["القيمة الحين", "Value now"], iv_t_pl: ["الربح/الخسارة", "P/L"], iv_t_dv: ["توزيعات بالسنة (متوقعة)", "Dividends a year (expected)"],
+  iv_month: ["هالشهر: اشتريت بـ {a} من {m} ريال", "This month: bought {a} of SAR {m}"],
+  iv_hist: ["سجل العمليات", "Trade log"], iv_del: ["احذف", "Delete"], iv_sure: ["متأكد؟", "Sure?"],
+  iv_empty: ["ما سجلت ولا عملية. أول ما تشتري، سجلها هنا.", "No trades yet. Log your first buy here."],
+  iv_real: ["أرباح محققة من البيع", "Realised P/L from sales"],
+  iv_proj_h: ["لو استمريت: كم تصير فلوسك؟", "If you keep going: what could it grow to?"],
+  iv_proj_p: ["حساب تقريبي لمبلغك الشهري لو كمّلت عليه، بثلاث نسب نمو سنوية مختلفة (أرباح + توزيعات يعاد استثمارها). السوق ما يمشي بخط مستقيم: فيه سنين خسارة وسنين ربح، والأرقام هنا متوسطات مو وعود.", "A rough projection of your monthly amount if you keep going, at three yearly growth rates (gains plus reinvested dividends). Markets don't move in straight lines: some years lose, some gain, and these are averages, not promises."],
+  iv_years: ["بعد", "After"], iv_yr: ["سنة", "yr"], iv_paid: ["اللي دفعته", "Paid in"],
+  iv_r5: ["5% متحفظ", "5% cautious"], iv_r8: ["8% متوسط", "8% average"], iv_r12: ["12% متفائل", "12% optimistic"],
+  iv_rules_h: ["قواعد بسيطة", "Simple rules"],
+  iv_rules: [["اشترِ في نفس الأسبوع كل شهر، مهما كان السوق طالع أو نازل.", "Buy in the same week every month, whether the market is up or down."], ["مع مبلغ 1000 ريال للسهم، وسيط بحد أدنى 12 ريال ياكل 1.2% من أول يوم. شيك عمود \"العمولة من الصفقة\".", "With SAR 1,000 per share, a broker with a SAR 12 minimum eats 1.2% on day one. Check the \"commission share\" column."], ["فلوس الاستثمار غير فلوس المضاربة. لا تبيع من هنا عشان تعوض خسارة مضاربة.", "Investment money is separate from trading money. Don't sell from here to cover a trading loss."], ["راجع النسب مرة أو مرتين في السنة بس، مو كل يوم.", "Review the weights once or twice a year, not daily."]]
+});
+
+const IV_EXAMPLE = { "1120": 25, "7010": 25, "2222": 25, "2280": 25 };
+const ivCfg = () => {
+  if (!S.invest) S.invest = {};
+  const d = { monthly: 4000, fee: 0.155, minFee: 0, targets: {}, names: {}, buys: [], del: [] };
+  for (const k in d) if (S.invest[k] == null) S.invest[k] = d[k];
+  return S.invest;
+};
+let ivDraft = null, ivDel = null;
+const ivDivOf = (s) => (typeof DIV !== "undefined" && DIV && Array.isArray(DIV.stocks) ? DIV.stocks : typeof DIV_SAMPLE !== "undefined" ? DIV_SAMPLE : []).find((x) => x.s === s);
+function ivName(s) {
+  const c = ivCfg(); if (c.names[s]) return c.names[s];
+  const tk = (typeof TECH !== "undefined" && TECH && TECH.stocks || []).find((x) => x.s === s); if (tk && tk.name) return tk.name;
+  const dv = ivDivOf(s); if (dv && dv.name) return dv.name;
+  const q = SAMPLE_QUOTES[s]; return q ? L(q.name) : "";
+}
+function ivPrice(s) {
+  const q = LIVE.quotes && LIVE.quotes[s]; if (q && numOr(q.price) != null) return { p: q.price, fresh: true };
+  const tp = typeof techPrice === "function" ? techPrice(s) : null; if (tp) return { p: tp, fresh: true };
+  const dv = ivDivOf(s); if (dv && dv.price && typeof DIV !== "undefined" && DIV) return { p: dv.price, fresh: true };
+  const last = ivCfg().buys.filter((b) => b.s === s).slice(-1)[0]; if (last) return { p: last.p, fresh: false };
+  const q2 = quoteOf(s); if (q2 && q2.price) return { p: q2.price, fresh: false };
+  return dv && dv.price ? { p: dv.price, fresh: false } : { p: null, fresh: false };
+}
+const ivComm = (value) => { const c = ivCfg(); if (!(value > 0)) return 0; return Math.max((value * c.fee) / 100, c.minFee || 0) * 1.15; };
+
+function ivHoldings() {
+  const c = ivCfg(), h = {}; let realised = 0;
+  c.buys.slice().sort((a, b) => (a.d + a.id < b.d + b.id ? -1 : 1)).forEach((b) => {
+    const x = h[b.s] || (h[b.s] = { s: b.s, q: 0, cost: 0 });
+    if (b.side === "sell") { const avg = x.q ? x.cost / x.q : 0, q = Math.min(b.q, x.q); realised += q * b.p - (b.fee || 0) - avg * q; x.cost -= avg * q; x.q -= q; }
+    else { x.q += b.q; x.cost += b.q * b.p + (b.fee || 0); }
+  });
+  return { list: Object.values(h).filter((x) => x.q > 0), realised };
+}
+
+function pageInvest() {
+  const c = ivCfg();
+  if (typeof loadDividends === "function" && typeof HOSTED !== "undefined" && HOSTED && CFG.token && (typeof DIV === "undefined" || !DIV)) setTimeout(() => loadDividends().then(() => { if (route() === "invest") render(); }), 0);
+  const inp = (id, k, val, step, extra) => '<div class="field"><label for="' + id + '">' + esc(t(k)) + '</label><input id="' + id + '" class="num" type="number" min="0" step="' + (step || "any") + '" value="' + esc(val ?? "") + '" ' + (extra || "") + "></div>";
+  const settings = '<div class="panel stack"><h3>' + esc(t("iv_set")) + '</h3><div class="form-grid">' + inp("iv-monthly", "iv_monthly", c.monthly, 100, 'data-iv="monthly"') + inp("iv-fee", "iv_fee", c.fee, 0.005, 'data-iv="fee"') + inp("iv-min", "iv_min", c.minFee, 1, 'data-iv="minFee"') +
+    '</div><div class="row small"><span class="muted">' + esc(t("iv_preset")) + '</span><button type="button" class="btn sm" data-act="iv-preset" data-fee="0.155" data-min="0">' + esc(t("iv_p_rajhi")) + '</button><button type="button" class="btn sm" data-act="iv-preset" data-fee="0.12" data-min="12">' + esc(t("iv_p_derayah")) + '</button><span class="muted">' + esc(t("iv_vat_note")) + "</span></div></div>";
+
+  const codes = Object.keys(c.targets), sumPct = codes.reduce((a, k) => a + (parseFloat(c.targets[k]) || 0), 0);
+  const tRows = codes.map((s) => {
+    const pct = parseFloat(c.targets[s]) || 0, amt = (c.monthly * pct) / 100, px = ivPrice(s).p;
+    let sh = 0; if (px > 0) { sh = Math.floor(amt / px); while (sh > 0 && sh * px + ivComm(sh * px) > amt) sh--; }
+    const val = sh * px, cm = ivComm(val), cmPct = val ? (cm / val) * 100 : 0;
+    return '<tr><td><span class="num">' + esc(s) + "</span> " + esc(ivName(s)) + '</td><td><input class="num" type="number" min="0" max="100" step="1" value="' + pct + '" data-ivt="' + esc(s) + '" aria-label="' + esc(t("iv_pct")) + " " + esc(s) + '" style="width:72px;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface)"></td><td class="num">' + fmt(amt, 0) + '</td><td class="num">' + (px ? fmt(px) : "–") + '</td><td class="num">' + (px ? int(sh) + " " + esc(t("iv_sh")) : "–") + '</td><td class="num">' + (val ? fmt(cm) : "–") + '</td><td class="num ' + (cmPct > 0.5 ? "neg" : "") + '">' + (val ? fmt(cmPct) + "%" : "–") + '</td><td><div class="row" style="flex-wrap:nowrap"><button type="button" class="btn sm" data-act="iv-buy" data-s="' + esc(s) + '" data-q="' + sh + '" data-p="' + (px || "") + '">' + esc(t("iv_bought")) + '</button><button type="button" class="btn sm ghost" data-act="iv-trm" data-s="' + esc(s) + '">' + esc(t("iv_rm")) + "</button></div></td></tr>";
+  }).join("");
+  const targets = '<div class="panel stack"><h3>' + esc(t("iv_targets")) + "</h3>" +
+    (codes.length ? '<div class="tablewrap"><table><thead><tr>' + ["dv_sym", "iv_pct", "iv_amt", "iv_price", "iv_est", "iv_comm", "iv_comm_pct"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "<th></th></tr></thead><tbody>" + tRows + "</tbody></table></div>" + (Math.abs(sumPct - 100) > 0.01 ? '<div class="notice">' + esc(t("iv_sum_bad").replace("{p}", fmt(sumPct, 0))) + "</div>" : "")
+      : '<div class="row"><button type="button" class="btn" data-act="iv-example">' + esc(t("iv_example")) + '</button></div><p class="small muted">' + esc(t("iv_example_note")) + "</p>") +
+    '<form class="row" data-form="iv-target" style="gap:8px;align-items:end"><div class="field"><label for="iv-tcode">' + esc(t("iv_code")) + '</label><input id="iv-tcode" class="num" inputmode="numeric" maxlength="4" style="width:100px"></div><div class="field"><label for="iv-tname">' + esc(t("iv_name")) + '</label><input id="iv-tname" style="width:160px"></div><div class="field"><label for="iv-tpct">' + esc(t("iv_pct")) + '</label><input id="iv-tpct" class="num" type="number" min="0" max="100" step="1" value="25" style="width:80px"></div><button class="btn sm" type="submit">' + esc(t("iv_add")) + "</button></form>" +
+    (codes.length && codes.join() === Object.keys(IV_EXAMPLE).join() ? '<p class="small muted">' + esc(t("iv_example_note")) + "</p>" : "") + "</div>";
+
+  const d = ivDraft || {}; ivDraft = null;
+  const form = '<form class="panel stack" id="iv-form" data-form="iv-buy" novalidate><h3>' + esc(t("iv_new")) + '</h3><div class="form-grid"><div class="field"><label for="iv-side">' + esc(t("iv_side")) + '</label><select id="iv-side"><option value="buy">' + esc(t("iv_buy")) + '</option><option value="sell">' + esc(t("iv_sell")) + '</option></select></div><div class="field"><label for="iv-date">' + esc(t("iv_date")) + '</label><input id="iv-date" type="date" value="' + today() + '"></div><div class="field"><label for="iv-s">' + esc(t("iv_code")) + '</label><input id="iv-s" class="num" inputmode="numeric" maxlength="4" value="' + esc(d.s || "") + '"></div>' +
+    inp("iv-q", "iv_qty", d.q || "", 1) + inp("iv-p", "iv_price", d.p || "", 0.01) + '<div class="field"><label for="iv-f">' + esc(t("iv_fee_amt")) + '</label><input id="iv-f" class="num" type="number" min="0" step="0.01" placeholder="' + esc(t("iv_fee_auto")) + '"></div></div><div><button class="btn primary" type="submit">' + esc(t("iv_save")) + "</button></div></form>";
+
+  const H = ivHoldings(); let tCost = 0, tVal = 0, tDv = 0;
+  const rowsH = H.list.map((x) => { const pr = ivPrice(x.s), v = x.q * (pr.p || 0); tCost += x.cost; tVal += v; return { x, pr, v }; });
+  const hRows = rowsH.map(({ x, pr, v }) => {
+    const pl = v - x.cost, plp = x.cost ? (pl / x.cost) * 100 : 0, dv = ivDivOf(x.s), dvY = dv && dv.dps12 ? dv.dps12 * x.q : 0; tDv += dvY;
+    const nx = dv && dv.next_ex ? '<span class="num">' + esc(dv.next_ex) + "</span>" + (dv.next_amt ? ' <span class="small muted">≈ ' + fmt(dv.next_amt * x.q) + "</span>" : "") : "–";
+    const cls = pl > 0 ? "pos" : pl < 0 ? "neg" : "";
+    return '<tr><td><span class="num">' + esc(x.s) + "</span> " + esc(ivName(x.s)) + '</td><td class="num">' + int(x.q) + '</td><td class="num">' + fmt(x.cost / x.q, 3) + '</td><td class="num">' + fmt(x.cost) + '</td><td class="num"' + (pr.fresh ? "" : ' title="' + esc(t("iv_px_old")) + '"') + ">" + (pr.p ? fmt(pr.p) + (pr.fresh ? "" : "*") : "–") + '</td><td class="num">' + fmt(v) + '</td><td class="num ' + cls + '">' + (pl > 0 ? "+" : "") + fmt(pl) + " (" + (plp > 0 ? "+" : "") + fmt(plp, 1) + '%)</td><td class="num">' + (tVal ? fmt((v / tVal) * 100, 0) + "%" : "–") + '</td><td class="num">' + (dvY ? fmt(dvY) : "–") + "</td><td>" + nx + "</td></tr>";
+  }).join("");
+  const tPl = tVal - tCost, ym = today().slice(0, 7), thisMonth = c.buys.filter((b) => b.side !== "sell" && b.d.slice(0, 7) === ym).reduce((a, b) => a + b.q * b.p + (b.fee || 0), 0);
+  const stats = '<div class="stats"><div><span>' + esc(t("iv_t_cost")) + "</span><b>" + fmt(tCost, 0) + "</b></div><div><span>" + esc(t("iv_t_val")) + "</span><b>" + fmt(tVal, 0) + "</b></div><div><span>" + esc(t("iv_t_pl")) + '</span><b class="' + (tPl > 0 ? "pos" : tPl < 0 ? "neg" : "") + '">' + (tCost ? (tPl > 0 ? "+" : "") + fmt(tPl, 0) + " (" + fmt((tPl / tCost) * 100, 1) + "%)" : "–") + "</b></div><div><span>" + esc(t("iv_t_dv")) + "</span><b>" + (tDv ? fmt(tDv, 0) : "–") + "</b></div></div>" +
+    '<div class="stack" style="gap:6px"><span class="small">' + esc(t("iv_month").replace("{a}", fmt(thisMonth, 0)).replace("{m}", fmt(c.monthly, 0))) + '</span><div class="meter"><i style="width:' + Math.min(100, c.monthly ? (thisMonth / c.monthly) * 100 : 0) + '%"></i></div></div>';
+  const hold = '<div class="stack"><h3>' + esc(t("iv_hold")) + "</h3>" + stats + (H.list.length ? '<div class="tablewrap"><table><thead><tr>' + ["dv_sym", "iv_qty", "iv_avg", "iv_cost", "iv_now", "iv_val", "iv_pl", "iv_w", "iv_dv", "iv_next"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "</tr></thead><tbody>" + hRows + "</tbody></table></div>" : '<div class="panel muted">' + esc(t("iv_empty")) + "</div>") +
+    (H.realised ? '<p class="small">' + esc(t("iv_real")) + ': <b class="num ' + (H.realised > 0 ? "pos" : "neg") + '">' + fmt(H.realised) + "</b></p>" : "") + "</div>";
+
+  const hist = c.buys.length ? '<div class="stack"><h3>' + esc(t("iv_hist")) + '</h3><div class="tablewrap"><table><thead><tr>' + ["iv_date", "iv_side", "dv_sym", "iv_qty", "iv_price", "iv_comm", "iv_cost"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "<th></th></tr></thead><tbody>" +
+    c.buys.slice().sort((a, b) => (a.d + a.id < b.d + b.id ? 1 : -1)).map((b) => "<tr><td class=\"num\">" + esc(b.d) + '</td><td><span class="tag ' + (b.side === "sell" ? "down" : "up") + '">' + esc(t(b.side === "sell" ? "iv_sell" : "iv_buy")) + '</span></td><td><span class="num">' + esc(b.s) + "</span> " + esc(ivName(b.s)) + '</td><td class="num">' + int(b.q) + '</td><td class="num">' + fmt(b.p) + '</td><td class="num">' + fmt(b.fee || 0) + '</td><td class="num">' + fmt(b.q * b.p + (b.side === "sell" ? -(b.fee || 0) : b.fee || 0)) + "</td><td>" +
+      (ivDel === b.id ? '<div class="row" style="flex-wrap:nowrap"><button class="btn sm danger" data-act="iv-del-yes" data-id="' + b.id + '">' + esc(t("iv_sure")) + '</button><button class="btn sm" data-act="iv-del-no">' + esc(t("j_cancel")) + "</button></div>" : '<button class="btn sm ghost" data-act="iv-del" data-id="' + b.id + '">' + esc(t("iv_del")) + "</button>") + "</td></tr>").join("") + "</tbody></table></div></div>" : "";
+
+  const fv = (m, r, y) => { const i = r / 12; let v = 0; for (let k = 0; k < y * 12; k++) v = v * (1 + i) + m; return v; };
+  const proj = '<div class="panel stack"><h3>' + esc(t("iv_proj_h")) + '</h3><p class="small muted">' + esc(t("iv_proj_p")) + '</p><div class="tablewrap"><table><thead><tr><th>' + esc(t("iv_years")) + "</th><th>" + esc(t("iv_paid")) + "</th><th>" + esc(t("iv_r5")) + "</th><th>" + esc(t("iv_r8")) + "</th><th>" + esc(t("iv_r12")) + "</th></tr></thead><tbody>" +
+    [1, 3, 5, 10].map((y) => '<tr><td>' + y + " " + esc(t("iv_yr")) + '</td><td class="num">' + fmt(c.monthly * 12 * y, 0) + "</td>" + [0.05, 0.08, 0.12].map((r) => '<td class="num">' + fmt(fv(c.monthly, r, y), 0) + "</td>").join("") + "</tr>").join("") + "</tbody></table></div></div>";
+  const rules = '<div class="panel stack"><h3>' + esc(t("iv_rules_h")) + "</h3><ul>" + UI.iv_rules.map((r) => "<li>" + esc(L(r)) + "</li>").join("") + "</ul></div>";
+
+  return svcShell("invest", '<p class="muted" style="max-width:64ch">' + esc(t("iv_p")) + "</p>" + settings + targets + form + hold + hist + '<div class="grid2">' + proj + rules + "</div>" + '<p class="small muted">' + esc(t("disclaimer")) + "</p>");
+}
+
+document.addEventListener("change", (e) => {
+  const el = e.target; if (!el.dataset) return;
+  const c = ivCfg();
+  if (el.dataset.iv) { const v = parseFloat(el.value); if (isFinite(v) && v >= 0) { c[el.dataset.iv] = v; save(); render(); } }
+  else if (el.dataset.ivt) { const v = parseFloat(el.value); if (isFinite(v) && v >= 0) { c.targets[el.dataset.ivt] = Math.min(100, v); save(); render(); } }
+});
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act^="iv-"]'); if (!el) return;
+  const c = ivCfg(), a = el.dataset.act;
+  if (a === "iv-preset") { c.fee = parseFloat(el.dataset.fee); c.minFee = parseFloat(el.dataset.min); save(); render(); }
+  else if (a === "iv-example") { c.targets = Object.assign({}, IV_EXAMPLE); save(); render(); }
+  else if (a === "iv-trm") { delete c.targets[el.dataset.s]; save(); render(); }
+  else if (a === "iv-buy") { ivDraft = { s: el.dataset.s, q: el.dataset.q, p: el.dataset.p }; render(); const f = document.getElementById("iv-form"); if (f) f.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  else if (a === "iv-del") { ivDel = el.dataset.id; render(); }
+  else if (a === "iv-del-no") { ivDel = null; render(); }
+  else if (a === "iv-del-yes") { c.buys = c.buys.filter((b) => b.id !== el.dataset.id); c.del = (c.del || []).concat([el.dataset.id]); ivDel = null; save(); render(); }
+});
+document.addEventListener("submit", (e) => {
+  const f = e.target; if (!f.matches) return;
+  const val = (id) => (document.getElementById(id) || {}).value || "", digits = (s) => s.replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).trim();
+  const c = ivCfg();
+  if (f.matches('[data-form="iv-target"]')) {
+    e.preventDefault();
+    const s = digits(val("iv-tcode")), pct = parseFloat(val("iv-tpct"));
+    if (!/^\d{4}$/.test(s)) { toast(t("tc_bad")); return; }
+    c.targets[s] = isFinite(pct) ? Math.min(100, Math.max(0, pct)) : 0;
+    if (val("iv-tname").trim()) c.names[s] = val("iv-tname").trim();
+    save(); render();
+  } else if (f.matches('[data-form="iv-buy"]')) {
+    e.preventDefault();
+    const s = digits(val("iv-s")), q = parseFloat(digits(val("iv-q"))), p = parseFloat(digits(val("iv-p"))), side = val("iv-side") === "sell" ? "sell" : "buy";
+    if (!/^\d{4}$/.test(s) || !(q > 0) || !(p > 0)) { toast(t("iv_need")); return; }
+    if (side === "sell") { const h = ivHoldings().list.find((x) => x.s === s); if (!h || h.q < q) { toast(t("iv_too_many")); return; } }
+    const fv = val("iv-f").trim(), fee = fv === "" ? Math.round(ivComm(q * p) * 100) / 100 : parseFloat(digits(fv)) || 0;
+    c.buys.push({ id: "b" + Date.now().toString(36), d: val("iv-date") || today(), s, q, p, fee, side, updated: Date.now() });
+    save(); toast(t("iv_saved")); render();
+  }
+});
 /* ===== التشغيل ===== */
 lastRoute = route();
 render();
