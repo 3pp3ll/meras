@@ -31,6 +31,7 @@
 | `src/content.js` | الدروس والقاموس والمسارات |
 | `src/app.js` | الصفحات والمنطق |
 | `src/sync.js` | المزامنة وقراءة الأسعار |
+| `src/dividends.js` | تبويب التوزيعات وحاسبته |
 | `src/style.css` | الهوية والتصميم |
 | `build.sh` | يجمع ملفات `src` في `index.html` |
 
