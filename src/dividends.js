@@ -24,7 +24,13 @@ Object.assign(UI, {
   dv_sell: ["في يوم الاستحقاق ينزل السعر غالباً بقريب من مبلغ التوزيع، لأن الفلوس طلعت من الشركة. فلو اشتريت قبلها بيوم وبعت بعدها مباشرة، غالباً ترجع قريب من رأس مالك، والعمولة تاكل جزء من التوزيع. الفكرة تنجح أكثر مع أسهم تحتفظ فيها فترة أطول.", "On the ex-date the price usually drops by roughly the dividend, because the cash has left the company. Buy the day before and sell right after, and you usually end up near where you started, with commission eating part of the payout. The idea works better with shares you hold for longer."],
   dv_fee_note: ["مع مبلغ صغير انتبه للعمولة: بعض الوسطاء عندهم حد أدنى للعمولة لكل أمر، وممكن ياكل جزء كبير من توزيع صغير. اسأل وسيطك عن الحد الأدنى.", "With a small amount, watch the commission: some brokers charge a minimum per order, which can eat much of a small dividend. Ask your broker about their minimum."],
   dv_src: ["المصادر: شاشة أسهم TradingView وتاريخ التوزيعات من Yahoo Finance، تتحدث يومياً. التوزيعات تتغير وممكن تخفضها الشركة أو توقفها، فتأكد من آخر إعلان في موقع تداول السعودية قبل أي قرار.", "Sources: the TradingView stock screener and dividend history from Yahoo Finance, updated daily. Dividends change and can be cut or stopped, so check the latest announcement on the Saudi Exchange site before any decision."],
-  dv_lesson: ["اقرأ درس التوزيعات النقدية", "Read the cash dividends lesson"]
+  dv_lesson: ["اقرأ درس التوزيعات النقدية", "Read the cash dividends lesson"],
+  dv_pdf: ["تصدير PDF", "Export PDF"], dv_pdf_h: ["تقويم التوزيعات القادمة", "Upcoming dividend calendar"],
+  dv_pdf_sub: ["من مِراس · {d} · {n} سهم · الحساب على مبلغ {b} ريال لكل سهم", "From Meras · {d} · {n} shares · worked out on SAR {b} per share"],
+  dv_pdf_empty: ["ما فيه أسهم ظاهرة في الجدول. غيّر الفلتر أو البحث ثم صدّر.", "No shares are showing in the table. Change the filter or search, then export."],
+  dv_pdf_frame: ["التصدير يشتغل في النسخة المنشورة على GitHub، مو في هذي المعاينة.", "Export works in the version published on GitHub, not in this preview."],
+  dv_pdf_tip: ["في نافذة الطباعة اختر \"حفظ كـ PDF\". من الجوال: اضغط مشاركة ثم احفظ في الملفات.", "In the print window choose \"Save as PDF\". On a phone: tap Share, then save to Files."],
+  dv_pdf_amt: ["لمبلغ {b} ريال", "For SAR {b}"], dv_pdf_sh: ["أسهم", "shares"], dv_pdf_get: ["التوزيع", "payout"]
 });
 
 /* قائمة نموذجية لما ما فيه بيانات (معاينة Claude أو قبل أول تشغيل). الأرقام تقريبية، أكتوبر 2026. */
@@ -85,7 +91,7 @@ function pageDividends() {
   return svcShell("dividends",
     '<p class="muted" style="max-width:64ch">' + esc(t("dv_p")) + ' <a href="#l-inv-2-3">' + esc(t("dv_lesson")) + "</a></p>" +
     (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") +
-    '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(c.q) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" + count + "</div></div>" +
+    '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(c.q) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" + count + "</div></div>" +
     '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
     '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +
     '<p class="small muted">' + esc(t("dv_src")) + " " + esc(t("disclaimer")) + "</p>");
@@ -116,9 +122,35 @@ document.addEventListener("input", (e) => {
   if (key && isFinite(v) && v >= 0) { c[key] = v; save(); runDiv(); }
 });
 document.addEventListener("click", (e) => {
-  const el = e.target.closest && e.target.closest('[data-act="dv-f"],[data-act="dv-star"]'); if (!el) return;
+  const el = e.target.closest && e.target.closest('[data-act="dv-f"],[data-act="dv-star"],[data-act="dv-pdf"]'); if (!el) return;
+  if (el.dataset.act === "dv-pdf") { exportDivPdf(); return; }
   if (el.dataset.act === "dv-f") { divCfg().f = el.dataset.f; save(); render(); }
   else toggleStar(el.dataset.sym);
 });
 window.addEventListener("hashchange", () => { if (route() === "dividends") loadDividends(); });
 if (route() === "dividends") setTimeout(loadDividends, 0);
+
+/* تصدير PDF: نبني تقرير نظيف من الصفوف الظاهرة ونفتح نافذة الطباعة، والمستخدم يختار "حفظ كـ PDF". */
+function exportDivPdf() {
+  if (window.self !== window.top) { toast(t("dv_pdf_frame")); return; }
+  const c = divCfg(), fee = Math.max(0, c.fee) / 100, list = divList();
+  const rows = list.map((x, i) => ({ x, i })).filter(({ i }) => { const r = document.getElementById("dv-r" + i); return r && !r.hidden; });
+  if (!rows.length) { toast(t("dv_pdf_empty")); return; }
+  const d = new Date(), z = (n) => String(n).padStart(2, "0"), stamp = d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate());
+  const body = rows.map(({ x }) => {
+    const px = divPx(x), sh = px > 0 ? Math.floor(c.budget / (px * (1 + fee))) : 0, days = dayDiff(x.next_ex);
+    return "<tr><td><b>" + esc(x.name || "") + '</b> <span class="pr-num">' + esc(x.s) + "</span></td><td>" + (x.next_ex ? '<span class="pr-num">' + esc(x.next_ex) + "</span><br><small>" + esc(t(x.announced ? "dv_ann" : "dv_exp")) + (days != null && days >= 0 ? " · " + days + " " + esc(t("dv_days")) : "") + "</small>" : "–") +
+      '</td><td class="pr-num">' + (x.next_ex ? esc(buyBy(x.next_ex)) : "–") + '</td><td class="pr-num">' + (x.next_amt ? fmt(x.next_amt, x.next_amt < 1 ? 3 : 2) : "–") + '</td><td class="pr-num">' + (x.yld ? fmt(x.yld, 1) + "%" : "–") +
+      '</td><td class="pr-num">' + (px ? fmt(px) : "–") + '</td><td class="pr-num">' + int(sh) + '</td><td class="pr-num">' + (x.next_amt ? fmt(sh * x.next_amt) : "–") + "</td></tr>";
+  }).join("");
+  const heads = [t("dv_sym"), t("dv_ex"), t("dv_buyby"), t("dv_next"), t("dv_yld"), t("dv_min"), t("dv_pdf_amt").replace("{b}", int(c.budget)) + "<br>" + t("dv_pdf_sh"), t("dv_pdf_get")];
+  let box = document.getElementById("dv-print");
+  if (!box) { box = document.createElement("section"); box.id = "dv-print"; document.body.appendChild(box); }
+  box.innerHTML = '<header><div class="pr-brand">' + LOGO + "<span>" + esc(t("brand")) + "</span></div><h1>" + esc(t("dv_pdf_h")) + "</h1><p>" + esc(t("dv_pdf_sub").replace("{d}", stamp).replace("{n}", rows.length).replace("{b}", int(c.budget))) + "</p></header>" +
+    "<table><thead><tr>" + heads.map((h) => "<th>" + h + "</th>").join("") + "</tr></thead><tbody>" + body + "</tbody></table>" +
+    '<div class="pr-notes"><p><b>' + esc(t("dv_rule_h")) + "</b> " + esc(t("dv_rule")) + "</p><p><b>" + esc(t("dv_sell_h")) + "</b> " + esc(t("dv_sell")) + "</p><p>" + esc(t("dv_src")) + " " + esc(t("disclaimer")) + "</p></div>";
+  const done = () => { document.body.classList.remove("printing"); window.removeEventListener("afterprint", done); };
+  document.body.classList.add("printing"); window.addEventListener("afterprint", done);
+  const old = document.title; document.title = t("dv_pdf_h") + " " + stamp;
+  setTimeout(() => { try { window.print(); } catch (e) { toast(t("dv_pdf_frame")); } document.title = old; setTimeout(done, 500); }, 60);
+}

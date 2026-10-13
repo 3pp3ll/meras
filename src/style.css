@@ -382,3 +382,26 @@ td .num,td.num{font-size:13.5px}
 .dv-table tr.dv-soon td{background:var(--amber-soft)}
 .dv-table tr.dv-month td:first-child{box-shadow:inset -3px 0 0 var(--amber)}
 [dir="ltr"] .dv-table tr.dv-month td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
+
+/* تقرير التوزيعات للطباعة / PDF */
+#dv-print{display:none}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body.printing{background:#fff!important;color:#0F1F3D!important}
+  body.printing > *:not(#dv-print){display:none!important}
+  body.printing #dv-print{display:block;font-family:var(--body);color:#0F1F3D}
+  #dv-print header{border-bottom:2px solid #E09A1A;padding-bottom:8px;margin-bottom:10px}
+  #dv-print .pr-brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:16px;font-weight:700}
+  #dv-print .pr-brand svg{width:22px;height:22px}
+  #dv-print h1{font-size:22px;margin:4px 0 2px}
+  #dv-print header p{margin:0;color:#55637F;font-size:11.5px}
+  #dv-print table{width:100%;border-collapse:collapse;font-size:10.5px}
+  #dv-print th,#dv-print td{border:1px solid #D5DCE9;padding:4px 6px;text-align:start;vertical-align:top;white-space:normal;background:#fff;color:#0F1F3D}
+  #dv-print th{background:#EEF1F7!important;font-weight:600;font-size:10px;color:#55637F}
+  #dv-print tr{break-inside:avoid}
+  #dv-print small{color:#55637F}
+  #dv-print .pr-num{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
+  #dv-print .pr-notes{margin-top:10px;font-size:10px;color:#55637F;display:flex;flex-direction:column;gap:4px}
+  #dv-print .pr-notes b{color:#0F1F3D}
+  #dv-print *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
