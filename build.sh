@@ -8,7 +8,7 @@ body() {
   echo '<style>'; cat src/style.css; echo '</style>'
   echo '<header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>'
   echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>'
-  echo '<script>'; cat src/content.js src/app.js src/chart.js src/lab.js src/fib.js src/guides.js src/indicators.js src/sync.js src/ai.js src/dividends.js src/tech.js src/invest.js src/boot.js; echo '</script>'
+  echo '<script>'; cat src/content.js src/app.js src/theme.js src/chart.js src/lab.js src/fib.js src/guides.js src/indicators.js src/sync.js src/ai.js src/dividends.js src/tech.js src/invest.js src/boot.js; echo '</script>'
 }
 {
 cat <<'HEAD'
@@ -19,7 +19,7 @@ cat <<'HEAD'
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>مِراس</title>
 <meta name="description" content="مِراس: منصة تعليمية للسوق المالية السعودية. مسارات للمستثمر والمتداول والمبرمج.">
-<meta name="theme-color" content="#14284F">
+<meta name="theme-color" content="#FFE2D2">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
