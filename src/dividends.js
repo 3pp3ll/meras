@@ -1,76 +1,122 @@
 /* ===== مِراس: التوزيعات =====
-   قائمة أولية لأسهم توزع أرباح نقدية، مع حاسبة: كم سهم تقدر تشتري بمبلغك، وكم توزيع يجيك في السنة.
-   الأرقام تقريبية من مصادر عامة بتاريخ أكتوبر 2026، والسعر يتحدث تلقائياً لو السهم في أسعارك الحقيقية. */
+   كل أسهم السوق اللي توزع، مرتبة حسب أقرب تاريخ استحقاق. البيانات من dividends.json في مستودعك الخاص،
+   يحدثها سكربت يومي (scripts/fetch_dividends.py). بدون ربط تظهر قائمة نموذجية صغيرة.
+   زر النجمة يحفظ السهم في divwatch.json، والسكربت ينبهك عنه قبل 30 يوم وقبل 5 أيام. */
 Object.assign(UI, {
   tab_div: ["التوزيعات", "Dividends"],
-  dv_p: ["أسهم توزع أرباح نقدية، وكم أقل مبلغ تدخل فيه، وكم توزيع يجيك في السنة بالمبلغ اللي تحدده. ابدأ بمبلغ بسيط وتعلّم كيف تشتغل التوزيعات.", "Shares that pay cash dividends, the smallest amount you can enter with, and the yearly dividend your chosen amount would earn. Start small and learn how dividends work."],
+  dv_p: ["كل أسهم السوق اللي توزع أرباح، مرتبة حسب أقرب تاريخ استحقاق. سهم واحد يكفي عشان تستحق التوزيع، والجدول يحسب لك كم يجيك بالمبلغ اللي تحدده.", "Every dividend-paying share on the market, sorted by the nearest ex-date. One share is enough to qualify, and the table works out what your chosen amount would earn."],
   dv_budget: ["المبلغ لكل سهم (ريال)", "Amount per share (SAR)"], dv_fee: ["العمولة لكل عملية %", "Commission per side %"],
-  dv_sym: ["السهم", "Share"], dv_price: ["السعر", "Price"], dv_dps: ["التوزيع السنوي للسهم", "Yearly dividend / share"], dv_yld: ["العائد", "Yield"],
-  dv_freq: ["التكرار", "Frequency"], dv_min: ["أقل مبلغ للدخول", "Minimum to enter"], dv_sh: ["أسهم بمبلغك", "Shares for your amount"], dv_year: ["توزيعك السنوي", "Your yearly dividend"], dv_pay: ["كل دفعة تقريباً", "Per payment, approx."],
-  dv_q: ["ربع سنوي", "Quarterly"], dv_h: ["نصف سنوي", "Half-yearly"], dv_y: ["سنوي", "Yearly"],
-  dv_est: ["تقديري", "estimate"], dv_live: ["سعر حي", "live price"],
-  dv_total_h: ["لو وزعت المبلغ على كل الأسهم فوق", "If you split the amount across all shares above"],
-  dv_total: ["الإجمالي المستثمر", "Total invested"], dv_total_y: ["التوزيعات السنوية المتوقعة", "Expected yearly dividends"], dv_total_r: ["العائد على المبلغ", "Return on the amount"],
-  dv_own_h: ["احسب سهم من عندك", "Work out a share of your own"], dv_own_p: ["اكتب سعر السهم والتوزيع السنوي للسهم من موقع تداول أو تطبيق وسيطك.", "Enter the share price and its yearly dividend per share from the exchange site or your broker's app."],
+  dv_search: ["ابحث بالرمز أو الاسم", "Search by symbol or name"],
+  dv_f_all: ["الكل", "All"], dv_f_30: ["خلال 30 يوم", "Within 30 days"], dv_f_star: ["نجومي", "Starred"],
+  dv_sym: ["السهم", "Share"], dv_price: ["السعر", "Price"], dv_next: ["التوزيع القادم للسهم", "Next dividend / share"], dv_ex: ["تاريخ الاستحقاق", "Ex-date"],
+  dv_left: ["باقي", "In"], dv_days: ["يوم", "days"], dv_buyby: ["آخر يوم شراء", "Buy by"], dv_yld: ["العائد السنوي", "Yearly yield"],
+  dv_min: ["أقل مبلغ (سهم واحد)", "Minimum (one share)"], dv_sh: ["أسهم بمبلغك", "Shares for your amount"], dv_get: ["يجيك في الدفعة القادمة", "Your next payout"],
+  dv_ann: ["معلن", "announced"], dv_exp: ["متوقع", "expected"], dv_none: ["ما فيه تاريخ", "no date"],
+  dv_star: ["نبّهني عن هذا السهم", "Alert me about this share"], dv_starred: ["انضاف للتنبيهات. السكربت ينبهك قبل 30 يوم وقبل 5 أيام", "Added. The script alerts you 30 and 5 days before"], dv_unstarred: ["انشال من التنبيهات", "Removed from alerts"],
+  dv_count: ["{n} سهم يوزع · آخر تحديث {d}", "{n} paying shares · updated {d}"],
+  dv_sample: ["هذي قائمة نموذجية صغيرة. القائمة الكاملة تظهر في النسخة المنشورة بعد ربط مستودعك وأول تشغيل لسكربت التوزيعات.", "This is a small sample list. The full list appears in the published version once your repository is linked and the dividends script has run once."],
+  dv_alert_h: ["التنبيهات", "Alerts"],
+  dv_alert: ["اضغط النجمة جنب أي سهم. كل يوم 4:30 م يفحص السكربت التواريخ، ويفتح لك تنبيه في مستودع meras-data قبل الاستحقاق بـ 30 يوم (تجهّز المبلغ) وقبله بـ 5 أيام (وقت الشراء). عشان يوصلك على الجوال ثبّت تطبيق GitHub وفعّل إشعاراته.", "Tap the star next to any share. Every day at 4:30 pm the script checks the dates and opens an alert in the meras-data repository 30 days before the ex-date (get the money ready) and 5 days before (time to buy). To get it on your phone, install the GitHub app and turn on its notifications."],
   dv_rule_h: ["متى تستحق التوزيع؟", "When are you entitled?"],
-  dv_rule: ["لازم تملك السهم بنهاية تداول يوم الأحقية اللي تعلنه الشركة. اللي يشتري بعده ما يستحق. وفي اليوم اللي بعد الأحقية ينزل السعر غالباً بقريب من مبلغ التوزيع، فالشراء قبلها بيوم عشان التوزيع بس ما يعتبر ربح مجاني.", "You must hold the share at the end of trading on the eligibility date the company announces. Buy after it and you are not entitled. The day after, the price usually drops by roughly the dividend, so buying the day before just for the payout is not free money."],
-  dv_reit_h: ["صناديق الريت", "REIT funds"],
-  dv_reit: ["صناديق الريت (مثل الراجحي ريت والرياض ريت) ملزمة نظاماً توزع أغلب أرباحها، وسعر الوحدة غالباً أقل من 10 ريال، فتقدر تبدأ فيها بمبلغ صغير جداً. لكن سعرها يتأثر بسوق العقار ونسبة الإشغال.", "REIT funds (such as Al Rajhi REIT and Riyad REIT) are required to distribute most of their profit, and a unit often costs under SAR 10, so you can start with a very small amount. Their price moves with the property market and occupancy."],
+  dv_rule: ["تاريخ الاستحقاق (Ex) هو أول يوم تداول ما يعطيك التوزيع. لازم تشتري قبله بيوم تداول على الأقل، يعني في \"آخر يوم شراء\" بالجدول أو قبله. التاريخ المعلن من الشركة هو المرجع، والمتوقع محسوب من توزيعات السنة الماضية وممكن يتغير.", "The ex-date is the first trading day that no longer carries the dividend. You must buy at least one trading day before it, on the \"buy by\" date in the table or earlier. The company's announced date is the reference; an expected date is estimated from last year's payouts and can change."],
+  dv_sell_h: ["تشتري قبل وتبيع بعد؟", "Buy before, sell after?"],
+  dv_sell: ["في يوم الاستحقاق ينزل السعر غالباً بقريب من مبلغ التوزيع، لأن الفلوس طلعت من الشركة. فلو اشتريت قبلها بيوم وبعت بعدها مباشرة، غالباً ترجع قريب من رأس مالك، والعمولة تاكل جزء من التوزيع. الفكرة تنجح أكثر مع أسهم تحتفظ فيها فترة أطول.", "On the ex-date the price usually drops by roughly the dividend, because the cash has left the company. Buy the day before and sell right after, and you usually end up near where you started, with commission eating part of the payout. The idea works better with shares you hold for longer."],
   dv_fee_note: ["مع مبلغ صغير انتبه للعمولة: بعض الوسطاء عندهم حد أدنى للعمولة لكل أمر، وممكن ياكل جزء كبير من توزيع صغير. اسأل وسيطك عن الحد الأدنى.", "With a small amount, watch the commission: some brokers charge a minimum per order, which can eat much of a small dividend. Ask your broker about their minimum."],
-  dv_src: ["الأرقام تقريبية من مصادر عامة (Stock Analysis وSimply Wall St وDigrin وأرقام) بتاريخ سبتمبر وأكتوبر 2026. التوزيعات تتغير، وممكن تخفضها الشركة أو توقفها. تأكد من آخر إعلان على موقع تداول السعودية قبل أي قرار.", "Figures are approximate, from public sources (Stock Analysis, Simply Wall St, Digrin, Argaam) as of September and October 2026. Dividends change and a company can cut or stop them. Check the latest announcement on the Saudi Exchange site before any decision."],
+  dv_src: ["المصادر: شاشة أسهم TradingView وتاريخ التوزيعات من Yahoo Finance، تتحدث يومياً. التوزيعات تتغير وممكن تخفضها الشركة أو توقفها، فتأكد من آخر إعلان في موقع تداول السعودية قبل أي قرار.", "Sources: the TradingView stock screener and dividend history from Yahoo Finance, updated daily. Dividends change and can be cut or stopped, so check the latest announcement on the Saudi Exchange site before any decision."],
   dv_lesson: ["اقرأ درس التوزيعات النقدية", "Read the cash dividends lesson"]
 });
 
-const DIVS = [
-  { s: "4330", n: ["الرياض ريت", "Riyad REIT"], p: 4.46, d: 0.32, f: "h", reit: 1 },
-  { s: "4001", n: ["أسواق العثيم", "Al Othaim Markets"], p: 4.99, d: 0.24, f: "q" },
-  { s: "4340", n: ["الراجحي ريت", "Al Rajhi REIT"], p: 7.79, d: 0.54, f: "q", reit: 1 },
-  { s: "1010", n: ["بنك الرياض", "Riyad Bank"], p: 19.28, d: 1.04, f: "h", est: 1 },
-  { s: "2222", n: ["أرامكو السعودية", "Saudi Aramco"], p: 26.48, d: 1.36, f: "q" },
-  { s: "1180", n: ["البنك الأهلي السعودي", "Saudi National Bank"], p: 37.04, d: 2.3, f: "h" },
-  { s: "7010", n: ["اس تي سي", "stc"], p: 43.22, d: 2.2, f: "q" },
-  { s: "1120", n: ["مصرف الراجحي", "Al Rajhi Bank"], p: 61.85, d: 3.03, f: "h", est: 1 }
+/* قائمة نموذجية لما ما فيه بيانات (معاينة Claude أو قبل أول تشغيل). الأرقام تقريبية، أكتوبر 2026. */
+const DIV_SAMPLE = [
+  { s: "4330", name: "الرياض ريت", price: 4.46, yld: 7.2, dps12: 0.32, freq: "h", last_ex: "2026-09-03", last_amt: 0.16, next_ex: "2027-03-03", next_amt: 0.16, announced: false },
+  { s: "4001", name: "أسواق العثيم", price: 4.99, yld: 4.8, dps12: 0.24, freq: "q", last_ex: "2026-05-31", last_amt: 0.06, next_ex: null, next_amt: 0.06, announced: false },
+  { s: "4340", name: "الراجحي ريت", price: 7.79, yld: 6.9, dps12: 0.54, freq: "q", last_ex: "2026-08-31", last_amt: 0.135, next_ex: "2026-11-30", next_amt: 0.135, announced: false },
+  { s: "1010", name: "بنك الرياض", price: 19.28, yld: 5.4, dps12: 1.04, freq: "h", last_ex: "2026-07-28", last_amt: 0.64, next_ex: "2027-01-27", next_amt: 0.64, announced: false },
+  { s: "2222", name: "أرامكو السعودية", price: 26.48, yld: 5.1, dps12: 1.36, freq: "q", last_ex: "2026-08-20", last_amt: 0.3393, next_ex: "2026-11-19", next_amt: 0.3393, announced: false },
+  { s: "1180", name: "البنك الأهلي السعودي", price: 37.04, yld: 6.2, dps12: 2.3, freq: "h", last_ex: "2026-07-28", last_amt: 1.15, next_ex: "2027-01-27", next_amt: 1.15, announced: false },
+  { s: "7010", name: "اس تي سي", price: 43.22, yld: 5.1, dps12: 2.2, freq: "q", last_ex: "2026-08-04", last_amt: 0.55, next_ex: "2026-11-03", next_amt: 0.55, announced: false },
+  { s: "1120", name: "مصرف الراجحي", price: 61.85, yld: 4.9, dps12: 3.03, freq: "h", last_ex: "2026-09-22", last_amt: 1.26, next_ex: "2027-03-23", next_amt: 1.26, announced: false }
 ];
-const divCfg = () => { if (!S.div) S.div = { budget: 500, fee: 0.15, op: 20, od: 1 }; return S.div; };
-const divPx = (x) => { const q = LIVE.quotes && LIVE.quotes[x.s]; return q && numOr(q.price) != null ? { p: q.price, live: true } : { p: x.p, live: false }; };
-const perYear = (f) => (f === "q" ? 4 : f === "h" ? 2 : 1);
+const DIV_KEY = "meras.div";
+let DIV = null, DIVW = null, divLoading = false;
+try { DIV = JSON.parse(localStorage.getItem(DIV_KEY) || "null"); } catch (e) {}
+const divCfg = () => { if (!S.div) S.div = {}; const d = { budget: 500, fee: 0.15, f: "all", q: "" }; for (const k in d) if (S.div[k] == null) S.div[k] = d[k]; return S.div; };
+const divList = () => (DIV && Array.isArray(DIV.stocks) && DIV.stocks.length ? DIV.stocks : DIV_SAMPLE);
+const divPx = (x) => { const q = LIVE.quotes && LIVE.quotes[x.s]; return q && numOr(q.price) != null ? q.price : x.price; };
+const dayDiff = (iso) => { if (!iso) return null; const a = new Date(iso + "T00:00:00"), b = new Date(today() + "T00:00:00"); return Math.round((a - b) / 864e5); };
+function buyBy(iso) { const d = new Date(iso + "T00:00:00"); do { d.setDate(d.getDate() - 1); } while (d.getDay() === 5 || d.getDay() === 6); const z = (n) => String(n).padStart(2, "0"); return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate()); }
+
+async function loadDividends() {
+  if (divLoading || !(typeof HOSTED !== "undefined" && HOSTED && CFG.token)) return;
+  divLoading = true;
+  try {
+    const f = await readJson("dividends.json");
+    if (f && f.data && Array.isArray(f.data.stocks)) { DIV = f.data; try { localStorage.setItem(DIV_KEY, JSON.stringify(DIV)); } catch (e) {} }
+    const w = await readJson("divwatch.json");
+    DIVW = w && Array.isArray(w.data) ? w.data.map(String) : [];
+  } catch (e) {}
+  divLoading = false;
+  if (route() === "dividends" && !(document.activeElement && /INPUT|SELECT/.test(document.activeElement.tagName))) render();
+}
+async function toggleStar(sym) {
+  if (!(typeof HOSTED !== "undefined" && HOSTED && CFG.token)) { toast(t("wl_need")); return; }
+  try {
+    const f = await readJson("divwatch.json"), cur = f && Array.isArray(f.data) ? f.data.map(String) : [];
+    const on = !cur.includes(sym), next = on ? cur.concat([sym]) : cur.filter((x) => x !== sym);
+    await gh("divwatch.json", "PUT", { message: "divwatch", content: b64e(JSON.stringify(next) + "\n"), sha: f ? f.sha : undefined });
+    DIVW = next; toast(t(on ? "dv_starred" : "dv_unstarred"));
+  } catch (e) { toast(errText(e)); }
+  render();
+}
 
 function pageDividends() {
-  const c = divCfg();
+  const c = divCfg(), list = divList(), real = list !== DIV_SAMPLE, canStar = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  if (canStar && DIVW == null) setTimeout(loadDividends, 0);
   const inp = (id, k, val, step) => '<div class="field"><label for="' + id + '">' + esc(t(k)) + '</label><input id="' + id + '" class="num" type="number" min="0" step="' + (step || "any") + '" value="' + val + '" data-div="' + id + '"></div>';
-  const head = ["dv_sym", "dv_price", "dv_dps", "dv_yld", "dv_freq", "dv_min", "dv_sh", "dv_year", "dv_pay"].map((k) => "<th>" + esc(t(k)) + "</th>").join("");
-  const rows = DIVS.map((x, i) => '<tr><td><span class="num">' + esc(x.s) + "</span> " + esc(L(x.n)) + (x.reit ? ' <span class="tag">REIT</span>' : "") + '</td><td class="num" id="dv-p' + i + '"></td><td class="num">' + fmt(x.d) + (x.est ? ' <span class="tag amber">' + esc(t("dv_est")) + "</span>" : "") + '</td><td class="num" id="dv-y' + i + '"></td><td>' + esc(t("dv_" + x.f)) + '</td><td class="num" id="dv-m' + i + '"></td><td class="num" id="dv-s' + i + '"></td><td class="num pos" id="dv-a' + i + '"></td><td class="num" id="dv-e' + i + '"></td></tr>').join("");
+  const fb = (v, k) => '<button type="button" class="btn sm tgl' + (c.f === v ? " on" : "") + '" data-act="dv-f" data-f="' + v + '" aria-pressed="' + (c.f === v) + '">' + esc(t(k)) + "</button>";
+  const head = ["", "dv_sym", "dv_price", "dv_next", "dv_ex", "dv_left", "dv_buyby", "dv_yld", "dv_min", "dv_sh", "dv_get"].map((k) => "<th>" + (k ? esc(t(k)) : "") + "</th>").join("");
+  const rows = list.map((x, i) => {
+    const on = DIVW && DIVW.includes(x.s);
+    const ex = x.next_ex ? '<span class="num">' + esc(x.next_ex) + '</span> <span class="tag' + (x.announced ? " up" : "") + '">' + esc(t(x.announced ? "dv_ann" : "dv_exp")) + "</span>" : '<span class="muted">' + esc(t("dv_none")) + "</span>";
+    return '<tr id="dv-r' + i + '" data-s="' + esc(x.s) + '" data-n="' + esc(String(x.name || "").toLowerCase()) + '"><td><button type="button" class="dv-star" data-act="dv-star" data-sym="' + esc(x.s) + '" aria-pressed="' + !!on + '" title="' + esc(t("dv_star")) + '" aria-label="' + esc(t("dv_star")) + " " + esc(x.s) + '">' + (on ? "★" : "☆") + '</button></td><td><span class="num">' + esc(x.s) + "</span> " + esc(x.name || "") + '</td><td class="num" id="dv-p' + i + '"></td><td class="num">' + (x.next_amt ? fmt(x.next_amt, x.next_amt < 1 ? 3 : 2) : "–") + "</td><td>" + ex + '</td><td class="num" id="dv-d' + i + '"></td><td class="num">' + (x.next_ex ? esc(buyBy(x.next_ex)) : "–") + '</td><td class="num" id="dv-y' + i + '"></td><td class="num" id="dv-m' + i + '"></td><td class="num" id="dv-s' + i + '"></td><td class="num pos" id="dv-a' + i + '"></td></tr>';
+  }).join("");
+  const count = real ? '<span class="small muted">' + esc(t("dv_count").replace("{n}", list.length).replace("{d}", DIV.as_of || whenText(DIV.fetched_at))) + "</span>" : "";
   return svcShell("dividends",
     '<p class="muted" style="max-width:64ch">' + esc(t("dv_p")) + ' <a href="#l-inv-2-3">' + esc(t("dv_lesson")) + "</a></p>" +
-    '<div class="panel"><div class="form-grid" style="max-width:420px">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + "</div></div>" +
-    '<div class="tablewrap"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
-    '<div class="panel stack"><h3>' + esc(t("dv_total_h")) + '</h3><div class="result" id="dv-total"></div></div>' +
-    '<div class="grid2"><div class="panel stack"><div><h3>' + esc(t("dv_own_h")) + '</h3><p class="muted small">' + esc(t("dv_own_p")) + '</p></div><div class="form-grid">' + inp("dv-op", "dv_price", c.op, 0.01) + inp("dv-od", "dv_dps", c.od, 0.01) + '</div><div class="result" id="dv-own"></div></div>' +
-    '<div class="panel stack"><h3>' + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + "</p><h3>" + esc(t("dv_reit_h")) + "</h3><p>" + esc(t("dv_reit")) + "</p></div></div>" +
-    '<div class="notice">' + esc(t("dv_fee_note")) + '</div><p class="small muted">' + esc(t("dv_src")) + " " + esc(t("disclaimer")) + "</p>");
+    (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") +
+    '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(c.q) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + count + "</div></div>" +
+    '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
+    '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +
+    '<p class="small muted">' + esc(t("dv_src")) + " " + esc(t("disclaimer")) + "</p>");
 }
 function runDiv() {
-  if (!document.getElementById("dv-total")) return;
-  const c = divCfg(), fee = Math.max(0, c.fee) / 100, set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
-  let inv = 0, yr = 0;
-  DIVS.forEach((x, i) => {
-    const px = divPx(x), sh = Math.floor(c.budget / (px.p * (1 + fee))), a = sh * x.d;
-    inv += sh * px.p * (1 + fee); yr += a;
-    set("dv-p" + i, fmt(px.p) + (px.live ? ' <span class="tag up">' + esc(t("dv_live")) + "</span>" : ""));
-    set("dv-y" + i, fmt((x.d / px.p) * 100, 1) + "%");
-    set("dv-m" + i, fmt(px.p * (1 + fee)));
+  if (!document.querySelector(".dv-table")) return;
+  const c = divCfg(), fee = Math.max(0, c.fee) / 100, q = String(c.q || "").trim().toLowerCase(), set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+  divList().forEach((x, i) => {
+    const row = document.getElementById("dv-r" + i); if (!row) return;
+    const px = divPx(x), days = dayDiff(x.next_ex), sh = px > 0 ? Math.floor(c.budget / (px * (1 + fee))) : 0;
+    const show = (!q || x.s.includes(q) || String(x.name || "").toLowerCase().includes(q)) && (c.f === "all" || (c.f === "30" && days != null && days >= 0 && days <= 30) || (c.f === "star" && DIVW && DIVW.includes(x.s)));
+    row.hidden = !show;
+    row.className = days != null && days >= 0 && days <= 5 ? "dv-soon" : days != null && days >= 0 && days <= 30 ? "dv-month" : "";
+    set("dv-p" + i, fmt(px));
+    set("dv-d" + i, days == null ? "–" : days < 0 ? "–" : days + " " + esc(t("dv_days")));
+    set("dv-y" + i, x.yld ? fmt(x.yld, 1) + "%" : px && x.dps12 ? fmt((x.dps12 / px) * 100, 1) + "%" : "–");
+    set("dv-m" + i, px ? fmt(px * (1 + fee)) : "–");
     set("dv-s" + i, int(sh));
-    set("dv-a" + i, fmt(a));
-    set("dv-e" + i, fmt(a / perYear(x.f)));
+    set("dv-a" + i, x.next_amt ? fmt(sh * x.next_amt) : "–");
   });
-  const box = (k, v, cls) => "<div><span>" + esc(t(k)) + '</span><b class="' + (cls || "") + '">' + v + "</b></div>";
-  set("dv-total", box("dv_total", fmt(inv) + " " + esc(t("sar"))) + box("dv_total_y", fmt(yr) + " " + esc(t("sar")), "pos") + box("dv_total_r", inv ? fmt((yr / inv) * 100, 1) + "%" : "–"));
-  const osh = c.op > 0 ? Math.floor(c.budget / (c.op * (1 + fee))) : 0;
-  set("dv-own", box("dv_yld", c.op > 0 ? fmt((c.od / c.op) * 100, 1) + "%" : "–") + box("dv_sh", int(osh)) + box("dv_year", fmt(osh * c.od) + " " + esc(t("sar")), "pos"));
 }
 document.addEventListener("input", (e) => {
   const id = e.target.dataset && e.target.dataset.div; if (!id) return;
-  const c = divCfg(), v = parseFloat(e.target.value);
-  const key = { "dv-budget": "budget", "dv-fee": "fee", "dv-op": "op", "dv-od": "od" }[id];
+  const c = divCfg();
+  if (id === "dv-q") { c.q = e.target.value; save(); runDiv(); return; }
+  const v = parseFloat(e.target.value), key = { "dv-budget": "budget", "dv-fee": "fee" }[id];
   if (key && isFinite(v) && v >= 0) { c[key] = v; save(); runDiv(); }
 });
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act="dv-f"],[data-act="dv-star"]'); if (!el) return;
+  if (el.dataset.act === "dv-f") { divCfg().f = el.dataset.f; save(); render(); }
+  else toggleStar(el.dataset.sym);
+});
+window.addEventListener("hashchange", () => { if (route() === "dividends") loadDividends(); });
+if (route() === "dividends") setTimeout(loadDividends, 0);
