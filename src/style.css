@@ -443,3 +443,25 @@ td .num,td.num{font-size:13.5px}
 .th-swatches{display:flex;gap:6px}
 .th-swatches i{width:22px;height:22px;border-radius:50%;border:1px solid var(--line)}
 .panel,.quote,.chartbox,.stats,.flow,.tablewrap{box-shadow:0 1px 2px rgba(60,40,50,.04)}
+/* المعادن */
+.mt-cards,.mt-holds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
+@media (max-width:720px){.mt-cards,.mt-holds{grid-template-columns:1fr}}
+.mt-card,.mt-hold{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0;border-top:4px solid var(--muted)}
+.mt-card.gold,.mt-hold.gold{border-top-color:var(--amber);background:linear-gradient(180deg,var(--amber-soft),var(--surface) 55%)}
+.mt-card h3,.mt-hold h3{font-size:19px}
+.mt-big{display:flex;flex-direction:column;gap:2px}
+.mt-big b{font-size:34px;line-height:1.1;direction:ltr;unicode-bidi:isolate;text-align:start}
+.mt-sub{display:flex;gap:22px;flex-wrap:wrap}
+.mt-sub div{display:flex;flex-direction:column}
+.mt-sub b{font-size:16px;direction:ltr;unicode-bidi:isolate}
+.mt-spark{width:100%;height:44px;display:block;margin-top:4px}
+.mt-karats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.mt-karats div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column}
+.mt-karats b{font-size:17px;direction:ltr;unicode-bidi:isolate}
+@media (max-width:420px){.mt-karats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mt-hold .result{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.iv-met td{background:var(--amber-soft)}
+.iv-met.silver td{background:var(--sunk)}
+.iv-split{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--sunk)}
+.iv-split i{display:block;height:100%}
+.iv-dot{display:inline-block;width:10px;height:10px;border-radius:99px;vertical-align:middle}

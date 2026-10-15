@@ -273,7 +273,7 @@ function pageLesson(id) {
 
 /* ----- services ----- */
 function svcShell(tab, inner) {
-  const tabs = [["journal", "tab_journal"], ["invest", "tab_inv"], ["tech", "tab_tech"], ["dividends", "tab_div"], ["calc", "tab_calc"], ["glossary", "tab_gloss"]];
+  const tabs = [["journal", "tab_journal"], ["invest", "tab_inv"], ["tech", "tab_tech"], ["dividends", "tab_div"], ["metals", "tab_met"], ["calc", "tab_calc"], ["glossary", "tab_gloss"]];
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t("services_h")) + '</h1></div><div class="tabs">' + tabs.map(([h, k]) => '<a href="#' + h + '"' + (h === tab ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</div><div class="stack" style="padding-block:22px">' + inner + "</div></div>";
 }
 const plOf = (j) => (j.exit == null ? null : (j.exit - j.entry) * j.qty);
@@ -377,12 +377,12 @@ function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
   const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["lab", "nav_lab"], ["guides", "nav_guides"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
-  const group = r === "settings" ? "account" : r.startsWith("g-") ? "guides" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "dividends", "glossary", "tech", "invest"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
+  const group = r === "settings" ? "account" : r.startsWith("g-") ? "guides" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "dividends", "glossary", "tech", "invest", "metals"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
   $("#top").innerHTML = '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav" aria-label="main">' + nav.map(([h, k]) => '<a href="#' + h + '"' + (group === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</nav><div class="tools">' + (typeof themeButton === "function" ? themeButton() : "") + '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a></div></div>";
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();

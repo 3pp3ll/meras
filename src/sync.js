@@ -56,7 +56,7 @@ async function readJson(path) {
 const errText = (e) => t({ "401": "e_401", "404": "e_404", "403": "e_403", net: "e_net" }[e && e.code] || "e_net");
 
 /* ما يتزامن: التقدم، السجل، الباقة، الحساب. اللغة وحالة الدخول تبقى لكل جهاز. */
-const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null, lb: s.lab || null, iv: s.invest || null });
+const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null, lb: s.lab || null, iv: s.invest || null, mt: s.metals || null });
 function mergeState(local, remote) {
   if (!remote || typeof remote !== "object") return local;
   const newer = (local.updatedAt || 0) >= (remote.updatedAt || 0) ? local : remote;
@@ -70,6 +70,11 @@ function mergeState(local, remote) {
     const li = local.invest || {}, ri = remote.invest || {}, del = Array.from(new Set([].concat(li.del || [], ri.del || []))), byB = {};
     [].concat(ri.buys || [], li.buys || []).forEach((b) => { const p = byB[b.id]; if (!p || (b.updated || 0) >= (p.updated || 0)) byB[b.id] = b; });
     out.invest = Object.assign({}, newer.invest || li || ri, { buys: Object.values(byB).filter((b) => !del.includes(b.id)), del });
+  }
+  if (local.metals || remote.metals) {
+    const lm = local.metals || {}, rm = remote.metals || {}, del = Array.from(new Set([].concat(lm.del || [], rm.del || []))), byM = {};
+    [].concat(rm.buys || [], lm.buys || []).forEach((b) => { const p = byM[b.id]; if (!p || (b.updated || 0) >= (p.updated || 0)) byM[b.id] = b; });
+    out.metals = Object.assign({}, newer.metals || lm || rm, { buys: Object.values(byM).filter((b) => !del.includes(b.id)), del });
   }
   if (!out.account && (remote.account || local.account)) out.account = local.account || remote.account;
   return out;
