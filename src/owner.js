@@ -48,7 +48,9 @@ Object.assign(UI, {
   ow_road: [
     ["مكتبي: محفظتي وشارتاتي، السوق الأمريكي، ودروس العقود", "My desk: portfolio, charts, US market and options lessons"],
     ["استراتيجيات المختبر للفوركس والمعادن، تتحدث كل أسبوع مع التقرير", "Lab strategies for forex and metals, updated weekly with the report"],
-    ["خادم خارجي (Supabase): تسجيل دخول، تأكيد الإيميل، نسيت كلمة المرور، وكود المالك يشتغل من الخادم", "External server (Supabase): sign-in, email confirmation, password reset, and the owner key served from the server"]
+    ["خادم خارجي (Supabase): تسجيل دخول، تأكيد الإيميل، نسيت كلمة المرور، وكود المالك يشتغل من الخادم", "External server (Supabase): sign-in, email confirmation, password reset, and the owner key served from the server"],
+    ["اشتراك الفرز الشرعي للمستخدمين (مثلاً 4.50$ شهرياً) بعد رخصة بيانات تجارية، وتفعيله لكل مستخدم من لوحة المالك", "Sharia screening subscription for users (e.g. $4.50/month) after a commercial data licence, enabled per user from the dashboard"],
+    ["باقة مجمّعة (مثلاً 145$ شهرياً): المنصة والفرز الشرعي وربط OpenRouter", "A bundle (e.g. $145/month): the platform, sharia screening and the OpenRouter connection"]
   ],
   ow_road_done: ["جاهز", "Ready"], ow_road_next: ["قيد التنفيذ", "In progress"], ow_road_later: ["لاحقاً", "Later"],
   ow_conflict: ["الملف تغير من جهاز ثاني. حدّث الصفحة وجرب مرة ثانية.", "The file changed on another device. Refresh and try again."]
