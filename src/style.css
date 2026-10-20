@@ -501,3 +501,17 @@ a.th-btn[aria-current="page"]{border-color:var(--amber);color:var(--amber-ink)}
 [dir="ltr"] .hub-foot .go{transform:scaleX(-1)}
 #totop{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline-end:18px;z-index:35;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:0 6px 18px rgba(40,30,60,.18);display:grid;place-items:center;cursor:pointer}
 #totop:hover{border-color:var(--amber);color:var(--amber-ink)}
+/* لوحة المالك */
+.ow-bar{gap:10px;flex-wrap:wrap}
+.ow-tabs{flex:1;min-width:0}
+.ow-tabs a{cursor:pointer}
+.ow-lists{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+@media (max-width:900px){.ow-lists{grid-template-columns:1fr}}
+.ow-users{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
+@media (max-width:820px){.ow-users{grid-template-columns:1fr}}
+.ow-user h3{font-size:19px}
+.ow-keys{border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:560px){.stats[style*="repeat(4"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}.stats[style*="repeat(3"]{grid-template-columns:1fr!important}}
+form[data-form^="ow-"] input:not([type="checkbox"]){background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0;color:var(--ink);font:inherit}
+form[data-form^="ow-"] input:focus{outline:2px solid var(--amber);outline-offset:1px}
+@media (max-width:560px){.ow-tabs{flex-basis:100%}}

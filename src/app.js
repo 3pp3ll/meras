@@ -362,7 +362,7 @@ function pageAccount() {
     const isUp = accTab === "signup";
     inner = '<div class="tabs"><a href="#account" data-act="acc-tab" data-tab="signup"' + (isUp ? ' aria-current="page"' : "") + ">" + esc(t("signup")) + '</a><a href="#account" data-act="acc-tab" data-tab="login"' + (!isUp ? ' aria-current="page"' : "") + ">" + esc(t("login")) + '</a></div><form class="panel stack" data-form="' + accTab + '" novalidate>' + (isUp ? '<div class="field"><label for="acc-name">' + esc(t("name")) + '</label><input id="acc-name" autocomplete="name"></div>' : "") + '<div class="field"><label for="acc-email">' + esc(t("email")) + '</label><input id="acc-email" type="email" dir="ltr" autocomplete="email"></div><div><button class="btn primary" type="submit">' + esc(t(isUp ? "signup" : "login")) + "</button></div></form>";
   }
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("account_h")) + '</h1></div><div class="stack" style="padding-block:18px;max-width:520px"><div class="notice">' + esc(t("acc_demo")) + "</div>" + inner + (HOSTED ? '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>" : "") + '<div><button class="btn sm ' + (resetArmed ? "danger" : "ghost") + '" data-act="reset">' + esc(t(resetArmed ? "reset_sure" : "reset")) + "</button></div></div></div>";
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("account_h")) + '</h1></div><div class="stack" style="padding-block:18px;max-width:520px"><div class="notice">' + esc(t("acc_demo")) + "</div>" + inner + (HOSTED ? '<div class="row"><a class="btn" href="#settings">' + esc(t("set_h")) + "</a>" + (CFG.token ? '<a class="btn" href="#owner">' + esc(t("ow_h")) + "</a>" : "") + "</div>" : "") + '<div><button class="btn sm ' + (resetArmed ? "danger" : "ghost") + '" data-act="reset">' + esc(t(resetArmed ? "reset_sure" : "reset")) + "</button></div></div></div>";
 }
 
 /* ---------- shell & router ---------- */
@@ -398,7 +398,7 @@ function renderNow() {
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": pageGate, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": pageGate, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
