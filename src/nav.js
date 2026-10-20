@@ -38,12 +38,10 @@ function groupOf(r) {
 function subOf(r) { if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
 
 const ICON_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 4v3M7 15v5M17 3v4M17 13v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4.5" y="7" width="5" height="8" rx="1" fill="currentColor"/><rect x="14.5" y="7" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
-const ICON_OWNER = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
 function headerHtml(r) {
   const g = groupOf(r), sub = subOf(r);
   const top = [["learn", "nav_learn"], ["services", "nav_svc"], ["plans", "nav_plans"]].map(([h, k]) => '<a href="#' + h + '"' + (g === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("");
-  const own = typeof HOSTED !== "undefined" && HOSTED && CFG.token ? '<a class="btn sm th-btn" href="#owner" title="' + esc(t("ow_h")) + '" aria-label="' + esc(t("ow_h")) + '"' + (r === "owner" ? ' aria-current="page"' : "") + ">" + ICON_OWNER + "</a>" : "";
-  const tools = own + '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
+  const tools = '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
     '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a>";
   const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
   return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;
@@ -109,4 +107,15 @@ function pageGate() {
   document.body.appendChild(b);
   const upd = () => { b.hidden = window.scrollY < 500; b.setAttribute("aria-label", t("totop")); b.title = t("totop"); };
   window.addEventListener("scroll", upd, { passive: true }); upd();
+})();
+
+/* ----- hidden door: 5 quick taps on the logo square open the owner dashboard (only on the owner's linked device) ----- */
+(function () {
+  let n = 0, timer = null;
+  document.addEventListener("click", (e) => {
+    const logo = e.target.closest && e.target.closest(".brand svg"); if (!logo) return;
+    if (!(typeof HOSTED !== "undefined" && HOSTED && CFG.token)) return;
+    n++; clearTimeout(timer); timer = setTimeout(() => { n = 0; }, 1500);
+    if (n >= 5) { n = 0; e.preventDefault(); location.hash = "owner"; }
+  }, true);
 })();
