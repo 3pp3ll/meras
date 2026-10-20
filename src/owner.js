@@ -41,6 +41,17 @@ Object.assign(UI, {
   ow_v_short: ["كلمة السر لازم 8 أحرف أو أكثر", "The password must be 8 characters or more"], ow_v_mismatch: ["الكلمتين مو متطابقتين", "The passwords do not match"], ow_v_wrong: ["كلمة السر غلط", "Wrong password"], ow_v_opened: ["الخزنة مفتوحة", "Vault unlocked"],
   ow_v_locked_tag: ["مقفلة", "Locked"], ow_v_open_tag: ["مفتوحة", "Unlocked"],
   ow_v_how: ["الكود محفوظ هنا للرجوع له. كل مستخدم يحط كوده بنفسه في إعدادات جهازه، لأن المنصة للحين ما فيها حسابات حقيقية لكل شخص.", "Keys are stored here for reference. Each user still enters their own key in their device settings, because the platform does not have real per-person accounts yet."],
+  ow_u_keymode: ["طريقة الربط", "Connection"], ow_km_own: ["كوده الخاص", "Own key"], ow_km_owner: ["كود من المالك", "Key from the owner"],
+  ow_u_budget: ["رصيد كوده في OpenRouter ($)", "OpenRouter key credit ($)"],
+  ow_km_tip: ["كود من المالك: تسوي له في OpenRouter مفتاح خاص فيه بحد صرف من 5 إلى 50 دولار حسب استخدامه، وتحطه في منصات الربط تحت، وتزوده كل شهر. يستخدمه للربط بس وما يقدر يسحب الرصيد.", "Key from the owner: create a dedicated OpenRouter key for this user with a spending limit of 5 to 50 dollars depending on use, add it under connected platforms below, and top it up each month. It works for connections only and the credit cannot be withdrawn."],
+  ow_road_h: ["القادم", "Coming next"],
+  ow_road: [
+    ["مكتبي: محفظتي وشارتاتي", "My desk: portfolio and charts"],
+    ["استراتيجيات المختبر للفوركس والمعادن، تتحدث كل أسبوع مع التقرير", "Lab strategies for forex and metals, updated weekly with the report"],
+    ["مكتبي: السوق الأمريكي والعقود (للمالك فقط)", "My desk: US market and options (owner only)"],
+    ["خادم خارجي (Supabase): تسجيل دخول، تأكيد الإيميل، نسيت كلمة المرور، وكود المالك يشتغل من الخادم", "External server (Supabase): sign-in, email confirmation, password reset, and the owner key served from the server"]
+  ],
+  ow_road_done: ["جاهز", "Ready"], ow_road_next: ["قيد التنفيذ", "In progress"], ow_road_later: ["لاحقاً", "Later"],
   ow_conflict: ["الملف تغير من جهاز ثاني. حدّث الصفحة وجرب مرة ثانية.", "The file changed on another device. Refresh and try again."]
 });
 
@@ -124,6 +135,7 @@ function owContent() {
   const nInd = typeof IND_KEYS !== "undefined" ? IND_KEYS.length : 0, nStr = typeof STRATS !== "undefined" ? (Array.isArray(STRATS) ? STRATS.length : Object.keys(STRATS).length) : 0;
   const other = [["ow_c_guides", (typeof GUIDES !== "undefined" ? GUIDES.length : 0) + 1], ["ow_c_terms", GLOSSARY.length], ["ow_c_inds", nInd]].concat(nStr ? [["ow_c_strats", nStr]] : []);
   return owPanel(t("nav_tracks"), '<div class="tablewrap"><table><thead><tr><th>' + esc(t("ow_c_track")) + "</th>" + [1, 2, 3, 4, 5].map((n) => "<th>" + esc(t("ow_c_lvl").replace("{n}", n)) + "</th>").join("") + "<th>" + esc(t("ow_c_total")) + "</th></tr></thead><tbody>" + rows + '</tbody></table></div><p class="small muted">' + esc(t("ow_c_note")) + "</p>") +
+    owPanel(t("ow_road_h"), '<ol class="ow-road">' + UI.ow_road.map((r, i) => "<li><span>" + esc(L(r)) + "</span>" + owTag(i === 0 ? "up" : i === 1 ? "amber" : "", i === 0 ? "ow_road_done" : i === 1 ? "ow_road_next" : "ow_road_later") + "</li>").join("") + "</ol>") +
     owPanel(t("ow_c_other"), '<div class="stats" style="grid-template-columns:repeat(' + other.length + ',minmax(0,1fr))">' + other.map(([k, n]) => "<div><span>" + esc(t(k)) + "</span><b>" + n + "</b></div>").join("") + "</div>");
 }
 
@@ -134,6 +146,7 @@ function owUserForm(u) {
   return '<form class="panel stack ow-uform" data-form="ow-user" data-id="' + esc(u.id || "") + '" novalidate><div class="form-grid">' + f("ou-name", "ow_u_name", u.name, "text", ' autocomplete="off"') + f("ou-contact", "ow_u_contact", u.contact, "text", ' autocomplete="off" dir="auto"') +
     sel("ou-plan", "ow_u_plan", u.plan, [["free", "plan_free"], ["full", "plan_full"]]) + sel("ou-status", "ow_u_status", u.status, [["active", "ow_u_active"], ["trial", "ow_u_trial"], ["paused", "ow_u_paused"]]) +
     f("ou-start", "ow_u_start", u.start, "date") + f("ou-end", "ow_u_end", u.end, "date") + f("ou-amount", "ow_u_amount", u.amount, "number", ' min="0" step="1" inputmode="decimal"') + f("ou-note", "ow_u_note", u.note) +
+    sel("ou-keymode", "ow_u_keymode", u.keyMode || "own", [["own", "ow_km_own"], ["owner", "ow_km_owner"]]) + f("ou-budget", "ow_u_budget", u.orBudget, "number", ' min="0" max="500" step="1" inputmode="decimal"') +
     '</div><div class="row"><button class="btn primary" type="submit">' + esc(t("ow_u_save")) + '</button><button class="btn ghost" type="button" data-act="ow-ucancel">' + esc(t("ow_u_cancel")) + "</button></div></form>";
 }
 function owVaultBox() {
@@ -154,7 +167,8 @@ function owUsers() {
     const links = (u.links || []).map((k, i) => '<li class="row" style="justify-content:space-between;gap:8px"><span><b>' + esc(k.platform) + '</b> <span class="num small muted" dir="ltr">' + esc(k.hint || "••••") + '</span></span><span class="row" style="gap:6px">' + (VAULT ? '<button class="btn sm" data-act="ow-kcopy" data-id="' + esc(u.id) + '" data-i="' + i + '">' + esc(t("ow_k_copy")) + "</button>" : "") + '<button class="btn sm ghost" data-act="ow-krm" data-id="' + esc(u.id) + '" data-i="' + i + '" aria-label="' + esc(t("ow_rm") + " " + k.platform) + '">×</button></span></li>').join("");
     const addKey = VAULT ? '<form class="row" data-form="ow-key" data-id="' + esc(u.id) + '" novalidate><input list="ow-plats" id="ok-p-' + esc(u.id) + '" placeholder="' + esc(t("ow_k_platform")) + '" aria-label="' + esc(t("ow_k_platform")) + '" style="flex:1;min-width:130px" autocomplete="off"><input id="ok-k-' + esc(u.id) + '" type="password" placeholder="' + esc(t("ow_k_key")) + '" aria-label="' + esc(t("ow_k_key")) + '" style="flex:2;min-width:160px" autocomplete="off" spellcheck="false" dir="ltr"><button class="btn sm" type="submit">' + esc(t("ow_k_add")) + "</button></form>" : '<p class="small muted" style="margin:0">' + esc(t("ow_k_locked")) + "</p>";
     return '<div class="panel stack ow-user"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3>' + esc(u.name) + "</h3>" + (u.contact ? '<div class="small muted" dir="auto">' + esc(u.contact) + "</div>" : "") + '</div><div class="row" style="gap:6px">' + owTag(u.status === "active" ? "up" : u.status === "trial" ? "amber" : "", "ow_u_" + u.status) + '<span class="tag">' + esc(t(u.plan === "full" ? "plan_full" : "plan_free")) + "</span>" + endTag + "</div></div>" +
-      '<div class="small muted">' + esc(t("ow_u_start")) + ': <span class="num">' + esc(u.start || "–") + "</span> · " + esc(t("ow_u_end")) + ': <span class="num">' + esc(u.end || "–") + "</span>" + (u.amount ? " · " + esc(t("ow_u_amount")) + ': <span class="num">' + int(u.amount) + "</span>" : "") + "</div>" + (u.note ? '<p class="small" style="margin:0">' + esc(u.note) + "</p>" : "") +
+      '<div class="small muted">' + esc(t("ow_u_start")) + ': <span class="num">' + esc(u.start || "–") + "</span> · " + esc(t("ow_u_end")) + ': <span class="num">' + esc(u.end || "–") + "</span>" + (u.amount ? " · " + esc(t("ow_u_amount")) + ': <span class="num">' + int(u.amount) + "</span>" : "") + "</div>" +
+      '<div class="row small" style="gap:6px"><span class="tag' + (u.keyMode === "owner" ? " amber" : "") + '">' + esc(t(u.keyMode === "owner" ? "ow_km_owner" : "ow_km_own")) + "</span>" + (u.keyMode === "owner" && u.orBudget ? '<span class="muted">' + esc(t("ow_u_budget")) + ': <span class="num">$' + int(u.orBudget) + "</span></span>" : "") + "</div>" + (u.keyMode === "owner" ? '<p class="small muted" style="margin:0">' + esc(t("ow_km_tip")) + "</p>" : "") + (u.note ? '<p class="small" style="margin:0">' + esc(u.note) + "</p>" : "") +
       '<div class="ow-keys"><b class="small">' + esc(t("ow_k_h")) + "</b>" + (links ? '<ul class="stack" style="list-style:none;margin:6px 0;padding:0;gap:6px">' + links + "</ul>" : '<p class="small muted" style="margin:4px 0">' + esc(t("ow_k_none")) + "</p>") + addKey + "</div>" +
       '<div class="row"><button class="btn sm" data-act="ow-uedit" data-id="' + esc(u.id) + '">' + esc(t("ow_u_edit")) + '</button><button class="btn sm ' + (owDel === u.id ? "danger" : "ghost") + '" data-act="ow-udel" data-id="' + esc(u.id) + '">' + esc(t(owDel === u.id ? "ow_u_del_sure" : "ow_u_del")) + "</button></div></div>";
   };
@@ -171,7 +185,7 @@ function pageOwner() {
   if (!OW.loaded) { loadOwner(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_loading")) + "</div></div>"; }
   const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
   const body = { data: owData, lists: owLists, backup: owBackup, content: owContent, users: owUsers }[owTab]();
-  return head + '<div class="row ow-bar" style="justify-content:space-between"><div class="tabs ow-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#owner" role="tab" data-act="ow-tab" data-tab="' + k + '"' + (owTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><button class="btn sm ghost" data-act="ow-reload"' + (OW.loading ? " disabled" : "") + ">↻ " + esc(t(OW.loading ? "ow_loading" : "ow_reload")) + '</button></div><div class="stack" style="padding-block:18px 40px">' + body + "</div></div>";
+  return head + '<div class="row ow-bar" style="justify-content:space-between"><div class="tabs ow-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#owner" role="tab" data-act="ow-tab" data-tab="' + k + '"' + (owTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><a class="btn sm primary" href="#desk">' + esc(t("ow_desk_btn")) + '</a><button class="btn sm ghost" data-act="ow-reload"' + (OW.loading ? " disabled" : "") + ">↻ " + esc(t(OW.loading ? "ow_loading" : "ow_reload")) + '</button></div><div class="stack" style="padding-block:18px 40px">' + body + "</div></div>";
 }
 
 /* ----- vault: PBKDF2 + AES-GCM, all on the device ----- */
@@ -245,7 +259,7 @@ document.addEventListener("submit", async (e) => {
     saveList(file, cur.concat([s]));
   } else if (kind === "ow-user") {
     const name = v("ou-name"); if (!name) { toast(t("ow_u_need_name")); return; }
-    const data = { name, contact: v("ou-contact"), plan: v("ou-plan"), status: v("ou-status"), start: v("ou-start"), end: v("ou-end"), amount: v("ou-amount") ? Number(v("ou-amount")) : null, note: v("ou-note") };
+    const data = { keyMode: v("ou-keymode") || "own", orBudget: v("ou-budget") ? Number(v("ou-budget")) : null, name, contact: v("ou-contact"), plan: v("ou-plan"), status: v("ou-status"), start: v("ou-start"), end: v("ou-end"), amount: v("ou-amount") ? Number(v("ou-amount")) : null, note: v("ou-note") };
     const id = form.dataset.id;
     if (id) { const u = OW.own.users.find((x) => x.id === id); if (u) Object.assign(u, data); }
     else OW.own.users.push(Object.assign({ id: "u" + Date.now().toString(36), links: [], created: today() }, data));
