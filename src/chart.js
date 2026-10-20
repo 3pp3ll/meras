@@ -106,7 +106,7 @@ function chartData(sym) {
   if (PRACTICE[sym]) return practiceSeries(sym);
   return ((LIVE.history && LIVE.history[sym]) || []).filter((r) => r && isFinite(r.o) && isFinite(r.c));
 }
-const symName = (sym) => (PRACTICE[sym] ? t(PRACTICE[sym]) : (quoteOf(sym) ? L(quoteOf(sym).name) : sym));
+const symName = (sym) => (PRACTICE[sym] ? t(PRACTICE[sym]) : typeof US !== "undefined" && US && US.symbols && US.symbols[sym] ? US.symbols[sym].n : (quoteOf(sym) ? L(quoteOf(sym).name) : sym));
 
 /* ----- indicator maths (null until enough candles) ----- */
 function sma(cl, p) { const out = []; let sum = 0; for (let i = 0; i < cl.length; i++) { sum += cl[i]; if (i >= p) sum -= cl[i - p]; out.push(i >= p - 1 ? sum / p : null); } return out; }

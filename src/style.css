@@ -530,3 +530,18 @@ textarea{font:inherit;color:var(--ink)}
 .dk-leg i{display:inline-block;width:16px;height:0;border-top:2px dashed;vertical-align:middle;margin-inline-end:5px}
 .dk-l-e i{border-color:var(--amber-ink)}.dk-l-s i{border-color:var(--down)}.dk-l-t i{border-color:var(--up)}
 .dk-sg.pos{color:var(--up)!important}.dk-sg.neg{color:var(--down)!important}
+.dk-cur{font-size:17px;margin:6px 0 -6px;color:var(--muted)}
+.op-lesson summary{cursor:pointer;list-style:none}
+.op-lesson summary::-webkit-details-marker{display:none}
+.op-lesson summary h3{display:inline;font-size:19px}
+.op-lesson summary::after{content:"＋";float:inline-end;color:var(--muted)}
+.op-lesson[open] summary::after{content:"－"}
+.op-lesson p,.op-lesson li{line-height:1.9}
+.op-lesson ol,.op-lesson ul{padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
+.op-ex{background:var(--sunk);border-inline-start:4px solid var(--amber);border-radius:8px;padding:10px 14px;margin-block:10px}
+.op-ex p{margin:0 0 6px}.op-li{padding-inline-start:14px;position:relative;line-height:1.9}.op-li::before{content:"•";position:absolute;inset-inline-start:0;color:var(--amber-ink)}
+.op-q{border:1px dashed var(--line);border-radius:8px;padding:12px;margin-top:12px}
+.op-q .btn.on-ok{border-color:var(--up);color:var(--up);background:color-mix(in srgb,var(--up) 12%,transparent)}
+.op-q .btn.on-bad{border-color:var(--down);color:var(--down)}
+.op-why{margin:8px 0 0;color:var(--up)}
+.op-chart{width:100%;height:auto;display:block;margin-top:10px;background:var(--sunk);border-radius:8px}

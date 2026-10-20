@@ -117,6 +117,7 @@ async function loadPrices(quiet) {
     let hist = LIVE.history || {};
     try { const h = await readJson("history.json"); if (h && h.data && typeof h.data === "object") hist = h.data; } catch (e) {}
     LIVE = { quotes: f.data.quotes, fetchedAt: f.data.fetched_at || null, history: hist };
+    if (typeof usMerge === "function") usMerge();
     try { localStorage.setItem(PX_KEY, JSON.stringify(LIVE)); } catch (e) {}
     if (!quiet) toast(t("px_ok"));
     if (!document.activeElement || !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) render();

@@ -550,6 +550,21 @@ textarea{font:inherit;color:var(--ink)}
 .dk-leg i{display:inline-block;width:16px;height:0;border-top:2px dashed;vertical-align:middle;margin-inline-end:5px}
 .dk-l-e i{border-color:var(--amber-ink)}.dk-l-s i{border-color:var(--down)}.dk-l-t i{border-color:var(--up)}
 .dk-sg.pos{color:var(--up)!important}.dk-sg.neg{color:var(--down)!important}
+.dk-cur{font-size:17px;margin:6px 0 -6px;color:var(--muted)}
+.op-lesson summary{cursor:pointer;list-style:none}
+.op-lesson summary::-webkit-details-marker{display:none}
+.op-lesson summary h3{display:inline;font-size:19px}
+.op-lesson summary::after{content:"＋";float:inline-end;color:var(--muted)}
+.op-lesson[open] summary::after{content:"－"}
+.op-lesson p,.op-lesson li{line-height:1.9}
+.op-lesson ol,.op-lesson ul{padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
+.op-ex{background:var(--sunk);border-inline-start:4px solid var(--amber);border-radius:8px;padding:10px 14px;margin-block:10px}
+.op-ex p{margin:0 0 6px}.op-li{padding-inline-start:14px;position:relative;line-height:1.9}.op-li::before{content:"•";position:absolute;inset-inline-start:0;color:var(--amber-ink)}
+.op-q{border:1px dashed var(--line);border-radius:8px;padding:12px;margin-top:12px}
+.op-q .btn.on-ok{border-color:var(--up);color:var(--up);background:color-mix(in srgb,var(--up) 12%,transparent)}
+.op-q .btn.on-bad{border-color:var(--down);color:var(--down)}
+.op-why{margin:8px 0 0;color:var(--up)}
+.op-chart{width:100%;height:auto;display:block;margin-top:10px;background:var(--sunk);border-radius:8px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1873,7 +1888,7 @@ function chartData(sym) {
   if (PRACTICE[sym]) return practiceSeries(sym);
   return ((LIVE.history && LIVE.history[sym]) || []).filter((r) => r && isFinite(r.o) && isFinite(r.c));
 }
-const symName = (sym) => (PRACTICE[sym] ? t(PRACTICE[sym]) : (quoteOf(sym) ? L(quoteOf(sym).name) : sym));
+const symName = (sym) => (PRACTICE[sym] ? t(PRACTICE[sym]) : typeof US !== "undefined" && US && US.symbols && US.symbols[sym] ? US.symbols[sym].n : (quoteOf(sym) ? L(quoteOf(sym).name) : sym));
 
 /* ----- indicator maths (null until enough candles) ----- */
 function sma(cl, p) { const out = []; let sum = 0; for (let i = 0; i < cl.length; i++) { sum += cl[i]; if (i >= p) sum -= cl[i - p]; out.push(i >= p - 1 ? sum / p : null); } return out; }
@@ -2924,6 +2939,7 @@ async function loadPrices(quiet) {
     let hist = LIVE.history || {};
     try { const h = await readJson("history.json"); if (h && h.data && typeof h.data === "object") hist = h.data; } catch (e) {}
     LIVE = { quotes: f.data.quotes, fetchedAt: f.data.fetched_at || null, history: hist };
+    if (typeof usMerge === "function") usMerge();
     try { localStorage.setItem(PX_KEY, JSON.stringify(LIVE)); } catch (e) {}
     if (!quiet) toast(t("px_ok"));
     if (!document.activeElement || !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) render();
@@ -3895,7 +3911,7 @@ Object.assign(UI, {
   ow_run: ["شغّل الآن", "Run now"], ow_ran: ["انطلب التشغيل. يبان هنا خلال دقيقة.", "Run requested. It shows here within a minute."],
   ow_ok: ["نجح", "Succeeded"], ow_fail: ["فشل", "Failed"], ow_busy: ["يشتغل", "Running"], ow_cancel: ["انلغى", "Cancelled"], ow_none: ["ما اشتغل", "No runs"],
   ow_runs_403: ["عشان تشوف حالة التشغيل وتشغّل يدوياً، أضف للرمز صلاحية Actions (Read and write) من إعدادات الرمز في GitHub. باقي اللوحة يشتغل بدونها.", "To see run status and run jobs by hand, add the Actions permission (Read and write) to the token in GitHub. The rest of the dashboard works without it."],
-  j_prices: ["الأسعار والشموع", "Prices and candles"], j_technicals: ["التحليل الفني", "Technicals"], j_dividends: ["التوزيعات", "Dividends"], j_metals: ["المعادن", "Metals"],
+  j_prices: ["الأسعار والشموع", "Prices and candles"], j_technicals: ["التحليل الفني", "Technicals"], j_dividends: ["التوزيعات", "Dividends"], j_metals: ["المعادن", "Metals"], j_us: ["السوق الأمريكي والفوركس", "US market and forex"], s_us: ["1:30 الفجر، الثلاثاء إلى السبت", "1:30 am, Tue to Sat"],
   s_prices: ["7 مرات يومياً، الأحد إلى الخميس", "7 times a day, Sun to Thu"], s_technicals: ["3 مرات يومياً، الأحد إلى الخميس", "3 times a day, Sun to Thu"], s_dividends: ["4:30 م، الأحد إلى الخميس", "4:30 pm, Sun to Thu"], s_metals: ["كل ساعتين، الاثنين إلى الجمعة", "Every 2 hours, Mon to Fri"],
   ow_hist: ["تاريخ الأسهم", "Share history"], ow_sym: ["السهم", "Share"], ow_candles: ["عدد الشموع", "Candles"], ow_lastc: ["آخر شمعة", "Last candle"], ow_state: ["الحالة", "Status"],
   ow_h_ok: ["سليم", "OK"], ow_h_short: ["تاريخ قصير", "Short history"], ow_h_old: ["متأخر", "Behind"], ow_h_missing: ["بدون تاريخ", "No history"],
@@ -3929,16 +3945,15 @@ Object.assign(UI, {
   ow_km_tip: ["كود من المالك: تسوي له في OpenRouter مفتاح خاص فيه بحد صرف من 5 إلى 50 دولار حسب استخدامه، وتحطه في منصات الربط تحت، وتزوده كل شهر. يستخدمه للربط بس وما يقدر يسحب الرصيد.", "Key from the owner: create a dedicated OpenRouter key for this user with a spending limit of 5 to 50 dollars depending on use, add it under connected platforms below, and top it up each month. It works for connections only and the credit cannot be withdrawn."],
   ow_road_h: ["القادم", "Coming next"],
   ow_road: [
-    ["مكتبي: محفظتي وشارتاتي", "My desk: portfolio and charts"],
+    ["مكتبي: محفظتي وشارتاتي، السوق الأمريكي، ودروس العقود", "My desk: portfolio, charts, US market and options lessons"],
     ["استراتيجيات المختبر للفوركس والمعادن، تتحدث كل أسبوع مع التقرير", "Lab strategies for forex and metals, updated weekly with the report"],
-    ["مكتبي: السوق الأمريكي والعقود (للمالك فقط)", "My desk: US market and options (owner only)"],
     ["خادم خارجي (Supabase): تسجيل دخول، تأكيد الإيميل، نسيت كلمة المرور، وكود المالك يشتغل من الخادم", "External server (Supabase): sign-in, email confirmation, password reset, and the owner key served from the server"]
   ],
   ow_road_done: ["جاهز", "Ready"], ow_road_next: ["قيد التنفيذ", "In progress"], ow_road_later: ["لاحقاً", "Later"],
   ow_conflict: ["الملف تغير من جهاز ثاني. حدّث الصفحة وجرب مرة ثانية.", "The file changed on another device. Refresh and try again."]
 });
 
-const OW_JOBS = ["prices", "technicals", "dividends", "metals"];
+const OW_JOBS = ["prices", "technicals", "dividends", "metals", "us"];
 const OW_LISTS = [["watchlist.json", "ow_l_wl", "ow_l_wl_p"], ["techlist.json", "ow_l_tech", "ow_l_tech_p"], ["divwatch.json", "ow_l_div", "ow_l_div_p"]];
 const OW_PLATFORMS = ["OpenRouter", "سهمك SAHMK", "TradingView", "أرقام Argaam", "Twelve Data", "Alpha Vantage"];
 let OW = { loaded: false, loading: false, files: {}, lists: {}, runs: null, runsErr: null, own: null, ownSha: null, stateSize: null };
@@ -3960,9 +3975,10 @@ async function ghApi(path, method, body) {
 async function loadOwner(force) {
   if (!HOSTED || !CFG.token || OW.loading || (OW.loaded && !force)) return;
   OW.loading = true; if (force) render();
+  if (typeof loadUS === "function") await loadUS();
   const get = async (p) => { try { return await readJson(p); } catch (e) { return null; } };
   const [pr, te, dv, mt, ow, st, ...ls] = await Promise.all([get("prices.json"), get("technicals.json"), get("dividends.json"), get("metals.json"), get("owner.json"), gh("state.json").catch(() => null)].concat(OW_LISTS.map((x) => get(x[0]))));
-  OW.files = { prices: pr && pr.data, technicals: te && te.data, dividends: dv && dv.data, metals: mt && mt.data };
+  OW.files = { prices: pr && pr.data, technicals: te && te.data, dividends: dv && dv.data, metals: mt && mt.data, us: typeof US !== "undefined" ? US : null };
   OW_LISTS.forEach((x, i) => { OW.lists[x[0]] = { data: ls[i] && Array.isArray(ls[i].data) ? ls[i].data.map(String) : [], sha: ls[i] ? ls[i].sha : undefined }; });
   OW.own = (ow && ow.data) || { version: 1, users: [] }; if (!Array.isArray(OW.own.users)) OW.own.users = []; OW.ownSha = ow ? ow.sha : undefined;
   OW.stateSize = st ? st.size : null;
@@ -3990,7 +4006,7 @@ function owData() {
   const rows = OW_JOBS.map((j) => { const r = runOf(j), f = OW.files[j]; return "<tr><td><b>" + esc(t("j_" + j)) + '</b></td><td class="small muted">' + esc(t("s_" + j)) + "</td><td>" + (OW.runs ? (r ? owStamp(r.updated_at || r.created_at) : "–") : "–") + "</td><td>" + (OW.runs ? (r && r.html_url ? '<a href="' + esc(r.html_url) + '" target="_blank" rel="noopener">' + res(r) + "</a>" : res(r)) : "–") + "</td><td>" + owStamp(f && f.fetched_at) + "</td><td>" + (OW.runsErr ? "" : '<button class="btn sm" data-act="ow-run" data-job="' + j + '">' + esc(t("ow_run")) + "</button>") + "</td></tr>"; }).join("");
   const jobs = owPanel(t("ow_jobs"), (OW.runsErr === "403" || OW.runsErr === "404" ? '<div class="notice">' + esc(t("ow_runs_403")) + "</div>" : "") + '<div class="tablewrap"><table><thead><tr><th>' + esc(t("ow_job")) + "</th><th>" + esc(t("ow_sched")) + "</th><th>" + esc(t("ow_lastrun")) + "</th><th>" + esc(t("ow_result")) + "</th><th>" + esc(t("ow_fileat")) + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>");
   const hist = LIVE.history || {}, wl = (OW.lists["watchlist.json"] || {}).data || [];
-  const syms = Array.from(new Set(wl.concat(Object.keys(hist))));
+  const syms = Array.from(new Set(wl.concat(Object.keys(hist)))).filter((x) => /^\d{4}$/.test(x));
   const hrows = syms.map((s) => {
     const h = hist[s] || [], last = h.length ? h[h.length - 1].d : null, age = last ? -owDays(last) : null;
     const st = !h.length ? owTag("down", "ow_h_missing") : h.length < 60 ? owTag("amber", "ow_h_short") : age > 4 ? owTag("amber", "ow_h_old") : owTag("up", "ow_h_ok");
@@ -4199,7 +4215,7 @@ Object.assign(UI, {
   dk_hit_t: ["وصل الهدف {d}", "Target hit {d}"], dk_hit_s: ["ضرب الوقف {d}", "Stop hit {d}"], dk_hit_none: ["ما وصل الهدف ولا الوقف", "Neither target nor stop hit"],
   dk_rr: ["العائد إلى المخاطرة", "Reward to risk"], dk_rec: ["سجّل صفقة", "Record a trade"], dk_redraw: ["خذ رسوماتي الحالية", "Use my current drawings"],
   dk_f_all: ["الكل", "All"], dk_conflict: ["الملف تغير من جهاز ثاني. حدّث وجرب مرة ثانية.", "The file changed on another device. Refresh and try again."],
-  ow_desk_btn: ["مكتبي", "My desk"]
+  ow_desk_btn: ["مكتبي", "My desk"], dk_sar: ["بالريال", "In SAR"], dk_usd: ["بالدولار", "In USD"]
 });
 
 let DK = { loaded: false, loading: false, data: null, sha: undefined }, dkTab = "pf", dkTrade = null, dkAn = null, dkDel = null, dkFilter = "all";
@@ -4208,6 +4224,7 @@ const dkBlank = () => ({ version: 1, cfg: { feePct: 0 }, trades: [], charts: [] 
 async function loadDesk(force) {
   if (!HOSTED || !CFG.token || DK.loading || (DK.loaded && !force)) return;
   DK.loading = true;
+  await loadUS();
   try { const f = await readJson("desk.json"); DK.data = (f && f.data) || dkBlank(); DK.sha = f ? f.sha : undefined; } catch (e) { DK.data = DK.data || dkBlank(); toast(errText(e)); }
   ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0 }, DK.data.cfg);
   DK.loading = false; DK.loaded = true; if (route() === "desk") render();
@@ -4220,14 +4237,14 @@ async function saveDesk() {
 window.addEventListener("hashchange", () => { if (route() === "desk") loadDesk(); });
 
 /* ----- prices & holdings ----- */
-const dkName = (s) => { const n = typeof owName === "function" ? owName(s) : ""; if (n) return n; const q = quoteOf(s); return q && q.name ? (Array.isArray(q.name) ? L(q.name) : q.name) : ""; };
+const dkName = (s) => { if (typeof US !== "undefined" && US && US.symbols && US.symbols[s]) return US.symbols[s].n || ""; const n = typeof owName === "function" ? owName(s) : ""; if (n) return n; const q = quoteOf(s); return q && q.name ? (Array.isArray(q.name) ? L(q.name) : q.name) : ""; };
 function dkPrice(sym, fallback) {
   const q = quoteOf(sym); if (q && q.live && isFinite(q.price)) return { p: q.price, src: "live" };
   const h = chartData(sym); if (h.length) return { p: h[h.length - 1].c, src: "close" };
   return { p: fallback, src: "trade" };
 }
-function dkHoldings() {
-  const by = {}, tr = DK.data.trades.slice().sort((a, b) => (a.date === b.date ? (a.at || 0) - (b.at || 0) : a.date < b.date ? -1 : 1));
+function dkHoldings(cur) {
+  const by = {}, tr = DK.data.trades.filter((x) => !cur || curOf(x.sym) === cur).sort((a, b) => (a.date === b.date ? (a.at || 0) - (b.at || 0) : a.date < b.date ? -1 : 1));
   let realised = 0;
   tr.forEach((x) => {
     const h = by[x.sym] || (by[x.sym] = { sym: x.sym, qty: 0, cost: 0, realised: 0, last: x.price });
@@ -4245,24 +4262,28 @@ function dkTradeForm() {
   const x = dkTrade || {}, f = (id, k, v, type, extra) => '<div class="field"><label for="' + id + '">' + esc(t(k)) + '</label><input id="' + id + '" type="' + (type || "text") + '" value="' + esc(v == null ? "" : v) + '"' + (extra || "") + "></div>";
   return '<form class="panel stack" data-form="dk-trade" data-id="' + esc(x.id || "") + '" novalidate><h3>' + esc(t(x.id ? "dk_edit" : "dk_new_trade")) + '</h3><div class="form-grid">' +
     '<div class="field"><label for="dt-side">' + esc(t("dk_side")) + '</label><select id="dt-side"><option value="buy"' + (x.side !== "sell" ? " selected" : "") + ">" + esc(t("dk_buy")) + '</option><option value="sell"' + (x.side === "sell" ? " selected" : "") + ">" + esc(t("dk_sell")) + "</option></select></div>" +
-    f("dt-sym", "dk_sym", x.sym, "text", ' inputmode="numeric" maxlength="4" dir="ltr" autocomplete="off" data-dk="fee"') + f("dt-date", "dk_date", x.date || today(), "date") +
+    f("dt-sym", "dk_sym", x.sym, "text", ' maxlength="6" dir="ltr" autocomplete="off" autocapitalize="characters" placeholder="1120 / TSLA" data-dk="fee"') + f("dt-date", "dk_date", x.date || today(), "date") +
     f("dt-qty", "dk_qty", x.qty, "number", ' min="0" step="1" inputmode="numeric" data-dk="fee"') + f("dt-price", "dk_px", x.price, "number", ' min="0" step="0.01" inputmode="decimal" data-dk="fee"') + f("dt-fee", "dk_fee", x.fee, "number", ' min="0" step="0.01" inputmode="decimal"') +
     '</div><div class="field"><label for="dt-note">' + esc(t("dk_note")) + '</label><input id="dt-note" value="' + esc(x.note || "") + '"></div><div class="row"><button class="btn primary" type="submit">' + esc(t("dk_save")) + '</button><button class="btn ghost" type="button" data-act="dk-tcancel">' + esc(t("dk_cancel")) + "</button></div></form>";
 }
-function dkPortfolio() {
-  const H = dkHoldings(), tot = H.unreal + H.realised;
-  const stats = '<div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))"><div><span>' + esc(t("dk_cost")) + "</span><b>" + fmt(H.cost) + "</b></div><div><span>" + esc(t("dk_value")) + "</span><b>" + fmt(H.value) + "</b></div><div><span>" + esc(t("dk_unreal")) + "</span><b>" + dkSign(H.unreal) + (H.cost ? ' <span class="small">' + dkSign((H.unreal / H.cost) * 100, 1, "%") + "</span>" : "") + "</b></div><div><span>" + esc(t("dk_real")) + "</span><b>" + dkSign(H.realised) + "</b></div></div>";
+function dkPfCur(cur) {
+  const H = dkHoldings(cur);
+  const stats = '<div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))"><div><span>' + esc(t("dk_cost")) + "</span><b>" + money(H.cost, cur) + "</b></div><div><span>" + esc(t("dk_value")) + "</span><b>" + money(H.value, cur) + "</b></div><div><span>" + esc(t("dk_unreal")) + "</span><b>" + dkSign(H.unreal) + (H.cost ? ' <span class="small">' + dkSign((H.unreal / H.cost) * 100, 1, "%") + "</span>" : "") + "</b></div><div><span>" + esc(t("dk_real")) + "</span><b>" + dkSign(H.realised) + "</b></div></div>";
   const COLORS = ["var(--amber)", "#5b8def", "#3fb68b", "#c770c9", "#e07a5f", "#7aa6b8", "#d4a72c", "#8d99ae"];
   const split = H.value > 0 ? '<div class="iv-split" aria-hidden="true">' + H.open.map((h, i) => '<i style="width:' + ((h.value / H.value) * 100).toFixed(2) + "%;background:" + COLORS[i % COLORS.length] + '"></i>').join("") + "</div>" : "";
   const pxTag = (px) => '<span class="tag ' + (px.src === "live" ? "up" : px.src === "trade" ? "amber" : "") + '">' + esc(t(px.src === "live" ? "dk_px_live" : px.src === "close" ? "dk_px_close" : "dk_px_trade")) + "</span>";
-  const rows = H.open.map((h, i) => '<tr><td><span class="iv-dot" style="background:' + COLORS[i % COLORS.length] + '"></span> <span class="num">' + esc(h.sym) + "</span> " + esc(dkName(h.sym)) + '</td><td class="num">' + int(h.qty) + '</td><td class="num">' + fmt(h.avg) + '</td><td class="num">' + fmt(h.px.p) + " " + pxTag(h.px) + '</td><td class="num">' + fmt(h.value) + "</td><td>" + dkSign(h.pl) + ' <span class="small">' + dkSign((h.pl / h.cost) * 100, 1) + '%</span></td><td class="num">' + (H.value ? fmt((h.value / H.value) * 100, 1) + "%" : "–") + "</td><td>" + (chartData(h.sym).length ? '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(h.sym) + '">' + esc(t("dk_open_ch")) + "</button>" : "") + "</td></tr>").join("");
-  const holds = H.open.length ? owPanel(t("dk_hold_h"), split + '<div class="tablewrap"><table><thead><tr><th>' + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_avg")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_value")) + "</th><th>" + esc(t("dk_pl")) + "</th><th>" + esc(t("dk_w")) + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>" + (H.open.some((h) => h.px.src === "trade") ? '<p class="small muted">' + esc(t("dk_px_tip")) + "</p>" : "")) : "";
+  const rows = H.open.map((h, i) => '<tr><td><span class="iv-dot" style="background:' + COLORS[i % COLORS.length] + '"></span> <span class="num">' + esc(h.sym) + "</span> " + esc(dkName(h.sym)) + '</td><td class="num">' + int(h.qty) + '</td><td class="num">' + money(h.avg, cur) + '</td><td class="num">' + money(h.px.p, cur) + " " + pxTag(h.px) + '</td><td class="num">' + money(h.value, cur) + "</td><td>" + dkSign(h.pl) + ' <span class="small">' + dkSign((h.pl / h.cost) * 100, 1) + '%</span></td><td class="num">' + (H.value ? fmt((h.value / H.value) * 100, 1) + "%" : "–") + "</td><td>" + (chartData(h.sym).length ? '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(h.sym) + '">' + esc(t("dk_open_ch")) + "</button>" : "") + "</td></tr>").join("");
+  const holds = H.open.length ? owPanel(t("dk_hold_h") + " · " + t(cur === "USD" ? "dk_usd" : "dk_sar"), split + '<div class="tablewrap"><table><thead><tr><th>' + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_avg")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_value")) + "</th><th>" + esc(t("dk_pl")) + "</th><th>" + esc(t("dk_w")) + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>" + (H.open.some((h) => h.px.src === "trade") ? '<p class="small muted">' + esc(t("dk_px_tip")) + "</p>" : "")) : "";
+  return (cur === "USD" ? '<h3 class="dk-cur">' + esc(t("dk_usd")) + "</h3>" : (DK.data.trades.some((x) => curOf(x.sym) === "USD") ? '<h3 class="dk-cur">' + esc(t("dk_sar")) + "</h3>" : "")) + stats + holds;
+}
+function dkPortfolio() {
   const trs = DK.data.trades.slice().sort((a, b) => (a.date === b.date ? (b.at || 0) - (a.at || 0) : a.date < b.date ? 1 : -1));
-  const trows = trs.map((x) => '<tr><td class="num">' + esc(x.date) + "</td><td>" + owTag(x.side === "buy" ? "up" : "down", x.side === "buy" ? "dk_buy" : "dk_sell") + '</td><td><span class="num">' + esc(x.sym) + "</span> " + esc(dkName(x.sym)) + '</td><td class="num">' + int(x.qty) + '</td><td class="num">' + fmt(x.price) + '</td><td class="num">' + fmt(Number(x.fee) || 0) + '</td><td class="num">' + fmt(x.qty * x.price + (x.side === "buy" ? 1 : -1) * (Number(x.fee) || 0)) + '</td><td class="small">' + esc(x.note || "") + '</td><td class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm ghost" data-act="dk-tedit" data-id="' + esc(x.id) + '">' + esc(t("dk_edit")) + '</button><button class="btn sm ' + (dkDel === x.id ? "danger" : "ghost") + '" data-act="dk-tdel" data-id="' + esc(x.id) + '">' + esc(t(dkDel === x.id ? "dk_sure" : "dk_del")) + "</button></td></tr>").join("");
+  const trows = trs.map((x) => '<tr><td class="num">' + esc(x.date) + "</td><td>" + owTag(x.side === "buy" ? "up" : "down", x.side === "buy" ? "dk_buy" : "dk_sell") + '</td><td><span class="num">' + esc(x.sym) + "</span> " + esc(dkName(x.sym)) + '</td><td class="num">' + int(x.qty) + '</td><td class="num">' + money(x.price, curOf(x.sym)) + '</td><td class="num">' + money(Number(x.fee) || 0, curOf(x.sym)) + '</td><td class="num">' + money(x.qty * x.price + (x.side === "buy" ? 1 : -1) * (Number(x.fee) || 0), curOf(x.sym)) + '</td><td class="small">' + esc(x.note || "") + '</td><td class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm ghost" data-act="dk-tedit" data-id="' + esc(x.id) + '">' + esc(t("dk_edit")) + '</button><button class="btn sm ' + (dkDel === x.id ? "danger" : "ghost") + '" data-act="dk-tdel" data-id="' + esc(x.id) + '">' + esc(t(dkDel === x.id ? "dk_sure" : "dk_del")) + "</button></td></tr>").join("");
   const trades = owPanel(t("dk_trades_h"), (trs.length ? '<div class="tablewrap"><table><thead><tr><th>' + esc(t("dk_date")) + "</th><th>" + esc(t("dk_side")) + "</th><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_fee")) + "</th><th>" + esc(t("dk_total")) + "</th><th>" + esc(t("dk_note")) + "</th><th></th></tr></thead><tbody>" + trows + "</tbody></table></div>" : '<p class="muted" style="margin:0">' + esc(t("dk_none_tr")) + "</p>") +
     '<form class="row" data-form="dk-cfg" novalidate style="align-items:flex-end"><div class="field" style="width:200px"><label for="dk-feepct">' + esc(t("dk_feepct")) + '</label><input id="dk-feepct" type="number" min="0" step="0.001" inputmode="decimal" value="' + esc(DK.data.cfg.feePct) + '"></div><button class="btn sm" type="submit">' + esc(t("dk_save")) + '</button><p class="small muted" style="flex:1;min-width:200px;margin:0">' + esc(t("dk_feepct_tip")) + "</p></form>",
     trs.length ? '<button class="btn sm" data-act="dk-xlsx">⤓ ' + esc(t("dk_xlsx")) + "</button>" : "");
-  return stats + (dkTrade ? dkTradeForm() : '<div><button class="btn primary" data-act="dk-tnew">+ ' + esc(t("dk_new_trade")) + "</button></div>") + holds + trades;
+  const curs = ["SAR", "USD"].filter((c) => c === "SAR" || DK.data.trades.some((x) => curOf(x.sym) === c));
+  return (dkTrade ? dkTradeForm() : '<div><button class="btn primary" data-act="dk-tnew">+ ' + esc(t("dk_new_trade")) + "</button></div>") + curs.map(dkPfCur).join("") + trades;
 }
 
 /* ----- my charts ----- */
@@ -4333,8 +4354,8 @@ function pageDesk() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
-  const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"]];
-  return head + '<div class="tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + (dkTab === "pf" ? dkPortfolio() : dkCharts()) + "</div></div>";
+  const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["us", "us_t"], ["op", "op_t"]];
+  return head + '<div class="tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
 }
 
 function dkExport() {
@@ -4366,7 +4387,8 @@ document.addEventListener("click", async (e) => {
 document.addEventListener("input", (e) => {
   const el = e.target; if (!el.dataset || el.dataset.dk !== "fee") return;
   const q = parseFloat(document.getElementById("dt-qty").value), p = parseFloat(document.getElementById("dt-price").value), fee = document.getElementById("dt-fee");
-  if (fee && q > 0 && p > 0 && DK.data && DK.data.cfg.feePct > 0) fee.value = (q * p * DK.data.cfg.feePct / 100).toFixed(2);
+  const sv = (document.getElementById("dt-sym").value || "").trim();
+  if (fee && /^\d{4}$/.test(sv) && q > 0 && p > 0 && DK.data && DK.data.cfg.feePct > 0) fee.value = (q * p * DK.data.cfg.feePct / 100).toFixed(2);
 });
 document.addEventListener("change", (e) => {
   if (e.target.dataset && e.target.dataset.dk === "an-sym") { const s = e.target.value, n = (S.drawings && S.drawings[s] || []).length, p = document.getElementById("da-draws"); if (p) p.textContent = t("dk_draws").replace("{n}", n); }
@@ -4378,8 +4400,8 @@ document.addEventListener("submit", async (e) => {
   const kind = form.dataset.form;
   if (kind === "dk-cfg") { const p = parseFloat(v("dk-feepct")); DK.data.cfg.feePct = isFinite(p) && p >= 0 ? p : 0; await saveDesk(); render(); }
   else if (kind === "dk-trade") {
-    const sym = v("dt-sym").replace(/\D/g, ""), qty = num("dt-qty"), price = num("dt-price"), side = v("dt-side"), id = form.dataset.id;
-    if (!/^\d{4}$/.test(sym) || !qty || !price) { toast(t("dk_bad")); return; }
+    const sym = v("dt-sym").toUpperCase().replace(/[^0-9A-Z.]/g, ""), qty = num("dt-qty"), price = num("dt-price"), side = v("dt-side"), id = form.dataset.id;
+    if (!/^(\d{4}|[A-Z]{1,5}(\.[A-Z])?)$/.test(sym) || !qty || !price) { toast(t("dk_bad")); return; }
     if (side === "sell") { const others = DK.data.trades.filter((x) => x.id !== id), keep = DK.data.trades; DK.data.trades = others; const held = (dkHoldings().by[sym] || { qty: 0 }).qty; DK.data.trades = keep; if (qty > held + 1e-9) { toast(t("dk_oversell").replace("{n}", int(held))); return; } }
     const rec = { sym, side, qty, price, fee: parseFloat(v("dt-fee")) || 0, date: v("dt-date") || today(), note: v("dt-note") };
     if (id) Object.assign(DK.data.trades.find((x) => x.id === id), rec); else DK.data.trades.push(Object.assign({ id: "t" + Date.now().toString(36), at: Date.now() }, rec));
@@ -4391,6 +4413,201 @@ document.addEventListener("submit", async (e) => {
     else DK.data.charts.push(Object.assign({ id: "a" + Date.now().toString(36), at: Date.now(), sym, date: h.length ? h[h.length - 1].d : today(), price: h.length ? h[h.length - 1].c : null, draws: dkCopyDraws(sym), ind: S.chart ? JSON.parse(JSON.stringify(S.chart)) : null }, rec));
     dkAn = null; render(); await saveDesk(); render();
   }
+});
+/* ===== مِراس: السوق الأمريكي داخل مكتبي =====
+   الأسهم الأمريكية والفوركس والنفط من us.json (Alpha Vantage عبر GitHub Actions)، والذهب والفضة من metals.json.
+   للمالك فقط: رخصة Alpha Vantage للاستخدام الشخصي، فما تنعرض لغيره. كل المبالغ بالدولار. */
+Object.assign(UI, {
+  us_t: ["السوق الأمريكي", "US market"],
+  us_g_movers: ["الأسهم الأكثر حركة", "Biggest movers"], us_g_ai: ["الذكاء الاصطناعي والسحابة", "AI and cloud"], us_g_fx: ["الفوركس", "Forex"], us_g_cmd: ["النفط والمعادن", "Oil and metals"],
+  us_last: ["آخر إقفال", "Last close"], us_1d: ["اليوم", "1 day"], us_5d: ["5 أيام", "5 days"], us_1m: ["شهر", "1 month"], us_range: ["مدى 30 يوم", "30-day range"],
+  us_none: ["البيانات لسا ما وصلت. أول تشغيل ياخذ 5 دقايق تقريباً بعد إضافة المفتاح، وبعدها مرة كل يوم 1:30 الفجر.", "No data yet. The first run takes about 5 minutes after the key is added, then once a day at 1:30 am Riyadh time."],
+  us_meta: ["آخر تحديث {d} · استخدم {n} من 25 طلب", "Updated {d} · used {n} of 25 requests"],
+  us_err: ["رموز ما وصلت بياناتها", "Symbols with no data"], us_note: ["البيانات للاستخدام الشخصي حسب رخصة Alpha Vantage، فهي تظهر لك أنت بس.", "Data is for personal use under the Alpha Vantage licence, so it is shown to you only."],
+  us_gold: ["الذهب (أونصة)", "Gold (oz)"], us_silver: ["الفضة (أونصة)", "Silver (oz)"]
+});
+
+const US_KEY = "meras.us";
+let US = null; try { US = JSON.parse(localStorage.getItem(US_KEY) || "null"); } catch (e) {}
+let USM = null; // metals.json
+const isUS = (s) => !!(US && US.symbols && US.symbols[s]);
+const curOf = (s) => (/^\d{4}$/.test(String(s)) ? "SAR" : "USD");
+const money = (n, cur, d = 2) => (cur === "USD" ? "$" : "") + fmt(n, d);
+
+function usMerge() {
+  if (!US || !US.symbols || !LIVE) return;
+  LIVE.history = LIVE.history || {};
+  Object.entries(US.symbols).forEach(([s, v]) => { if (Array.isArray(v.rows) && v.rows.length) LIVE.history[s] = v.rows; });
+}
+async function loadUS() {
+  if (!HOSTED || !CFG.token) return;
+  try {
+    const [u, m] = await Promise.all([readJson("us.json").catch(() => null), readJson("metals.json").catch(() => null)]);
+    if (u && u.data && u.data.symbols) { US = u.data; try { localStorage.setItem(US_KEY, JSON.stringify(US)); } catch (e) {} usMerge(); }
+    if (m && m.data) USM = m.data;
+  } catch (e) {}
+}
+usMerge();
+
+function usSpark(rows) {
+  const r = rows.slice(-30).map((x) => x.c); if (r.length < 2) return "";
+  const lo = Math.min(...r), hi = Math.max(...r), sp = hi - lo || 1, W = 90, H = 26;
+  const pts = r.map((v, i) => (i * (W / (r.length - 1))).toFixed(1) + "," + (H - 2 - ((v - lo) / sp) * (H - 4)).toFixed(1)).join(" ");
+  return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" aria-hidden="true" dir="ltr"><polyline points="' + pts + '" fill="none" stroke="' + (r[r.length - 1] >= r[0] ? "var(--up)" : "var(--down)") + '" stroke-width="1.6"/></svg>';
+}
+const usPct = (rows, n) => { if (rows.length <= n) return null; const a = rows[rows.length - 1 - n].c, b = rows[rows.length - 1].c; return a ? ((b - a) / a) * 100 : null; };
+function usRow(s, name, rows, chartable, dec) {
+  const last = rows.length ? rows[rows.length - 1] : null, m = rows.slice(-30), lo = m.length ? Math.min(...m.map((x) => x.l)) : null, hi = m.length ? Math.max(...m.map((x) => x.h)) : null;
+  const pc = (v) => (v == null ? "–" : dkSign(v, 1, "%"));
+  const d = dec || (last && last.c < 5 ? 4 : 2);
+  return '<tr><td><b class="num">' + esc(s) + '</b> <span class="small muted">' + esc(name || "") + '</span></td><td class="num">' + (last ? (curOf(s) === "USD" && !/^[A-Z]{6}$/.test(s) ? "$" : "") + fmt(last.c, d) : "–") + "</td><td>" + pc(usPct(rows, 1)) + "</td><td>" + pc(usPct(rows, 5)) + "</td><td>" + pc(usPct(rows, 21)) + '</td><td class="num small">' + (lo != null ? fmt(lo, d) + " – " + fmt(hi, d) : "–") + "</td><td>" + usSpark(rows) + "</td><td>" + (chartable ? '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button>" : "") + "</td></tr>";
+}
+function dkUS() {
+  if (!US || !US.symbols || !Object.keys(US.symbols).length) return '<div class="notice">' + esc(t("us_none")) + "</div>";
+  const head = "<thead><tr><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("us_last")) + "</th><th>" + esc(t("us_1d")) + "</th><th>" + esc(t("us_5d")) + "</th><th>" + esc(t("us_1m")) + "</th><th>" + esc(t("us_range")) + "</th><th></th><th></th></tr></thead>";
+  const grp = (g) => Object.entries(US.symbols).filter(([, v]) => v.g === g);
+  const table = (g, extra) => { const rows = grp(g).map(([s, v]) => usRow(s, v.n, v.rows || [], true)).join("") + (extra || ""); return rows ? owPanel(t("us_g_" + g), '<div class="tablewrap"><table>' + head + "<tbody>" + rows + "</tbody></table></div>") : ""; };
+  let metals = "";
+  if (USM) [["gold", "us_gold"], ["silver", "us_silver"]].forEach(([k, lab]) => { const m = USM[k]; if (m && Array.isArray(m.hist)) { const rows = m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })); if (m.price && rows.length && rows[rows.length - 1].c !== m.price) rows.push({ d: today(), o: m.price, h: m.price, l: m.price, c: m.price }); metals += usRow(k === "gold" ? "XAU" : "XAG", t(lab), rows, false, 2); } });
+  const errs = Object.entries(US.errors || {});
+  return '<p class="small muted" style="margin:0">' + esc(t("us_meta").replace("{d}", whenText(US.fetched_at)).replace("{n}", US.requests != null ? US.requests : "–")) + " · " + esc(t("us_note")) + "</p>" +
+    (errs.length ? '<div class="notice"><b>' + esc(t("us_err")) + ":</b> " + errs.map(([s, m]) => '<span class="num">' + esc(s) + "</span> <span class=\"small\">(" + esc(m) + ")</span>").join("، ") + "</div>" : "") +
+    table("movers") + table("ai") + table("fx") + table("cmd", metals);
+}
+/* ===== مِراس: العقود (الأوبشن) داخل مكتبي =====
+   دروس خاصة بالمالك من مفهوم العقد إلى البيع وجمع العلاوة، مع حاسبة ربح وخسارة عند الانتهاء.
+   تعليم فقط: لا توصيات ولا تنبؤات. كل المبالغ بالدولار. */
+Object.assign(UI, {
+  op_t: ["العقود", "Options"], op_intro: ["دروس العقود الأمريكية (الأوبشن) من الصفر. اقرأها بالترتيب، وجرّب كل فكرة في الحاسبة تحت قبل أي صفقة حقيقية.", "US options from scratch. Read them in order and try every idea in the calculator below before any real trade."],
+  op_calc: ["حاسبة العقد عند الانتهاء", "Option payoff at expiry"], op_strat: ["الطريقة", "Strategy"],
+  op_lc: ["شراء Call", "Buy a call"], op_lp: ["شراء Put", "Buy a put"], op_cc: ["بيع Call مغطى", "Covered call"], op_csp: ["بيع Put مضمون بالكاش", "Cash-secured put"],
+  op_k: ["سعر التنفيذ $", "Strike $"], op_p: ["العلاوة للسهم $", "Premium per share $"], op_n: ["عدد العقود", "Contracts"], op_s0: ["سعر السهم الحين (أو سعر شرائك) $", "Share price now (or your cost) $"], op_fee: ["عمولة الوسيط لكل عقد $", "Broker fee per contract $"],
+  op_be: ["نقطة التعادل", "Breakeven"], op_maxp: ["أعلى ربح", "Max profit"], op_maxl: ["أعلى خسارة", "Max loss"], op_cash: ["المبلغ المحجوز", "Capital tied up"], op_unl: ["مفتوح", "Unlimited"],
+  op_at: ["لو كان السعر عند الانتهاء", "If the price at expiry is"], op_res: ["النتيجة", "Result"], op_q: ["سؤال", "Question"], op_show: ["شوف الجواب", "Show answer"], op_right: ["صح", "Correct"], op_wrong: ["مو هذا", "Not this one"]
+});
+
+const OP_LESSONS = [
+  { t: "1. وش هو عقد الأوبشن؟", b: [
+    ["p", "عقد الأوبشن اتفاق يعطيك **حق** تشتري أو تبيع سهم بسعر محدد قبل تاريخ محدد. حق، مو التزام: إذا ما ناسبك تتركه ينتهي."],
+    ["p", "مثال من الحياة: تدفع للبائع 5,000 ريال عربون عشان يحجز لك أرض بمليون لمدة 3 شهور. إذا ارتفع سعر الأرض تشتريها بالمليون وتكسب الفرق. إذا نزل، تخسر العربون بس. العربون هنا هو **العلاوة** (Premium)."],
+    ["ul", ["**سعر التنفيذ (Strike):** السعر اللي يحق لك تشتري أو تبيع فيه.", "**تاريخ الانتهاء (Expiration):** آخر يوم يعيش فيه العقد. أغلب العقود تنتهي يوم جمعة، وفيه عقود أسبوعية وشهرية.", "**العلاوة (Premium):** سعر العقد نفسه. المشتري يدفعها، والبائع ياخذها.", "**العقد الواحد = 100 سهم.** إذا مكتوب العلاوة 2.50$ فالعقد يكلف 250$."]],
+    ["warn", "العقود الأمريكية على الأسهم من النوع الأمريكي: البائع ممكن يُطلب منه التنفيذ في أي يوم قبل الانتهاء، مو بس يوم الانتهاء."],
+    ["q", "علاوة عقد Call مكتوبة 1.80$. كم تدفع لشراء عقدين؟", ["3.60$", "180$", "360$"], 2, "كل عقد 100 سهم: 1.80 × 100 × 2 = 360$."]
+  ] },
+  { t: "2. Call و Put بالأمثلة", b: [
+    ["p", "**Call** = حق الشراء. تشتريه إذا تتوقع السهم يطلع. **Put** = حق البيع. تشتريه إذا تتوقع السهم ينزل، أو كتأمين على أسهم عندك."],
+    ["ex", "**مثال Call:** سهم أبل 200$. تشتري Call بسعر تنفيذ 210$ ينتهي بعد 30 يوم، العلاوة 3$ (يعني 300$ للعقد).\n- لو أبل وصل 220$ عند الانتهاء: العقد يسوى 10$ × 100 = 1,000$. ربحك 1,000 − 300 = **700$**.\n- لو أبل 205$: العقد ما له قيمة. خسارتك **300$** وبس.\n- نقطة التعادل: 210 + 3 = **213$**."],
+    ["ex", "**مثال Put:** نفس السهم 200$. تشتري Put بسعر تنفيذ 190$، العلاوة 2.50$ (250$ للعقد).\n- لو نزل لـ 175$: العقد يسوى 15$ × 100 = 1,500$. ربحك **1,250$**.\n- لو بقى فوق 190$: تخسر **250$**.\n- نقطة التعادل: 190 − 2.50 = **187.50$**."],
+    ["p", "لاحظ: المشتري خسارته محدودة بالعلاوة اللي دفعها، لكن لازم السهم يتحرك **كفاية** و**بسرعة** قبل الانتهاء."],
+    ["q", "اشتريت Put بسعر تنفيذ 50$ وعلاوة 2$. السهم عند الانتهاء 49$. وش النتيجة للعقد الواحد؟", ["ربح 100$", "خسارة 100$", "خسارة 200$"], 1, "العقد يسوى 50 − 49 = 1$ × 100 = 100$، ودفعت 200$، فالنتيجة خسارة 100$. التعادل كان عند 48$."]
+  ] },
+  { t: "3. قراءة سلسلة العقود (Option Chain)", b: [
+    ["p", "في تطبيق الوسيط تختار السهم ثم تاريخ الانتهاء، وتطلع لك جدول: الـ Calls على جهة والـ Puts على الجهة الثانية، وأسعار التنفيذ في النص."],
+    ["ul", ["**Bid:** أعلى سعر يدفعه مشتري الحين. إذا بتبيع، هذا تقريباً اللي تاخذه.", "**Ask:** أقل سعر يقبله بائع. إذا بتشتري، هذا تقريباً اللي تدفعه.", "**الفرق بينهم (Spread):** كل ما كان أوسع، كل ما خسرت أكثر بمجرد الدخول.", "**Volume:** كم عقد انتداول اليوم.", "**Open Interest:** كم عقد مفتوح حالياً. رقم عالي = سيولة أفضل.", "**IV (التذبذب الضمني):** كم يتوقع السوق السهم يتحرك. IV عالي = العقود غالية."]],
+    ["p", "**ITM** (داخل السعر): Call تنفيذه تحت سعر السهم، أو Put تنفيذه فوق السهم. **ATM**: عند سعر السهم. **OTM** (خارج السعر): ما له قيمة لو انتهى الحين."],
+    ["warn", "قاعدة عملية: اختر عقود فيها Open Interest كبير وفرق Bid/Ask ضيق، واستخدم **أمر محدد (Limit)** بسعر بين الـ Bid والـ Ask. لا تستخدم أمر سوق (Market) في العقود."],
+    ["q", "Bid = 1.20 و Ask = 1.60. وش أفضل طريقة تشتري فيها؟", ["أمر سوق", "أمر محدد عند 1.40 تقريباً وتصبر", "أمر محدد عند 1.20"], 1, "أمر السوق ينفذ عند 1.60 غالباً. الأمر المحدد في النص يعطيك فرصة سعر أفضل، و1.20 غالباً ما ينفذ."]
+  ] },
+  { t: "4. وش يحدد سعر العقد؟", b: [
+    ["p", "العلاوة = **القيمة الذاتية** + **القيمة الزمنية**."],
+    ["ul", ["**القيمة الذاتية:** كم يسوى العقد لو انتهى الحين. Call تنفيذه 190$ والسهم 200$ = قيمة ذاتية 10$.", "**القيمة الزمنية:** الباقي من العلاوة. هذا ثمن الاحتمال إن السهم يتحرك قبل الانتهاء. تذوب كل يوم، وتذوب أسرع في آخر 30 يوم."]],
+    ["ex", "Call تنفيذه 190$، السهم 200$، العلاوة 13$: القيمة الذاتية 10$ والزمنية 3$. لو بقى السهم 200$ لين الانتهاء، العقد يصير 10$ بس، يعني الـ 3$ ذابت."],
+    ["p", "**التذبذب (IV)** يرفع القيمة الزمنية. قبل إعلان النتائج المالية يرتفع IV، وبعد الإعلان ينهار حتى لو تحرك السهم. هذا اسمه **IV Crush**، وكثير من المبتدئين يشترون قبل النتائج ويخسرون رغم إن توقعهم صح."],
+    ["q", "اشتريت Call قبل النتائج، والسهم طلع 2% بعدها، لكن العقد نزل. وش السبب الأرجح؟", ["خطأ في التطبيق", "انهيار التذبذب الضمني (IV Crush)", "العقد انتهى"], 1, "العلاوة كانت منفوخة بالتذبذب المتوقع. بعد الإعلان التذبذب نزل، وحركة 2% ما غطت النقص."]
+  ] },
+  { t: "5. الإغريقيات ببساطة", b: [
+    ["ul", ["**Delta:** كم يتغير سعر العقد لما السهم يتحرك 1$. Delta 0.40 = العقد يتحرك 0.40$ (يعني 40$ للعقد). وكتقريب، هي احتمال تقريبي إن العقد ينتهي داخل السعر.", "**Theta:** كم يخسر العقد كل يوم من الوقت. Theta −0.05 = يخسر 5$ باليوم للعقد. المشتري يخسر الـ Theta، والبائع يكسبها.", "**Vega:** كم يتغير السعر لو التذبذب الضمني تغير نقطة وحدة.", "**Gamma:** كم تتغير الـ Delta نفسها. تكبر قرب الانتهاء، فالعقود القريبة تتقلب بعنف."]],
+    ["p", "ما تحتاج تحسبها بنفسك، التطبيق يعرضها. المهم تفهم: **المشتري يحارب الوقت، والبائع يستفيد منه.**"],
+    ["q", "عقد Delta حقه 0.30. السهم طلع 2$. كم تقريباً يتغير سعر العقد الواحد؟", ["0.30$", "60$", "200$"], 1, "0.30 × 2 = 0.60$ للسهم × 100 = 60$ تقريباً."]
+  ] },
+  { t: "6. شراء عقد خطوة بخطوة", b: [
+    ["ol", ["**حدد الفكرة:** وش تتوقع؟ صعود (Call) أو نزول (Put)، ولين متى؟ بدون تاريخ واضح لا تشتري عقد.", "**اختر تاريخ أبعد من توقعك:** إذا تتوقع الحركة خلال 3 أسابيع، خذ عقد ينتهي بعد 45 إلى 60 يوم. الوقت الزايد يحميك من تآكل الوقت السريع.", "**اختر سعر التنفيذ:** للمبتدئ، عقد قريب من السعر أو داخله قليلاً (Delta بين 0.50 و 0.70). العقود البعيدة رخيصة لكن أغلبها ينتهي بدون قيمة.", "**افحص السيولة:** Open Interest عالي وفرق Bid/Ask ضيق.", "**حدد المبلغ:** العلاوة ممكن تروح كاملة. لا تحط في صفقة وحدة أكثر من 1 إلى 2% من محفظتك.", "**أدخل بأمر محدد** بين الـ Bid والـ Ask.", "**حدد الخروج قبل الدخول:** مثلاً تبيع لو ربح العقد 50 إلى 100%، أو لو خسر 50%، أو قبل الانتهاء بأسبوعين مهما كان.", "**اطلع قبل الانتهاء:** تبيع العقد نفسه في السوق، ما تحتاج تنفذ وتشتري الأسهم."]],
+    ["warn", "إذا تركت عقد داخل السعر لين الانتهاء، الوسيط غالباً ينفذه تلقائياً، وتلقى نفسك تشتري 100 سهم وما عندك كاش كافي. بيع العقد قبلها."],
+    ["q", "تتوقع السهم يطلع خلال شهر. أي عقد أنسب لمبتدئ؟", ["ينتهي هذا الأسبوع، بعيد عن السعر لأنه رخيص", "ينتهي بعد 45 إلى 60 يوم، قريب من السعر", "ينتهي بعد سنة، بعيد جداً"], 1, "وقت كافي لتحقق الفكرة، وDelta معقولة. العقد الرخيص القريب يحتاج حركة كبيرة وسريعة جداً."]
+  ] },
+  { t: "7. الجهة الثانية: بيع العقود وجمع العلاوة", b: [
+    ["p", "كل عقد له مشتري وبائع. **البائع** (يسمونه كاتب العقد Writer) هو اللي ياخذ العلاوة من المشتري على طول، ومقابلها يلتزم: يبيع السهم بسعر التنفيذ (لو باع Call) أو يشتريه (لو باع Put) إذا طلب المشتري."],
+    ["p", "هذا اللي كثير من الدورات تسميه \"اكسب من عمولة المتداولين\". هي مو عمولة، هي **العلاوة** اللي يدفعها المشتري. والفكرة إن القيمة الزمنية تذوب كل يوم لصالح البائع."],
+    ["ul", ["**ربح البائع محدود:** أعلى شي ياخذه هو العلاوة.", "**خسارته ممكن تكون كبيرة:** لو السهم تحرك بقوة ضده.", "**البيع المكشوف (Naked):** تبيع Call بدون ما تملك السهم. خسارته **مفتوحة** نظرياً. هذا ممنوع على المبتدئ، وأغلب الوسطاء ما يسمحون فيه إلا بأعلى مستوى موافقة.", "**البيع المغطى:** إما تملك الأسهم (Covered Call)، أو تحجز الكاش كامل لشرائها (Cash-Secured Put). هذي الطرق اللي نشرحها في الدرسين الجاية."]],
+    ["warn", "البيع يعطي ربح صغير متكرر، وأحياناً خسارة كبيرة تاكل أرباح شهور. الناس يوصفونه بـ\"تلقط ريالات قدام الحادلة\". النجاح فيه يجي من اختيار أسهم تبي تملكها أصلاً، وحجم صغير، وانضباط."],
+    ["q", "بعت Put وأخذت علاوة 150$. وش أعلى ربح ممكن من هذي الصفقة؟", ["150$", "مفتوح", "يعتمد على صعود السهم"], 0, "البائع أعلى ربح له العلاوة اللي استلمها، مهما طلع السهم."]
+  ] },
+  { t: "8. البيع المغطى (Covered Call)", b: [
+    ["p", "عندك 100 سهم أو أكثر، وتبيع عليها Call بسعر تنفيذ فوق السعر الحالي. تاخذ العلاوة كدخل إضافي، ومقابلها توافق تبيع أسهمك بسعر التنفيذ لو وصله."],
+    ["ex", "عندك 100 سهم أبل اشتريتها بـ 200$. تبيع Call تنفيذه 210$ ينتهي بعد 30 يوم بعلاوة 3$، فتستلم **300$**.\n- لو بقى السهم تحت 210$: تحتفظ بالأسهم والـ 300$، وتقدر تعيدها الشهر الجاي.\n- لو طلع فوق 210$: أسهمك تنباع بـ 210$. ربحك (210 − 200 + 3) × 100 = **1,300$**، وهذا أعلى شي حتى لو وصل 250$.\n- لو نزل لـ 180$: خسارة الأسهم 2,000$ والعلاوة تخففها لـ **1,700$**."],
+    ["ul", ["مناسب لما تتوقع السهم يمشي عرضي أو يطلع بهدوء.", "اختر سعر تنفيذ ترضى تبيع عنده فعلاً.", "قاعدة شائعة عند البائعين: يقفلون الصفقة لما تحقق 50% من العلاوة، بدل ما ينتظرون الانتهاء.", "انتبه لتواريخ التوزيعات: قبلها ممكن ينطلب منك التنفيذ مبكراً."]],
+    ["q", "في المثال فوق، السهم وصل 240$. وش اللي صار؟", ["ربحت 4,300$", "ربحت 1,300$ وفاتك باقي الصعود", "خسرت"], 1, "التزمت تبيع بـ 210$، فربحك محدود بـ 1,300$. هذا ثمن العلاوة اللي أخذتها."]
+  ] },
+  { t: "9. بيع Put مضمون بالكاش، وعجلة العقود (The Wheel)", b: [
+    ["p", "تبيع Put على سهم **تبي تشتريه أصلاً**، بسعر تنفيذ أقل من سعره الحالي، وتحجز كامل مبلغ الشراء كاش في حسابك. تاخذ العلاوة الحين."],
+    ["ex", "أبل 200$ وتبي تشتريه لو نزل. تبيع Put تنفيذه 190$ ينتهي بعد 30 يوم بعلاوة 2.50$، فتستلم **250$** وتحجز 19,000$.\n- لو بقى فوق 190$: العقد ينتهي، وتحتفظ بالـ 250$ (حوالي 1.3% على المبلغ المحجوز في شهر).\n- لو نزل لـ 180$: تشتري 100 سهم بـ 190$، لكن تكلفتك الفعلية 187.50$ بسبب العلاوة. خسارتك على الورق (180 − 187.50) × 100 = **750$**."],
+    ["p", "**العجلة (The Wheel):** تبيع Put مضمون ⟵ إذا انطلب منك التنفيذ وصارت عندك الأسهم، تبيع عليها Covered Call ⟵ إذا انباعت الأسهم، ترجع تبيع Put. وكل لفة تجمع علاوة."],
+    ["warn", "العجلة تنجح على أسهم قوية تقبل تمسكها سنين لو نزلت. على سهم ضعيف ممكن تلقى نفسك ماسك أسهم نازلة 40% وأنت تجمع علاوات صغيرة عليها."],
+    ["q", "وش أهم شرط قبل ما تبيع Put مضمون؟", ["العلاوة تكون كبيرة", "تكون فعلاً تبي تملك السهم بهذا السعر وعندك الكاش كامل", "السهم يكون نازل بقوة"], 1, "أسوأ سيناريو إنك تشتري السهم. إذا ما تبيه، لا تبيع عليه Put."]
+  ] },
+  { t: "10. قبل أول صفقة: المخاطر والقواعد", b: [
+    ["ul", ["**ابدأ بحساب تجريبي** (Paper Trading) عند الوسيط لمدة شهر على الأقل، وسجل كل صفقة في مكتبي.", "**مستويات الموافقة:** الوسيط يطلب منك تعبي استبيان. غالباً المستوى الأول يسمح بالبيع المغطى والمضمون، والثاني بالشراء، والأعلى بالاستراتيجيات المعقدة والبيع المكشوف.", "**أوقات التداول:** من 9:30 ص إلى 4:00 م بتوقيت نيويورك، يعني 4:30 م إلى 11:00 م بتوقيت الرياض في التوقيت الصيفي، و5:30 م إلى 12:00 بالليل في الشتوي.", "**لا تدخل قبل النتائج المالية** وأنت مبتدئ، بسبب انهيار التذبذب.", "**الحجم:** للشراء لا تخاطر بأكثر من 1 إلى 2% في الصفقة. للبيع المضمون، لا تحجز كل محفظتك في سهم واحد.", "**لا تبيع مكشوف أبداً** وأنت تتعلم.", "**الرسوم:** فيه عمولة لكل عقد عند أغلب الوسطاء. حطها في الحاسبة."]],
+    ["warn", "الجانب الشرعي: كثير من العلماء والهيئات الشرعية يرون إن عقود الخيارات غير جائزة، وفيه من يجيز بعض صورها. إذا يهمك هالجانب، اسأل جهة شرعية موثوقة قبل ما تتداول."],
+    ["p", "هذي الدروس تعليم فقط، مو توصية بأي صفقة. القرار والمسؤولية عليك."]
+  ] }
+];
+
+const opFmt = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+function opBlock(b, li, bi) {
+  const [k, v] = b;
+  if (k === "p") return "<p>" + opFmt(v) + "</p>";
+  if (k === "ul" || k === "ol") return "<" + k + ">" + v.map((x) => "<li>" + opFmt(x) + "</li>").join("") + "</" + k + ">";
+  if (k === "ex") { const lines = v.split("\n"); return '<div class="op-ex">' + lines.map((x) => (x.startsWith("- ") ? '<div class="op-li">' + opFmt(x.slice(2)) + "</div>" : "<p>" + opFmt(x) + "</p>")).join("") + "</div>"; }
+  if (k === "warn") return '<div class="notice">' + opFmt(v) + "</div>";
+  if (k === "q") { const [, q, opts, ans, why] = b; return '<div class="op-q" data-ans="' + ans + '"><b>' + esc(t("op_q")) + ":</b> " + opFmt(q) + '<div class="row" style="gap:6px;margin-top:8px">' + opts.map((o, i) => '<button type="button" class="btn sm" data-act="op-pick" data-i="' + i + '">' + esc(o) + "</button>").join("") + '</div><p class="op-why small" hidden>' + opFmt(why) + "</p></div>"; }
+  return "";
+}
+
+let OPC = { s: "lc", k: 210, p: 3, n: 1, s0: 200, fee: 0.65, at: 220 };
+function opCalcNums(c) {
+  const m = 100 * c.n, fee = c.fee * c.n, K = c.k, P = c.p, S0 = c.s0;
+  const pay = (S) => ({ lc: Math.max(S - K, 0) - P, lp: Math.max(K - S, 0) - P, cc: S - S0 - Math.max(S - K, 0) + P, csp: P - Math.max(K - S, 0) }[c.s] * m - fee);
+  const be = { lc: K + P, lp: K - P, cc: S0 - P, csp: K - P }[c.s];
+  const maxp = { lc: null, lp: (K - P) * m - fee, cc: (K - S0 + P) * m - fee, csp: P * m - fee }[c.s];
+  const maxl = { lc: P * m + fee, lp: P * m + fee, cc: (S0 - P) * m + fee, csp: (K - P) * m + fee }[c.s];
+  const cash = { lc: P * m + fee, lp: P * m + fee, cc: S0 * m, csp: K * m }[c.s];
+  return { pay, be, maxp, maxl, cash };
+}
+function opChart(c) {
+  const r = opCalcNums(c), lo = Math.max(0, Math.min(c.k, c.s0) * 0.7), hi = Math.max(c.k, c.s0) * 1.3, W = 640, H = 220, pad = 30, N = 80;
+  const xs = Array.from({ length: N + 1 }, (_, i) => lo + ((hi - lo) * i) / N), ys = xs.map(r.pay);
+  let ymin = Math.min(...ys, 0), ymax = Math.max(...ys, 0); const sp = ymax - ymin || 1; ymin -= sp * 0.08; ymax += sp * 0.08;
+  const X = (x) => pad + ((x - lo) / (hi - lo)) * (W - pad * 2), Y = (y) => 10 + ((ymax - y) / (ymax - ymin)) * (H - 40);
+  const pts = xs.map((x, i) => X(x).toFixed(1) + "," + Y(ys[i]).toFixed(1)).join(" ");
+  const pos = xs.map((x, i) => X(x).toFixed(1) + "," + Y(Math.max(ys[i], 0)).toFixed(1)).join(" "), neg = xs.map((x, i) => X(x).toFixed(1) + "," + Y(Math.min(ys[i], 0)).toFixed(1)).join(" ");
+  const y0 = Y(0), ticks = [lo, c.k, hi].map((v) => '<text x="' + X(v) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="12" fill="var(--muted)">$' + fmt(v, 0) + "</text>").join("");
+  return '<svg class="op-chart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="payoff" dir="ltr"><polygon points="' + X(lo) + "," + y0 + " " + pos + " " + X(hi) + "," + y0 + '" fill="var(--up)" opacity=".14"/><polygon points="' + X(lo) + "," + y0 + " " + neg + " " + X(hi) + "," + y0 + '" fill="var(--down)" opacity=".14"/><line x1="' + pad + '" x2="' + (W - pad) + '" y1="' + y0 + '" y2="' + y0 + '" stroke="var(--line)" stroke-width="1.2"/><line x1="' + X(c.k) + '" x2="' + X(c.k) + '" y1="10" y2="' + (H - 30) + '" stroke="var(--muted)" stroke-dasharray="3 3"/>' + (r.be > lo && r.be < hi ? '<circle cx="' + X(r.be) + '" cy="' + y0 + '" r="4" fill="var(--amber)"/>' : "") + '<polyline points="' + pts + '" fill="none" stroke="var(--ink)" stroke-width="2"/>' + ticks + "</svg>";
+}
+function opCalcBody() {
+  const c = OPC, r = opCalcNums(c), at = r.pay(c.at);
+  return '<div class="result"><div><span>' + esc(t("op_be")) + "</span><b>$" + fmt(r.be) + "</b></div><div><span>" + esc(t("op_maxp")) + "</span><b>" + (r.maxp == null ? esc(t("op_unl")) : "$" + fmt(r.maxp)) + "</b></div><div><span>" + esc(t("op_maxl")) + "</span><b>$" + fmt(r.maxl) + "</b></div><div><span>" + esc(t("op_cash")) + "</span><b>$" + fmt(r.cash, 0) + "</b></div><div><span>" + esc(t("op_res")) + " @ $" + fmt(c.at) + "</span><b>" + dkSign(at) + "</b></div></div>" + opChart(c);
+}
+function opCalc() {
+  const f = (id, k, v, step) => '<div class="field"><label for="opc-' + id + '">' + esc(t(k)) + '</label><input id="opc-' + id + '" data-opc="' + id + '" type="number" min="0" step="' + step + '" inputmode="decimal" value="' + v + '"></div>';
+  return owPanel(t("op_calc"), '<div class="form-grid"><div class="field"><label for="opc-s">' + esc(t("op_strat")) + '</label><select id="opc-s" data-opc="s">' + [["lc", "op_lc"], ["lp", "op_lp"], ["cc", "op_cc"], ["csp", "op_csp"]].map(([v, k]) => '<option value="' + v + '"' + (OPC.s === v ? " selected" : "") + ">" + esc(t(k)) + "</option>").join("") + "</select></div>" +
+    f("k", "op_k", OPC.k, "0.5") + f("p", "op_p", OPC.p, "0.05") + f("n", "op_n", OPC.n, "1") + f("s0", "op_s0", OPC.s0, "0.5") + f("fee", "op_fee", OPC.fee, "0.05") + f("at", "op_at", OPC.at, "0.5") + '</div><div id="opc-out">' + opCalcBody() + "</div>");
+}
+function dkOptions() {
+  return '<p class="muted" style="margin:0">' + esc(t("op_intro")) + "</p>" + opCalc() + '<div class="stack op-lessons">' + OP_LESSONS.map((l, li) => '<details class="panel op-lesson"' + (li === 0 ? " open" : "") + "><summary><h3>" + esc(l.t) + "</h3></summary>" + l.b.map((b, bi) => opBlock(b, li, bi)).join("") + "</details>").join("") + "</div>";
+}
+
+document.addEventListener("input", (e) => {
+  const k = e.target.dataset && e.target.dataset.opc; if (!k) return;
+  OPC[k] = k === "s" ? e.target.value : Math.max(0, parseFloat(e.target.value) || 0);
+  const o = document.getElementById("opc-out"); if (o) o.innerHTML = opCalcBody();
+});
+document.addEventListener("change", (e) => { if (e.target.dataset && e.target.dataset.opc === "s") { OPC.s = e.target.value; const o = document.getElementById("opc-out"); if (o) o.innerHTML = opCalcBody(); } });
+document.addEventListener("click", (e) => {
+  const b = e.target.closest && e.target.closest('[data-act="op-pick"]'); if (!b) return;
+  const box = b.closest(".op-q"), ok = Number(b.dataset.i) === Number(box.dataset.ans);
+  box.querySelectorAll('[data-act="op-pick"]').forEach((x) => x.classList.remove("on-ok", "on-bad"));
+  b.classList.add(ok ? "on-ok" : "on-bad"); b.setAttribute("aria-label", t(ok ? "op_right" : "op_wrong"));
+  if (ok) box.querySelector(".op-why").hidden = false;
 });
 /* ===== التشغيل ===== */
 lastRoute = route();

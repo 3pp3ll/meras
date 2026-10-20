@@ -25,7 +25,7 @@ Object.assign(UI, {
   dk_hit_t: ["وصل الهدف {d}", "Target hit {d}"], dk_hit_s: ["ضرب الوقف {d}", "Stop hit {d}"], dk_hit_none: ["ما وصل الهدف ولا الوقف", "Neither target nor stop hit"],
   dk_rr: ["العائد إلى المخاطرة", "Reward to risk"], dk_rec: ["سجّل صفقة", "Record a trade"], dk_redraw: ["خذ رسوماتي الحالية", "Use my current drawings"],
   dk_f_all: ["الكل", "All"], dk_conflict: ["الملف تغير من جهاز ثاني. حدّث وجرب مرة ثانية.", "The file changed on another device. Refresh and try again."],
-  ow_desk_btn: ["مكتبي", "My desk"]
+  ow_desk_btn: ["مكتبي", "My desk"], dk_sar: ["بالريال", "In SAR"], dk_usd: ["بالدولار", "In USD"]
 });
 
 let DK = { loaded: false, loading: false, data: null, sha: undefined }, dkTab = "pf", dkTrade = null, dkAn = null, dkDel = null, dkFilter = "all";
@@ -34,6 +34,7 @@ const dkBlank = () => ({ version: 1, cfg: { feePct: 0 }, trades: [], charts: [] 
 async function loadDesk(force) {
   if (!HOSTED || !CFG.token || DK.loading || (DK.loaded && !force)) return;
   DK.loading = true;
+  await loadUS();
   try { const f = await readJson("desk.json"); DK.data = (f && f.data) || dkBlank(); DK.sha = f ? f.sha : undefined; } catch (e) { DK.data = DK.data || dkBlank(); toast(errText(e)); }
   ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0 }, DK.data.cfg);
   DK.loading = false; DK.loaded = true; if (route() === "desk") render();
@@ -46,14 +47,14 @@ async function saveDesk() {
 window.addEventListener("hashchange", () => { if (route() === "desk") loadDesk(); });
 
 /* ----- prices & holdings ----- */
-const dkName = (s) => { const n = typeof owName === "function" ? owName(s) : ""; if (n) return n; const q = quoteOf(s); return q && q.name ? (Array.isArray(q.name) ? L(q.name) : q.name) : ""; };
+const dkName = (s) => { if (typeof US !== "undefined" && US && US.symbols && US.symbols[s]) return US.symbols[s].n || ""; const n = typeof owName === "function" ? owName(s) : ""; if (n) return n; const q = quoteOf(s); return q && q.name ? (Array.isArray(q.name) ? L(q.name) : q.name) : ""; };
 function dkPrice(sym, fallback) {
   const q = quoteOf(sym); if (q && q.live && isFinite(q.price)) return { p: q.price, src: "live" };
   const h = chartData(sym); if (h.length) return { p: h[h.length - 1].c, src: "close" };
   return { p: fallback, src: "trade" };
 }
-function dkHoldings() {
-  const by = {}, tr = DK.data.trades.slice().sort((a, b) => (a.date === b.date ? (a.at || 0) - (b.at || 0) : a.date < b.date ? -1 : 1));
+function dkHoldings(cur) {
+  const by = {}, tr = DK.data.trades.filter((x) => !cur || curOf(x.sym) === cur).sort((a, b) => (a.date === b.date ? (a.at || 0) - (b.at || 0) : a.date < b.date ? -1 : 1));
   let realised = 0;
   tr.forEach((x) => {
     const h = by[x.sym] || (by[x.sym] = { sym: x.sym, qty: 0, cost: 0, realised: 0, last: x.price });
@@ -71,24 +72,28 @@ function dkTradeForm() {
   const x = dkTrade || {}, f = (id, k, v, type, extra) => '<div class="field"><label for="' + id + '">' + esc(t(k)) + '</label><input id="' + id + '" type="' + (type || "text") + '" value="' + esc(v == null ? "" : v) + '"' + (extra || "") + "></div>";
   return '<form class="panel stack" data-form="dk-trade" data-id="' + esc(x.id || "") + '" novalidate><h3>' + esc(t(x.id ? "dk_edit" : "dk_new_trade")) + '</h3><div class="form-grid">' +
     '<div class="field"><label for="dt-side">' + esc(t("dk_side")) + '</label><select id="dt-side"><option value="buy"' + (x.side !== "sell" ? " selected" : "") + ">" + esc(t("dk_buy")) + '</option><option value="sell"' + (x.side === "sell" ? " selected" : "") + ">" + esc(t("dk_sell")) + "</option></select></div>" +
-    f("dt-sym", "dk_sym", x.sym, "text", ' inputmode="numeric" maxlength="4" dir="ltr" autocomplete="off" data-dk="fee"') + f("dt-date", "dk_date", x.date || today(), "date") +
+    f("dt-sym", "dk_sym", x.sym, "text", ' maxlength="6" dir="ltr" autocomplete="off" autocapitalize="characters" placeholder="1120 / TSLA" data-dk="fee"') + f("dt-date", "dk_date", x.date || today(), "date") +
     f("dt-qty", "dk_qty", x.qty, "number", ' min="0" step="1" inputmode="numeric" data-dk="fee"') + f("dt-price", "dk_px", x.price, "number", ' min="0" step="0.01" inputmode="decimal" data-dk="fee"') + f("dt-fee", "dk_fee", x.fee, "number", ' min="0" step="0.01" inputmode="decimal"') +
     '</div><div class="field"><label for="dt-note">' + esc(t("dk_note")) + '</label><input id="dt-note" value="' + esc(x.note || "") + '"></div><div class="row"><button class="btn primary" type="submit">' + esc(t("dk_save")) + '</button><button class="btn ghost" type="button" data-act="dk-tcancel">' + esc(t("dk_cancel")) + "</button></div></form>";
 }
-function dkPortfolio() {
-  const H = dkHoldings(), tot = H.unreal + H.realised;
-  const stats = '<div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))"><div><span>' + esc(t("dk_cost")) + "</span><b>" + fmt(H.cost) + "</b></div><div><span>" + esc(t("dk_value")) + "</span><b>" + fmt(H.value) + "</b></div><div><span>" + esc(t("dk_unreal")) + "</span><b>" + dkSign(H.unreal) + (H.cost ? ' <span class="small">' + dkSign((H.unreal / H.cost) * 100, 1, "%") + "</span>" : "") + "</b></div><div><span>" + esc(t("dk_real")) + "</span><b>" + dkSign(H.realised) + "</b></div></div>";
+function dkPfCur(cur) {
+  const H = dkHoldings(cur);
+  const stats = '<div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))"><div><span>' + esc(t("dk_cost")) + "</span><b>" + money(H.cost, cur) + "</b></div><div><span>" + esc(t("dk_value")) + "</span><b>" + money(H.value, cur) + "</b></div><div><span>" + esc(t("dk_unreal")) + "</span><b>" + dkSign(H.unreal) + (H.cost ? ' <span class="small">' + dkSign((H.unreal / H.cost) * 100, 1, "%") + "</span>" : "") + "</b></div><div><span>" + esc(t("dk_real")) + "</span><b>" + dkSign(H.realised) + "</b></div></div>";
   const COLORS = ["var(--amber)", "#5b8def", "#3fb68b", "#c770c9", "#e07a5f", "#7aa6b8", "#d4a72c", "#8d99ae"];
   const split = H.value > 0 ? '<div class="iv-split" aria-hidden="true">' + H.open.map((h, i) => '<i style="width:' + ((h.value / H.value) * 100).toFixed(2) + "%;background:" + COLORS[i % COLORS.length] + '"></i>').join("") + "</div>" : "";
   const pxTag = (px) => '<span class="tag ' + (px.src === "live" ? "up" : px.src === "trade" ? "amber" : "") + '">' + esc(t(px.src === "live" ? "dk_px_live" : px.src === "close" ? "dk_px_close" : "dk_px_trade")) + "</span>";
-  const rows = H.open.map((h, i) => '<tr><td><span class="iv-dot" style="background:' + COLORS[i % COLORS.length] + '"></span> <span class="num">' + esc(h.sym) + "</span> " + esc(dkName(h.sym)) + '</td><td class="num">' + int(h.qty) + '</td><td class="num">' + fmt(h.avg) + '</td><td class="num">' + fmt(h.px.p) + " " + pxTag(h.px) + '</td><td class="num">' + fmt(h.value) + "</td><td>" + dkSign(h.pl) + ' <span class="small">' + dkSign((h.pl / h.cost) * 100, 1) + '%</span></td><td class="num">' + (H.value ? fmt((h.value / H.value) * 100, 1) + "%" : "–") + "</td><td>" + (chartData(h.sym).length ? '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(h.sym) + '">' + esc(t("dk_open_ch")) + "</button>" : "") + "</td></tr>").join("");
-  const holds = H.open.length ? owPanel(t("dk_hold_h"), split + '<div class="tablewrap"><table><thead><tr><th>' + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_avg")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_value")) + "</th><th>" + esc(t("dk_pl")) + "</th><th>" + esc(t("dk_w")) + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>" + (H.open.some((h) => h.px.src === "trade") ? '<p class="small muted">' + esc(t("dk_px_tip")) + "</p>" : "")) : "";
+  const rows = H.open.map((h, i) => '<tr><td><span class="iv-dot" style="background:' + COLORS[i % COLORS.length] + '"></span> <span class="num">' + esc(h.sym) + "</span> " + esc(dkName(h.sym)) + '</td><td class="num">' + int(h.qty) + '</td><td class="num">' + money(h.avg, cur) + '</td><td class="num">' + money(h.px.p, cur) + " " + pxTag(h.px) + '</td><td class="num">' + money(h.value, cur) + "</td><td>" + dkSign(h.pl) + ' <span class="small">' + dkSign((h.pl / h.cost) * 100, 1) + '%</span></td><td class="num">' + (H.value ? fmt((h.value / H.value) * 100, 1) + "%" : "–") + "</td><td>" + (chartData(h.sym).length ? '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(h.sym) + '">' + esc(t("dk_open_ch")) + "</button>" : "") + "</td></tr>").join("");
+  const holds = H.open.length ? owPanel(t("dk_hold_h") + " · " + t(cur === "USD" ? "dk_usd" : "dk_sar"), split + '<div class="tablewrap"><table><thead><tr><th>' + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_avg")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_value")) + "</th><th>" + esc(t("dk_pl")) + "</th><th>" + esc(t("dk_w")) + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>" + (H.open.some((h) => h.px.src === "trade") ? '<p class="small muted">' + esc(t("dk_px_tip")) + "</p>" : "")) : "";
+  return (cur === "USD" ? '<h3 class="dk-cur">' + esc(t("dk_usd")) + "</h3>" : (DK.data.trades.some((x) => curOf(x.sym) === "USD") ? '<h3 class="dk-cur">' + esc(t("dk_sar")) + "</h3>" : "")) + stats + holds;
+}
+function dkPortfolio() {
   const trs = DK.data.trades.slice().sort((a, b) => (a.date === b.date ? (b.at || 0) - (a.at || 0) : a.date < b.date ? 1 : -1));
-  const trows = trs.map((x) => '<tr><td class="num">' + esc(x.date) + "</td><td>" + owTag(x.side === "buy" ? "up" : "down", x.side === "buy" ? "dk_buy" : "dk_sell") + '</td><td><span class="num">' + esc(x.sym) + "</span> " + esc(dkName(x.sym)) + '</td><td class="num">' + int(x.qty) + '</td><td class="num">' + fmt(x.price) + '</td><td class="num">' + fmt(Number(x.fee) || 0) + '</td><td class="num">' + fmt(x.qty * x.price + (x.side === "buy" ? 1 : -1) * (Number(x.fee) || 0)) + '</td><td class="small">' + esc(x.note || "") + '</td><td class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm ghost" data-act="dk-tedit" data-id="' + esc(x.id) + '">' + esc(t("dk_edit")) + '</button><button class="btn sm ' + (dkDel === x.id ? "danger" : "ghost") + '" data-act="dk-tdel" data-id="' + esc(x.id) + '">' + esc(t(dkDel === x.id ? "dk_sure" : "dk_del")) + "</button></td></tr>").join("");
+  const trows = trs.map((x) => '<tr><td class="num">' + esc(x.date) + "</td><td>" + owTag(x.side === "buy" ? "up" : "down", x.side === "buy" ? "dk_buy" : "dk_sell") + '</td><td><span class="num">' + esc(x.sym) + "</span> " + esc(dkName(x.sym)) + '</td><td class="num">' + int(x.qty) + '</td><td class="num">' + money(x.price, curOf(x.sym)) + '</td><td class="num">' + money(Number(x.fee) || 0, curOf(x.sym)) + '</td><td class="num">' + money(x.qty * x.price + (x.side === "buy" ? 1 : -1) * (Number(x.fee) || 0), curOf(x.sym)) + '</td><td class="small">' + esc(x.note || "") + '</td><td class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm ghost" data-act="dk-tedit" data-id="' + esc(x.id) + '">' + esc(t("dk_edit")) + '</button><button class="btn sm ' + (dkDel === x.id ? "danger" : "ghost") + '" data-act="dk-tdel" data-id="' + esc(x.id) + '">' + esc(t(dkDel === x.id ? "dk_sure" : "dk_del")) + "</button></td></tr>").join("");
   const trades = owPanel(t("dk_trades_h"), (trs.length ? '<div class="tablewrap"><table><thead><tr><th>' + esc(t("dk_date")) + "</th><th>" + esc(t("dk_side")) + "</th><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_fee")) + "</th><th>" + esc(t("dk_total")) + "</th><th>" + esc(t("dk_note")) + "</th><th></th></tr></thead><tbody>" + trows + "</tbody></table></div>" : '<p class="muted" style="margin:0">' + esc(t("dk_none_tr")) + "</p>") +
     '<form class="row" data-form="dk-cfg" novalidate style="align-items:flex-end"><div class="field" style="width:200px"><label for="dk-feepct">' + esc(t("dk_feepct")) + '</label><input id="dk-feepct" type="number" min="0" step="0.001" inputmode="decimal" value="' + esc(DK.data.cfg.feePct) + '"></div><button class="btn sm" type="submit">' + esc(t("dk_save")) + '</button><p class="small muted" style="flex:1;min-width:200px;margin:0">' + esc(t("dk_feepct_tip")) + "</p></form>",
     trs.length ? '<button class="btn sm" data-act="dk-xlsx">⤓ ' + esc(t("dk_xlsx")) + "</button>" : "");
-  return stats + (dkTrade ? dkTradeForm() : '<div><button class="btn primary" data-act="dk-tnew">+ ' + esc(t("dk_new_trade")) + "</button></div>") + holds + trades;
+  const curs = ["SAR", "USD"].filter((c) => c === "SAR" || DK.data.trades.some((x) => curOf(x.sym) === c));
+  return (dkTrade ? dkTradeForm() : '<div><button class="btn primary" data-act="dk-tnew">+ ' + esc(t("dk_new_trade")) + "</button></div>") + curs.map(dkPfCur).join("") + trades;
 }
 
 /* ----- my charts ----- */
@@ -159,8 +164,8 @@ function pageDesk() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
-  const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"]];
-  return head + '<div class="tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + (dkTab === "pf" ? dkPortfolio() : dkCharts()) + "</div></div>";
+  const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["us", "us_t"], ["op", "op_t"]];
+  return head + '<div class="tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
 }
 
 function dkExport() {
@@ -192,7 +197,8 @@ document.addEventListener("click", async (e) => {
 document.addEventListener("input", (e) => {
   const el = e.target; if (!el.dataset || el.dataset.dk !== "fee") return;
   const q = parseFloat(document.getElementById("dt-qty").value), p = parseFloat(document.getElementById("dt-price").value), fee = document.getElementById("dt-fee");
-  if (fee && q > 0 && p > 0 && DK.data && DK.data.cfg.feePct > 0) fee.value = (q * p * DK.data.cfg.feePct / 100).toFixed(2);
+  const sv = (document.getElementById("dt-sym").value || "").trim();
+  if (fee && /^\d{4}$/.test(sv) && q > 0 && p > 0 && DK.data && DK.data.cfg.feePct > 0) fee.value = (q * p * DK.data.cfg.feePct / 100).toFixed(2);
 });
 document.addEventListener("change", (e) => {
   if (e.target.dataset && e.target.dataset.dk === "an-sym") { const s = e.target.value, n = (S.drawings && S.drawings[s] || []).length, p = document.getElementById("da-draws"); if (p) p.textContent = t("dk_draws").replace("{n}", n); }
@@ -204,8 +210,8 @@ document.addEventListener("submit", async (e) => {
   const kind = form.dataset.form;
   if (kind === "dk-cfg") { const p = parseFloat(v("dk-feepct")); DK.data.cfg.feePct = isFinite(p) && p >= 0 ? p : 0; await saveDesk(); render(); }
   else if (kind === "dk-trade") {
-    const sym = v("dt-sym").replace(/\D/g, ""), qty = num("dt-qty"), price = num("dt-price"), side = v("dt-side"), id = form.dataset.id;
-    if (!/^\d{4}$/.test(sym) || !qty || !price) { toast(t("dk_bad")); return; }
+    const sym = v("dt-sym").toUpperCase().replace(/[^0-9A-Z.]/g, ""), qty = num("dt-qty"), price = num("dt-price"), side = v("dt-side"), id = form.dataset.id;
+    if (!/^(\d{4}|[A-Z]{1,5}(\.[A-Z])?)$/.test(sym) || !qty || !price) { toast(t("dk_bad")); return; }
     if (side === "sell") { const others = DK.data.trades.filter((x) => x.id !== id), keep = DK.data.trades; DK.data.trades = others; const held = (dkHoldings().by[sym] || { qty: 0 }).qty; DK.data.trades = keep; if (qty > held + 1e-9) { toast(t("dk_oversell").replace("{n}", int(held))); return; } }
     const rec = { sym, side, qty, price, fee: parseFloat(v("dt-fee")) || 0, date: v("dt-date") || today(), note: v("dt-note") };
     if (id) Object.assign(DK.data.trades.find((x) => x.id === id), rec); else DK.data.trades.push(Object.assign({ id: "t" + Date.now().toString(36), at: Date.now() }, rec));

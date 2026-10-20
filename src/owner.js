@@ -12,7 +12,7 @@ Object.assign(UI, {
   ow_run: ["شغّل الآن", "Run now"], ow_ran: ["انطلب التشغيل. يبان هنا خلال دقيقة.", "Run requested. It shows here within a minute."],
   ow_ok: ["نجح", "Succeeded"], ow_fail: ["فشل", "Failed"], ow_busy: ["يشتغل", "Running"], ow_cancel: ["انلغى", "Cancelled"], ow_none: ["ما اشتغل", "No runs"],
   ow_runs_403: ["عشان تشوف حالة التشغيل وتشغّل يدوياً، أضف للرمز صلاحية Actions (Read and write) من إعدادات الرمز في GitHub. باقي اللوحة يشتغل بدونها.", "To see run status and run jobs by hand, add the Actions permission (Read and write) to the token in GitHub. The rest of the dashboard works without it."],
-  j_prices: ["الأسعار والشموع", "Prices and candles"], j_technicals: ["التحليل الفني", "Technicals"], j_dividends: ["التوزيعات", "Dividends"], j_metals: ["المعادن", "Metals"],
+  j_prices: ["الأسعار والشموع", "Prices and candles"], j_technicals: ["التحليل الفني", "Technicals"], j_dividends: ["التوزيعات", "Dividends"], j_metals: ["المعادن", "Metals"], j_us: ["السوق الأمريكي والفوركس", "US market and forex"], s_us: ["1:30 الفجر، الثلاثاء إلى السبت", "1:30 am, Tue to Sat"],
   s_prices: ["7 مرات يومياً، الأحد إلى الخميس", "7 times a day, Sun to Thu"], s_technicals: ["3 مرات يومياً، الأحد إلى الخميس", "3 times a day, Sun to Thu"], s_dividends: ["4:30 م، الأحد إلى الخميس", "4:30 pm, Sun to Thu"], s_metals: ["كل ساعتين، الاثنين إلى الجمعة", "Every 2 hours, Mon to Fri"],
   ow_hist: ["تاريخ الأسهم", "Share history"], ow_sym: ["السهم", "Share"], ow_candles: ["عدد الشموع", "Candles"], ow_lastc: ["آخر شمعة", "Last candle"], ow_state: ["الحالة", "Status"],
   ow_h_ok: ["سليم", "OK"], ow_h_short: ["تاريخ قصير", "Short history"], ow_h_old: ["متأخر", "Behind"], ow_h_missing: ["بدون تاريخ", "No history"],
@@ -46,16 +46,15 @@ Object.assign(UI, {
   ow_km_tip: ["كود من المالك: تسوي له في OpenRouter مفتاح خاص فيه بحد صرف من 5 إلى 50 دولار حسب استخدامه، وتحطه في منصات الربط تحت، وتزوده كل شهر. يستخدمه للربط بس وما يقدر يسحب الرصيد.", "Key from the owner: create a dedicated OpenRouter key for this user with a spending limit of 5 to 50 dollars depending on use, add it under connected platforms below, and top it up each month. It works for connections only and the credit cannot be withdrawn."],
   ow_road_h: ["القادم", "Coming next"],
   ow_road: [
-    ["مكتبي: محفظتي وشارتاتي", "My desk: portfolio and charts"],
+    ["مكتبي: محفظتي وشارتاتي، السوق الأمريكي، ودروس العقود", "My desk: portfolio, charts, US market and options lessons"],
     ["استراتيجيات المختبر للفوركس والمعادن، تتحدث كل أسبوع مع التقرير", "Lab strategies for forex and metals, updated weekly with the report"],
-    ["مكتبي: السوق الأمريكي والعقود (للمالك فقط)", "My desk: US market and options (owner only)"],
     ["خادم خارجي (Supabase): تسجيل دخول، تأكيد الإيميل، نسيت كلمة المرور، وكود المالك يشتغل من الخادم", "External server (Supabase): sign-in, email confirmation, password reset, and the owner key served from the server"]
   ],
   ow_road_done: ["جاهز", "Ready"], ow_road_next: ["قيد التنفيذ", "In progress"], ow_road_later: ["لاحقاً", "Later"],
   ow_conflict: ["الملف تغير من جهاز ثاني. حدّث الصفحة وجرب مرة ثانية.", "The file changed on another device. Refresh and try again."]
 });
 
-const OW_JOBS = ["prices", "technicals", "dividends", "metals"];
+const OW_JOBS = ["prices", "technicals", "dividends", "metals", "us"];
 const OW_LISTS = [["watchlist.json", "ow_l_wl", "ow_l_wl_p"], ["techlist.json", "ow_l_tech", "ow_l_tech_p"], ["divwatch.json", "ow_l_div", "ow_l_div_p"]];
 const OW_PLATFORMS = ["OpenRouter", "سهمك SAHMK", "TradingView", "أرقام Argaam", "Twelve Data", "Alpha Vantage"];
 let OW = { loaded: false, loading: false, files: {}, lists: {}, runs: null, runsErr: null, own: null, ownSha: null, stateSize: null };
@@ -77,9 +76,10 @@ async function ghApi(path, method, body) {
 async function loadOwner(force) {
   if (!HOSTED || !CFG.token || OW.loading || (OW.loaded && !force)) return;
   OW.loading = true; if (force) render();
+  if (typeof loadUS === "function") await loadUS();
   const get = async (p) => { try { return await readJson(p); } catch (e) { return null; } };
   const [pr, te, dv, mt, ow, st, ...ls] = await Promise.all([get("prices.json"), get("technicals.json"), get("dividends.json"), get("metals.json"), get("owner.json"), gh("state.json").catch(() => null)].concat(OW_LISTS.map((x) => get(x[0]))));
-  OW.files = { prices: pr && pr.data, technicals: te && te.data, dividends: dv && dv.data, metals: mt && mt.data };
+  OW.files = { prices: pr && pr.data, technicals: te && te.data, dividends: dv && dv.data, metals: mt && mt.data, us: typeof US !== "undefined" ? US : null };
   OW_LISTS.forEach((x, i) => { OW.lists[x[0]] = { data: ls[i] && Array.isArray(ls[i].data) ? ls[i].data.map(String) : [], sha: ls[i] ? ls[i].sha : undefined }; });
   OW.own = (ow && ow.data) || { version: 1, users: [] }; if (!Array.isArray(OW.own.users)) OW.own.users = []; OW.ownSha = ow ? ow.sha : undefined;
   OW.stateSize = st ? st.size : null;
@@ -107,7 +107,7 @@ function owData() {
   const rows = OW_JOBS.map((j) => { const r = runOf(j), f = OW.files[j]; return "<tr><td><b>" + esc(t("j_" + j)) + '</b></td><td class="small muted">' + esc(t("s_" + j)) + "</td><td>" + (OW.runs ? (r ? owStamp(r.updated_at || r.created_at) : "–") : "–") + "</td><td>" + (OW.runs ? (r && r.html_url ? '<a href="' + esc(r.html_url) + '" target="_blank" rel="noopener">' + res(r) + "</a>" : res(r)) : "–") + "</td><td>" + owStamp(f && f.fetched_at) + "</td><td>" + (OW.runsErr ? "" : '<button class="btn sm" data-act="ow-run" data-job="' + j + '">' + esc(t("ow_run")) + "</button>") + "</td></tr>"; }).join("");
   const jobs = owPanel(t("ow_jobs"), (OW.runsErr === "403" || OW.runsErr === "404" ? '<div class="notice">' + esc(t("ow_runs_403")) + "</div>" : "") + '<div class="tablewrap"><table><thead><tr><th>' + esc(t("ow_job")) + "</th><th>" + esc(t("ow_sched")) + "</th><th>" + esc(t("ow_lastrun")) + "</th><th>" + esc(t("ow_result")) + "</th><th>" + esc(t("ow_fileat")) + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>");
   const hist = LIVE.history || {}, wl = (OW.lists["watchlist.json"] || {}).data || [];
-  const syms = Array.from(new Set(wl.concat(Object.keys(hist))));
+  const syms = Array.from(new Set(wl.concat(Object.keys(hist)))).filter((x) => /^\d{4}$/.test(x));
   const hrows = syms.map((s) => {
     const h = hist[s] || [], last = h.length ? h[h.length - 1].d : null, age = last ? -owDays(last) : null;
     const st = !h.length ? owTag("down", "ow_h_missing") : h.length < 60 ? owTag("amber", "ow_h_short") : age > 4 ? owTag("amber", "ow_h_old") : owTag("up", "ow_h_ok");
