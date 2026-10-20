@@ -21,7 +21,11 @@ Object.assign(UI, {
   sh_yaqeen: ["تأكد في يقين", "Check on Yaqeen"], sh_argaam: ["قائمة أرقام", "Argaam list"],
   sh_est: ["حساب مِراس التقديري (لك أنت بس)", "Meras estimate (only you see this)"], sh_est_note: ["محسوب من القوائم المالية حسب معيار AAOIFI، تقدير وليس فتوى. يقين أو هيئتك الشرعية هي المرجع.", "Calculated from the financial statements per the AAOIFI standard; an estimate, not a ruling."],
   sh_debt: ["الديون بفائدة ÷ القيمة السوقية", "Interest debt ÷ market cap"], sh_cash: ["النقد والاستثمارات ÷ القيمة السوقية", "Cash and investments ÷ market cap"], sh_haram: ["الدخل غير المباح ÷ الإيرادات", "Non-permissible income ÷ revenue"],
-  sh_est_wait: ["الحساب التقديري ينحسب لسهمين كل يوم، وهذا السهم دوره قريب.", "Estimates are computed for two shares a day; this one is coming."],
+  sh_notyet: ["هذا السهم لسا ما انحسب في قاعدة البيانات. القاعدة تكبر كل يوم: سهمين في أيام الأسعار، و12 سهم الأحد والاثنين.", "This share is not in the database yet. It grows every day: two shares on price days and 12 on Sunday and Monday."],
+  sh_queue_btn: ["احسبه أول واحد الليلة", "Compute it first tonight"], sh_queued: ["في الطابور: ينحسب أول واحد في التشغيل الجاي 3:30 الفجر.", "Queued: it will be computed first at the next run, 3:30 am."], sh_queued_ok: ["انضاف للطابور", "Added to the queue"],
+  sh_err: ["ما قدرنا نحسبه آخر مرة (البيانات المالية ناقصة)، وبنجرب مرة ثانية.", "We could not compute it last time (missing statements); it will be retried."],
+  sh_activity: ["النشاط", "Business"], sh_isfx: ["هذا زوج عملات، والفرز الشرعي يخص الأسهم بس. تداول العملات له أحكامه الخاصة (مثل التقابض)، فاسأل جهة شرعية.", "This is a currency pair; sharia screening is for shares only."], sh_iscmd: ["هذي سلعة مو سهم، والفرز الشرعي يخص الأسهم بس.", "This is a commodity, not a share; sharia screening is for shares only."],
+  sh_db: ["قاعدة الفرز الأمريكية: {n} سهم محسوب من {u}، آخر تحديث {d}", "US screening database: {n} of {u} shares computed, updated {d}"],
   sh_own: ["إدخالك الخاص", "Your own entry"], sh_own_add: ["سجّل حكمه من مصدرك", "Record its ruling from your source"], sh_own_status: ["الحكم", "Ruling"], sh_own_src: ["المصدر (مثل يقين)", "Source (e.g. Yaqeen)"], sh_own_save: ["احفظ", "Save"], sh_own_del: ["احذف إدخالي", "Delete my entry"],
   sh_more: ["و{n} نتائج ثانية، اكتب أكثر عشان تضيّق البحث.", "and {n} more, keep typing to narrow it down."],
   sh_admin_h: ["قائمة الأسهم السعودية الشرعية", "Saudi sharia list"], sh_admin_p: ["كل ربع سنة: افتح صفحة أرقام، حدد الجدول كامل من أول شركة لآخر شركة، انسخه والصقه هنا.", "Each quarter: open the Argaam page, select the whole table, copy it and paste it here."],
@@ -34,7 +38,7 @@ Object.assign(UI, {
 
 const SH_BOARDS = ["rajhi", "osaimi", "bilad"];
 const SH_ARGAAM = "https://www.argaam.com/ar/company/shariahcompanies";
-let shTried = false, SHSA = null, SHOWN = null, SHOWN_SHA, SHSA_SHA, shQ = "", shPick = null, shAmt = "", shRatio = "", shLoading = false, shDraft = null;
+let SHUNI = null, SHUS = null, SHQ = null, SHQ_SHA, shTried = false, SHSA = null, SHOWN = null, SHOWN_SHA, SHSA_SHA, shQ = "", shPick = null, shAmt = "", shRatio = "", shLoading = false, shDraft = null;
 try { SHSA = JSON.parse(localStorage.getItem("meras.shsa") || "null"); } catch (e) {}
 
 async function loadSharia() {
@@ -42,6 +46,9 @@ async function loadSharia() {
   try { const r = await fetch("./sharia_sa.json?t=" + Date.now(), { cache: "no-store" }); if (r.ok) { const d = await r.json(); if (d && Array.isArray(d.rows)) SHSA = d; } } catch (e) {}
   if (HOSTED && CFG.token) {
     try { const f = await readJson("sharia_sa.json"); if (f && f.data && Array.isArray(f.data.rows) && (!SHSA || (f.data.updated || "") >= (SHSA.updated || ""))) SHSA = f.data; SHSA_SHA = f ? f.sha : undefined; } catch (e) {}
+    try { const un = await readJson("us_universe.json"); SHUNI = (un && un.data && un.data.stocks) || null; } catch (e) {}
+    try { const u = await readJson("us_sharia.json"); SHUS = (u && u.data) || null; } catch (e) {}
+    try { const qf = await readJson("us_queue.json"); SHQ = qf && Array.isArray(qf.data) ? qf.data.map(String) : []; SHQ_SHA = qf ? qf.sha : undefined; } catch (e) { SHQ = SHQ || []; }
     try { const o = await readJson("sharia_own.json"); SHOWN = (o && o.data) || {}; SHOWN_SHA = o ? o.sha : undefined; } catch (e) { SHOWN = SHOWN || {}; }
   }
   try { if (SHSA) localStorage.setItem("meras.shsa", JSON.stringify(SHSA)); } catch (e) {}
@@ -55,9 +62,12 @@ function shSearch(q) {
   const out = [], seen = new Set(), push = (r) => { if (!seen.has(r.m + r.s)) { seen.add(r.m + r.s); out.push(r); } };
   (SHSA && SHSA.rows || []).forEach((r) => { if (r.s === n || r.s.startsWith(n) || shNorm(r.n).includes(n)) push({ m: "SA", s: r.s, n: r.n, row: r }); });
   if (/^\d{4}$/.test(n)) { if (!out.length) push({ m: "SA", s: n, n: "", row: null }); }
-  if (typeof US !== "undefined" && US && US.symbols) Object.entries(US.symbols).forEach(([s, v]) => { if (v.k === "stock" && (s.toLowerCase().startsWith(n) || shNorm(v.n).includes(n))) push({ m: "US", s, n: v.n }); });
+  if (typeof US !== "undefined" && US && US.symbols) Object.entries(US.symbols).forEach(([s, v]) => { if ((s.toLowerCase().startsWith(n) || shNorm(v.n).includes(n))) push({ m: "US", s, n: v.n }); });
+  if (SHUS && SHUS.stocks) Object.entries(SHUS.stocks).forEach(([s, v]) => { if (out.length < 40 && (s.toLowerCase().startsWith(n) || (n.length > 2 && shNorm(v.n).includes(n)))) push({ m: "US", s, n: v.n || "" }); });
+  if (SHUNI) Object.entries(SHUNI).forEach(([s, v]) => { if (out.length < 40 && (s.toLowerCase() === n || (n.length > 2 && (s.toLowerCase().startsWith(n) || shNorm(v.n).includes(n))))) push({ m: "US", s, n: v.n || "" }); });
   if (SHOWN) Object.entries(SHOWN).forEach(([s, v]) => { if (s.toLowerCase().startsWith(n) || shNorm(v.n).includes(n)) push({ m: /^\d{4}$/.test(s) ? "SA" : "US", s, n: v.n || "" }); });
-  if (/^[a-z]{1,5}(\.[a-z])?$/.test(n) && !out.some((r) => r.m === "US" && r.s.toLowerCase() === n)) push({ m: "US", s: n.toUpperCase(), n: "" });
+
+  if (/^[a-z]{1,5}(\.[a-z])?$/.test(n) && !out.some((r) => r.m === "US" && r.s.toLowerCase() === n) && !out.length) push({ m: "US", s: n.toUpperCase(), n: "" });
   out.sort((a, b) => (a.s.toLowerCase() === n ? -1 : b.s.toLowerCase() === n ? 1 : 0));
   return out;
 }
@@ -80,13 +90,20 @@ function shCard(r) {
       if (!own) body += '<p class="small muted" style="margin:0">' + esc(t("sh_purify_na")) + "</p>";
     }
   } else {
-    const est = owner && typeof US !== "undefined" && US && US.sharia && US.sharia[r.s];
+    const usv = typeof US !== "undefined" && US && US.symbols && US.symbols[r.s];
+    const est = owner && SHUS && SHUS.stocks && SHUS.stocks[r.s];
+    if (usv && usv.k !== "stock") return '<div class="panel stack sh-card"><h3><span class="num">' + esc(r.s) + "</span> " + esc(usv.n || "") + '</h3><p class="small muted" style="margin:0">' + esc(t(usv.k === "fx" ? "sh_isfx" : "sh_iscmd")) + "</p></div>";
+    if (est && est.n && !r.n) r.n = est.n;
     if (est && !est.err) {
       st = est.status;
       purify = est.purify;
       const pc = (v) => (v == null ? "–" : fmt(v, 1) + "%");
       body += '<div class="sh-est"><b class="small">' + esc(t("sh_est")) + "</b>" + '<div class="sh-b"><span>' + esc(t("sh_debt")) + '</span><b class="num ' + (est.debt_mc != null && est.debt_mc >= 30 ? "neg" : "") + '">' + pc(est.debt_mc) + ' <span class="muted small">/ 30%</span></b></div><div class="sh-b"><span>' + esc(t("sh_cash")) + '</span><b class="num ' + (est.cash_mc != null && est.cash_mc >= 30 ? "neg" : "") + '">' + pc(est.cash_mc) + ' <span class="muted small">/ 30%</span></b></div><div class="sh-b"><span>' + esc(t("sh_haram")) + '</span><b class="num ' + (est.haram_rev != null && est.haram_rev >= 5 ? "neg" : "") + '">' + pc(est.haram_rev) + ' <span class="muted small">/ 5%</span></b></div><p class="small muted" style="margin:0">' + esc(t("sh_est_note")) + (est.asof ? ' · <span class="num">' + esc(est.asof) + "</span>" : "") + "</p></div>";
-    } else if (owner && typeof US !== "undefined" && US && US.symbols && US.symbols[r.s]) body += '<p class="small muted">' + esc(t("sh_est_wait")) + "</p>";
+      if (est.sub || est.sec) body += '<p class="small muted" style="margin:0">' + esc(t("sh_activity")) + ": " + esc(est.sub || est.sec) + (est.biz && est.biz !== "ok" ? " " + shTag(est.biz === "no" ? "no" : "review") : "") + "</p>";
+    } else if (owner) {
+      const queued = SHQ && SHQ.includes(r.s), err = est && est.err;
+      body += '<p class="small muted" style="margin:0">' + esc(t(queued ? "sh_queued" : err ? "sh_err" : "sh_notyet")) + "</p>" + (queued ? "" : '<div><button class="btn sm primary" data-act="sh-queue" data-s="' + esc(r.s) + '">' + esc(t("sh_queue_btn")) + "</button></div>");
+    }
     else if (!own) body += '<p class="small muted">' + esc(t("sh_notfound")) + "</p>";
   }
   if (own) { st = own.status || st; if (own.purify != null) purify = own.purify; body += '<div class="sh-own"><b class="small">' + esc(t("sh_own")) + "</b> " + shTag(own.status) + (own.purify != null ? ' <span class="small">' + esc(t("sh_purify")) + ': <b class="num">' + fmt(own.purify, 2) + "%</b></span>" : "") + (own.src ? ' <span class="small muted">· ' + esc(own.src) + (own.date ? " · " + esc(own.date) : "") + "</span>" : "") + "</div>"; }
@@ -111,7 +128,8 @@ function shResults() {
 }
 function shFinder() {
   if (!shTried) loadSharia();
-  return '<div class="panel stack"><div class="field"><label for="sh-q">' + esc(t("sh_q")) + '</label><input id="sh-q" data-sh="q" type="search" autocomplete="off" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"></div><div id="sh-res">' + shResults() + "</div></div>";
+  const db = shOwner() && SHUS ? '<p class="small muted" style="margin:0">' + esc(t("sh_db").replace("{n}", SHUS.count || 0).replace("{u}", SHUS.universe || "–").replace("{d}", whenText(SHUS.updated))) + "</p>" : "";
+  return '<div class="panel stack">' + db + '<div class="field"><label for="sh-q">' + esc(t("sh_q")) + '</label><input id="sh-q" data-sh="q" type="search" autocomplete="off" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"></div><div id="sh-res">' + shResults() + "</div></div>";
 }
 function pageSharia() { if (!shTried) loadSharia(); return svcShell("sharia", '<p class="muted" style="max-width:70ch;margin:0">' + esc(t("sh_p")) + "</p>" + shFinder()); }
 
@@ -177,6 +195,12 @@ document.addEventListener("click", async (e) => {
   else if (a === "sh-own-del") { delete SHOWN[el.dataset.s]; shDraft = null; repaint(); await shSaveOwn(); }
   else if (a === "sh-read") { const rows = shParse((document.getElementById("sh-paste") || {}).value || ""); if (!rows.length) { toast(t("sh_admin_bad")); return; } shPaste = { rows }; render(); }
   else if (a === "sh-save") shSave();
+  else if (a === "sh-queue") {
+    const sym = el.dataset.s; SHQ = SHQ || []; if (SHQ.includes(sym)) return;
+    const next = SHQ.concat([sym]);
+    try { const cur = await readJson("us_queue.json").catch(() => null); const r = await gh("us_queue.json", "PUT", { message: "sharia queue " + sym + " [skip ci]", content: b64e(JSON.stringify(next) + "\n"), sha: cur ? cur.sha : undefined }); SHQ = next; toast(t("sh_queued_ok")); } catch (err) { toast(errText(err)); }
+    repaint();
+  }
 });
 async function shSaveOwn() {
   try { const r = await gh("sharia_own.json", "PUT", { message: "sharia own", content: b64e(JSON.stringify(SHOWN, null, 1) + "\n"), sha: SHOWN_SHA }); SHOWN_SHA = r && r.content ? r.content.sha : SHOWN_SHA; toast(t("dk_saved")); } catch (e) { toast(errText(e)); }
