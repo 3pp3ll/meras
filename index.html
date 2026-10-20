@@ -259,7 +259,7 @@ td .num,td.num{font-size:13.5px}
 .gloss{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
 .gloss div{padding-block:12px;border-bottom:1px solid var(--line)}
 .gloss dt{font-weight:600;font-family:var(--display);font-size:17px}
-.gloss dt small{font-family:var(--mono);font-weight:400;color:var(--muted);font-size:12.5px;margin-inline-start:8px}
+.gloss dt small{font-family:var(--mono);font-weight:400;color:var(--muted);font-size:12.5px;margin:0 8px}
 .gloss dd{margin:2px 0 0;color:var(--muted);font-size:15px}
 @media (max-width:720px){.gloss{grid-template-columns:1fr}}
 .plan{display:flex;flex-direction:column;gap:14px}
@@ -485,6 +485,42 @@ td .num,td.num{font-size:13.5px}
 .iv-split{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--sunk)}
 .iv-split i{display:block;height:100%}
 .iv-dot{display:inline-block;width:10px;height:10px;border-radius:99px;vertical-align:middle}
+/* navigation */
+.nav.top3{flex:0 1 auto;gap:4px;margin-inline-end:auto;margin-inline-start:18px}
+.nav.top3 a{font-size:16px;font-weight:600}
+@media (max-width:760px){.nav.top3{order:3;flex-basis:100%;justify-content:space-around;margin:0}}
+.subnav{border-top:1px solid var(--line);background:color-mix(in srgb,var(--sunk) 70%,transparent)}
+.subnav .wrap{padding-block:0}
+.subnav nav{display:flex;min-width:0;flex:1;gap:2px;overflow-x:auto;scrollbar-width:none;width:100%}
+.subnav nav::-webkit-scrollbar{display:none}
+.subnav a{white-space:nowrap;text-decoration:none;padding:8px 12px;font-size:14.5px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent}
+.subnav a:hover{color:var(--ink)}
+.subnav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--amber);font-weight:600}
+a.th-btn{display:inline-flex}
+a.th-btn[aria-current="page"]{border-color:var(--amber);color:var(--amber-ink)}
+.cont{display:flex;flex-direction:column;gap:10px}
+.cont > b{font-family:var(--display);font-size:20px}
+.cont-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+@media (max-width:820px){.cont-row{grid-template-columns:1fr}}
+.cont-card{display:flex;flex-direction:column;gap:2px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-inline-start:4px solid var(--amber);border-radius:var(--r);padding:12px 14px}
+.cont-card:hover{border-color:var(--amber)}
+.cont-card strong{font-family:var(--display);font-size:17px;font-weight:600}
+.gates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
+@media (max-width:820px){.gates{grid-template-columns:1fr}}
+.gate{display:flex;flex-direction:column;gap:10px;text-decoration:none;padding:24px;background:linear-gradient(135deg,var(--surface) 0%,var(--sunk) 100%)}
+.gate:hover{border-color:var(--amber)}
+.gate h2{font-size:26px}
+.hub{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+@media (max-width:900px){.hub{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.hub{grid-template-columns:1fr}}
+.hub-card{display:flex;flex-direction:column;gap:8px;text-decoration:none}
+.hub-card:hover{border-color:var(--amber)}
+.hub-card h3{font-size:20px}
+.hub-foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center}
+.hub-foot .go{color:var(--amber-ink);font-size:18px}
+[dir="ltr"] .hub-foot .go{transform:scaleX(-1)}
+#totop{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline-end:18px;z-index:35;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:0 6px 18px rgba(40,30,60,.18);display:grid;place-items:center;cursor:pointer}
+#totop:hover{border-color:var(--amber);color:var(--amber-ink)}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1429,8 +1465,8 @@ function pageLesson(id) {
 
 /* ----- services ----- */
 function svcShell(tab, inner) {
-  const tabs = [["journal", "tab_journal"], ["invest", "tab_inv"], ["tech", "tab_tech"], ["dividends", "tab_div"], ["metals", "tab_met"], ["calc", "tab_calc"], ["glossary", "tab_gloss"]];
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("services_h")) + '</h1></div><div class="tabs">' + tabs.map(([h, k]) => '<a href="#' + h + '"' + (h === tab ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</div><div class="stack" style="padding-block:22px">' + inner + "</div></div>";
+  const titles = { journal: "tab_journal", calc: "tab_calc", glossary: "tab_gloss", dividends: "tab_div", metals: "tab_met", tech: "tab_tech", invest: "tab_inv" };
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t(titles[tab] || "services_h")) + '</h1></div><div class="stack" style="padding-block:18px">' + inner + "</div></div>";
 }
 const plOf = (j) => (j.exit == null ? null : (j.exit - j.entry) * j.qty);
 let draft = null, closing = null, deleting = null;
@@ -1523,22 +1559,38 @@ function pageAccount() {
 
 /* ---------- shell & router ---------- */
 function route() { return (location.hash || "").replace(/^#/, ""); }
-let rendering = false;
+let rendering = false, lastPainted = null, lastTap = null;
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest("[data-act]"); if (!el) return;
+  const sel = "[data-act=\"" + el.dataset.act + "\"]" + Object.keys(el.dataset).filter((k) => k !== "act").map((k) => "[data-" + k.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase()) + "=\"" + String(el.dataset[k]).replace(/["\\]/g, "\\$&") + "\"]").join("");
+  lastTap = { sel, top: el.getBoundingClientRect().top, at: Date.now() };
+}, true);
 function render() {
   if (rendering) return;
   rendering = true;
+  const r = route(), same = r === lastPainted, y = window.scrollY, m = document.getElementById("main");
+  if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
+  const sn = document.querySelector(".subnav nav"), cur = sn && sn.querySelector('[aria-current="page"]');
+  if (cur) { const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; }
+  if (same) {
+    const hold = () => {
+      window.scrollTo(0, y);
+      // keep the button you just pressed under your finger, even when the list above it changes length
+      if (lastTap && Date.now() - lastTap.at < 1500) { const el = document.querySelector(lastTap.sel); if (el) window.scrollBy(0, el.getBoundingClientRect().top - lastTap.top); }
+    };
+    hold(); requestAnimationFrame(() => { if (m) m.style.minHeight = ""; hold(); });
+  }
+  lastPainted = r;
 }
 function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
-  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["lab", "nav_lab"], ["guides", "nav_guides"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
-  const group = r === "settings" ? "account" : r.startsWith("g-") ? "guides" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "dividends", "glossary", "tech", "invest", "metals"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
-  $("#top").innerHTML = '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav" aria-label="main">' + nav.map(([h, k]) => '<a href="#' + h + '"' + (group === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</nav><div class="tools">' + (typeof themeButton === "function" ? themeButton() : "") + '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a></div></div>";
+  $("#top").innerHTML = headerHtml(r);
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": pageGate, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -1546,7 +1598,7 @@ function renderNow() {
   if (r === "chart" && typeof maybeAutoAnalysis === "function") setTimeout(maybeAutoAnalysis, 0);
 }
 let lastRoute = null;
-window.addEventListener("hashchange", () => { closing = deleting = null; resetArmed = false; render(); if (route() !== lastRoute) window.scrollTo(0, 0); lastRoute = route(); });
+window.addEventListener("hashchange", () => { closing = deleting = null; resetArmed = false; if (typeof noteVisit === "function") noteVisit(route()); render(); if (route() !== lastRoute) window.scrollTo(0, 0); lastRoute = route(); });
 
 document.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]"); if (!el) return;
@@ -3679,6 +3731,116 @@ document.addEventListener("submit", (e) => {
 });
 window.addEventListener("hashchange", () => { metTick(); if (route() === "metals") loadMetals(); else if (route() === "invest" && !MET.at) loadMetals(); });
 setTimeout(() => { metTick(); if (route() === "invest" && !MET.at) loadMetals(); }, 0);
+/* ===== مِراس: التنقل =====
+   ثلاث أقسام فوق (التعليم، الخدمات، الباقات)، وشريط ثاني تحتها بصفحات القسم المفتوح.
+   الرئيسية بوابة للقسمين مع "كمّل من وين وقفت". */
+Object.assign(UI, {
+  nav_learn: ["التعليم", "Learning"], nav_svc: ["الخدمات", "Services"],
+  learn_h: ["القسم التعليمي", "Learning"], learn_p: ["كل اللي تتعلم منه: الدروس، الشارت، المختبر، الشروحات، والقاموس. وتقدّمك محفوظ في كل خطوة.", "Everything you learn from: lessons, the chart, the lab, guides and the glossary. Your progress is saved at every step."],
+  svc_hub_h: ["الخدمات", "Services"], svc_hub_p: ["الأدوات اللي تشتغل عليها كل يوم: سجل صفقاتك، خطتك الشهرية، التحليل الفني، التوزيعات، المعادن، والحاسبات.", "The tools you work with every day: your trade journal, monthly plan, technicals, dividends, metals and calculators."],
+  cont_h: ["كمّل من وين وقفت", "Pick up where you left off"], cont_lesson: ["آخر درس", "Last lesson"], cont_page: ["آخر صفحة", "Last page"], cont_next: ["الدرس الجاي", "Next lesson"],
+  cont_none: ["ما بديت للحين. أول خطوة: الدرجة الأولى في مسار المستثمر.", "You have not started yet. First step: step one of the investor track."],
+  open: ["افتح", "Open"], totop: ["للأعلى", "Back to top"],
+  d_tracks: ["خمس درجات لكل مسار: المستثمر، المتداول، المبرمج.", "Five steps per track: investor, trader, developer."],
+  d_chart: ["شموع ومؤشرات وأدوات رسم، وتحليل فيبوناتشي.", "Candles, indicators, drawing tools and Fibonacci analysis."],
+  d_lab: ["ركّب قواعد واختبرها على تاريخ السهم.", "Build rules and test them on a share's history."],
+  d_guides: ["شروحات مصورة للشارت والسجل، ودليل المؤشرات.", "Illustrated guides to the chart and journal, and the indicator guide."],
+  d_gloss: ["المصطلحات اللي تمر عليك في الدروس.", "The terms you meet in the lessons."],
+  d_prog: ["وين وصلت في كل مسار، والنسخ الاحتياطي.", "Where you stand in each track, and backups."],
+  d_journal: ["كل صفقة تدريبية بسببها ووقفها وهدفها.", "Every practice trade with its reason, stop and target."],
+  d_invest: ["مبلغ ثابت كل شهر موزع على أسهم تختارها.", "A fixed amount each month spread over shares you choose."],
+  d_tech: ["ملخص فني لكل سهم تتابعه.", "A technical summary for every share you follow."],
+  d_div: ["أسهم توزع أرباح، وكم يجيك بمبلغك.", "Shares that pay dividends, and what your amount would earn."],
+  d_met: ["أسعار الذهب والفضة، ومحفظة معادنك.", "Gold and silver prices, and your metals holdings."],
+  d_calc: ["متوسط السعر، العائد، حجم الصفقة، والزكاة.", "Average cost, return, position size and zakat."],
+  s_lessons: ["{d} من {n} درس", "{d} of {n} lessons"], s_shares: ["{n} سهم بشموع حقيقية", "{n} shares with real candles"], s_guides: ["{n} شروحات", "{n} guides"], s_terms: ["{n} مصطلح", "{n} terms"],
+  s_open: ["{n} صفقة مفتوحة", "{n} open trades"], s_calcs: ["4 حاسبات", "4 calculators"]
+});
+
+const NAV_GROUPS = {
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["glossary", "tab_gloss", "d_gloss"], ["progress", "nav_progress", "d_prog"]] },
+  services: { label: "nav_svc", items: [["journal", "tab_journal", "d_journal"], ["invest", "tab_inv", "d_invest"], ["tech", "tab_tech", "d_tech"], ["dividends", "tab_div", "d_div"], ["metals", "tab_met", "d_met"], ["calc", "tab_calc", "d_calc"]] }
+};
+function groupOf(r) {
+  if (r === "learn" || r.startsWith("l-") || r.startsWith("g-")) return "learn";
+  if (r === "services") return "services";
+  if (r === "checkout" || r === "plans") return "plans";
+  for (const g in NAV_GROUPS) if (NAV_GROUPS[g].items.some((x) => x[0] === r)) return g;
+  return "";
+}
+function subOf(r) { if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
+
+const ICON_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 4v3M7 15v5M17 3v4M17 13v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4.5" y="7" width="5" height="8" rx="1" fill="currentColor"/><rect x="14.5" y="7" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+function headerHtml(r) {
+  const g = groupOf(r), sub = subOf(r);
+  const top = [["learn", "nav_learn"], ["services", "nav_svc"], ["plans", "nav_plans"]].map(([h, k]) => '<a href="#' + h + '"' + (g === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("");
+  const tools = '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
+    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a>";
+  const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
+  return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;
+}
+
+/* ----- "pick up where you left off": per device, never synced ----- */
+const LAST_KEY = "meras.last";
+let LAST = {}; try { LAST = JSON.parse(localStorage.getItem(LAST_KEY) || "{}"); } catch (e) {}
+function noteVisit(r) {
+  if (!r || r === "learn" || r === "services" || ["account", "settings", "plans", "checkout"].includes(r)) return;
+  if (r.startsWith("l-")) LAST.lesson = r.slice(2);
+  else LAST.page = { r, sym: r === "chart" && S.chart ? S.chart.sym : null, at: Date.now() };
+  try { localStorage.setItem(LAST_KEY, JSON.stringify(LAST)); } catch (e) {}
+}
+function pageLabel(p) {
+  if (!p) return "";
+  if (p.r.startsWith("g-")) { const g = typeof GUIDES !== "undefined" && GUIDES.find((x) => "g-" + x.id === p.r); return g ? L(g.title) : t("nav_guides"); }
+  for (const g in NAV_GROUPS) { const it = NAV_GROUPS[g].items.find((x) => x[0] === p.r); if (it) return t(it[1]) + (p.sym && typeof symName === "function" ? ": " + symName(p.sym) : ""); }
+  return p.r;
+}
+function continueHtml() {
+  const ls = LAST.lesson && LESSONS.find((x) => x.id === LAST.lesson), next = ls ? (lessonsOf(ls.track).find((x) => !isDone(x.id) && canOpen(x)) || null) : nextLesson("inv");
+  const cards = [];
+  if (ls) cards.push(['#l-' + ls.id, t("cont_lesson"), L(ls.title), L(trackById(ls.track).name)]);
+  if (next && (!ls || next.id !== ls.id)) cards.push(['#l-' + next.id, t("cont_next"), L(next.title), L(trackById(next.track).name)]);
+  if (LAST.page) cards.push(["#" + LAST.page.r, t("cont_page"), pageLabel(LAST.page), ""]);
+  if (!cards.length) return '<div class="cont"><b>' + esc(t("cont_h")) + '</b><a class="cont-card" href="#l-' + LESSONS[0].id + '"><span class="small muted">' + esc(t("cont_none")) + "</span></a></div>";
+  return '<div class="cont"><b>' + esc(t("cont_h")) + '</b><div class="cont-row">' + cards.slice(0, 3).map(([h, k, title, sub]) => '<a class="cont-card" href="' + h + '"><span class="small muted">' + esc(k) + "</span><strong>" + esc(title) + "</strong>" + (sub ? '<span class="small muted">' + esc(sub) + "</span>" : "") + "</a>").join("") + "</div></div>";
+}
+
+/* ----- hubs ----- */
+function hubStat(k) {
+  const f = (key, o) => t(key).replace(/\{(\w+)\}/g, (_, x) => o[x]);
+  if (k === "tracks") return f("s_lessons", { d: LESSONS.filter((l) => isDone(l.id)).length, n: LESSONS.length });
+  if (k === "chart") return f("s_shares", { n: Object.keys(LIVE.history || {}).filter((x) => (LIVE.history[x] || []).length > 1).length });
+  if (k === "guides") return f("s_guides", { n: (typeof GUIDES !== "undefined" ? GUIDES.length : 0) + 1 });
+  if (k === "glossary") return f("s_terms", { n: GLOSSARY.length });
+  if (k === "progress") return Math.round((LESSONS.filter((l) => isDone(l.id)).length / LESSONS.length) * 100) + "%";
+  if (k === "journal") return f("s_open", { n: S.journal.filter((j) => j.exit == null).length });
+  if (k === "calc") return t("s_calcs");
+  return "";
+}
+function hubCards(g) {
+  return '<div class="hub">' + NAV_GROUPS[g].items.map(([h, k, d]) => '<a class="panel hub-card" href="#' + h + '"><h3>' + esc(t(k)) + '</h3><p class="muted small">' + esc(t(d)) + '</p><span class="hub-foot"><span class="tag amber">' + esc(hubStat(h) || t("open")) + '</span><span class="go" aria-hidden="true">←</span></span></a>').join("") + "</div>";
+}
+function pageLearn() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("learn_h")) + "</h1><p>" + esc(t("learn_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + continueHtml() + hubCards("learn") + "</div></div>"; }
+function pageServicesHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("svc_hub_h")) + "</h1><p>" + esc(t("svc_hub_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("services") + "</div></div>"; }
+
+function pageGate() {
+  const first = nextLesson("inv") || LESSONS[0];
+  const gate = (g, h, p) => '<a class="panel gate" href="#' + g + '"><h2>' + esc(t(h)) + '</h2><p class="muted">' + esc(t(p)) + '</p><span class="row" style="gap:6px">' + NAV_GROUPS[g].items.map(([, k]) => '<span class="tag">' + esc(t(k)) + "</span>").join("") + "</span></a>";
+  return '<section class="hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + stairs(null, true) + "</div></section>" +
+    '<div class="wrap"><section class="sec">' + continueHtml() + '</section><section class="sec"><div class="gates">' + gate("learn", "learn_h", "learn_p") + gate("services", "svc_hub_h", "svc_hub_p") + "</div></section>" +
+    '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + '</div></section><section class="sec"><div class="notice">' + esc(t(typeof LIVE !== "undefined" && LIVE.fetchedAt ? "live_note" : "sample_note")) + "</div></section></div>";
+}
+
+/* ----- back to top ----- */
+(function () {
+  const b = document.createElement("button");
+  b.id = "totop"; b.type = "button"; b.hidden = true;
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  b.addEventListener("click", () => window.scrollTo({ top: 0, behavior: window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }));
+  document.body.appendChild(b);
+  const upd = () => { b.hidden = window.scrollY < 500; b.setAttribute("aria-label", t("totop")); b.title = t("totop"); };
+  window.addEventListener("scroll", upd, { passive: true }); upd();
+})();
 /* ===== التشغيل ===== */
 lastRoute = route();
 render();

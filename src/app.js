@@ -273,8 +273,8 @@ function pageLesson(id) {
 
 /* ----- services ----- */
 function svcShell(tab, inner) {
-  const tabs = [["journal", "tab_journal"], ["invest", "tab_inv"], ["tech", "tab_tech"], ["dividends", "tab_div"], ["metals", "tab_met"], ["calc", "tab_calc"], ["glossary", "tab_gloss"]];
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("services_h")) + '</h1></div><div class="tabs">' + tabs.map(([h, k]) => '<a href="#' + h + '"' + (h === tab ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</div><div class="stack" style="padding-block:22px">' + inner + "</div></div>";
+  const titles = { journal: "tab_journal", calc: "tab_calc", glossary: "tab_gloss", dividends: "tab_div", metals: "tab_met", tech: "tab_tech", invest: "tab_inv" };
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t(titles[tab] || "services_h")) + '</h1></div><div class="stack" style="padding-block:18px">' + inner + "</div></div>";
 }
 const plOf = (j) => (j.exit == null ? null : (j.exit - j.entry) * j.qty);
 let draft = null, closing = null, deleting = null;
@@ -367,22 +367,38 @@ function pageAccount() {
 
 /* ---------- shell & router ---------- */
 function route() { return (location.hash || "").replace(/^#/, ""); }
-let rendering = false;
+let rendering = false, lastPainted = null, lastTap = null;
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest("[data-act]"); if (!el) return;
+  const sel = "[data-act=\"" + el.dataset.act + "\"]" + Object.keys(el.dataset).filter((k) => k !== "act").map((k) => "[data-" + k.replace(/[A-Z]/g, (c) => "-" + c.toLowerCase()) + "=\"" + String(el.dataset[k]).replace(/["\\]/g, "\\$&") + "\"]").join("");
+  lastTap = { sel, top: el.getBoundingClientRect().top, at: Date.now() };
+}, true);
 function render() {
   if (rendering) return;
   rendering = true;
+  const r = route(), same = r === lastPainted, y = window.scrollY, m = document.getElementById("main");
+  if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
+  const sn = document.querySelector(".subnav nav"), cur = sn && sn.querySelector('[aria-current="page"]');
+  if (cur) { const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; }
+  if (same) {
+    const hold = () => {
+      window.scrollTo(0, y);
+      // keep the button you just pressed under your finger, even when the list above it changes length
+      if (lastTap && Date.now() - lastTap.at < 1500) { const el = document.querySelector(lastTap.sel); if (el) window.scrollBy(0, el.getBoundingClientRect().top - lastTap.top); }
+    };
+    hold(); requestAnimationFrame(() => { if (m) m.style.minHeight = ""; hold(); });
+  }
+  lastPainted = r;
 }
 function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
-  const nav = [["", "nav_home"], ["tracks", "nav_tracks"], ["chart", "nav_chart"], ["lab", "nav_lab"], ["guides", "nav_guides"], ["journal", "nav_services"], ["progress", "nav_progress"], ["plans", "nav_plans"]];
-  const group = r === "settings" ? "account" : r.startsWith("g-") ? "guides" : r.startsWith("l-") ? "tracks" : ["journal", "calc", "dividends", "glossary", "tech", "invest", "metals"].includes(r) ? "journal" : r === "checkout" ? "plans" : r;
-  $("#top").innerHTML = '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav" aria-label="main">' + nav.map(([h, k]) => '<a href="#' + h + '"' + (group === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + '</nav><div class="tools">' + (typeof themeButton === "function" ? themeButton() : "") + '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a></div></div>";
+  $("#top").innerHTML = headerHtml(r);
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": pageHome, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": pageGate, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -390,7 +406,7 @@ function renderNow() {
   if (r === "chart" && typeof maybeAutoAnalysis === "function") setTimeout(maybeAutoAnalysis, 0);
 }
 let lastRoute = null;
-window.addEventListener("hashchange", () => { closing = deleting = null; resetArmed = false; render(); if (route() !== lastRoute) window.scrollTo(0, 0); lastRoute = route(); });
+window.addEventListener("hashchange", () => { closing = deleting = null; resetArmed = false; if (typeof noteVisit === "function") noteVisit(route()); render(); if (route() !== lastRoute) window.scrollTo(0, 0); lastRoute = route(); });
 
 document.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]"); if (!el) return;
