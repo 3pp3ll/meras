@@ -34,11 +34,11 @@ Object.assign(UI, {
 
 const SH_BOARDS = ["rajhi", "osaimi", "bilad"];
 const SH_ARGAAM = "https://www.argaam.com/ar/company/shariahcompanies";
-let SHSA = null, SHOWN = null, SHOWN_SHA, SHSA_SHA, shQ = "", shPick = null, shAmt = "", shRatio = "", shLoading = false, shDraft = null;
+let shTried = false, SHSA = null, SHOWN = null, SHOWN_SHA, SHSA_SHA, shQ = "", shPick = null, shAmt = "", shRatio = "", shLoading = false, shDraft = null;
 try { SHSA = JSON.parse(localStorage.getItem("meras.shsa") || "null"); } catch (e) {}
 
 async function loadSharia() {
-  if (shLoading) return; shLoading = true;
+  if (shLoading) return; shLoading = true; shTried = true;
   try { const r = await fetch("./sharia_sa.json?t=" + Date.now(), { cache: "no-store" }); if (r.ok) { const d = await r.json(); if (d && Array.isArray(d.rows)) SHSA = d; } } catch (e) {}
   if (HOSTED && CFG.token) {
     try { const f = await readJson("sharia_sa.json"); if (f && f.data && Array.isArray(f.data.rows) && (!SHSA || (f.data.updated || "") >= (SHSA.updated || ""))) SHSA = f.data; SHSA_SHA = f ? f.sha : undefined; } catch (e) {}
@@ -110,10 +110,10 @@ function shResults() {
   return '<div class="stack">' + rs.slice(0, max).map(shCard).join("") + (rs.length > max ? '<p class="small muted">' + esc(t("sh_more").replace("{n}", rs.length - max)) + "</p>" : "") + "</div>";
 }
 function shFinder() {
-  if (!SHSA && !shLoading) loadSharia();
+  if (!shTried) loadSharia();
   return '<div class="panel stack"><div class="field"><label for="sh-q">' + esc(t("sh_q")) + '</label><input id="sh-q" data-sh="q" type="search" autocomplete="off" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"></div><div id="sh-res">' + shResults() + "</div></div>";
 }
-function pageSharia() { if (!SHOWN && shOwner() && !shLoading) loadSharia(); return svcShell("sharia", '<p class="muted" style="max-width:70ch;margin:0">' + esc(t("sh_p")) + "</p>" + shFinder()); }
+function pageSharia() { if (!shTried) loadSharia(); return svcShell("sharia", '<p class="muted" style="max-width:70ch;margin:0">' + esc(t("sh_p")) + "</p>" + shFinder()); }
 
 /* ----- owner: paste the Argaam table ----- */
 let shPaste = null;
