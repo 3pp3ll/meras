@@ -594,3 +594,8 @@ p,li,dd{line-height:1.95}
 .sh-card .num{white-space:nowrap}
 .ind.i5{stroke:var(--ind5)} .rd.i5{color:var(--ind5)} .sw.i5{background:var(--ind5)}
 .rv-mid{fill:var(--amber)}
+/* الباحث */
+.sc-card h3{font-size:19px}
+.sc-checks{display:flex;flex-wrap:wrap;gap:6px}
+.sc-ck{font-size:13.5px;padding:3px 9px;border-radius:99px;background:var(--sunk);color:var(--muted)}
+.sc-ck.ok{background:color-mix(in srgb,var(--up) 14%,transparent);color:var(--up);font-weight:700}
