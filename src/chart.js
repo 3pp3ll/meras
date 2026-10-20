@@ -15,6 +15,8 @@ Object.assign(UI, {
   ch_hint_f1: ["اضغط على بداية الحركة: القاع إذا الحركة صاعدة، أو القمة إذا هابطة.", "Tap the start of the move: the low if the move is up, or the high if it is down."],
   ch_hint_f2: ["اضغط على نهاية الحركة. المستويات تنرسم بينهم.", "Now tap the end of the move. The levels are drawn between the two."],
   ch_type: ["نوع الشارت", "Chart type"], ty_candle: ["شموع", "Candles"], ty_line: ["خط", "Line"], ty_ohlc: ["أعمدة", "Bars"],
+  ch_vwap: ["متوسط السعر المرجح بالحجم", "VWAP"], ch_rvol: ["الحجم النسبي", "Relative volume"], ch_obv: ["حجم التوازن OBV", "OBV"], ch_cmf: ["تدفق الأموال CMF", "Chaikin money flow"], ch_mfi: ["مؤشر تدفق الأموال MFI", "Money flow index"],
+  ch_novol: ["مؤشرات السيولة تحتاج حجم تداول، وهذا الرمز ما له حجم (مثل الفوركس والمعادن).", "Liquidity indicators need volume, and this symbol has none (forex and metals)."],
   ch_add_ind: ["+ أضف مؤشر", "+ Add indicator"], ch_bb: ["بولنجر", "Bollinger"], ch_macd: ["ماكد", "MACD"], ch_remove: ["شيل", "Remove"],
   ch_sig: ["الإشارة", "Signal"], ch_up: ["العلوي", "Upper"], ch_low: ["السفلي", "Lower"],
   ch_ind_guide: ["دليل المؤشرات", "Indicator guide"], ch_short_sma: ["متوسط", "SMA"], ch_short_ema: ["أسي", "EMA"],
@@ -258,10 +260,19 @@ let chTool = "cursor", chPending = null, chOffset = 0, chReplay = null, CH = nul
 function chartCfg() {
   if (!S.chart || !S.chart.sma1) S.chart = chartDefaults(); if (!S.drawings) S.drawings = {};
   const c = S.chart; if (!c.bb) c.bb = { on: false, p: 20 }; if (!c.macd) c.macd = { on: false, p: 9 }; if (!c.type) c.type = "candle";
+  [["vwap", 20], ["rvol", 20], ["obv", 0], ["cmf", 20], ["mfi", 14]].forEach(([k, p]) => { if (!c[k]) c[k] = { on: false, p }; });
   return c;
 }
 /* the indicator catalogue: key, label, colour class, whether it has an editable period */
-const IND_KEYS = [["sma1", "ch_sma", "i1", true], ["sma2", "ch_sma", "i2", true], ["ema", "ch_ema", "i3", true], ["bb", "ch_bb", "i4", true], ["rsi", "ch_rsi", "i2", true], ["macd", "ch_macd", "i3", false], ["vol", "ch_vol", "", false]];
+const IND_KEYS = [["sma1", "ch_sma", "i1", true], ["sma2", "ch_sma", "i2", true], ["ema", "ch_ema", "i3", true], ["bb", "ch_bb", "i4", true], ["rsi", "ch_rsi", "i2", true], ["macd", "ch_macd", "i3", false], ["vol", "ch_vol", "", false],
+  ["vwap", "ch_vwap", "i5", true], ["rvol", "ch_rvol", "i4", true], ["obv", "ch_obv", "i1", false], ["cmf", "ch_cmf", "i3", true], ["mfi", "ch_mfi", "i2", true]];
+/* مؤشرات السيولة (من الشموع اليومية) */
+function vwapRoll(d, p) { const o = d.map(() => null); let pv = 0, vv = 0; for (let i = 0; i < d.length; i++) { const tp = (d[i].h + d[i].l + d[i].c) / 3, v = d[i].v || 0; pv += tp * v; vv += v; if (i >= p) { const q = d[i - p], tq = (q.h + q.l + q.c) / 3; pv -= tq * (q.v || 0); vv -= q.v || 0; } if (i >= p - 1 && vv > 0) o[i] = pv / vv; } return o; }
+function rvolS(d, p) { const o = d.map(() => null); let sum = 0; for (let i = 0; i < d.length; i++) { if (i >= p) { const avg = sum / p; o[i] = avg > 0 ? (d[i].v || 0) / avg : null; sum -= d[i - p].v || 0; } sum += d[i].v || 0; } return o; }
+function obvS(d) { const o = []; let x = 0; for (let i = 0; i < d.length; i++) { if (i) x += d[i].c > d[i - 1].c ? d[i].v || 0 : d[i].c < d[i - 1].c ? -(d[i].v || 0) : 0; o.push(x); } return o; }
+function cmfS(d, p) { const mfv = d.map((r) => { const rg = r.h - r.l; return rg > 0 ? (((r.c - r.l) - (r.h - r.c)) / rg) * (r.v || 0) : 0; }), o = d.map(() => null); for (let i = p - 1; i < d.length; i++) { let a = 0, b = 0; for (let k = i - p + 1; k <= i; k++) { a += mfv[k]; b += d[k].v || 0; } o[i] = b > 0 ? a / b : null; } return o; }
+function mfiS(d, p) { const tp = d.map((r) => (r.h + r.l + r.c) / 3), o = d.map(() => null); for (let i = p; i < d.length; i++) { let pos = 0, neg = 0; for (let k = i - p + 1; k <= i; k++) { const f = tp[k] * (d[k].v || 0); if (tp[k] > tp[k - 1]) pos += f; else if (tp[k] < tp[k - 1]) neg += f; } o[i] = neg === 0 ? (pos === 0 ? 50 : 100) : 100 - 100 / (1 + pos / neg); } return o; }
+const hasVol = (d) => d.some((r) => (r.v || 0) > 0);
 const indOn = (cfg, k) => (k === "vol" ? !!cfg.vol : !!(cfg[k] && cfg[k].on));
 const indName = (cfg, k) => { const d = IND_KEYS.find((x) => x[0] === k); return t(d[1]) + (d[3] ? " " + cfg[k].p : k === "macd" ? " 12/26/9" : ""); };
 
@@ -276,11 +287,18 @@ function chartSvg(cfg, full) {
   if (cfg.ema.on) lines.push({ cls: "i3", name: t("ch_ema") + " " + cfg.ema.p, v: ema(cl, cfg.ema.p) });
   const rs = cfg.rsi.on ? rsi(cl, cfg.rsi.p) : null, draws = S.drawings[cfg.sym] || [];
   const bb = cfg.bb.on ? bollinger(cl, cfg.bb.p, 2) : null, md = cfg.macd.on ? macd(cl, 12, 26, 9) : null;
+  const hv = hasVol(data);
+  if (hv && cfg.vwap.on) lines.push({ cls: "i5", name: t("ch_vwap") + " " + cfg.vwap.p, v: vwapRoll(data, cfg.vwap.p) });
+  const fl = [];
+  if (hv && cfg.rvol.on) fl.push({ k: "rvol", cls: "i4", name: t("ch_rvol") + " " + cfg.rvol.p, v: rvolS(data, cfg.rvol.p), lv: [1, 2], bars: true, dec: 2 });
+  if (hv && cfg.obv.on) fl.push({ k: "obv", cls: "i1", name: t("ch_obv"), v: obvS(data), lv: [], dec: 0 });
+  if (hv && cfg.cmf.on) fl.push({ k: "cmf", cls: "i3", name: t("ch_cmf") + " " + cfg.cmf.p, v: cmfS(data, cfg.cmf.p), lv: [0], dec: 3 });
+  if (hv && cfg.mfi.on) fl.push({ k: "mfi", cls: "i2", name: t("ch_mfi") + " " + cfg.mfi.p, v: mfiS(data, cfg.mfi.p), lv: [80, 20], fix: [0, 100], dec: 1 });
 
   /* geometry follows the real pixel width, so text never shrinks on a phone */
   const vw = document.documentElement.clientWidth || 960, vhgt = window.innerHeight || 700;
   const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62 - (chSide() ? 272 : 0))), axis = W < 520 ? 50 : 62;
-  const x0 = 6, x1 = W - axis, top = 8, tight = chFull && vhgt < 460, vh = cfg.vol ? (tight ? 26 : W < 520 ? 40 : 56) : 0, rh = rs ? (tight ? 50 : W < 520 ? 70 : 96) : 0, mh = md ? (tight ? 50 : W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + (mh ? mh + 14 : 0) + 20;
+  const x0 = 6, x1 = W - axis, top = 8, tight = chFull && vhgt < 460, vh = cfg.vol ? (tight ? 26 : W < 520 ? 40 : 56) : 0, rh = rs ? (tight ? 50 : W < 520 ? 70 : 96) : 0, mh = md ? (tight ? 50 : W < 520 ? 70 : 96) : 0, fh = tight ? 46 : W < 520 ? 64 : 84, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + (mh ? mh + 14 : 0) + fl.length * (fh + 14) + 20;
   const ph = chFull ? Math.max(70, vhgt - chFullPad - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
   const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), mtop = rtop + (rh ? rh + 14 : 0), H = top + ph + extra;
   let min = Infinity, max = -Infinity;
@@ -292,7 +310,7 @@ function chartSvg(cfg, full) {
   if (max - min < 0.02) { max += 0.5; min -= 0.5; }
   const pad = (max - min) * 0.07; min -= pad; max += pad;
   const bw = (x1 - x0) / slots, X = (i) => x0 + (i - s) * bw + bw / 2, Y = (v) => top + ((max - v) / (max - min)) * ph;
-  CH = { W, H, x0, x1, top, ph, bw, s, e, slots, min, max, data, lines, rs, bb, md, sym: cfg.sym, fullLen: full.length, end };
+  CH = { W, H, x0, x1, top, ph, bw, s, e, slots, min, max, data, lines, rs, bb, md, fl, sym: cfg.sym, fullLen: full.length, end };
 
   let g = '<defs><clipPath id="ch-clip"><rect x="' + x0 + '" y="' + top + '" width="' + (x1 - x0) + '" height="' + ph + '"/></clipPath></defs>';
   const ticks = ph < 180 ? 3 : 5;
@@ -351,6 +369,18 @@ function chartSvg(cfg, full) {
     [["line", "i2"], ["sig", "i1"]].forEach(([k, c]) => { let d = "", pen = false; for (let i = s; i < e; i++) { const v = md[k][i]; if (v == null) { pen = false; continue; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + MY(v).toFixed(1); pen = true; } if (d) g += '<path class="ind ' + c + ' thin" d="' + d + '"/>'; });
     g += '<text class="c-lab" x="' + (x0 + 4) + '" y="' + (mtop + 14) + '">' + esc(t("ch_macd")) + " 12/26/9</text>";
   }
+  let ftop = mtop + (mh ? mh + 14 : 0);
+  fl.forEach((f) => {
+    let lo = Infinity, hi = -Infinity; for (let i = s; i < e; i++) if (f.v[i] != null) { lo = Math.min(lo, f.v[i]); hi = Math.max(hi, f.v[i]); }
+    if (f.fix) { lo = f.fix[0]; hi = f.fix[1]; } else { f.lv.forEach((v) => { lo = Math.min(lo, v); hi = Math.max(hi, v); }); if (!isFinite(lo)) { lo = 0; hi = 1; } if (hi - lo < 1e-9) { hi += 1; lo -= 1; } const pd = (hi - lo) * 0.08; lo -= pd; hi += pd; }
+    const FY = (v) => ftop + ((hi - v) / (hi - lo)) * fh;
+    g += '<rect class="pane" x="' + x0 + '" y="' + ftop + '" width="' + (x1 - x0) + '" height="' + fh + '"/>';
+    f.lv.forEach((v) => { g += '<line class="c-grid" stroke-dasharray="4 4" x1="' + x0 + '" x2="' + x1 + '" y1="' + FY(v) + '" y2="' + FY(v) + '"/><text class="c-text" x="' + (x1 + 5) + '" y="' + (FY(v) + 4) + '">' + v + "</text>"; });
+    if (f.bars) { for (let i = s; i < e; i++) if (f.v[i] != null) { const w = Math.min(10, Math.max(1, bw * 0.5)), y0 = FY(Math.max(lo, 0)), y1 = FY(f.v[i]); g += '<rect class="' + (f.v[i] >= 2 ? "c-up" : f.v[i] >= 1 ? "rv-mid" : "c-down") + '" opacity=".55" x="' + (X(i) - w / 2) + '" y="' + Math.min(y0, y1) + '" width="' + w + '" height="' + Math.max(0.8, Math.abs(y1 - y0)) + '"/>'; } }
+    else { let d = "", pen = false; for (let i = s; i < e; i++) { if (f.v[i] == null) { pen = false; continue; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + FY(f.v[i]).toFixed(1); pen = true; } if (d) g += '<path class="ind ' + f.cls + '" d="' + d + '"/>'; }
+    g += '<text class="c-lab" x="' + (x0 + 4) + '" y="' + (ftop + 14) + '">' + esc(f.name) + "</text>";
+    ftop += fh + 14;
+  });
   g += '<line id="ch-x" class="cross" x1="0" x2="0" y1="' + top + '" y2="' + (H - 20) + '" visibility="hidden"/><line id="ch-y" class="cross" x1="' + x0 + '" x2="' + x1 + '" y1="0" y2="0" visibility="hidden"/>';
   return '<svg id="ch-svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(symName(cfg.sym)) + '">' + g + "</svg>";
 }
@@ -403,7 +433,7 @@ function pageChart() {
 
   return '<div class="wrap' + (chSide() ? " ch-page" : "") + '"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
-    '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
+    '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p>" + (["vwap", "rvol", "obv", "cmf", "mfi"].some((k) => indOn(cfg, k)) && !hasVol(full) ? '<p class="small notice" style="margin:0">' + esc(t("ch_novol")) + "</p>" : "") + "</div>" +
     '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + '<div class="ch-body' + (chSide() ? " side" : "") + '">' + svg + chInfoBox() + "</div></div>" +
     (chReading ? readingHtml() : "") +
     '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + step + '"' + (CH.s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + step + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
@@ -456,6 +486,7 @@ function chInfoLive(i) {
   CH.lines.forEach((ln) => { if (ln.v[i] != null) ind.push('<div class="ci-r"><span class="' + ln.cls + '">' + esc(ln.name) + "</span><b>" + f(ln.v[i]) + "</b></div>"); });
   if (CH.bb && CH.bb.up[i] != null) ind.push('<div class="ci-r"><span class="i4">' + esc(t("ch_bb")) + "</span><b>" + f(CH.bb.lo[i]) + " – " + f(CH.bb.up[i]) + "</b></div>");
   if (CH.md && CH.md.line[i] != null) ind.push('<div class="ci-r"><span class="i3">' + esc(t("ch_macd")) + '</span><b class="' + (CH.md.line[i] >= CH.md.sig[i] ? "up" : "down") + '">' + f(CH.md.line[i]) + " / " + f(CH.md.sig[i]) + "</b></div>");
+  (CH.fl || []).forEach((fv) => { const v = fv.v[i]; if (v != null) ind.push('<div class="ci-r"><span class="' + fv.cls + '">' + esc(fv.name) + '</span><b class="' + (fv.k === "cmf" ? (v >= 0 ? "up" : "down") : fv.k === "rvol" ? (v >= 1.5 ? "up" : "") : fv.k === "mfi" ? (v > 80 ? "down" : v < 20 ? "up" : "") : "") + '">' + (fv.k === "obv" ? int(Math.round(v)) : v.toFixed(fv.dec)) + (fv.k === "rvol" ? "×" : "") + "</b></div>"); });
   if (CH.rs && CH.rs[i] != null) ind.push('<div class="ci-r"><span class="i2">' + esc(t("ch_rsi")) + '</span><b class="' + (CH.rs[i] > 70 ? "down" : CH.rs[i] < 30 ? "up" : "") + '">' + CH.rs[i].toFixed(1) + "</b></div>");
   return '<div class="ci-sec">' + h + "</div>" + (ind.length ? '<div class="ci-sec">' + ind.join("") + "</div>" : "");
 }
@@ -475,6 +506,7 @@ function chartReadout(i) {
   CH.lines.forEach((ln) => { h += '<span class="rd ' + ln.cls + '">' + esc(ln.name) + ": " + n(f(ln.v[i])) + "</span>"; });
   if (CH.bb && CH.bb.up[i] != null) h += '<span class="rd i4">' + esc(t("ch_bb")) + ": " + n(f(CH.bb.lo[i])) + " – " + n(f(CH.bb.up[i])) + "</span>";
   if (CH.md && CH.md.line[i] != null) h += '<span class="rd i3">' + esc(t("ch_macd")) + ": " + n(f(CH.md.line[i])) + " / " + esc(t("ch_sig")) + " " + n(f(CH.md.sig[i])) + "</span>";
+  (CH.fl || []).forEach((fv) => { if (fv.v[i] != null) h += '<span class="rd ' + fv.cls + '">' + esc(fv.name) + ": " + n(fv.k === "obv" ? int(Math.round(fv.v[i])) : fv.v[i].toFixed(fv.dec)) + "</span>"; });
   if (CH.rs) h += '<span class="rd i2">' + esc(t("ch_rsi")) + ": " + n(CH.rs[i] == null ? "–" : CH.rs[i].toFixed(1)) + "</span>";
   return h;
 }

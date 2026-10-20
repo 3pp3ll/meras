@@ -10,7 +10,7 @@
   --sky:#7DC3E6; --sky-soft:#E4F4FC; --pink:#F2A7C0; --pink-soft:#FDEBF1;
   --up:#2E9C73; --up-soft:#E2F5EC; --down:#D9534F; --down-soft:#FCE6E6;
   --code-bg:#2F3A4F; --code-fg:#EEF3FA;
-  --ind1:#D9822B; --ind2:#3C8CC9; --ind3:#B05FC9; --ind4:#1E9E9E; --draw:#2F3A4F;
+  --ind1:#D9822B; --ind2:#3C8CC9; --ind3:#B05FC9; --ind4:#1E9E9E; --ind5:#C2410C; --draw:#2F3A4F;
   --display:"Almarai","IBM Plex Sans Arabic",system-ui,sans-serif;
   --body:"Almarai","IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
   --mono:"Calibri","Carlito","Almarai",system-ui,sans-serif;
@@ -27,7 +27,7 @@
     --sky:#7FB0FF; --sky-soft:hsl(210 50% calc(10% + var(--dk) * 10%)); --pink:#F2A7C0; --pink-soft:hsl(335 35% calc(10% + var(--dk) * 10%));
     --up:#3FCB96; --up-soft:hsl(158 50% calc(8% + var(--dk) * 10%)); --down:#F27C72; --down-soft:hsl(5 45% calc(10% + var(--dk) * 10%));
     --code-bg:hsl(220 60% calc(3% + var(--dk) * 8%)); --code-fg:#DCE6FA;
-    --ind1:#F0A93A; --ind2:#7FB0FF; --ind3:#C59BF7; --ind4:#4FD1C5; --draw:#E8EDF8;
+    --ind1:#F0A93A; --ind2:#7FB0FF; --ind3:#C59BF7; --ind4:#4FD1C5; --ind5:#FB923C; --draw:#E8EDF8;
     color-scheme:dark;
   }
 }
@@ -40,7 +40,7 @@
     --sky:#7FB0FF; --sky-soft:hsl(210 50% calc(10% + var(--dk) * 10%)); --pink:#F2A7C0; --pink-soft:hsl(335 35% calc(10% + var(--dk) * 10%));
     --up:#3FCB96; --up-soft:hsl(158 50% calc(8% + var(--dk) * 10%)); --down:#F27C72; --down-soft:hsl(5 45% calc(10% + var(--dk) * 10%));
     --code-bg:hsl(220 60% calc(3% + var(--dk) * 8%)); --code-fg:#DCE6FA;
-    --ind1:#F0A93A; --ind2:#7FB0FF; --ind3:#C59BF7; --ind4:#4FD1C5; --draw:#E8EDF8;
+    --ind1:#F0A93A; --ind2:#7FB0FF; --ind3:#C59BF7; --ind4:#4FD1C5; --ind5:#FB923C; --draw:#E8EDF8;
     color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -592,3 +592,5 @@ p,li,dd{line-height:1.95}
 .sh-calc{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
 @media (max-width:560px){.sh-calc{grid-template-columns:1fr}}
 .sh-card .num{white-space:nowrap}
+.ind.i5{stroke:var(--ind5)} .rd.i5{color:var(--ind5)} .sw.i5{background:var(--ind5)}
+.rv-mid{fill:var(--amber)}
