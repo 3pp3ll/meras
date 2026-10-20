@@ -2,7 +2,7 @@
 # يبني المنصة من ملفات src:
 #   index.html   النسخة المنشورة على GitHub Pages
 cd "$(dirname "$0")"
-FONTS='<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;600;700&display=swap">'
+FONTS='<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">'
 body() {
   echo "$FONTS"
   echo '<style>'; cat src/style.css; echo '</style>'

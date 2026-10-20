@@ -13,22 +13,25 @@ Object.assign(UI, {
 
 const US_KEY = "meras.us";
 let US = null; try { US = JSON.parse(localStorage.getItem(US_KEY) || "null"); } catch (e) {}
-let USM = null; // metals.json
+const USM_KEY = "meras.usm";
+let USM = null; try { USM = JSON.parse(localStorage.getItem(USM_KEY) || "null"); } catch (e) {} // metals.json
 const isUS = (s) => !!(US && US.symbols && US.symbols[s]);
 const curOf = (s) => (/^\d{4}$/.test(String(s)) ? "SAR" : "USD");
 const money = (n, cur, d = 2) => (cur === "USD" ? "$" : "") + fmt(n, d);
 
 function usMerge() {
-  if (!US || !US.symbols || !LIVE) return;
+  if (!LIVE || (!(US && US.symbols) && !USM)) return;
   LIVE.history = LIVE.history || {};
-  Object.entries(US.symbols).forEach(([s, v]) => { if (Array.isArray(v.rows) && v.rows.length) LIVE.history[s] = v.rows; });
+  if (US && US.symbols) Object.entries(US.symbols).forEach(([s, v]) => { if (Array.isArray(v.rows) && v.rows.length) LIVE.history[s] = v.rows; });
+  if (USM) [["gold", "XAU"], ["silver", "XAG"]].forEach(([k, s]) => { const o = USM[k] && USM[k].ohlc; if (Array.isArray(o) && o.length > 1) LIVE.history[s] = o.map(([d, op, h, l, c]) => ({ d, o: op, h, l, c })); });
 }
+const usNameOf = (s) => (s === "XAU" ? t("us_gold") : s === "XAG" ? t("us_silver") : US && US.symbols && US.symbols[s] ? US.symbols[s].n : null);
 async function loadUS() {
   if (!HOSTED || !CFG.token) return;
   try {
     const [u, m] = await Promise.all([readJson("us.json").catch(() => null), readJson("metals.json").catch(() => null)]);
     if (u && u.data && u.data.symbols) { US = u.data; try { localStorage.setItem(US_KEY, JSON.stringify(US)); } catch (e) {} usMerge(); }
-    if (m && m.data) USM = m.data;
+    if (m && m.data) { USM = m.data; try { localStorage.setItem(USM_KEY, JSON.stringify(USM)); } catch (e) {} usMerge(); }
   } catch (e) {}
 }
 usMerge();
@@ -52,9 +55,11 @@ function dkUS() {
   const grp = (g) => Object.entries(US.symbols).filter(([, v]) => v.g === g);
   const table = (g, extra) => { const rows = grp(g).map(([s, v]) => usRow(s, v.n, v.rows || [], true)).join("") + (extra || ""); return rows ? owPanel(t("us_g_" + g), '<div class="tablewrap"><table>' + head + "<tbody>" + rows + "</tbody></table></div>") : ""; };
   let metals = "";
-  if (USM) [["gold", "us_gold"], ["silver", "us_silver"]].forEach(([k, lab]) => { const m = USM[k]; if (m && Array.isArray(m.hist)) { const rows = m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })); if (m.price && rows.length && rows[rows.length - 1].c !== m.price) rows.push({ d: today(), o: m.price, h: m.price, l: m.price, c: m.price }); metals += usRow(k === "gold" ? "XAU" : "XAG", t(lab), rows, false, 2); } });
+  if (USM) [["gold", "us_gold", "XAU"], ["silver", "us_silver", "XAG"]].forEach(([k, lab, s]) => { const m = USM[k]; if (!m) return; const rows = LIVE.history[s] && LIVE.history[s].length > 1 ? LIVE.history[s] : Array.isArray(m.hist) ? m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })) : []; if (rows.length) metals += usRow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); });
   const errs = Object.entries(US.errors || {});
   return '<p class="small muted" style="margin:0">' + esc(t("us_meta").replace("{d}", whenText(US.fetched_at)).replace("{n}", US.requests != null ? US.requests : "–")) + " · " + esc(t("us_note")) + "</p>" +
     (errs.length ? '<div class="notice"><b>' + esc(t("us_err")) + ":</b> " + errs.map(([s, m]) => '<span class="num">' + esc(s) + "</span> <span class=\"small\">(" + esc(m) + ")</span>").join("، ") + "</div>" : "") +
     table("movers") + table("ai") + table("fx") + table("cmd", metals);
 }
+
+if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) loadUS();

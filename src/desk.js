@@ -10,7 +10,7 @@ Object.assign(UI, {
   dk_px_tip: ["السهم اللي سعره من آخر صفقة ما ينسحب سعره. أضفه لقائمة الشارت من لوحة المالك عشان يصير حي.", "A share priced from its last trade is not being fetched. Add it to the chart list in the owner dashboard to make it live."],
   dk_trades_h: ["سجل العمليات", "Transactions"], dk_new_trade: ["أضف عملية", "Add a transaction"], dk_side: ["النوع", "Type"], dk_buy: ["شراء", "Buy"], dk_sell: ["بيع", "Sell"],
   dk_date: ["التاريخ", "Date"], dk_fee: ["العمولة (ريال)", "Commission (SAR)"], dk_note: ["ملاحظة", "Note"], dk_sym: ["رمز السهم", "Share code"], dk_total: ["الإجمالي", "Total"],
-  dk_feepct: ["نسبة العمولة الافتراضية %", "Default commission %"], dk_feepct_tip: ["تنحسب العمولة تلقائياً من هذي النسبة، وتقدر تعدلها في كل عملية. اكتب النسبة اللي تشوفها في تطبيق دراية.", "Commission is filled in from this rate and can be edited on each transaction. Use the rate shown in your broker app."],
+  dk_feepct: ["عمولة السعودي %", "Saudi commission %"], dk_feemin: ["أقل عمولة (ريال)", "Minimum (SAR)"], dk_feeus: ["عمولة الأمريكي لكل عملية $", "US fee per trade $"], dk_feepct_tip: ["معبّاة بعمولة دراية: 0.12% وأقلها 12 ريال للسعودي، و2.25$ للعملية الأمريكية. تنحسب تلقائياً وتقدر تعدلها في كل عملية.", "Commission is filled in from this rate and can be edited on each transaction. Use the rate shown in your broker app."],
   dk_none_tr: ["ما سجلت عمليات للحين. أول ما تشتري من دراية سجّل العملية هنا.", "No transactions yet. When you buy in your broker app, record it here."],
   dk_bad: ["تأكد من الرمز والكمية والسعر", "Check the code, quantity and price"], dk_oversell: ["الكمية أكثر من اللي عندك في هذا السهم ({n})", "That is more than you hold in this share ({n})"],
   dk_saved: ["انحفظ", "Saved"], dk_del: ["احذف", "Delete"], dk_sure: ["متأكد؟", "Sure?"], dk_edit: ["عدّل", "Edit"], dk_save: ["احفظ", "Save"], dk_cancel: ["إلغاء", "Cancel"],
@@ -29,14 +29,14 @@ Object.assign(UI, {
 });
 
 let DK = { loaded: false, loading: false, data: null, sha: undefined }, dkTab = "pf", dkTrade = null, dkAn = null, dkDel = null, dkFilter = "all";
-const dkBlank = () => ({ version: 1, cfg: { feePct: 0 }, trades: [], charts: [] });
+const dkBlank = () => ({ version: 1, cfg: { feePct: 0.12, feeMin: 12, feeUS: 2.25 }, trades: [], charts: [] });
 
 async function loadDesk(force) {
   if (!HOSTED || !CFG.token || DK.loading || (DK.loaded && !force)) return;
   DK.loading = true;
   await loadUS();
   try { const f = await readJson("desk.json"); DK.data = (f && f.data) || dkBlank(); DK.sha = f ? f.sha : undefined; } catch (e) { DK.data = DK.data || dkBlank(); toast(errText(e)); }
-  ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0 }, DK.data.cfg);
+  ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0.12, feeMin: 12, feeUS: 2.25 }, DK.data.cfg); if (!DK.data.cfg.feePct && !DK.data.cfg.touched) Object.assign(DK.data.cfg, { feePct: 0.12, feeMin: 12, feeUS: 2.25 });
   DK.loading = false; DK.loaded = true; if (route() === "desk") render();
 }
 async function saveDesk() {
@@ -47,7 +47,7 @@ async function saveDesk() {
 window.addEventListener("hashchange", () => { if (route() === "desk") loadDesk(); });
 
 /* ----- prices & holdings ----- */
-const dkName = (s) => { if (typeof US !== "undefined" && US && US.symbols && US.symbols[s]) return US.symbols[s].n || ""; const n = typeof owName === "function" ? owName(s) : ""; if (n) return n; const q = quoteOf(s); return q && q.name ? (Array.isArray(q.name) ? L(q.name) : q.name) : ""; };
+const dkName = (s) => { if (typeof usNameOf === "function" && usNameOf(s)) return usNameOf(s); const n = typeof owName === "function" ? owName(s) : ""; if (n) return n; const q = quoteOf(s); return q && q.name ? (Array.isArray(q.name) ? L(q.name) : q.name) : ""; };
 function dkPrice(sym, fallback) {
   const q = quoteOf(sym); if (q && q.live && isFinite(q.price)) return { p: q.price, src: "live" };
   const h = chartData(sym); if (h.length) return { p: h[h.length - 1].c, src: "close" };
@@ -90,7 +90,7 @@ function dkPortfolio() {
   const trs = DK.data.trades.slice().sort((a, b) => (a.date === b.date ? (b.at || 0) - (a.at || 0) : a.date < b.date ? 1 : -1));
   const trows = trs.map((x) => '<tr><td class="num">' + esc(x.date) + "</td><td>" + owTag(x.side === "buy" ? "up" : "down", x.side === "buy" ? "dk_buy" : "dk_sell") + '</td><td><span class="num">' + esc(x.sym) + "</span> " + esc(dkName(x.sym)) + '</td><td class="num">' + int(x.qty) + '</td><td class="num">' + money(x.price, curOf(x.sym)) + '</td><td class="num">' + money(Number(x.fee) || 0, curOf(x.sym)) + '</td><td class="num">' + money(x.qty * x.price + (x.side === "buy" ? 1 : -1) * (Number(x.fee) || 0), curOf(x.sym)) + '</td><td class="small">' + esc(x.note || "") + '</td><td class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm ghost" data-act="dk-tedit" data-id="' + esc(x.id) + '">' + esc(t("dk_edit")) + '</button><button class="btn sm ' + (dkDel === x.id ? "danger" : "ghost") + '" data-act="dk-tdel" data-id="' + esc(x.id) + '">' + esc(t(dkDel === x.id ? "dk_sure" : "dk_del")) + "</button></td></tr>").join("");
   const trades = owPanel(t("dk_trades_h"), (trs.length ? '<div class="tablewrap"><table><thead><tr><th>' + esc(t("dk_date")) + "</th><th>" + esc(t("dk_side")) + "</th><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_fee")) + "</th><th>" + esc(t("dk_total")) + "</th><th>" + esc(t("dk_note")) + "</th><th></th></tr></thead><tbody>" + trows + "</tbody></table></div>" : '<p class="muted" style="margin:0">' + esc(t("dk_none_tr")) + "</p>") +
-    '<form class="row" data-form="dk-cfg" novalidate style="align-items:flex-end"><div class="field" style="width:200px"><label for="dk-feepct">' + esc(t("dk_feepct")) + '</label><input id="dk-feepct" type="number" min="0" step="0.001" inputmode="decimal" value="' + esc(DK.data.cfg.feePct) + '"></div><button class="btn sm" type="submit">' + esc(t("dk_save")) + '</button><p class="small muted" style="flex:1;min-width:200px;margin:0">' + esc(t("dk_feepct_tip")) + "</p></form>",
+    '<form class="row" data-form="dk-cfg" novalidate style="align-items:flex-end"><div class="field" style="width:200px"><label for="dk-feepct">' + esc(t("dk_feepct")) + '</label><input id="dk-feepct" type="number" min="0" step="0.001" inputmode="decimal" value="' + esc(DK.data.cfg.feePct) + '"></div><div class="field" style="width:150px"><label for="dk-feemin">' + esc(t("dk_feemin")) + '</label><input id="dk-feemin" type="number" min="0" step="1" inputmode="decimal" value="' + esc(DK.data.cfg.feeMin) + '"></div><div class="field" style="width:170px"><label for="dk-feeus">' + esc(t("dk_feeus")) + '</label><input id="dk-feeus" type="number" min="0" step="0.01" inputmode="decimal" value="' + esc(DK.data.cfg.feeUS) + '"></div><button class="btn sm" type="submit">' + esc(t("dk_save")) + '</button><p class="small muted" style="flex:1;min-width:200px;margin:0">' + esc(t("dk_feepct_tip")) + "</p></form>",
     trs.length ? '<button class="btn sm" data-act="dk-xlsx">⤓ ' + esc(t("dk_xlsx")) + "</button>" : "");
   const curs = ["SAR", "USD"].filter((c) => c === "SAR" || DK.data.trades.some((x) => curOf(x.sym) === c));
   return (dkTrade ? dkTradeForm() : '<div><button class="btn primary" data-act="dk-tnew">+ ' + esc(t("dk_new_trade")) + "</button></div>") + curs.map(dkPfCur).join("") + trades;
@@ -198,7 +198,9 @@ document.addEventListener("input", (e) => {
   const el = e.target; if (!el.dataset || el.dataset.dk !== "fee") return;
   const q = parseFloat(document.getElementById("dt-qty").value), p = parseFloat(document.getElementById("dt-price").value), fee = document.getElementById("dt-fee");
   const sv = (document.getElementById("dt-sym").value || "").trim();
-  if (fee && /^\d{4}$/.test(sv) && q > 0 && p > 0 && DK.data && DK.data.cfg.feePct > 0) fee.value = (q * p * DK.data.cfg.feePct / 100).toFixed(2);
+  if (!fee || !DK.data || !(q > 0 && p > 0)) return; const c = DK.data.cfg;
+  if (/^\d{4}$/.test(sv)) { if (c.feePct > 0) fee.value = Math.max(q * p * c.feePct / 100, c.feeMin || 0).toFixed(2); }
+  else if (sv && c.feeUS > 0) fee.value = Number(c.feeUS).toFixed(2);
 });
 document.addEventListener("change", (e) => {
   if (e.target.dataset && e.target.dataset.dk === "an-sym") { const s = e.target.value, n = (S.drawings && S.drawings[s] || []).length, p = document.getElementById("da-draws"); if (p) p.textContent = t("dk_draws").replace("{n}", n); }
@@ -208,7 +210,7 @@ document.addEventListener("submit", async (e) => {
   e.preventDefault();
   const v = (id) => { const x = document.getElementById(id); return x ? x.value.trim() : ""; }, num = (id) => { const n = parseFloat(v(id)); return isFinite(n) && n > 0 ? n : null; };
   const kind = form.dataset.form;
-  if (kind === "dk-cfg") { const p = parseFloat(v("dk-feepct")); DK.data.cfg.feePct = isFinite(p) && p >= 0 ? p : 0; await saveDesk(); render(); }
+  if (kind === "dk-cfg") { const g = (id) => { const n = parseFloat(v(id)); return isFinite(n) && n >= 0 ? n : 0; }; Object.assign(DK.data.cfg, { feePct: g("dk-feepct"), feeMin: g("dk-feemin"), feeUS: g("dk-feeus"), touched: true }); await saveDesk(); render(); }
   else if (kind === "dk-trade") {
     const sym = v("dt-sym").toUpperCase().replace(/[^0-9A-Z.]/g, ""), qty = num("dt-qty"), price = num("dt-price"), side = v("dt-side"), id = form.dataset.id;
     if (!/^(\d{4}|[A-Z]{1,5}(\.[A-Z])?)$/.test(sym) || !qty || !price) { toast(t("dk_bad")); return; }
