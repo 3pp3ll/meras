@@ -38,10 +38,29 @@ function groupOf(r) {
 function subOf(r) { if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
 
 const ICON_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 4v3M7 15v5M17 3v4M17 13v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4.5" y="7" width="5" height="8" rx="1" fill="currentColor"/><rect x="14.5" y="7" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+const BACK_KEY = "meras.back", OWN_R = ["owner", "desk"];
+let BACK = null; try { BACK = JSON.parse(sessionStorage.getItem(BACK_KEY) || "null"); } catch (e) {}
+function trackBack(r) {
+  const prev = typeof lastPainted !== "undefined" ? lastPainted : null, was = BACK;
+  if (OWN_R.includes(r)) BACK = null;
+  else if (prev && OWN_R.includes(prev) && prev !== r) BACK = { r: prev, tab: prev === "desk" ? (typeof dkTab !== "undefined" ? dkTab : null) : typeof owTab !== "undefined" ? owTab : null };
+  if (was !== BACK) try { sessionStorage.setItem(BACK_KEY, JSON.stringify(BACK)); } catch (e) {}
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest && e.target.closest('[data-act="nav-back"]'); if (!b || !BACK) return;
+  e.preventDefault(); if (BACK.tab) { if (BACK.r === "desk" && typeof dkTab !== "undefined") dkTab = BACK.tab; if (BACK.r === "owner" && typeof owTab !== "undefined") owTab = BACK.tab; }
+  location.hash = BACK.r;
+});
+Object.assign(UI, { back_desk: ["رجوع لمكتبي", "Back to my desk"], back_owner: ["رجوع للوحة المالك", "Back to the dashboard"] });
 function headerHtml(r) {
+  trackBack(r);
   const g = groupOf(r), sub = subOf(r);
   const top = [["learn", "nav_learn"], ["services", "nav_svc"], ["plans", "nav_plans"]].map(([h, k]) => '<a href="#' + h + '"' + (g === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("");
-  const tools = '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
+  const back = BACK && typeof HOSTED !== "undefined" && HOSTED && CFG.token ? '<a class="btn sm back-btn" href="#' + BACK.r + '" data-act="nav-back" title="' + esc(t(BACK.r === "desk" ? "back_desk" : "back_owner")) + '"><span aria-hidden="true">↩</span> <span>' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")) + "</span></a>" : "";
+  let fab = document.getElementById("backfab");
+  if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }
+  fab.hidden = !back; if (back) { fab.href = "#" + BACK.r; fab.innerHTML = '<span aria-hidden="true">↩</span> ' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")); fab.title = t(BACK.r === "desk" ? "back_desk" : "back_owner"); }
+  const tools = back + '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
     '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a>";
   const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
   return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;

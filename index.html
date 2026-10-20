@@ -16,7 +16,7 @@
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Carlito:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">
 <style>
 /* Layout: the مدرج (staircase) is the spine. Day is a soft peach, pink and sky blend; night is the navy staircase, with a dimmer the reader controls (--dk). */
 :root{
@@ -33,7 +33,8 @@
   --ind1:#D9822B; --ind2:#3C8CC9; --ind3:#B05FC9; --ind4:#1E9E9E; --draw:#2F3A4F;
   --display:"Almarai","IBM Plex Sans Arabic",system-ui,sans-serif;
   --body:"Almarai","IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --mono:"Calibri","Carlito","Almarai",system-ui,sans-serif;
+  --code:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
   --r:12px; --gap:16px; --wrap:1080px;
 }
 @media (prefers-color-scheme: dark){
@@ -185,9 +186,9 @@ main{display:block;min-height:60vh}
 .prose{display:flex;flex-direction:column;gap:14px;font-size:18px}
 .prose h3{font-size:21px;margin-top:10px}
 .prose ul{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
-.prose code{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 6px;border-radius:4px;direction:ltr;unicode-bidi:isolate}
+.prose code{font-family:var(--code);font-size:.88em;background:var(--sunk);padding:1px 6px;border-radius:4px;direction:ltr;unicode-bidi:isolate}
 .code{position:relative;background:var(--code-bg);color:var(--code-fg);border-radius:var(--r);direction:ltr;text-align:left}
-.code pre{margin:0;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:15px;line-height:1.65}
+.code pre{margin:0;padding:16px;overflow-x:auto;font-family:var(--code);font-size:15px;line-height:1.65}
 .code .cap{display:flex;justify-content:space-between;align-items:center;padding:6px 8px 6px 16px;font-family:var(--mono);font-size:13.5px;color:var(--navy-muted);border-bottom:1px solid var(--navy-line)}
 .code .cap button{background:transparent;border:1px solid var(--navy-line);color:var(--code-fg);border-radius:6px;padding:2px 10px;font-size:13.5px;cursor:pointer}
 .figure{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px;overflow-x:auto}
@@ -267,7 +268,7 @@ td .num,td.num{font-size:15px}
 .plan ul{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px}
 .plan.best{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
 .plan .btn{margin-top:auto}
-.testcard{font-family:var(--mono);background:var(--navy);color:var(--navy-fg);border-radius:var(--r);padding:16px;direction:ltr;text-align:left;max-width:340px}
+.testcard{font-family:var(--code);background:var(--navy);color:var(--navy-fg);border-radius:var(--r);padding:16px;direction:ltr;text-align:left;max-width:340px}
 .testcard small{color:var(--navy-muted);display:block}
 .foot{border-top:1px solid var(--line);margin-top:40px}
 .foot .wrap{padding-block:22px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;font-size:15px;color:var(--muted)}
@@ -570,6 +571,39 @@ body{font-weight:400;letter-spacing:0}
 b,strong,th,label,.btn,.tag,.nav a,.subnav a,.tabs a,.brand,.field label{font-weight:700}
 .muted{color:color-mix(in srgb,var(--muted) 82%,var(--ink))}
 p,li,dd{line-height:1.95}
+/* الأرقام بخط Calibri (أو Carlito المطابق له) وعريضة */
+.num,.stats b,.result b,.quote .px,.quote dd,.plan .price,.ch-read b,.dk-sg{font-variant-numeric:tabular-nums lining-nums}
+.stats b,.result b,.quote .px,.plan .price,.ch-read b,.quote dd{font-weight:700}
+.stats b{font-size:24px}.result b{font-size:21px}
+/* لوحة القراءات بأسلوب MT5 */
+.wrap.ch-page{--wrap:1400px}
+.chartbox:has(.ch-body.side) .ch-top .ch-read{display:none}
+.chartbox:has(.ch-body.side) .ch-top{justify-content:flex-end}
+.ch-body.side{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;align-items:start}
+.ch-body:not(.side){display:flex;flex-direction:column;gap:10px}
+.ch-body:not(.side) .ci-tip{display:none}
+.ch-body:not(.side) .ch-info{font-size:14px;padding:10px 12px}
+.ch-body:not(.side) #ci-live{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.ch-info{background:#0f1f6e;color:#eef2ff;border:1px solid #33489e;border-radius:10px;padding:12px 14px;font-family:var(--mono);font-size:15px;line-height:1.5;box-shadow:0 4px 14px rgba(15,31,110,.25)}
+.ci-head{display:flex;flex-direction:column;gap:2px;padding-bottom:8px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.18)}
+.ci-head b{color:#ffd54a;font-size:18px;font-family:var(--body)}
+.ci-head span{color:#ffb547;font-size:13.5px;font-weight:700}
+.ci-sec{padding-block:4px;border-bottom:1px solid rgba(255,255,255,.12)}
+.ci-sec:last-child{border-bottom:0}
+.ci-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:2px 0}
+.ci-r span{color:#c9d3ff;font-family:var(--body);font-size:14px}
+.ci-r b{font-weight:700;direction:ltr;unicode-bidi:isolate;white-space:nowrap;font-size:15.5px}
+.ch-info .up{color:#4ade80}.ch-info .down{color:#ff7272}.ch-info .amber{color:#ffd54a}
+.ch-info .i1{color:#7cc4ff}.ch-info .i2{color:#ffb4f0}.ch-info .i3{color:#d9a6ff}.ch-info .i4{color:#ffd28a}.ch-info .i5{color:#9ff0d2}
+.ci-sum .ci-r b{font-size:16.5px}
+.ci-tip{margin:6px 0 0;color:#9fb0f5;font-size:12.5px;font-family:var(--body)}
+.back-btn{gap:4px;white-space:nowrap;border-color:var(--amber);color:var(--amber-ink)}
+@media (max-width:420px){.back-btn span:last-child{display:none}}
+#backfab{display:none}
+@media (max-width:560px){
+  .back-btn{display:none!important}
+  #backfab:not([hidden]){display:inline-flex;align-items:center;gap:6px;position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline-start:18px;z-index:35;height:44px;padding:0 16px;border-radius:22px;background:var(--surface);border:1px solid var(--amber);color:var(--amber-ink);font-weight:700;text-decoration:none;box-shadow:0 6px 18px rgba(40,30,60,.18)}
+}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1969,6 +2003,7 @@ function analyze(data, s, e) {
   else if (regime === "down" && h2.length === 2 && lh) out.auto.push({ t: "t", i1: h2[0].i, p1: r2(h2[0].p), i2: h2[1].i, p2: r2(h2[1].p), auto: 1 });
   if (below) out.auto.push({ t: "h", p: r2(below.p), auto: 1 });
   if (above) out.auto.push({ t: "h", p: r2(above.p), auto: 1 });
+  out.sup = below ? below.p : null; out.res = above ? above.p : null;
   return out;
 }
 
@@ -2065,7 +2100,7 @@ function chartSvg(cfg, full) {
 
   /* geometry follows the real pixel width, so text never shrinks on a phone */
   const vw = document.documentElement.clientWidth || 960, vhgt = window.innerHeight || 700;
-  const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62)), axis = W < 520 ? 50 : 62;
+  const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62 - (chSide() ? 272 : 0))), axis = W < 520 ? 50 : 62;
   const x0 = 6, x1 = W - axis, top = 8, tight = chFull && vhgt < 460, vh = cfg.vol ? (tight ? 26 : W < 520 ? 40 : 56) : 0, rh = rs ? (tight ? 50 : W < 520 ? 70 : 96) : 0, mh = md ? (tight ? 50 : W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + (mh ? mh + 14 : 0) + 20;
   const ph = chFull ? Math.max(70, vhgt - chFullPad - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
   const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), mtop = rtop + (rh ? rh + 14 : 0), H = top + ph + extra;
@@ -2187,10 +2222,10 @@ function pageChart() {
   const wl = !(typeof HOSTED !== "undefined" && HOSTED) ? "" : '<div class="panel stack"><div><h3 style="font-size:18px">' + esc(t("wl_h")) + (WL ? ' <span class="tag num">' + WL.length + " / " + WL_MAX + "</span>" : "") + '</h3><p class="small muted">' + esc(canWl ? t("wl_p") : t("wl_need")) + "</p></div>" +
     (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" + importHtml() : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
 
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
+  return '<div class="wrap' + (chSide() ? " ch-page" : "") + '"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
     '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
-    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
+    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + '<div class="ch-body' + (chSide() ? " side" : "") + '">' + svg + chInfoBox() + "</div></div>" +
     (chReading ? readingHtml() : "") +
     '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + step + '"' + (CH.s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + step + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
     '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + '</div>' + (isReal ? '<label class="row small" style="gap:8px"><input type="checkbox" id="fb-auto"' + (cfg.autoAI ? " checked" : "") + ">" + esc(t("fb_auto")) + '</label><p class="small muted" style="margin-top:-6px">' + esc(t("fb_auto_note")) + "</p>" : "") + "</div>" + wl +
@@ -2229,6 +2264,31 @@ document.addEventListener("change", (ev) => {
   fr.readAsArrayBuffer(ev.target.files[0]);
 });
 
+/* ----- لوحة القراءات (بأسلوب MT5) ----- */
+const chSide = () => !chFull && (document.documentElement.clientWidth || 960) >= 1100;
+function chATR(i, n) { if (!CH || i < n) return null; let x = 0; for (let k = i - n + 1; k <= i; k++) { const r = CH.data[k], pc = CH.data[k - 1].c; x += Math.max(r.h - r.l, Math.abs(r.h - pc), Math.abs(r.l - pc)); } return x / n; }
+function chInfoLive(i) {
+  const r = CH.data[i]; if (!r) return "";
+  const d = r.c < 5 ? 4 : 2, f = (v) => (v == null || !isFinite(v) ? "–" : Number(v).toFixed(d)), prev = CH.data[i - 1], ch = prev ? ((r.c - prev.c) / prev.c) * 100 : null, atr = chATR(i, 14);
+  const row = (k, v, cls) => '<div class="ci-r"><span>' + esc(k) + '</span><b class="' + (cls || "") + '">' + v + "</b></div>";
+  const h = row(t("ci_date"), esc(r.d || String(i + 1))) + row(t("ch_c"), f(r.c), r.c >= r.o ? "up" : "down") + (ch == null ? "" : row(t("ci_chg"), (ch > 0 ? "+" : "") + ch.toFixed(2) + "%", ch >= 0 ? "up" : "down")) +
+    row(t("ch_o"), f(r.o)) + row(t("ch_hi"), f(r.h)) + row(t("ch_lo"), f(r.l)) + row(t("ci_span"), f(r.h - r.l)) + (atr != null ? row(t("ci_atr"), f(atr)) : "") + (r.v ? row(t("ch_vol"), int(r.v)) : "");
+  const ind = [];
+  CH.lines.forEach((ln) => { if (ln.v[i] != null) ind.push('<div class="ci-r"><span class="' + ln.cls + '">' + esc(ln.name) + "</span><b>" + f(ln.v[i]) + "</b></div>"); });
+  if (CH.bb && CH.bb.up[i] != null) ind.push('<div class="ci-r"><span class="i4">' + esc(t("ch_bb")) + "</span><b>" + f(CH.bb.lo[i]) + " – " + f(CH.bb.up[i]) + "</b></div>");
+  if (CH.md && CH.md.line[i] != null) ind.push('<div class="ci-r"><span class="i3">' + esc(t("ch_macd")) + '</span><b class="' + (CH.md.line[i] >= CH.md.sig[i] ? "up" : "down") + '">' + f(CH.md.line[i]) + " / " + f(CH.md.sig[i]) + "</b></div>");
+  if (CH.rs && CH.rs[i] != null) ind.push('<div class="ci-r"><span class="i2">' + esc(t("ch_rsi")) + '</span><b class="' + (CH.rs[i] > 70 ? "down" : CH.rs[i] < 30 ? "up" : "") + '">' + CH.rs[i].toFixed(1) + "</b></div>");
+  return '<div class="ci-sec">' + h + "</div>" + (ind.length ? '<div class="ci-sec">' + ind.join("") + "</div>" : "");
+}
+function chInfoBox() {
+  if (!CH || !CH.data.length) return "";
+  const a = CH.e - CH.s >= 20 ? analyze(CH.data, CH.s, CH.e) : null, d = CH.data[CH.e - 1].c < 5 ? 4 : 2, sym = S.chart && S.chart.sym;
+  const reg = a && a.regime ? '<b class="' + (a.regime === "up" ? "up" : a.regime === "down" ? "down" : "amber") + '">' + esc(t("ci_reg_" + a.regime)) + "</b>" : "<b>–</b>";
+  const stat = a && a.regime ? '<div class="ci-sec ci-sum"><div class="ci-r"><span>' + esc(t("ci_trend")) + "</span>" + reg + '</div><div class="ci-r"><span>' + esc(t("ci_sup")) + '</span><b class="up">' + (a.sup ? a.sup.toFixed(d) : "–") + '</b></div><div class="ci-r"><span>' + esc(t("ci_res")) + '</span><b class="down">' + (a.res ? a.res.toFixed(d) : "–") + "</b></div></div>" : "";
+  return '<aside class="ch-info" aria-label="' + esc(t("ci_h")) + '"><div class="ci-head"><b>' + esc(sym ? symName(sym) : "") + "</b><span>" + esc((sym && !PRACTICE[sym] ? sym + " · " : "") + t("ci_tf")) + "</span></div>" + stat + '<div id="ci-live">' + chInfoLive(CH.e - 1) + '</div><p class="ci-tip">' + esc(t("ci_tip")) + "</p></aside>";
+}
+Object.assign(UI, { ci_h: ["لوحة القراءات", "Readings"], ci_tf: ["يومي", "Daily"], ci_date: ["التاريخ", "Date"], ci_chg: ["التغير", "Change"], ci_span: ["مدى الشمعة", "Candle range"], ci_atr: ["متوسط المدى (14)", "Avg range (14)"],
+  ci_trend: ["الاتجاه", "Trend"], ci_reg_up: ["صاعد", "Up"], ci_reg_down: ["هابط", "Down"], ci_reg_range: ["عرضي", "Sideways"], ci_sup: ["أقرب دعم", "Nearest support"], ci_res: ["أقرب مقاومة", "Nearest resistance"], ci_tip: ["مرّر على الشارت وتتغير القراءات لكل شمعة.", "Hover the chart to read any candle."] });
 function chartReadout(i) {
   if (!CH || !CH.data[i]) return "&nbsp;";
   const r = CH.data[i], f = (v) => (v == null ? "–" : v.toFixed(2)), n = (v, cls) => '<b class="num ' + (cls || "") + '">' + v + "</b>";
@@ -2252,6 +2312,7 @@ function chartHover(ev) {
   const snap = CH.x0 + (pt.i - CH.s) * CH.bw + CH.bw / 2;
   cx.setAttribute("x1", snap); cx.setAttribute("x2", snap); cx.setAttribute("visibility", "visible");
   if (pt.inPrice) { cy.setAttribute("y1", pt.py); cy.setAttribute("y2", pt.py); cy.setAttribute("visibility", "visible"); } else cy.setAttribute("visibility", "hidden");
+  const ci = document.getElementById("ci-live"); if (ci && CH.data[pt.i]) ci.innerHTML = chInfoLive(pt.i);
   const rd = document.getElementById("ch-read");
   if (rd && CH.data[pt.i]) rd.innerHTML = chartReadout(pt.i) + (pt.inPrice && chTool !== "cursor" ? '<span class="rd muted">@ <b class="num">' + pt.p.toFixed(2) + "</b></span>" : "");
 }
@@ -3821,10 +3882,29 @@ function groupOf(r) {
 function subOf(r) { if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
 
 const ICON_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 4v3M7 15v5M17 3v4M17 13v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4.5" y="7" width="5" height="8" rx="1" fill="currentColor"/><rect x="14.5" y="7" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+const BACK_KEY = "meras.back", OWN_R = ["owner", "desk"];
+let BACK = null; try { BACK = JSON.parse(sessionStorage.getItem(BACK_KEY) || "null"); } catch (e) {}
+function trackBack(r) {
+  const prev = typeof lastPainted !== "undefined" ? lastPainted : null, was = BACK;
+  if (OWN_R.includes(r)) BACK = null;
+  else if (prev && OWN_R.includes(prev) && prev !== r) BACK = { r: prev, tab: prev === "desk" ? (typeof dkTab !== "undefined" ? dkTab : null) : typeof owTab !== "undefined" ? owTab : null };
+  if (was !== BACK) try { sessionStorage.setItem(BACK_KEY, JSON.stringify(BACK)); } catch (e) {}
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest && e.target.closest('[data-act="nav-back"]'); if (!b || !BACK) return;
+  e.preventDefault(); if (BACK.tab) { if (BACK.r === "desk" && typeof dkTab !== "undefined") dkTab = BACK.tab; if (BACK.r === "owner" && typeof owTab !== "undefined") owTab = BACK.tab; }
+  location.hash = BACK.r;
+});
+Object.assign(UI, { back_desk: ["رجوع لمكتبي", "Back to my desk"], back_owner: ["رجوع للوحة المالك", "Back to the dashboard"] });
 function headerHtml(r) {
+  trackBack(r);
   const g = groupOf(r), sub = subOf(r);
   const top = [["learn", "nav_learn"], ["services", "nav_svc"], ["plans", "nav_plans"]].map(([h, k]) => '<a href="#' + h + '"' + (g === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("");
-  const tools = '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
+  const back = BACK && typeof HOSTED !== "undefined" && HOSTED && CFG.token ? '<a class="btn sm back-btn" href="#' + BACK.r + '" data-act="nav-back" title="' + esc(t(BACK.r === "desk" ? "back_desk" : "back_owner")) + '"><span aria-hidden="true">↩</span> <span>' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")) + "</span></a>" : "";
+  let fab = document.getElementById("backfab");
+  if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }
+  fab.hidden = !back; if (back) { fab.href = "#" + BACK.r; fab.innerHTML = '<span aria-hidden="true">↩</span> ' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")); fab.title = t(BACK.r === "desk" ? "back_desk" : "back_owner"); }
+  const tools = back + '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
     '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm' + (S.signedIn ? "" : " primary") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a>";
   const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
   return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;
@@ -4205,7 +4285,7 @@ Object.assign(UI, {
   dk_px_tip: ["السهم اللي سعره من آخر صفقة ما ينسحب سعره. أضفه لقائمة الشارت من لوحة المالك عشان يصير حي.", "A share priced from its last trade is not being fetched. Add it to the chart list in the owner dashboard to make it live."],
   dk_trades_h: ["سجل العمليات", "Transactions"], dk_new_trade: ["أضف عملية", "Add a transaction"], dk_side: ["النوع", "Type"], dk_buy: ["شراء", "Buy"], dk_sell: ["بيع", "Sell"],
   dk_date: ["التاريخ", "Date"], dk_fee: ["العمولة (ريال)", "Commission (SAR)"], dk_note: ["ملاحظة", "Note"], dk_sym: ["رمز السهم", "Share code"], dk_total: ["الإجمالي", "Total"],
-  dk_feepct: ["عمولة السعودي %", "Saudi commission %"], dk_feemin: ["أقل عمولة (ريال)", "Minimum (SAR)"], dk_feeus: ["عمولة الأمريكي لكل عملية $", "US fee per trade $"], dk_feepct_tip: ["معبّاة بعمولة دراية: 0.12% وأقلها 12 ريال للسعودي، و2.25$ للعملية الأمريكية. تنحسب تلقائياً وتقدر تعدلها في كل عملية.", "Commission is filled in from this rate and can be edited on each transaction. Use the rate shown in your broker app."],
+  dk_feepct: ["عمولة السعودي % (الراجحي)", "Saudi commission % (Al Rajhi)"], dk_feevat: ["ضريبة على العمولة %", "VAT on commission %"], dk_feemin: ["أقل عمولة (ريال)", "Minimum (SAR)"], dk_feeus: ["عمولة الأمريكي لكل عملية $ (دراية)", "US fee per trade $ (Derayah)"], dk_feepct_tip: ["السعودي من محفظة الراجحي: 0.155% من قيمة الصفقة وعليها ضريبة 15%. والأمريكي من دراية: 2.25$ للعملية. تنحسب تلقائياً وتقدر تعدلها في كل عملية.", "Commission is filled in from this rate and can be edited on each transaction. Use the rate shown in your broker app."],
   dk_none_tr: ["ما سجلت عمليات للحين. أول ما تشتري من دراية سجّل العملية هنا.", "No transactions yet. When you buy in your broker app, record it here."],
   dk_bad: ["تأكد من الرمز والكمية والسعر", "Check the code, quantity and price"], dk_oversell: ["الكمية أكثر من اللي عندك في هذا السهم ({n})", "That is more than you hold in this share ({n})"],
   dk_saved: ["انحفظ", "Saved"], dk_del: ["احذف", "Delete"], dk_sure: ["متأكد؟", "Sure?"], dk_edit: ["عدّل", "Edit"], dk_save: ["احفظ", "Save"], dk_cancel: ["إلغاء", "Cancel"],
@@ -4224,14 +4304,14 @@ Object.assign(UI, {
 });
 
 let DK = { loaded: false, loading: false, data: null, sha: undefined }, dkTab = "pf", dkTrade = null, dkAn = null, dkDel = null, dkFilter = "all";
-const dkBlank = () => ({ version: 1, cfg: { feePct: 0.12, feeMin: 12, feeUS: 2.25 }, trades: [], charts: [] });
+const dkBlank = () => ({ version: 1, cfg: { v: 2, feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 2.25 }, trades: [], charts: [] });
 
 async function loadDesk(force) {
   if (!HOSTED || !CFG.token || DK.loading || (DK.loaded && !force)) return;
   DK.loading = true;
   await loadUS();
   try { const f = await readJson("desk.json"); DK.data = (f && f.data) || dkBlank(); DK.sha = f ? f.sha : undefined; } catch (e) { DK.data = DK.data || dkBlank(); toast(errText(e)); }
-  ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0.12, feeMin: 12, feeUS: 2.25 }, DK.data.cfg); if (!DK.data.cfg.feePct && !DK.data.cfg.touched) Object.assign(DK.data.cfg, { feePct: 0.12, feeMin: 12, feeUS: 2.25 });
+  ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 2.25 }, DK.data.cfg); if (DK.data.cfg.v !== 2) Object.assign(DK.data.cfg, { v: 2, feePct: 0.155, feeMin: 0, feeVat: 15 });
   DK.loading = false; DK.loaded = true; if (route() === "desk") render();
 }
 async function saveDesk() {
@@ -4285,7 +4365,7 @@ function dkPortfolio() {
   const trs = DK.data.trades.slice().sort((a, b) => (a.date === b.date ? (b.at || 0) - (a.at || 0) : a.date < b.date ? 1 : -1));
   const trows = trs.map((x) => '<tr><td class="num">' + esc(x.date) + "</td><td>" + owTag(x.side === "buy" ? "up" : "down", x.side === "buy" ? "dk_buy" : "dk_sell") + '</td><td><span class="num">' + esc(x.sym) + "</span> " + esc(dkName(x.sym)) + '</td><td class="num">' + int(x.qty) + '</td><td class="num">' + money(x.price, curOf(x.sym)) + '</td><td class="num">' + money(Number(x.fee) || 0, curOf(x.sym)) + '</td><td class="num">' + money(x.qty * x.price + (x.side === "buy" ? 1 : -1) * (Number(x.fee) || 0), curOf(x.sym)) + '</td><td class="small">' + esc(x.note || "") + '</td><td class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn sm ghost" data-act="dk-tedit" data-id="' + esc(x.id) + '">' + esc(t("dk_edit")) + '</button><button class="btn sm ' + (dkDel === x.id ? "danger" : "ghost") + '" data-act="dk-tdel" data-id="' + esc(x.id) + '">' + esc(t(dkDel === x.id ? "dk_sure" : "dk_del")) + "</button></td></tr>").join("");
   const trades = owPanel(t("dk_trades_h"), (trs.length ? '<div class="tablewrap"><table><thead><tr><th>' + esc(t("dk_date")) + "</th><th>" + esc(t("dk_side")) + "</th><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("dk_qty")) + "</th><th>" + esc(t("dk_px")) + "</th><th>" + esc(t("dk_fee")) + "</th><th>" + esc(t("dk_total")) + "</th><th>" + esc(t("dk_note")) + "</th><th></th></tr></thead><tbody>" + trows + "</tbody></table></div>" : '<p class="muted" style="margin:0">' + esc(t("dk_none_tr")) + "</p>") +
-    '<form class="row" data-form="dk-cfg" novalidate style="align-items:flex-end"><div class="field" style="width:200px"><label for="dk-feepct">' + esc(t("dk_feepct")) + '</label><input id="dk-feepct" type="number" min="0" step="0.001" inputmode="decimal" value="' + esc(DK.data.cfg.feePct) + '"></div><div class="field" style="width:150px"><label for="dk-feemin">' + esc(t("dk_feemin")) + '</label><input id="dk-feemin" type="number" min="0" step="1" inputmode="decimal" value="' + esc(DK.data.cfg.feeMin) + '"></div><div class="field" style="width:170px"><label for="dk-feeus">' + esc(t("dk_feeus")) + '</label><input id="dk-feeus" type="number" min="0" step="0.01" inputmode="decimal" value="' + esc(DK.data.cfg.feeUS) + '"></div><button class="btn sm" type="submit">' + esc(t("dk_save")) + '</button><p class="small muted" style="flex:1;min-width:200px;margin:0">' + esc(t("dk_feepct_tip")) + "</p></form>",
+    '<form class="row" data-form="dk-cfg" novalidate style="align-items:flex-end"><div class="field" style="width:200px"><label for="dk-feepct">' + esc(t("dk_feepct")) + '</label><input id="dk-feepct" type="number" min="0" step="0.001" inputmode="decimal" value="' + esc(DK.data.cfg.feePct) + '"></div><div class="field" style="width:150px"><label for="dk-feemin">' + esc(t("dk_feemin")) + '</label><input id="dk-feemin" type="number" min="0" step="1" inputmode="decimal" value="' + esc(DK.data.cfg.feeMin) + '"></div><div class="field" style="width:150px"><label for="dk-feevat">' + esc(t("dk_feevat")) + '</label><input id="dk-feevat" type="number" min="0" step="1" inputmode="decimal" value="' + esc(DK.data.cfg.feeVat) + '"></div><div class="field" style="width:170px"><label for="dk-feeus">' + esc(t("dk_feeus")) + '</label><input id="dk-feeus" type="number" min="0" step="0.01" inputmode="decimal" value="' + esc(DK.data.cfg.feeUS) + '"></div><button class="btn sm" type="submit">' + esc(t("dk_save")) + '</button><p class="small muted" style="flex:1;min-width:200px;margin:0">' + esc(t("dk_feepct_tip")) + "</p></form>",
     trs.length ? '<button class="btn sm" data-act="dk-xlsx">⤓ ' + esc(t("dk_xlsx")) + "</button>" : "");
   const curs = ["SAR", "USD"].filter((c) => c === "SAR" || DK.data.trades.some((x) => curOf(x.sym) === c));
   return (dkTrade ? dkTradeForm() : '<div><button class="btn primary" data-act="dk-tnew">+ ' + esc(t("dk_new_trade")) + "</button></div>") + curs.map(dkPfCur).join("") + trades;
@@ -4394,7 +4474,7 @@ document.addEventListener("input", (e) => {
   const q = parseFloat(document.getElementById("dt-qty").value), p = parseFloat(document.getElementById("dt-price").value), fee = document.getElementById("dt-fee");
   const sv = (document.getElementById("dt-sym").value || "").trim();
   if (!fee || !DK.data || !(q > 0 && p > 0)) return; const c = DK.data.cfg;
-  if (/^\d{4}$/.test(sv)) { if (c.feePct > 0) fee.value = Math.max(q * p * c.feePct / 100, c.feeMin || 0).toFixed(2); }
+  if (/^\d{4}$/.test(sv)) { if (c.feePct > 0) fee.value = (Math.max(q * p * c.feePct / 100, c.feeMin || 0) * (1 + (c.feeVat || 0) / 100)).toFixed(2); }
   else if (sv && c.feeUS > 0) fee.value = Number(c.feeUS).toFixed(2);
 });
 document.addEventListener("change", (e) => {
@@ -4405,7 +4485,7 @@ document.addEventListener("submit", async (e) => {
   e.preventDefault();
   const v = (id) => { const x = document.getElementById(id); return x ? x.value.trim() : ""; }, num = (id) => { const n = parseFloat(v(id)); return isFinite(n) && n > 0 ? n : null; };
   const kind = form.dataset.form;
-  if (kind === "dk-cfg") { const g = (id) => { const n = parseFloat(v(id)); return isFinite(n) && n >= 0 ? n : 0; }; Object.assign(DK.data.cfg, { feePct: g("dk-feepct"), feeMin: g("dk-feemin"), feeUS: g("dk-feeus"), touched: true }); await saveDesk(); render(); }
+  if (kind === "dk-cfg") { const g = (id) => { const n = parseFloat(v(id)); return isFinite(n) && n >= 0 ? n : 0; }; Object.assign(DK.data.cfg, { feePct: g("dk-feepct"), feeMin: g("dk-feemin"), feeVat: g("dk-feevat"), feeUS: g("dk-feeus"), touched: true }); await saveDesk(); render(); }
   else if (kind === "dk-trade") {
     const sym = v("dt-sym").toUpperCase().replace(/[^0-9A-Z.]/g, ""), qty = num("dt-qty"), price = num("dt-price"), side = v("dt-side"), id = form.dataset.id;
     if (!/^(\d{4}|[A-Z]{1,5}(\.[A-Z])?)$/.test(sym) || !qty || !price) { toast(t("dk_bad")); return; }

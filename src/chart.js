@@ -182,6 +182,7 @@ function analyze(data, s, e) {
   else if (regime === "down" && h2.length === 2 && lh) out.auto.push({ t: "t", i1: h2[0].i, p1: r2(h2[0].p), i2: h2[1].i, p2: r2(h2[1].p), auto: 1 });
   if (below) out.auto.push({ t: "h", p: r2(below.p), auto: 1 });
   if (above) out.auto.push({ t: "h", p: r2(above.p), auto: 1 });
+  out.sup = below ? below.p : null; out.res = above ? above.p : null;
   return out;
 }
 
@@ -278,7 +279,7 @@ function chartSvg(cfg, full) {
 
   /* geometry follows the real pixel width, so text never shrinks on a phone */
   const vw = document.documentElement.clientWidth || 960, vhgt = window.innerHeight || 700;
-  const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62)), axis = W < 520 ? 50 : 62;
+  const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62 - (chSide() ? 272 : 0))), axis = W < 520 ? 50 : 62;
   const x0 = 6, x1 = W - axis, top = 8, tight = chFull && vhgt < 460, vh = cfg.vol ? (tight ? 26 : W < 520 ? 40 : 56) : 0, rh = rs ? (tight ? 50 : W < 520 ? 70 : 96) : 0, mh = md ? (tight ? 50 : W < 520 ? 70 : 96) : 0, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + (mh ? mh + 14 : 0) + 20;
   const ph = chFull ? Math.max(70, vhgt - chFullPad - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
   const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), mtop = rtop + (rh ? rh + 14 : 0), H = top + ph + extra;
@@ -400,10 +401,10 @@ function pageChart() {
   const wl = !(typeof HOSTED !== "undefined" && HOSTED) ? "" : '<div class="panel stack"><div><h3 style="font-size:18px">' + esc(t("wl_h")) + (WL ? ' <span class="tag num">' + WL.length + " / " + WL_MAX + "</span>" : "") + '</h3><p class="small muted">' + esc(canWl ? t("wl_p") : t("wl_need")) + "</p></div>" +
     (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" + importHtml() : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
 
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
+  return '<div class="wrap' + (chSide() ? " ch-page" : "") + '"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
     '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p></div>" +
-    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + svg + "</div>" +
+    '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + '<div class="ch-body' + (chSide() ? " side" : "") + '">' + svg + chInfoBox() + "</div></div>" +
     (chReading ? readingHtml() : "") +
     '<div class="row" style="justify-content:space-between"><div class="row"><button class="btn sm" data-act="ch-pan" data-n="' + step + '"' + (CH.s > 0 ? "" : " disabled") + ">" + esc(t("ch_older")) + '</button><button class="btn sm" data-act="ch-pan" data-n="-' + step + '"' + (chOffset > 0 ? "" : " disabled") + ">" + esc(t("ch_newer")) + '</button></div><div class="row">' + replay + "</div></div>" +
     '<div class="panel stack"><div class="row" style="justify-content:space-between"><h3 style="font-size:18px">' + esc(t("ch_draws")) + '</h3><div class="row">' + (isReal ? '<a class="btn sm" target="_blank" rel="noopener" href="https://www.tradingview.com/chart/?symbol=TADAWUL%3A' + encodeURIComponent(cfg.sym) + '">' + esc(t("ch_tv")) + " ↗</a>" : "") + '<button class="btn sm primary" data-act="ch-trade"' + (CH.data.length ? "" : " disabled") + ">" + esc(t("ch_trade")) + '</button></div></div><div class="row">' + drawList + '</div>' + (isReal ? '<label class="row small" style="gap:8px"><input type="checkbox" id="fb-auto"' + (cfg.autoAI ? " checked" : "") + ">" + esc(t("fb_auto")) + '</label><p class="small muted" style="margin-top:-6px">' + esc(t("fb_auto_note")) + "</p>" : "") + "</div>" + wl +
@@ -442,6 +443,31 @@ document.addEventListener("change", (ev) => {
   fr.readAsArrayBuffer(ev.target.files[0]);
 });
 
+/* ----- لوحة القراءات (بأسلوب MT5) ----- */
+const chSide = () => !chFull && (document.documentElement.clientWidth || 960) >= 1100;
+function chATR(i, n) { if (!CH || i < n) return null; let x = 0; for (let k = i - n + 1; k <= i; k++) { const r = CH.data[k], pc = CH.data[k - 1].c; x += Math.max(r.h - r.l, Math.abs(r.h - pc), Math.abs(r.l - pc)); } return x / n; }
+function chInfoLive(i) {
+  const r = CH.data[i]; if (!r) return "";
+  const d = r.c < 5 ? 4 : 2, f = (v) => (v == null || !isFinite(v) ? "–" : Number(v).toFixed(d)), prev = CH.data[i - 1], ch = prev ? ((r.c - prev.c) / prev.c) * 100 : null, atr = chATR(i, 14);
+  const row = (k, v, cls) => '<div class="ci-r"><span>' + esc(k) + '</span><b class="' + (cls || "") + '">' + v + "</b></div>";
+  const h = row(t("ci_date"), esc(r.d || String(i + 1))) + row(t("ch_c"), f(r.c), r.c >= r.o ? "up" : "down") + (ch == null ? "" : row(t("ci_chg"), (ch > 0 ? "+" : "") + ch.toFixed(2) + "%", ch >= 0 ? "up" : "down")) +
+    row(t("ch_o"), f(r.o)) + row(t("ch_hi"), f(r.h)) + row(t("ch_lo"), f(r.l)) + row(t("ci_span"), f(r.h - r.l)) + (atr != null ? row(t("ci_atr"), f(atr)) : "") + (r.v ? row(t("ch_vol"), int(r.v)) : "");
+  const ind = [];
+  CH.lines.forEach((ln) => { if (ln.v[i] != null) ind.push('<div class="ci-r"><span class="' + ln.cls + '">' + esc(ln.name) + "</span><b>" + f(ln.v[i]) + "</b></div>"); });
+  if (CH.bb && CH.bb.up[i] != null) ind.push('<div class="ci-r"><span class="i4">' + esc(t("ch_bb")) + "</span><b>" + f(CH.bb.lo[i]) + " – " + f(CH.bb.up[i]) + "</b></div>");
+  if (CH.md && CH.md.line[i] != null) ind.push('<div class="ci-r"><span class="i3">' + esc(t("ch_macd")) + '</span><b class="' + (CH.md.line[i] >= CH.md.sig[i] ? "up" : "down") + '">' + f(CH.md.line[i]) + " / " + f(CH.md.sig[i]) + "</b></div>");
+  if (CH.rs && CH.rs[i] != null) ind.push('<div class="ci-r"><span class="i2">' + esc(t("ch_rsi")) + '</span><b class="' + (CH.rs[i] > 70 ? "down" : CH.rs[i] < 30 ? "up" : "") + '">' + CH.rs[i].toFixed(1) + "</b></div>");
+  return '<div class="ci-sec">' + h + "</div>" + (ind.length ? '<div class="ci-sec">' + ind.join("") + "</div>" : "");
+}
+function chInfoBox() {
+  if (!CH || !CH.data.length) return "";
+  const a = CH.e - CH.s >= 20 ? analyze(CH.data, CH.s, CH.e) : null, d = CH.data[CH.e - 1].c < 5 ? 4 : 2, sym = S.chart && S.chart.sym;
+  const reg = a && a.regime ? '<b class="' + (a.regime === "up" ? "up" : a.regime === "down" ? "down" : "amber") + '">' + esc(t("ci_reg_" + a.regime)) + "</b>" : "<b>–</b>";
+  const stat = a && a.regime ? '<div class="ci-sec ci-sum"><div class="ci-r"><span>' + esc(t("ci_trend")) + "</span>" + reg + '</div><div class="ci-r"><span>' + esc(t("ci_sup")) + '</span><b class="up">' + (a.sup ? a.sup.toFixed(d) : "–") + '</b></div><div class="ci-r"><span>' + esc(t("ci_res")) + '</span><b class="down">' + (a.res ? a.res.toFixed(d) : "–") + "</b></div></div>" : "";
+  return '<aside class="ch-info" aria-label="' + esc(t("ci_h")) + '"><div class="ci-head"><b>' + esc(sym ? symName(sym) : "") + "</b><span>" + esc((sym && !PRACTICE[sym] ? sym + " · " : "") + t("ci_tf")) + "</span></div>" + stat + '<div id="ci-live">' + chInfoLive(CH.e - 1) + '</div><p class="ci-tip">' + esc(t("ci_tip")) + "</p></aside>";
+}
+Object.assign(UI, { ci_h: ["لوحة القراءات", "Readings"], ci_tf: ["يومي", "Daily"], ci_date: ["التاريخ", "Date"], ci_chg: ["التغير", "Change"], ci_span: ["مدى الشمعة", "Candle range"], ci_atr: ["متوسط المدى (14)", "Avg range (14)"],
+  ci_trend: ["الاتجاه", "Trend"], ci_reg_up: ["صاعد", "Up"], ci_reg_down: ["هابط", "Down"], ci_reg_range: ["عرضي", "Sideways"], ci_sup: ["أقرب دعم", "Nearest support"], ci_res: ["أقرب مقاومة", "Nearest resistance"], ci_tip: ["مرّر على الشارت وتتغير القراءات لكل شمعة.", "Hover the chart to read any candle."] });
 function chartReadout(i) {
   if (!CH || !CH.data[i]) return "&nbsp;";
   const r = CH.data[i], f = (v) => (v == null ? "–" : v.toFixed(2)), n = (v, cls) => '<b class="num ' + (cls || "") + '">' + v + "</b>";
@@ -465,6 +491,7 @@ function chartHover(ev) {
   const snap = CH.x0 + (pt.i - CH.s) * CH.bw + CH.bw / 2;
   cx.setAttribute("x1", snap); cx.setAttribute("x2", snap); cx.setAttribute("visibility", "visible");
   if (pt.inPrice) { cy.setAttribute("y1", pt.py); cy.setAttribute("y2", pt.py); cy.setAttribute("visibility", "visible"); } else cy.setAttribute("visibility", "hidden");
+  const ci = document.getElementById("ci-live"); if (ci && CH.data[pt.i]) ci.innerHTML = chInfoLive(pt.i);
   const rd = document.getElementById("ch-read");
   if (rd && CH.data[pt.i]) rd.innerHTML = chartReadout(pt.i) + (pt.inPrice && chTool !== "cursor" ? '<span class="rd muted">@ <b class="num">' + pt.p.toFixed(2) + "</b></span>" : "");
 }
