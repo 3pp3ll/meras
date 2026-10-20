@@ -584,3 +584,11 @@ p,li,dd{line-height:1.95}
   .back-btn{display:none!important}
   #backfab:not([hidden]){display:inline-flex;align-items:center;gap:6px;position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));inset-inline-start:18px;z-index:35;height:44px;padding:0 16px;border-radius:22px;background:var(--surface);border:1px solid var(--amber);color:var(--amber-ink);font-weight:700;text-decoration:none;box-shadow:0 6px 18px rgba(40,30,60,.18)}
 }
+/* الفرز الشرعي */
+.sh-card h3{font-size:19px}
+.sh-boards,.sh-est{display:flex;flex-direction:column;gap:4px}
+.sh-b{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line)}
+.sh-own{background:var(--sunk);border-radius:8px;padding:8px 10px}
+.sh-calc{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
+@media (max-width:560px){.sh-calc{grid-template-columns:1fr}}
+.sh-card .num{white-space:nowrap}

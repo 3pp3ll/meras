@@ -12,7 +12,7 @@ Object.assign(UI, {
   ow_run: ["شغّل الآن", "Run now"], ow_ran: ["انطلب التشغيل. يبان هنا خلال دقيقة.", "Run requested. It shows here within a minute."],
   ow_ok: ["نجح", "Succeeded"], ow_fail: ["فشل", "Failed"], ow_busy: ["يشتغل", "Running"], ow_cancel: ["انلغى", "Cancelled"], ow_none: ["ما اشتغل", "No runs"],
   ow_runs_403: ["عشان تشوف حالة التشغيل وتشغّل يدوياً، أضف للرمز صلاحية Actions (Read and write) من إعدادات الرمز في GitHub. باقي اللوحة يشتغل بدونها.", "To see run status and run jobs by hand, add the Actions permission (Read and write) to the token in GitHub. The rest of the dashboard works without it."],
-  j_prices: ["الأسعار والشموع", "Prices and candles"], j_technicals: ["التحليل الفني", "Technicals"], j_dividends: ["التوزيعات", "Dividends"], j_metals: ["المعادن", "Metals"], j_us: ["السوق الأمريكي والفوركس", "US market and forex"], s_us: ["1:30 الفجر، الثلاثاء إلى السبت", "1:30 am, Tue to Sat"],
+  j_prices: ["الأسعار والشموع", "Prices and candles"], j_technicals: ["التحليل الفني", "Technicals"], j_dividends: ["التوزيعات", "Dividends"], j_metals: ["المعادن", "Metals"], j_us: ["السوق الأمريكي والفوركس", "US market and forex"], s_us: ["3:30 الفجر، الثلاثاء إلى السبت", "3:30 am, Tue to Sat"],
   s_prices: ["7 مرات يومياً، الأحد إلى الخميس", "7 times a day, Sun to Thu"], s_technicals: ["3 مرات يومياً، الأحد إلى الخميس", "3 times a day, Sun to Thu"], s_dividends: ["4:30 م، الأحد إلى الخميس", "4:30 pm, Sun to Thu"], s_metals: ["كل ساعتين، الاثنين إلى الجمعة", "Every 2 hours, Mon to Fri"],
   ow_hist: ["تاريخ الأسهم", "Share history"], ow_sym: ["السهم", "Share"], ow_candles: ["عدد الشموع", "Candles"], ow_lastc: ["آخر شمعة", "Last candle"], ow_state: ["الحالة", "Status"],
   ow_h_ok: ["سليم", "OK"], ow_h_short: ["تاريخ قصير", "Short history"], ow_h_old: ["متأخر", "Behind"], ow_h_missing: ["بدون تاريخ", "No history"],
@@ -183,8 +183,8 @@ function pageOwner() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + '</div><div><a class="btn primary" href="#settings">' + esc(t("set_h")) + "</a></div></div></div>";
   if (!OW.loaded) { loadOwner(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_loading")) + "</div></div>"; }
-  const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
-  const body = { data: owData, lists: owLists, backup: owBackup, content: owContent, users: owUsers }[owTab]();
+  const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["sharia", "tab_sharia"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
+  const body = { data: owData, lists: owLists, sharia: shAdmin, backup: owBackup, content: owContent, users: owUsers }[owTab]();
   return head + '<div class="row ow-bar" style="justify-content:space-between"><div class="tabs ow-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#owner" role="tab" data-act="ow-tab" data-tab="' + k + '"' + (owTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><a class="btn sm primary" href="#desk">' + esc(t("ow_desk_btn")) + '</a><button class="btn sm ghost" data-act="ow-reload"' + (OW.loading ? " disabled" : "") + ">↻ " + esc(t(OW.loading ? "ow_loading" : "ow_reload")) + '</button></div><div class="stack" style="padding-block:18px 40px">' + body + "</div></div>";
 }
 

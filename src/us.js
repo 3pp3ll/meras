@@ -5,7 +5,7 @@ Object.assign(UI, {
   us_t: ["السوق الأمريكي", "US market"],
   us_g_movers: ["الأسهم الأكثر حركة", "Biggest movers"], us_g_ai: ["الذكاء الاصطناعي والسحابة", "AI and cloud"], us_g_fx: ["الفوركس", "Forex"], us_g_cmd: ["النفط والمعادن", "Oil and metals"],
   us_last: ["آخر إقفال", "Last close"], us_1d: ["اليوم", "1 day"], us_5d: ["5 أيام", "5 days"], us_1m: ["شهر", "1 month"], us_range: ["مدى 30 يوم", "30-day range"],
-  us_none: ["البيانات لسا ما وصلت. أول تشغيل ياخذ 5 دقايق تقريباً بعد إضافة المفتاح، وبعدها مرة كل يوم 1:30 الفجر.", "No data yet. The first run takes about 5 minutes after the key is added, then once a day at 1:30 am Riyadh time."],
+  us_none: ["البيانات لسا ما وصلت. أول تشغيل ياخذ 5 دقايق تقريباً بعد إضافة المفتاح، وبعدها مرة كل يوم 3:30 الفجر.", "No data yet. The first run takes about 5 minutes after the key is added, then once a day at 3:30 am Riyadh time."],
   us_meta: ["آخر تحديث {d} · استخدم {n} من 25 طلب", "Updated {d} · used {n} of 25 requests"],
   us_err: ["رموز ما وصلت بياناتها", "Symbols with no data"], us_note: ["البيانات للاستخدام الشخصي حسب رخصة Alpha Vantage، فهي تظهر لك أنت بس.", "Data is for personal use under the Alpha Vantage licence, so it is shown to you only."],
   us_gold: ["الذهب (أونصة)", "Gold (oz)"], us_silver: ["الفضة (أونصة)", "Silver (oz)"]
@@ -57,7 +57,7 @@ function dkUS() {
   let metals = "";
   if (USM) [["gold", "us_gold", "XAU"], ["silver", "us_silver", "XAG"]].forEach(([k, lab, s]) => { const m = USM[k]; if (!m) return; const rows = LIVE.history[s] && LIVE.history[s].length > 1 ? LIVE.history[s] : Array.isArray(m.hist) ? m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })) : []; if (rows.length) metals += usRow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); });
   const errs = Object.entries(US.errors || {});
-  return '<p class="small muted" style="margin:0">' + esc(t("us_meta").replace("{d}", whenText(US.fetched_at)).replace("{n}", US.requests != null ? US.requests : "–")) + " · " + esc(t("us_note")) + "</p>" +
+  return '<h3 style="font-size:19px;margin:0">' + esc(t("tab_sharia")) + "</h3>" + shFinder() + '<p class="small muted" style="margin:0">' + esc(t("us_meta").replace("{d}", whenText(US.fetched_at)).replace("{n}", US.requests != null ? US.requests : "–")) + " · " + esc(t("us_note")) + "</p>" +
     (errs.length ? '<div class="notice"><b>' + esc(t("us_err")) + ":</b> " + errs.map(([s, m]) => '<span class="num">' + esc(s) + "</span> <span class=\"small\">(" + esc(m) + ")</span>").join("، ") + "</div>" : "") +
     table("movers") + table("ai") + table("fx") + table("cmd", metals);
 }

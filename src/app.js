@@ -273,7 +273,7 @@ function pageLesson(id) {
 
 /* ----- services ----- */
 function svcShell(tab, inner) {
-  const titles = { journal: "tab_journal", calc: "tab_calc", glossary: "tab_gloss", dividends: "tab_div", metals: "tab_met", tech: "tab_tech", invest: "tab_inv" };
+  const titles = { journal: "tab_journal", calc: "tab_calc", glossary: "tab_gloss", dividends: "tab_div", metals: "tab_met", sharia: "tab_sharia", tech: "tab_tech", invest: "tab_inv" };
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t(titles[tab] || "services_h")) + '</h1></div><div class="stack" style="padding-block:18px">' + inner + "</div></div>";
 }
 const plOf = (j) => (j.exit == null ? null : (j.exit - j.entry) * j.qty);
@@ -398,7 +398,7 @@ function renderNow() {
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": pageGate, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": pageGate, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
