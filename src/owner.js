@@ -186,7 +186,7 @@ function pageOwner() {
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + '</div><div><a class="btn primary" href="#settings">' + esc(t("set_h")) + "</a></div></div></div>";
   if (!OW.loaded) { loadOwner(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_loading")) + "</div></div>"; }
   const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["sharia", "tab_sharia"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
-  const body = { data: owData, lists: owLists, sharia: shAdmin, backup: owBackup, content: owContent, users: owUsers }[owTab]();
+  const body = { data: owData, lists: owLists, sharia: () => shFinder() + shAdmin(), backup: owBackup, content: owContent, users: owUsers }[owTab]();
   return head + '<div class="row ow-bar" style="justify-content:space-between"><div class="tabs ow-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#owner" role="tab" data-act="ow-tab" data-tab="' + k + '"' + (owTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><a class="btn sm primary" href="#desk">' + esc(t("ow_desk_btn")) + '</a><button class="btn sm ghost" data-act="ow-reload"' + (OW.loading ? " disabled" : "") + ">↻ " + esc(t(OW.loading ? "ow_loading" : "ow_reload")) + '</button></div><div class="stack" style="padding-block:18px 40px">' + body + "</div></div>";
 }
 

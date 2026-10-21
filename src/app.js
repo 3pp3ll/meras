@@ -379,6 +379,7 @@ function render() {
   const r = route(), same = r === lastPainted, y = window.scrollY, m = document.getElementById("main");
   if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
+  if (typeof topBell === "function") topBell();
   const sn = document.querySelector(".subnav nav"), cur = sn && sn.querySelector('[aria-current="page"]');
   if (cur) { const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; }
   if (same) {

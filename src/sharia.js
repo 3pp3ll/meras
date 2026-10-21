@@ -18,7 +18,7 @@ Object.assign(UI, {
   sh_listed: ["ضمن المتوافقة", "On the compliant list"], sh_notlisted: ["مو ضمن المتوافقة", "Not on the compliant list"],
   sh_purify: ["نسبة التطهير", "Purification ratio"], sh_purify_na: ["قوائم الهيئات ما فيها نسب التطهير. خذها من مصدرك (مثل البلاد المالية أو تطبيقك).", "The board lists do not include purification ratios. Take it from your source."],
   sh_calc: ["حاسبة التطهير", "Purification calculator"], sh_amount: ["المبلغ (توزيعات أو ربح)", "Amount (dividends or gain)"], sh_ratio: ["نسبة التطهير %", "Purification %"], sh_give: ["تتصدق بـ", "Give in charity"],
-  sh_yaqeen: ["تأكد في يقين", "Check on Yaqeen"], sh_argaam: ["قائمة أرقام", "Argaam list"],
+  sh_yaqeen: ["تأكد في يقين", "Check on Yaqeen"], sh_yaqeen_all: ["ابحث في يقين", "Search Yaqeen"], sh_notit: ["مو هذا السهم اللي تدوره؟", "Not the share you want?"], sh_nores: ["ما لقينا السهم عندنا. دوّره هنا:", "We do not have this share. Look it up here:"], sh_argaam: ["قائمة أرقام", "Argaam list"],
   sh_est: ["حساب مِراس التقديري (لك أنت بس)", "Meras estimate (only you see this)"], sh_est_note: ["محسوب من القوائم المالية حسب معيار AAOIFI، تقدير وليس فتوى. يقين أو هيئتك الشرعية هي المرجع.", "Calculated from the financial statements per the AAOIFI standard; an estimate, not a ruling."],
   sh_debt: ["الديون بفائدة ÷ القيمة السوقية", "Interest debt ÷ market cap"], sh_cash: ["النقد والاستثمارات ÷ القيمة السوقية", "Cash and investments ÷ market cap"], sh_haram: ["الدخل غير المباح ÷ الإيرادات", "Non-permissible income ÷ revenue"],
   sh_notyet: ["هذا السهم لسا ما انحسب في قاعدة البيانات. القاعدة تكبر كل يوم: سهمين في أيام الأسعار، و12 سهم الأحد والاثنين.", "This share is not in the database yet. It grows every day: two shares on price days and 12 on Sunday and Monday."],
@@ -124,7 +124,8 @@ function shOwnForm(own) {
 function shResults() {
   const rs = shSearch(shQ), max = 8;
   if (!shQ.trim()) return "";
-  return '<div class="stack">' + rs.slice(0, max).map(shCard).join("") + (rs.length > max ? '<p class="small muted">' + esc(t("sh_more").replace("{n}", rs.length - max)) + "</p>" : "") + "</div>";
+  const more = '<div class="row sh-more"><span class="small muted">' + esc(t(rs.length ? "sh_notit" : "sh_nores")) + '</span><a class="btn sm" href="https://yaaqen.com/stocks/all-stocks" target="_blank" rel="noopener">' + esc(t("sh_yaqeen_all")) + ' ↗</a><a class="btn sm ghost" href="' + SH_ARGAAM + '" target="_blank" rel="noopener">' + esc(t("sh_argaam")) + " ↗</a></div>";
+  return '<div class="stack">' + rs.slice(0, max).map(shCard).join("") + (rs.length > max ? '<p class="small muted">' + esc(t("sh_more").replace("{n}", rs.length - max)) + "</p>" : "") + more + "</div>";
 }
 function shFinder() {
   if (!shTried) loadSharia();
