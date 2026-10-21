@@ -32,10 +32,21 @@ function topBell() {
   const tools = document.querySelector(".top .tools");
   if (!tools) return;
   if (!b || !tools.contains(b)) { b = document.createElement("button"); b.type = "button"; b.id = "topbell"; b.className = "btn sm th-btn bell"; b.setAttribute("data-act", "nt-bell"); b.setAttribute("aria-haspopup", "dialog"); tools.insertBefore(b, tools.firstChild); }
+  let ck = document.getElementById("topclock");
+  if (!ck || !tools.contains(ck)) { ck = document.createElement("span"); ck.id = "topclock"; ck.className = "clock"; ck.setAttribute("dir", "ltr"); ck.setAttribute("aria-label", "Riyadh time"); tools.insertBefore(ck, tools.firstChild); topClock(); }
   const n = typeof ntUnread === "function" ? ntUnread() : Math.max(0, topNewCount());
   b.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' + (n ? '<span class="bell-n">' + n + "</span>" : "");
   b.title = t("nt_h") + (n ? " (" + n + ")" : ""); b.setAttribute("aria-label", b.title);
 }
+function topClock() {
+  const el = document.getElementById("topclock"); if (!el) return;
+  const p = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Riyadh", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }).formatToParts(new Date());
+  const g = (k) => (p.find((x) => x.type === k) || {}).value || "";
+  const ap = g("dayPeriod").toUpperCase() === "AM" ? (S.lang === "ar" ? "ص" : "AM") : (S.lang === "ar" ? "م" : "PM");
+  el.innerHTML = '<b>' + g("hour") + ":" + g("minute") + '</b><span class="sec">:' + g("second") + '</span> <span class="ap">' + ap + "</span>";
+  el.title = S.lang === "ar" ? "توقيت الرياض" : "Riyadh time";
+}
+setInterval(topClock, 1000);
 function topBeep() {
   try {
     const A = window.AudioContext || window.webkitAudioContext; if (!A) return; const ctx = topBeep.ctx || (topBeep.ctx = new A());

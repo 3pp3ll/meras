@@ -637,3 +637,10 @@ p,li,dd{line-height:1.95}
 .ln-why{border-inline-start:4px solid var(--amber);padding:4px 14px}
 .ln-cta{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:linear-gradient(135deg,var(--surface),var(--amber-soft))}
 .ln-cta h2{font-size:26px}
+/* الساعة */
+.clock{display:inline-flex;flex-direction:row;align-items:baseline;gap:1px;white-space:nowrap;direction:ltr;unicode-bidi:isolate;font-family:var(--mono);font-size:16px;color:var(--ink);padding:0 2px}
+[dir="rtl"] .clock{margin-left:36px}[dir="ltr"] .clock{margin-right:36px}
+.clock b{font-weight:700;font-variant-numeric:tabular-nums}
+.clock .sec{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.clock .ap{font-size:13px;font-weight:700;color:var(--amber-ink);margin-inline-start:4px;font-family:var(--body)}
+@media (max-width:560px){[dir="rtl"] .clock{margin-left:14px}[dir="ltr"] .clock{margin-right:14px}.clock{font-size:14px}.clock .sec{display:none}}
