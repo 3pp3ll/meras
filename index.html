@@ -628,6 +628,18 @@ p,li,dd{line-height:1.95}
 .tp-why ul{margin:4px 0 0;padding-inline-start:20px}
 .tp-left{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px}
 .sh-more{gap:8px;align-items:center;border-top:1px dashed var(--line);padding-top:10px}
+/* قائمة التنبيهات */
+#ntpanel{position:fixed;top:64px;inset-inline-end:max(12px,calc((100vw - var(--wrap)) / 2 + 12px));z-index:40;width:min(380px,calc(100vw - 24px));max-height:min(70vh,560px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(30,25,50,.22);padding:12px 14px}
+.nt-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.nt-head b{font-size:17px}
+.nt-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.nt-i{padding:10px 4px 10px 10px;border-bottom:1px dashed var(--line);position:relative}
+[dir="rtl"] .nt-i{padding:10px 10px 10px 4px}
+.nt-i.unread::before{content:"";position:absolute;inset-inline-start:0;top:16px;width:6px;height:6px;border-radius:50%;background:var(--down)}
+.nt-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.nt-top b{font-size:15px}
+.nt-link{text-decoration:none;color:inherit;display:block}
+.nt-code{background:var(--sunk);border:1px dashed var(--amber);border-radius:6px;padding:2px 8px;font-weight:700;letter-spacing:.5px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -4100,7 +4112,7 @@ Object.assign(UI, {
   ow_u_empty: ["ما فيه مستخدمين للحين. أضف أول واحد من الزر فوق.", "No users yet. Add the first one with the button above."], ow_u_need_name: ["اكتب الاسم", "Enter a name"],
   ow_u_ends: ["ينتهي", "Ends"], ow_u_ended: ["انتهى", "Ended"], ow_u_left: ["باقي {n} يوم", "{n} days left"],
   ow_k_h: ["منصات الربط", "Connected platforms"], ow_k_platform: ["اسم المنصة", "Platform"], ow_k_key: ["كود الربط", "Connection key"], ow_k_add: ["أضف الكود", "Add key"], ow_k_none: ["ما فيه أكواد مضافة.", "No keys added."],
-  ow_k_copy: ["انسخ", "Copy"], ow_k_copied: ["انسخ الكود", "Key copied"], ow_k_need: ["اكتب اسم المنصة والكود", "Enter the platform and the key"], ow_k_locked: ["افتح الخزنة عشان تضيف أو تنسخ الأكواد.", "Unlock the vault to add or copy keys."],
+  ow_k_copy: ["انسخ", "Copy"], ow_k_copied: ["تم نسخ الكود", "Key copied"], ow_k_need: ["اكتب اسم المنصة والكود", "Enter the platform and the key"], ow_k_locked: ["افتح الخزنة عشان تضيف أو تنسخ الأكواد.", "Unlock the vault to add or copy keys."],
   ow_v_h: ["خزنة الأكواد", "Key vault"], ow_v_new: ["أنشئ كلمة سر للخزنة. كل كود ربط يتشفر فيها على جهازك قبل ما ينحفظ في المستودع.", "Create a vault password. Every connection key is encrypted with it on your device before it is saved to the repository."],
   ow_v_warn: ["كلمة السر ما تنحفظ في أي مكان. إذا نسيتها ما تقدر ترجع الأكواد، وتحتاج تضيفها من جديد.", "The password is not stored anywhere. If you forget it the keys cannot be recovered and you will need to add them again."],
   ow_v_pass: ["كلمة السر", "Password"], ow_v_pass2: ["أعد كتابتها", "Repeat it"], ow_v_create: ["أنشئ الخزنة", "Create vault"], ow_v_open: ["افتح الخزنة", "Unlock"], ow_v_lock: ["اقفل الخزنة", "Lock"],
@@ -4251,8 +4263,8 @@ function pageOwner() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + '</div><div><a class="btn primary" href="#settings">' + esc(t("set_h")) + "</a></div></div></div>";
   if (!OW.loaded) { loadOwner(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_loading")) + "</div></div>"; }
-  const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["sharia", "tab_sharia"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
-  const body = { data: owData, lists: owLists, sharia: () => shFinder() + shAdmin(), backup: owBackup, content: owContent, users: owUsers }[owTab]();
+  const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["sharia", "tab_sharia"], ["notices", "ow_t_notices"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
+  const body = { data: owData, lists: owLists, sharia: () => shFinder() + shAdmin(), notices: ntAdmin, backup: owBackup, content: owContent, users: owUsers }[owTab]();
   return head + '<div class="row ow-bar" style="justify-content:space-between"><div class="tabs ow-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#owner" role="tab" data-act="ow-tab" data-tab="' + k + '"' + (owTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><a class="btn sm primary" href="#desk">' + esc(t("ow_desk_btn")) + '</a><button class="btn sm ghost" data-act="ow-reload"' + (OW.loading ? " disabled" : "") + ">↻ " + esc(t(OW.loading ? "ow_loading" : "ow_reload")) + '</button></div><div class="stack" style="padding-block:18px 40px">' + body + "</div></div>";
 }
 
@@ -5009,13 +5021,12 @@ function topActive() { return TOP ? Object.entries(TOP.items || {}).filter(([, v
 function topNewCount() { if (!TOP) return -1; const seen = topSeen(); return topActive().filter(([s, v]) => v.sharia === "ok" && !seen.includes(topKey(s, v))).length; }
 function topBell() {
   let b = document.getElementById("topbell");
-  const show = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const tools = document.querySelector(".top .tools");
-  if (!show || !tools) { if (b) b.remove(); return; }
-  if (!b || !tools.contains(b)) { b = document.createElement("a"); b.id = "topbell"; b.className = "btn sm th-btn bell"; b.href = "#desk"; b.setAttribute("data-act", "top-open"); tools.insertBefore(b, tools.firstChild); }
-  const n = Math.max(0, topNewCount());
+  if (!tools) return;
+  if (!b || !tools.contains(b)) { b = document.createElement("button"); b.type = "button"; b.id = "topbell"; b.className = "btn sm th-btn bell"; b.setAttribute("data-act", "nt-bell"); b.setAttribute("aria-haspopup", "dialog"); tools.insertBefore(b, tools.firstChild); }
+  const n = typeof ntUnread === "function" ? ntUnread() : Math.max(0, topNewCount());
   b.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' + (n ? '<span class="bell-n">' + n + "</span>" : "");
-  b.title = t("tp_bell").replace("{n}", n); b.setAttribute("aria-label", b.title);
+  b.title = t("nt_h") + (n ? " (" + n + ")" : ""); b.setAttribute("aria-label", b.title);
 }
 function topBeep() {
   try {
@@ -5055,7 +5066,7 @@ function dkTop() {
       '<div class="row"><button class="btn sm primary" data-act="top-ai" data-s="' + esc(s) + '">' + esc(t("tp_ai")) + '</button><a class="btn sm" href="' + news + '" target="_blank" rel="noopener">' + esc(t("tp_news")) + ' ↗</a><button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button></div></div>";
   };
   const left = (TOP.log || []).filter((x) => x.out).slice(-6).reverse();
-  setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); topBell(); } catch (e) {} }, 1500);
+  setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); if (typeof ntMark === "function") ntMark((TOP.log || []).filter((x) => x.in).map((x) => "m:" + x.s + "|" + x.in)); topBell(); } catch (e) {} }, 1500);
   return head + '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + " " + esc(whenText(TOP.updated)) + "</p>" + (act.length ? '<div class="stack">' + act.map(card).join("") + "</div>" : '<div class="notice">' + esc(t("tp_none")) + "</div>") +
     (left.length ? owPanel(t("tp_left"), '<ul class="tp-left">' + left.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc(dkName(x.s)) + ' <span class="small muted">' + esc(t("tp_out").replace("{d}", x.out).replace("{s}", x.score + "/6")) + "</span></li>").join("") + "</ul>") : "");
 }
@@ -5073,6 +5084,107 @@ if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) {
   setInterval(() => { if (document.visibilityState === "visible") loadTop(true); }, 10 * 60 * 1000);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadTop(true); });
 }
+/* ===== مِراس: قائمة التنبيهات =====
+   الجرس فوق يفتح قائمة فيها:
+   - إعلانات المنصة (notices.json في الموقع): المالك يضيفها من لوحة المالك، مثل كود خصم أو تحديث، وتظهر لكل الزوار.
+   - تنبيهات أفضل حركة (للمالك فقط): كل سهم دخل القائمة، وتبقى محفوظة.
+   المقروء ينحفظ على الجهاز. */
+Object.assign(UI, {
+  nt_h: ["التنبيهات", "Notifications"], nt_empty: ["ما فيه تنبيهات للحين.", "No notifications yet."], nt_all_read: ["علّم الكل مقروء", "Mark all read"],
+  nt_notices: ["من مِراس", "From Meras"], nt_movers: ["أفضل حركة", "Best movers"], nt_mover: ["{s} {n} دخل أفضل حركة ({x}/6)", "{s} {n} entered best movers ({x}/6)"],
+  nt_copy: ["انسخ الكود", "Copy code"], nt_copied: ["تم نسخ الكود", "Code copied"], nt_open: ["افتح", "Open"], nt_until: ["إلى {d}", "until {d}"],
+  nt_k_info: ["إعلان", "Notice"], nt_k_promo: ["عرض", "Offer"], nt_k_update: ["تحديث", "Update"], nt_unknown_sh: ["شرعيته لسا ما انحسبت", "Screening not computed yet"],
+  ow_t_notices: ["الإشعارات", "Notices"], nt_admin_p: ["الإشعار يظهر لكل اللي يفتحون مِراس في قائمة الجرس، من تاريخ البداية لين النهاية. مثل كود خصم أو تحديث جديد.", "A notice appears to everyone who opens Meras, in the bell list, between its start and end dates."],
+  nt_f_title: ["العنوان", "Title"], nt_f_body: ["النص", "Text"], nt_f_code: ["كود (اختياري)", "Code (optional)"], nt_f_url: ["رابط (اختياري)", "Link (optional)"], nt_f_kind: ["النوع", "Type"], nt_f_from: ["من", "From"], nt_f_to: ["إلى", "To"],
+  nt_add: ["انشر الإشعار", "Publish notice"], nt_del: ["احذف", "Delete"], nt_saved: ["تم نشر الإشعار، ويظهر للزوار خلال دقيقة أو دقيقتين.", "Notice published. Visitors see it within a couple of minutes."], nt_need: ["اكتب العنوان", "Enter a title"],
+  nt_list: ["الإشعارات المنشورة", "Published notices"], nt_none_pub: ["ما نشرت إشعارات للحين.", "No notices yet."], nt_active: ["ظاهر الحين", "Live"], nt_ended: ["انتهى", "Ended"], nt_soon: ["يبدأ {d}", "Starts {d}"]
+});
+
+let NOTICES = null, ntOpen = false;
+const ntRead = () => { try { return new Set(JSON.parse(localStorage.getItem("meras.ntread") || "[]")); } catch (e) { return new Set(); } };
+const ntMark = (ids) => { try { const s = ntRead(); ids.forEach((i) => s.add(i)); localStorage.setItem("meras.ntread", JSON.stringify([...s].slice(-500))); } catch (e) {} };
+async function loadNotices() {
+  try { const r = await fetch("./notices.json?t=" + Date.now(), { cache: "no-store" }); NOTICES = r.ok ? await r.json() : []; } catch (e) { NOTICES = NOTICES || []; }
+  if (!Array.isArray(NOTICES)) NOTICES = [];
+  if (typeof topBell === "function") topBell();
+}
+const ntLive = (n) => { const d = today(); return (!n.from || n.from <= d) && (!n.to || n.to >= d); };
+function ntItems() {
+  const items = [];
+  (NOTICES || []).filter(ntLive).forEach((n) => items.push({ id: "n:" + n.id, kind: "notice", n, date: n.from || "" }));
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  if (owner && typeof TOP !== "undefined" && TOP && Array.isArray(TOP.log)) TOP.log.filter((x) => x.in).slice(-40).forEach((x) => items.push({ id: "m:" + x.s + "|" + x.in, kind: "mover", x, date: x.in }));
+  return items.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+}
+function ntUnread() { const r = ntRead(); return ntItems().filter((i) => !r.has(i.id) && (i.kind === "notice" || i.x.sharia === "ok")).length; }
+function ntPanel() {
+  const items = ntItems(), r = ntRead();
+  const row = (i) => {
+    const unread = !r.has(i.id);
+    if (i.kind === "notice") {
+      const n = i.n;
+      return '<li class="nt-i' + (unread ? " unread" : "") + '"><div class="nt-top"><span class="tag ' + (n.kind === "promo" ? "amber" : n.kind === "update" ? "up" : "") + '">' + esc(t("nt_k_" + (n.kind || "info"))) + '</span><b>' + esc(n.t) + "</b></div>" + (n.b ? '<p class="small" style="margin:4px 0 0">' + esc(n.b) + "</p>" : "") +
+        '<div class="row" style="gap:6px;margin-top:6px">' + (n.code ? '<span class="nt-code num">' + esc(n.code) + '</span><button class="btn sm" data-act="nt-copy" data-c="' + esc(n.code) + '">' + esc(t("nt_copy")) + "</button>" : "") + (n.url ? '<a class="btn sm ghost" href="' + esc(n.url) + '"' + (/^https?:/.test(n.url) ? ' target="_blank" rel="noopener"' : "") + ">" + esc(t("nt_open")) + "</a>" : "") + (n.to ? '<span class="small muted">' + esc(t("nt_until").replace("{d}", n.to)) + "</span>" : "") + "</div></li>";
+    }
+    const x = i.x;
+    return '<li class="nt-i' + (unread && x.sharia === "ok" ? " unread" : "") + '"><a href="#desk" data-act="nt-mover" class="nt-link"><div class="nt-top"><span class="tag up">' + esc(t("nt_movers")) + '</span><b>' + esc(t("nt_mover").replace("{s}", x.s).replace("{n}", (typeof dkName === "function" && dkName(x.s)) || x.n || "").replace("{x}", x.score)) + '</b></div><span class="small muted num">' + esc(x.in) + "</span>" + (x.sharia && x.sharia !== "ok" ? ' <span class="small muted">· ' + esc(x.sharia === "no" ? t("tp_noshar") : t("nt_unknown_sh")) + "</span>" : "") + "</a></li>";
+  };
+  return '<div class="nt-head"><b>' + esc(t("nt_h")) + "</b>" + (items.length ? '<button class="btn sm ghost" data-act="nt-readall">' + esc(t("nt_all_read")) + "</button>" : "") + "</div>" + (items.length ? '<ul class="nt-list">' + items.map(row).join("") + "</ul>" : '<p class="muted small" style="margin:8px 0">' + esc(t("nt_empty")) + "</p>");
+}
+function ntToggle(open) {
+  let p = document.getElementById("ntpanel");
+  ntOpen = open == null ? !ntOpen : open;
+  if (!ntOpen) { if (p) p.remove(); return; }
+  if (!p) { p = document.createElement("div"); p.id = "ntpanel"; p.setAttribute("role", "dialog"); p.setAttribute("aria-label", t("nt_h")); document.body.appendChild(p); }
+  p.innerHTML = ntPanel();
+  const b = document.getElementById("topbell"); if (b) { const r = b.getBoundingClientRect(); p.style.top = Math.round(r.bottom + 8) + "px"; }
+  setTimeout(() => { ntMark(ntItems().map((i) => i.id)); if (typeof topBell === "function") topBell(); }, 1200);
+}
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act^="nt-"]');
+  if (!el) { if (ntOpen && !e.target.closest("#ntpanel") && !e.target.closest("#topbell")) ntToggle(false); return; }
+  const a = el.dataset.act;
+  if (a === "nt-bell") { ntToggle(); return; }
+  if (a === "nt-copy") { navigator.clipboard && navigator.clipboard.writeText(el.dataset.c).then(() => toast(t("nt_copied"))).catch(() => {}); }
+  else if (a === "nt-readall") { ntMark(ntItems().map((i) => i.id)); ntToggle(true); topBell(); }
+  else if (a === "nt-mover") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") dkTab = "top"; if (route() === "desk") render(); else location.hash = "desk"; }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && ntOpen) ntToggle(false); });
+window.addEventListener("hashchange", () => { if (ntOpen) ntToggle(false); });
+loadNotices();
+
+/* ----- owner: publish notices to the site (notices.json in the meras repository) ----- */
+let ntDel = null;
+function ntAdmin() {
+  const f = (id, k, type, extra) => '<div class="field"><label for="nf-' + id + '">' + esc(t(k)) + '</label><input id="nf-' + id + '" type="' + (type || "text") + '"' + (extra || "") + "></div>";
+  const list = (NOTICES || []).slice().sort((a, b) => ((b.from || "") > (a.from || "") ? 1 : -1));
+  const st = (n) => { const d = today(); return n.to && n.to < d ? '<span class="tag">' + esc(t("nt_ended")) + "</span>" : n.from && n.from > d ? '<span class="tag amber">' + esc(t("nt_soon").replace("{d}", n.from)) + "</span>" : '<span class="tag up">' + esc(t("nt_active")) + "</span>"; };
+  return owPanel(t("ow_t_notices"), '<p class="muted" style="margin:0">' + esc(t("nt_admin_p")) + '</p><form class="stack" data-form="nt-add" novalidate><div class="form-grid">' + f("t", "nt_f_title", "text", ' maxlength="80"') +
+    '<div class="field"><label for="nf-kind">' + esc(t("nt_f_kind")) + '</label><select id="nf-kind"><option value="promo">' + esc(t("nt_k_promo")) + '</option><option value="info">' + esc(t("nt_k_info")) + '</option><option value="update">' + esc(t("nt_k_update")) + "</option></select></div>" +
+    f("code", "nt_f_code", "text", ' maxlength="30" dir="ltr" autocapitalize="characters"') + f("url", "nt_f_url", "text", ' dir="ltr" placeholder="#plans"') + f("from", "nt_f_from", "date", ' value="' + today() + '"') + f("to", "nt_f_to", "date") + '</div><div class="field"><label for="nf-b">' + esc(t("nt_f_body")) + '</label><textarea id="nf-b" rows="2" maxlength="280"></textarea></div><div><button class="btn primary" type="submit">' + esc(t("nt_add")) + "</button></div></form>") +
+    owPanel(t("nt_list"), list.length ? '<ul class="nt-list">' + list.map((n) => '<li class="nt-i"><div class="row" style="justify-content:space-between"><div class="nt-top"><span class="tag">' + esc(t("nt_k_" + (n.kind || "info"))) + "</span><b>" + esc(n.t) + "</b> " + st(n) + '</div><button class="btn sm ' + (ntDel === n.id ? "danger" : "ghost") + '" data-act="nt-del" data-id="' + esc(n.id) + '">' + esc(t(ntDel === n.id ? "dk_sure" : "nt_del")) + "</button></div>" + (n.b ? '<p class="small" style="margin:4px 0 0">' + esc(n.b) + "</p>" : "") + '<span class="small muted num">' + esc((n.from || "") + (n.to ? " → " + n.to : "")) + (n.code ? " · " + esc(n.code) : "") + "</span></li>").join("") + "</ul>" : '<p class="muted" style="margin:0">' + esc(t("nt_none_pub")) + "</p>");
+}
+async function ntPublish(next) {
+  const content = b64e(JSON.stringify(next, null, 1) + "\n");
+  try {
+    const cur = await ghRepo("meras", "notices.json");
+    await ghRepo("meras", "notices.json", "PUT", { message: "إشعارات مِراس " + today(), content, sha: cur ? cur.sha : undefined });
+    NOTICES = next; toast(t("nt_saved")); return true;
+  } catch (e) { toast(e.code === "403" || e.code === "404" ? t("sh_admin_nopub") : errText(e)); return false; }
+}
+document.addEventListener("submit", async (e) => {
+  const f = e.target.closest && e.target.closest('[data-form="nt-add"]'); if (!f) return;
+  e.preventDefault();
+  const v = (id) => (document.getElementById("nf-" + id) || {}).value.trim();
+  if (!v("t")) { toast(t("nt_need")); return; }
+  const n = { id: Date.now().toString(36), t: v("t"), b: v("b"), kind: v("kind"), code: v("code").toUpperCase() || undefined, url: v("url") || undefined, from: v("from") || today(), to: v("to") || undefined };
+  if (await ntPublish((NOTICES || []).concat([n]))) render();
+});
+document.addEventListener("click", async (e) => {
+  const el = e.target.closest && e.target.closest('[data-act="nt-del"]'); if (!el) return;
+  if (ntDel !== el.dataset.id) { ntDel = el.dataset.id; render(); return; }
+  ntDel = null; if (await ntPublish((NOTICES || []).filter((n) => n.id !== el.dataset.id))) render();
+});
 /* ===== مِراس: العقود (الأوبشن) داخل مكتبي =====
    دروس خاصة بالمالك من مفهوم العقد إلى البيع وجمع العلاوة، مع حاسبة ربح وخسارة عند الانتهاء.
    تعليم فقط: لا توصيات ولا تنبؤات. كل المبالغ بالدولار. */

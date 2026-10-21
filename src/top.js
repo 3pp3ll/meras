@@ -29,13 +29,12 @@ function topActive() { return TOP ? Object.entries(TOP.items || {}).filter(([, v
 function topNewCount() { if (!TOP) return -1; const seen = topSeen(); return topActive().filter(([s, v]) => v.sharia === "ok" && !seen.includes(topKey(s, v))).length; }
 function topBell() {
   let b = document.getElementById("topbell");
-  const show = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const tools = document.querySelector(".top .tools");
-  if (!show || !tools) { if (b) b.remove(); return; }
-  if (!b || !tools.contains(b)) { b = document.createElement("a"); b.id = "topbell"; b.className = "btn sm th-btn bell"; b.href = "#desk"; b.setAttribute("data-act", "top-open"); tools.insertBefore(b, tools.firstChild); }
-  const n = Math.max(0, topNewCount());
+  if (!tools) return;
+  if (!b || !tools.contains(b)) { b = document.createElement("button"); b.type = "button"; b.id = "topbell"; b.className = "btn sm th-btn bell"; b.setAttribute("data-act", "nt-bell"); b.setAttribute("aria-haspopup", "dialog"); tools.insertBefore(b, tools.firstChild); }
+  const n = typeof ntUnread === "function" ? ntUnread() : Math.max(0, topNewCount());
   b.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' + (n ? '<span class="bell-n">' + n + "</span>" : "");
-  b.title = t("tp_bell").replace("{n}", n); b.setAttribute("aria-label", b.title);
+  b.title = t("nt_h") + (n ? " (" + n + ")" : ""); b.setAttribute("aria-label", b.title);
 }
 function topBeep() {
   try {
@@ -75,7 +74,7 @@ function dkTop() {
       '<div class="row"><button class="btn sm primary" data-act="top-ai" data-s="' + esc(s) + '">' + esc(t("tp_ai")) + '</button><a class="btn sm" href="' + news + '" target="_blank" rel="noopener">' + esc(t("tp_news")) + ' ↗</a><button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button></div></div>";
   };
   const left = (TOP.log || []).filter((x) => x.out).slice(-6).reverse();
-  setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); topBell(); } catch (e) {} }, 1500);
+  setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); if (typeof ntMark === "function") ntMark((TOP.log || []).filter((x) => x.in).map((x) => "m:" + x.s + "|" + x.in)); topBell(); } catch (e) {} }, 1500);
   return head + '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + " " + esc(whenText(TOP.updated)) + "</p>" + (act.length ? '<div class="stack">' + act.map(card).join("") + "</div>" : '<div class="notice">' + esc(t("tp_none")) + "</div>") +
     (left.length ? owPanel(t("tp_left"), '<ul class="tp-left">' + left.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc(dkName(x.s)) + ' <span class="small muted">' + esc(t("tp_out").replace("{d}", x.out).replace("{s}", x.score + "/6")) + "</span></li>").join("") + "</ul>") : "");
 }

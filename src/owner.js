@@ -34,7 +34,7 @@ Object.assign(UI, {
   ow_u_empty: ["ما فيه مستخدمين للحين. أضف أول واحد من الزر فوق.", "No users yet. Add the first one with the button above."], ow_u_need_name: ["اكتب الاسم", "Enter a name"],
   ow_u_ends: ["ينتهي", "Ends"], ow_u_ended: ["انتهى", "Ended"], ow_u_left: ["باقي {n} يوم", "{n} days left"],
   ow_k_h: ["منصات الربط", "Connected platforms"], ow_k_platform: ["اسم المنصة", "Platform"], ow_k_key: ["كود الربط", "Connection key"], ow_k_add: ["أضف الكود", "Add key"], ow_k_none: ["ما فيه أكواد مضافة.", "No keys added."],
-  ow_k_copy: ["انسخ", "Copy"], ow_k_copied: ["انسخ الكود", "Key copied"], ow_k_need: ["اكتب اسم المنصة والكود", "Enter the platform and the key"], ow_k_locked: ["افتح الخزنة عشان تضيف أو تنسخ الأكواد.", "Unlock the vault to add or copy keys."],
+  ow_k_copy: ["انسخ", "Copy"], ow_k_copied: ["تم نسخ الكود", "Key copied"], ow_k_need: ["اكتب اسم المنصة والكود", "Enter the platform and the key"], ow_k_locked: ["افتح الخزنة عشان تضيف أو تنسخ الأكواد.", "Unlock the vault to add or copy keys."],
   ow_v_h: ["خزنة الأكواد", "Key vault"], ow_v_new: ["أنشئ كلمة سر للخزنة. كل كود ربط يتشفر فيها على جهازك قبل ما ينحفظ في المستودع.", "Create a vault password. Every connection key is encrypted with it on your device before it is saved to the repository."],
   ow_v_warn: ["كلمة السر ما تنحفظ في أي مكان. إذا نسيتها ما تقدر ترجع الأكواد، وتحتاج تضيفها من جديد.", "The password is not stored anywhere. If you forget it the keys cannot be recovered and you will need to add them again."],
   ow_v_pass: ["كلمة السر", "Password"], ow_v_pass2: ["أعد كتابتها", "Repeat it"], ow_v_create: ["أنشئ الخزنة", "Create vault"], ow_v_open: ["افتح الخزنة", "Unlock"], ow_v_lock: ["اقفل الخزنة", "Lock"],
@@ -185,8 +185,8 @@ function pageOwner() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + '</div><div><a class="btn primary" href="#settings">' + esc(t("set_h")) + "</a></div></div></div>";
   if (!OW.loaded) { loadOwner(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_loading")) + "</div></div>"; }
-  const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["sharia", "tab_sharia"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
-  const body = { data: owData, lists: owLists, sharia: () => shFinder() + shAdmin(), backup: owBackup, content: owContent, users: owUsers }[owTab]();
+  const tabs = [["data", "ow_t_data"], ["lists", "ow_t_lists"], ["sharia", "tab_sharia"], ["notices", "ow_t_notices"], ["backup", "ow_t_backup"], ["content", "ow_t_content"], ["users", "ow_t_users"]];
+  const body = { data: owData, lists: owLists, sharia: () => shFinder() + shAdmin(), notices: ntAdmin, backup: owBackup, content: owContent, users: owUsers }[owTab]();
   return head + '<div class="row ow-bar" style="justify-content:space-between"><div class="tabs ow-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#owner" role="tab" data-act="ow-tab" data-tab="' + k + '"' + (owTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><a class="btn sm primary" href="#desk">' + esc(t("ow_desk_btn")) + '</a><button class="btn sm ghost" data-act="ow-reload"' + (OW.loading ? " disabled" : "") + ">↻ " + esc(t(OW.loading ? "ow_loading" : "ow_reload")) + '</button></div><div class="stack" style="padding-block:18px 40px">' + body + "</div></div>";
 }
 
