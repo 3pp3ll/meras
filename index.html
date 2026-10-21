@@ -1583,7 +1583,9 @@ function pageLesson(id) {
 }
 
 /* ----- services ----- */
+let svcBare = false;
 function svcShell(tab, inner) {
+  if (svcBare) return inner;
   const titles = { journal: "tab_journal", calc: "tab_calc", glossary: "tab_gloss", dividends: "tab_div", metals: "tab_met", sharia: "tab_sharia", tech: "tab_tech", invest: "tab_inv" };
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t(titles[tab] || "services_h")) + '</h1></div><div class="stack" style="padding-block:18px">' + inner + "</div></div>";
 }
@@ -1691,8 +1693,7 @@ function render() {
   if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
   if (typeof topBell === "function") topBell();
-  const sn = document.querySelector(".subnav nav"), cur = sn && sn.querySelector('[aria-current="page"]');
-  if (cur) { const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; }
+  document.querySelectorAll(".subnav nav, #main .tabs").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
       window.scrollTo(0, y);
@@ -3507,7 +3508,7 @@ async function loadTech() {
     TECHL = l && Array.isArray(l.data) ? l.data.map(String) : [];
   } catch (e) {}
   techLoading = false;
-  if (["tech", "invest"].includes(route()) && !(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))) render();
+  if ((["tech", "invest"].includes(route()) || (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "tech")) && !(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))) render();
 }
 async function techListEdit(sym, add) {
   if (!techCan()) { toast(t("wl_need")); return; }
@@ -4535,8 +4536,8 @@ function pageDesk() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
-  const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["us", "us_t"], ["op", "op_t"]];
-  return head + '<div class="tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
+  const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["us", "us_t"], ["op", "op_t"]];
+  return head + '<div class="tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
 }
 
 function dkExport() {

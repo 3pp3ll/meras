@@ -272,7 +272,9 @@ function pageLesson(id) {
 }
 
 /* ----- services ----- */
+let svcBare = false;
 function svcShell(tab, inner) {
+  if (svcBare) return inner;
   const titles = { journal: "tab_journal", calc: "tab_calc", glossary: "tab_gloss", dividends: "tab_div", metals: "tab_met", sharia: "tab_sharia", tech: "tab_tech", invest: "tab_inv" };
   return '<div class="wrap"><div class="page-head"><h1>' + esc(t(titles[tab] || "services_h")) + '</h1></div><div class="stack" style="padding-block:18px">' + inner + "</div></div>";
 }
@@ -380,8 +382,7 @@ function render() {
   if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
   if (typeof topBell === "function") topBell();
-  const sn = document.querySelector(".subnav nav"), cur = sn && sn.querySelector('[aria-current="page"]');
-  if (cur) { const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; }
+  document.querySelectorAll(".subnav nav, #main .tabs").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
       window.scrollTo(0, y);

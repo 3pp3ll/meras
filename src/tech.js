@@ -69,7 +69,7 @@ async function loadTech() {
     TECHL = l && Array.isArray(l.data) ? l.data.map(String) : [];
   } catch (e) {}
   techLoading = false;
-  if (["tech", "invest"].includes(route()) && !(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))) render();
+  if ((["tech", "invest"].includes(route()) || (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "tech")) && !(document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))) render();
 }
 async function techListEdit(sym, add) {
   if (!techCan()) { toast(t("wl_need")); return; }
