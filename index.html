@@ -4359,7 +4359,7 @@ Object.assign(UI, {
   dk_px_tip: ["السهم اللي سعره من آخر صفقة ما ينسحب سعره. أضفه لقائمة الشارت من لوحة المالك عشان يصير حي.", "A share priced from its last trade is not being fetched. Add it to the chart list in the owner dashboard to make it live."],
   dk_trades_h: ["سجل العمليات", "Transactions"], dk_new_trade: ["أضف عملية", "Add a transaction"], dk_side: ["النوع", "Type"], dk_buy: ["شراء", "Buy"], dk_sell: ["بيع", "Sell"],
   dk_date: ["التاريخ", "Date"], dk_fee: ["العمولة (ريال)", "Commission (SAR)"], dk_note: ["ملاحظة", "Note"], dk_sym: ["رمز السهم", "Share code"], dk_total: ["الإجمالي", "Total"],
-  dk_feepct: ["عمولة السعودي % (الراجحي)", "Saudi commission % (Al Rajhi)"], dk_feevat: ["ضريبة على العمولة %", "VAT on commission %"], dk_feemin: ["أقل عمولة (ريال)", "Minimum (SAR)"], dk_feeus: ["عمولة الأمريكي لكل عملية $ (دراية)", "US fee per trade $ (Derayah)"], dk_feepct_tip: ["السعودي من محفظة الراجحي: 0.155% من قيمة الصفقة وعليها ضريبة 15%. والأمريكي من دراية: 2.25$ للعملية. تنحسب تلقائياً وتقدر تعدلها في كل عملية.", "Commission is filled in from this rate and can be edited on each transaction. Use the rate shown in your broker app."],
+  dk_feepct: ["عمولة السعودي % (الراجحي)", "Saudi commission % (Al Rajhi)"], dk_feevat: ["ضريبة على العمولة %", "VAT on commission %"], dk_feemin: ["أقل عمولة (ريال)", "Minimum (SAR)"], dk_feeus: ["عمولة الأمريكي لكل عملية $ (دراية جلوبل لايت: 0)", "US fee per trade $ (Derayah)"], dk_feepct_tip: ["السعودي من محفظة الراجحي: 0.155% من قيمة الصفقة وعليها ضريبة 15%. والأمريكي من دراية جلوبل لايت: بدون عمولة في أوقات التداول الرسمية (وفي جلوبل العادي 2.25$). تنحسب تلقائياً وتقدر تعدلها في كل عملية.", "Commission is filled in from this rate and can be edited on each transaction. Use the rate shown in your broker app."],
   dk_none_tr: ["ما سجلت عمليات للحين. أول ما تشتري من دراية سجّل العملية هنا.", "No transactions yet. When you buy in your broker app, record it here."],
   dk_bad: ["تأكد من الرمز والكمية والسعر", "Check the code, quantity and price"], dk_oversell: ["الكمية أكثر من اللي عندك في هذا السهم ({n})", "That is more than you hold in this share ({n})"],
   dk_saved: ["انحفظ", "Saved"], dk_del: ["احذف", "Delete"], dk_sure: ["متأكد؟", "Sure?"], dk_edit: ["عدّل", "Edit"], dk_save: ["احفظ", "Save"], dk_cancel: ["إلغاء", "Cancel"],
@@ -4378,14 +4378,14 @@ Object.assign(UI, {
 });
 
 let DK = { loaded: false, loading: false, data: null, sha: undefined }, dkTab = "pf", dkTrade = null, dkAn = null, dkDel = null, dkFilter = "all";
-const dkBlank = () => ({ version: 1, cfg: { v: 2, feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 2.25 }, trades: [], charts: [] });
+const dkBlank = () => ({ version: 1, cfg: { v: 3, feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 0 }, trades: [], charts: [] });
 
 async function loadDesk(force) {
   if (!HOSTED || !CFG.token || DK.loading || (DK.loaded && !force)) return;
   DK.loading = true;
   await loadUS();
   try { const f = await readJson("desk.json"); DK.data = (f && f.data) || dkBlank(); DK.sha = f ? f.sha : undefined; } catch (e) { DK.data = DK.data || dkBlank(); toast(errText(e)); }
-  ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 2.25 }, DK.data.cfg); if (DK.data.cfg.v !== 2) Object.assign(DK.data.cfg, { v: 2, feePct: 0.155, feeMin: 0, feeVat: 15 });
+  ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 2.25 }, DK.data.cfg); if (DK.data.cfg.v !== 2 && DK.data.cfg.v !== 3) Object.assign(DK.data.cfg, { v: 2, feePct: 0.155, feeMin: 0, feeVat: 15 }); if (DK.data.cfg.v === 2) Object.assign(DK.data.cfg, { v: 3, feeUS: 0 });
   DK.loading = false; DK.loaded = true; if (route() === "desk") render();
 }
 async function saveDesk() {
@@ -4930,7 +4930,7 @@ function scRun() {
   return { res, out, total: uni.length };
 }
 function scFeeNote() {
-  const f = DK && DK.data && DK.data.cfg ? Number(DK.data.cfg.feeUS) || 0 : 2.25, b = SC.bus || 0; if (!f || !b || SC.mkt === "sa") return "";
+  const f = DK && DK.data && DK.data.cfg ? Number(DK.data.cfg.feeUS) || 0 : 0, b = SC.bus || 0; if (!f || !b || SC.mkt === "sa") return "";
   const p = (f / b) * 100; return '<p class="small notice" style="margin:0">' + esc(t("sc_fee").replace("{f}", fmt(f, 2)).replace("{b}", int(b)).replace("{p}", fmt(p, 1)).replace("{r}", fmt(p * 2, 1))) + "</p>";
 }
 function dkScreener() {

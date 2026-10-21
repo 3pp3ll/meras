@@ -74,7 +74,7 @@ function scRun() {
   return { res, out, total: uni.length };
 }
 function scFeeNote() {
-  const f = DK && DK.data && DK.data.cfg ? Number(DK.data.cfg.feeUS) || 0 : 2.25, b = SC.bus || 0; if (!f || !b || SC.mkt === "sa") return "";
+  const f = DK && DK.data && DK.data.cfg ? Number(DK.data.cfg.feeUS) || 0 : 0, b = SC.bus || 0; if (!f || !b || SC.mkt === "sa") return "";
   const p = (f / b) * 100; return '<p class="small notice" style="margin:0">' + esc(t("sc_fee").replace("{f}", fmt(f, 2)).replace("{b}", int(b)).replace("{p}", fmt(p, 1)).replace("{r}", fmt(p * 2, 1))) + "</p>";
 }
 function dkScreener() {
