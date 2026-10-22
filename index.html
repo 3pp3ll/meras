@@ -16,7 +16,7 @@
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Carlito:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: the مدرج (staircase) is the spine. Day is a soft peach, pink and sky blend; night is the navy staircase, with a dimmer the reader controls (--dk). */
 :root{
@@ -31,9 +31,9 @@
   --up:#2E9C73; --up-soft:#E2F5EC; --down:#D9534F; --down-soft:#FCE6E6;
   --code-bg:#2F3A4F; --code-fg:#EEF3FA;
   --ind1:#D9822B; --ind2:#3C8CC9; --ind3:#B05FC9; --ind4:#1E9E9E; --ind5:#C2410C; --draw:#2F3A4F;
-  --display:"Almarai","IBM Plex Sans Arabic",system-ui,sans-serif;
-  --body:"Almarai","IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
-  --mono:"Calibri","Carlito","Almarai",system-ui,sans-serif;
+  --display:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  --body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif;
+  --mono:"Calibri","Carlito","IBM Plex Sans Arabic",system-ui,sans-serif;
   --code:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
   --r:12px; --gap:16px; --wrap:1080px;
 }
@@ -1053,6 +1053,80 @@ body.nt-lock{overflow:hidden}
 @media (max-width:820px){.hero .org{padding-bottom:28px}.hero .copy{padding-top:0}}
 @media (max-width:560px){.hero .org-cols{grid-template-columns:1fr}}
 .hero .org-plans{flex:none;padding:12px}.hero .org-plans svg{width:22px;height:22px}
+/* IBM Plex Sans Arabic */
+p,li,dd{line-height:1.85}
+b,strong,th,label,.btn,.tag,.nav a,.subnav a,.tabs a,.brand,.field label{font-weight:600}
+h1,h2,h3,.hero h1{font-weight:700}
+/* الواجهة: النص فوق، والهيكل تحته بكامل العرض */
+.gate-hero .wrap{grid-template-columns:1fr;gap:6px;align-items:start;padding-top:40px}
+.gate-hero .copy{padding:0;max-width:820px}
+.gate-hero h1{font-size:clamp(30px,4.4vw,50px)}
+.gate-hero .eyebrow{font-size:15px;max-width:60ch;line-height:1.7}
+.gate-hero .lead{margin-block:12px 18px}
+.gate-hero .org{padding-block:22px 44px}
+.hero.gate-hero .org-cols{grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+.hero.gate-hero .org-cols::before,.hero.gate-hero .org-col::before{display:block}
+@media (max-width:1000px){.hero.gate-hero .org-cols{grid-template-columns:repeat(2,minmax(0,1fr))}.hero.gate-hero .org-cols::before,.hero.gate-hero .org-col::before{display:none}}
+@media (max-width:560px){.hero.gate-hero .org-cols{grid-template-columns:1fr}}
+/* شريط الهيكل: الاسم يمين، والتبديل والبحث يسار */
+.map-bar{align-items:center}
+.map-brand{display:flex;align-items:center;gap:10px}
+.map-brand svg{width:40px;height:40px}
+.map-brand span{display:flex;flex-direction:column;line-height:1.3}
+.map-brand b{font-size:22px;color:var(--ink)}
+.map-brand small{font-size:12.5px;color:var(--muted)}
+.map-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.map-sw button{font-size:13px;padding:5px 12px}
+.map-q{font-size:13px;padding:7px 12px;width:200px}
+@media (max-width:560px){.map-tools{width:100%}.map-q{flex:1;width:auto}}
+/* الشجرة: خط أصغر شوي */
+.gate-hero .tr{padding:22px 18px;padding-inline-start:46px;gap:22px}
+.gate-hero .tr-trunk{inset-inline-start:22px}
+.gate-hero .tr-grp::before{inset-inline-start:-24px;width:20px}
+.gate-hero .tr-head{padding:5px 13px;margin-bottom:10px;gap:7px}
+.gate-hero .tr-head b{font-size:15px}
+.gate-hero .tr-head small{font-size:10.5px}
+.gate-hero .tr-pills{gap:8px}
+.gate-hero .tr-pill{font-size:13px;padding:5px 8px 5px 13px;gap:7px}
+[dir="rtl"] .gate-hero .tr-pill{padding:5px 13px 5px 8px}
+.gate-hero .tr-pi{width:22px;height:22px}
+@media (max-width:560px){.gate-hero .tr{padding:16px 12px;padding-inline-start:36px}.gate-hero .tr-trunk{inset-inline-start:16px}.gate-hero .tr-grp::before{inset-inline-start:-20px;width:16px}.gate-hero .tr-pill{font-size:12.5px}}
+/* البطاقات */
+.cds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.cd{background:color-mix(in srgb,var(--surface) 82%,transparent);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px -2px rgba(20,26,40,.08);transition:box-shadow .25s}
+.cd:hover{box-shadow:0 14px 30px -14px rgba(20,26,40,.25)}
+.cd-h{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.cd-hi{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:var(--amber-soft);color:var(--amber-ink);border:1px solid color-mix(in srgb,var(--amber) 30%,transparent)}
+.cd-ht{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.cd-ht b{font-size:16px}
+.cd-ht small{font-size:12px;color:var(--muted)}
+.cd-n{flex:none;font-size:11.5px;font-weight:700;color:var(--amber-ink);background:var(--amber-soft);border-radius:99px;padding:2px 9px}
+.cd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cd-it{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:13px;font-weight:600;min-width:0;transition:border-color .2s}
+.cd-it span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cd-it:hover,.cd-it:focus-visible{border-color:var(--amber)}
+.cd-ii{flex:none;color:var(--amber-ink);display:grid}
+.cd-admin{background:color-mix(in srgb,var(--sky-soft) 80%,transparent);border-color:color-mix(in srgb,var(--sky) 45%,transparent)}
+.cd-admin .cd-hi{background:var(--surface);color:var(--ind2);border-color:color-mix(in srgb,var(--sky) 50%,transparent)}
+.cd-admin .cd-h{border-color:color-mix(in srgb,var(--sky) 40%,transparent)}
+.cd-admin .cd-ii{color:var(--ind2)}
+@media (max-width:760px){.cds{grid-template-columns:1fr}}
+/* دليل الرموز */
+.sy-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sy-bar input{flex:1;min-width:200px}
+.sy-sec{padding:0;overflow:hidden}
+.sy-sec summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;cursor:pointer;list-style:none;font-size:17px}
+.sy-sec summary::-webkit-details-marker{display:none}
+.sy-sec summary::after{content:"▾";color:var(--muted);margin-inline-start:6px}
+.sy-sec[open] summary{border-bottom:1px solid var(--line)}
+.sy-sec[open] summary::after{content:"▴"}
+.sy-sec summary b{flex:1}
+.sy-list{list-style:none;margin:0;padding:6px 10px 10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+.sy-list li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--sunk);line-height:1.4}
+.sy-code{flex:none;font-weight:700;font-size:15px;color:var(--amber-ink);background:var(--surface);border-radius:8px;padding:2px 8px;min-width:52px;text-align:center}
+.sy-nm{flex:1;min-width:0;display:flex;flex-direction:column}
+.sy-nm b{font-size:15px}
+.sy-nm small{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1734,7 +1808,7 @@ const UI = {
   nav_home: ["الرئيسية", "Home"], nav_tracks: ["المسارات", "Tracks"], nav_services: ["الخدمات", "Services"],
   nav_progress: ["تقدّمي", "My progress"], nav_plans: ["الباقات", "Plans"], nav_account: ["حسابي", "Account"],
   sign_in: ["دخول", "Sign in"],
-  hero_eyebrow: ["منصة تعليمية للسوق المالية السعودية", "A learning platform for the Saudi stock market"],
+  hero_eyebrow: ["منصة تعليمية للسوق المالية السعودية، واستعراض الأسواق العالمية للتعليم على أسعار حقيقية", "A learning platform for the Saudi market, with a look at world markets to learn on real prices"],
   hero_h: ["تعلّم السوق السعودي <em>بالمِراس</em>، درجة درجة", "Learn the Saudi market <em>by practice</em>, one step at a time"],
   hero_p: ["ثلاثة مسارات للمستثمر والمتداول والمبرمج. كل درس شرح، ثم مثال على سهم من تاسي، ثم تمرين تسجله في سجل تداولك.", "Three tracks for the investor, the trader and the developer. Each lesson is an explanation, then an example on a TASI share, then practice you log in your trading journal."],
   start: ["ابدأ من الدرجة الأولى", "Start at step one"], see_tracks: ["شوف المسارات", "See the tracks"],
@@ -2126,7 +2200,7 @@ function renderNow() {
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; if ((g === "learn" || g === "services") && typeof sideShell === "function") html = sideShell(g, r, html); }
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
@@ -3409,6 +3483,50 @@ function pageGuide(id) {
     g.steps.map((s, i) => '<li><div class="gs-text"><span class="gs-n num">' + (i + 1) + "</span><h2>" + esc(L(s.h)) + "</h2><p>" + esc(L(s.p)) + '</p></div><div class="gs-fig">' + s.fig() + "</div></li>").join("") +
     '</ol><div class="row" style="justify-content:space-between;padding-block:8px 40px"><a class="btn" href="#guides">' + esc(t("gd_all")) + '</a><a class="btn primary" href="' + g.go[0] + '">' + esc(t(g.go[1])) + "</a></div></div>";
 }
+/* ===== مِراس: دليل رموز السوق السعودي =====
+   كل شركات السوق الرئيسية (تاسي) مقسّمة حسب القطاع، كما يصنّفها أرقام.
+   كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
+   saName(رمز) ترجع الاسم المختصر، وتستخدمها صفحات المنصة بدل ما تكتب الاسم الطويل. */
+Object.assign(UI, {
+  nav_symbols: ["الرموز", "Symbols"], d_symbols: ["رموز أسهم السوق السعودي مقسّمة حسب القطاع.", "Saudi share codes grouped by sector."],
+  sy_h: ["دليل الرموز", "Symbol guide"], sy_p: ["رمز كل سهم في السوق السعودي الرئيسي (تاسي) واسمه، مقسّمة حسب القطاع. اكتب الرمز أو الاسم وتلقاه.", "Every share on the Saudi main market (TASI) with its code, grouped by sector. Type a code or name to find it."],
+  sy_q: ["ابحث برمز أو اسم… مثل 1211 أو معادن", "Search by code or name… e.g. 1211"], sy_n: ["{n} سهم", "{n} shares"], sy_all: ["{n} سهم في {s} قطاع", "{n} shares in {s} sectors"],
+  sy_open: ["افتح الكل", "Expand all"], sy_close: ["سكّر الكل", "Collapse all"], sy_chart: ["الشارت", "Chart"], sy_none: ["ما لقيت سهم بهالرمز أو الاسم.", "No share matches."],
+  sy_src: ["التصنيف من أرقام. الرموز ثابتة، والشركات الجديدة تنضاف مع التحديث.", "Sectors as classified by Argaam. New listings are added with updates."],
+  sy_code: ["الرمز", "Code"], sy_name: ["الاسم", "Name"], sy_full: ["الاسم الكامل", "Full name"]
+});
+const SA_SECTORS = [["الطاقة",[["2222","أرامكو السعودية","شركة الزيت العربية السعودية"],["2030","المصافي","شركة المصافي العربية السعودية"],["2380","بترو رابغ","شركة رابغ للتكرير والبتروكيماويات"],["4030","البحري","الشركة الوطنية السعودية للنقل البحري"],["2381","الحفر العربية","شركة الحفر العربية"],["2382","أديس","شركة أديس القابضة"]]],["المواد الاساسية",[["1201","تكوين","شركة تكوين المتطورة للصناعات"],["1325","حديد وطني","شرکة وطني للحدید والصلب"],["1202","مبكو","شركة الشرق الأوسط لصناعة وإنتاج الورق"],["1210","بي سي آي","شركة الصناعات الكيميائية الأساسية"],["1211","معادن","شركة التعدين العربية السعودية"],["1301","أسلاك","شركة إتحاد مصانع الأسلاك"],["1304","اليمامة للحديد","شركة اليمامة للصناعات الحديدية"],["1320","أنابيب السعودية","الشركة السعودية لأنابيب الصلب"],["2001","كيمانول","شركة كيمائيات الميثانول"],["2010","سابك","الشركة السعودية للصناعات الأساسية"],["2020","سابك للمغذيات الزراعية","شركة سابك للمغذيات الزراعية"],["2090","جبسكو","شركة الجبس الأهلية"],["2150","زجاج","شركة الصناعات الزجاجية الوطنية"],["2170","اللجين","شركة اللجين"],["2180","فيبكو","شركة تصنيع مواد التعبئة والتغليف"],["2200","أنابيب","الشركة العربية للأنابيب"],["2210","نماء للكيماويات","شركة نماء للكيماويات"],["2220","معدنية","الشركة الوطنية لتصنيع وسبك المعادن"],["2240","صناعات","شركة صناعات البناء المتقدمة"],["2250","المجموعة السعودية","المجموعة السعودية للإستثمار الصناعي"],["2290","ينساب","شركة ينبع الوطنية للبتروكيماويات"],["2300","صناعة الورق","الشركة السعودية لصناعة الورق"],["2310","سبكيم العالمية","شركة الصحراء العالمية للبتروكيماويات"],["2330","المتقدمة","الشركة المتقدمة للبتروكيماويات"],["2350","كيان السعودية","شركة كيان السعودية للبتروكيماويات"],["3002","أسمنت نجران","شركة أسمنت نجران"],["3003","أسمنت المدينة","شركة أسمنت المدينة"],["3004","أسمنت الشمالية","شركة أسمنت المنطقة الشمالية"],["3005","أسمنت ام القرى","شركة أسمنت ام القرى"],["3010","أسمنت العربية","شركة الأسمنت العربية"],["3020","أسمنت اليمامة","شركة أسمنت اليمامة"],["3030","أسمنت السعودية","شركة الأسمنت السعودية"],["3040","أسمنت القصيم","شركة أسمنت القصيم"],["3050","أسمنت الجنوب","شركة أسمنت المنطقة الجنوبية"],["3060","أسمنت ينبع","شركة أسمنت ينبع"],["3080","أسمنت الشرقية","شركة أسمنت المنطقة الشرقية"],["3090","أسمنت تبوك","شركة أسمنت تبوك"],["3091","أسمنت الجوف","شركة أسمنت الجوف"],["3092","أسمنت الرياض","شركة أسمنت الرياض"],["2060","التصنيع","شركة التصنيع الوطنية"],["3008","الكثيري","شركة الكثيري القابضة"],["3007","الواحة","شركة زهرة الواحة للتجارة"],["1321","أنابيب الشرق","شركة أنابيب الشرق المتكاملة للصناعة"],["1322","أماك","شركة المصانع الكبرى للتعدين"],["2223","لوبريف","شركة أرامكو السعودية لزيوت الأساس"],["1324","صالح الراشد","شركة صالح عبدالعزيز الراشد وأولاده"],["2360","الفخارية","الشركة السعودية لإنتاج الأنابيب الفخارية"],["1323","يو سي آي سي","الشركة المتحدة لصناعات الكرتون"],["4143","تالكو","شركة مجموعة التيسير تالكو الصناعية"]]],["السلع الرأسمالية",[["1212","أسترا الصناعية","مجموعة أسترا الصناعية"],["4146","جاز","شركة جاز العربية للخدمات"],["1302","بوان","شركة بوان"],["1303","الصناعات الكهربائية","شركة الصناعات الكهربائية"],["4148","الوسائل الصناعية","شركة الوسائل الصناعية"],["4145","أو جي سي","شركة العبيكان للزجاج"],["2040","الخزف السعودي","شركة الخزف السعودي"],["2110","الكابلات السعودية","شركة الكابلات السعودية"],["4144","رؤوم","شركة رؤوم التجارية"],["2160","أميانتيت","شركة أميانتيت العربية السعودية"],["2320","البابطين","شركة البابطين للطاقة والإتصالات"],["2370","مسك","شركة الشرق الأوسط للكابلات المتخصصة"],["4140","صادرات","الشركة السعودية للصادرات الصناعية"],["4141","العمران","شركة العمران للصناعة والتجارة"],["4142","كابلات الرياض","شركة مجموعة كابلات الرياض"],["1214","شاكر","شركة الحسن غازي إبراهيم شاكر"],["4110","باتك","شركة باتك للإستثمار والأعمال اللوجستية"],["4147","سي جي إس","شركة اتحاد جروننفلدر سعدي القابضة"]]],["الخدمات التجارية والمهنية",[["4270","طباعة وتغليف","الشركة السعودية للطباعة والتغليف"],["6004","كاتريون","شركة كاتريون للتموين القابضة"],["1832","صدر","شركة صدر للخدمات اللوجستية"],["1831","مهارة","شركة مهارة للموارد البشرية"],["1833","الموارد","شركة الموارد للقوى البشرية"],["1834","سماسكو","الشركة السعودية لحلول القوى البشرية"],["1835","تمكين","شركة تمكين للموارد البشرية"]]],["النقل",[["4031","الخدمات الأرضية","الشركة السعودية للخدمات الأرضية"],["4040","سابتكو","الشركة السعودية للنقل الجماعي"],["4260","بدجت السعودية","الشركة المتحدة الدولية للمواصلات"],["2190","سيسكو القابضة","شركة البنى التحتية المستدامة القابضة"],["4261","ذيب","شركة ذيب لتأجير السيارات"],["4263","سال","شركة سال السعودية للخدمات اللوجستية"],["4262","لومي","شركة لومي للتأجير"],["4265","شري","شركة شري للتجارة"],["4264","طيران ناس","شركة طيران ناس"]]],["السلع طويلة الأجل",[["1213","نسيج","شركة نسيج العالمية التجارية"],["2130","صدق","الشركة السعودية للتنمية الصناعية"],["2340","ارتيكس","شركة ارتيكس للاستثمار الصناعي"],["4011","لازوردي","شركة لازوردي للمجوهرات"],["4012","الأصيل","شركة ثوب الأصيل"]]],["الخدمات الإستهلاكية",[["1810","سيرا","مجموعة سيرا القابضة"],["6013","التطويرية الغذائية","شركة الأعمال التطويرية الغذائية"],["1820","بان","شركة مجموعة بان القابضة"],["4170","شمس","شركة المشروعات السياحية"],["4290","الخليج للتدريب","شركة الخليج للتدريب والتعليم"],["6017","جاهز","شركة جاهز الدولية لتقنية نظم المعلومات"],["6002","هرفي للأغذية","شركة هرفي للخدمات الغذائية"],["1830","لجام للرياضة","شركة لجام للرياضة"],["6012","ريدان","شركة ريدان الغذائية"],["4291","الوطنية للتعليم","الشركة الوطنية للتربية و التعليم"],["4292","عطاء","شركة عطاء التعليمية"],["6014","الآمار","شركة الآمار الغذائية"],["6015","أمريكانا","شركة أمريكانا للمطاعم العالمية بي إل سي - شركة أجنبية"],["6016","برغرايززر","شركة مطاعم بيت الشطيرة للوجبات السريعة"],["6018","الأندية للرياضة","شركة الأندية للرياضة"],["6019","المسار الشامل","شركة المسار الشامل للتعليم"],["6022","أرماح","شركة أرماح الرياضية"],["4250","جبل عمر","شركة جبل عمر للتطوير"],["4090","طيبة","شركة طيبة للإستثمار"]]],["الإعلام والترفيه",[["4070","تهامة","شركة تهامة للإعلان والعلاقات العامة والتسويق"],["4210","الأبحاث والإعلام","المجموعة السعودية للأبحاث والإعلام"],["4071","العربية","الشركة العربية للتعهدات الفنية"],["4072","مجموعة إم بي سي","شركة مجموعة إم بي سي"]]],["تجزئة وتوزيع السلع الكمالية",[["4003","إكسترا","الشركة المتحدة للإلكترونيات"],["4008","ساكو","الشركة السعودية للعدد والأدوات"],["4050","ساسكو","الشركة السعودية لخدمات السيارات والمعدات"],["4190","جرير","شركة جرير للتسويق"],["4240","إيه إف جي ريتيل","شركة إيه إف جي إنترناشونال"],["4191","أبو معطي","شركة عبد الله سعد محمد أبو معطي للمكتبات"],["4051","باعظيم","شركة باعظيم التجارية"],["4192","السيف غاليري","شركة متاجر السيف للتنمية والاستثمار"],["4193","نايس ون","شركة نايس ون بيوتي للتسويق الإلكتروني"],["4194","محطة البناء","شركة مجموعة منزل التسويق للتجارة"],["4200","الدريس","شركة الدريس للخدمات البترولية و النقليات"],["4180","مجموعة فتيحي","مجموعة فتيحي القابضة"]]],["تجزئة وتوزيع السلع الاستهلاكية",[["4001","أسواق ع العثيم","شركة أسواق عبدالله العثيم"],["4006","أسواق المزرعة","الشركة السعودية للتسويق"],["4061","أنعام القابضة","مجموعة أنعام الدولية القابضة"],["4160","ثمار",""],["4161","بن داود","شركة بن داود القابضة"],["4162","المنجم","شركة المنجم للأغذية"],["4164","النهدي","شركة النهدي الطبية"],["4163","الدواء","شركة الدواء للخدمات الطبية"]]],["إنتاج الأغذية",[["2050","مجموعة صافولا","مجموعة صافولا"],["2100","وفرة","شركة وفرة للصناعة والتنمية"],["2270","سدافكو","الشركة السعودية لمنتجات الألبان والأغذية"],["2280","المراعي","شركة المراعي"],["6001","حلواني إخوان","شركة حلواني إخوان"],["2288","نفوذ","شركة نفوذ للمنتجات الغذائية"],["6010","نادك","الشركة الوطنية للتنمية الزراعية"],["6020","جاكو","شركة القصيم القابضة للاستثمار"],["6040","تبوك الزراعية","شركة تبوك للتنمية الزراعية"],["6050","الأسماك","الشركة السعودية للأسماك"],["6060","الشرقية للتنمية","شركة الشرقية للتنمية"],["6070","الجوف","شركة الجوف الزراعية"],["6090","جازادكو","شركة جازان للتنمية والاستثمار"],["2281","تنمية","شركة التنمية الغذائية"],["2282","نقي","شركة نقي للمياه"],["2283","المطاحن الأولى","شركة المطاحن الأولى"],["4080","سناد القابضة","شركة سناد القابضة"],["2284","المطاحن الحديثة","شركة المطاحن الحديثة للمنتجات الغذائية"],["2285","المطاحن العربية","شركة المطاحن العربية للمنتجات الغذائية"],["2286","المطاحن الرابعة","شركة المطاحن الرابعة"],["2287","إنتاج","الشركة العربية للاستثمار الزراعي والصناعي"],["2140","أيان","شركة أيان للإستثمار"]]],["الرعاية الصحية",[["4002","المواساة","شركة المواساة للخدمات الطبية"],["4021","المركز الكندي الطبي","شركة مجمع المركز الكندي الطبي العام"],["4004","دله الصحية","شركة دله للخدمات الصحية"],["4005","رعاية","الشركة الوطنية للرعاية الطبية"],["4007","الحمادي","شركة الحمادي القابضة"],["4009","السعودي الألماني الصحية","شركة الشرق الأوسط للرعاية الصحية"],["2230","الكيميائية","الشركة الكيميائية السعودية القابضة"],["4013","سليمان الحبيب","مجموعة الدكتور سليمان الحبيب للخدمات الطبية"],["4014","دار المعدات","شركة دار المعدات الطبية والعلمية"],["4017","فقيه الطبية","شركة مستشفى الدكتور سليمان عبدالقادر فقيه"],["4018","الموسى","شركة الموسى الصحية"],["4019","اس ام سي للرعاية الصحية","الشركة الطبية التخصصية"]]],["الأدوية",[["2070","الدوائية","الشركة السعودية للصناعات الدوائية والمستلزمات الطبية"],["4015","جمجوم فارما","شركة مصنع جمجوم للأدوية"],["4016","أفالون فارما","شركة الشرق الأوسط للصناعات الدوائية"]]],["البنوك",[["1010","الرياض","بنك الرياض"],["1020","الجزيرة","بنك الجزيرة"],["1030","الإستثمار","البنك السعودي للإستثمار"],["1050","بي اس اف","البنك السعودي الفرنسي"],["1060","الأول","البنك السعودي الأول"],["1080","العربي","البنك العربي الوطني"],["1120","الراجحي","مصرف الراجحي"],["1140","البلاد","بنك البلاد"],["1150","الإنماء","مصرف الإنماء"],["1180","الأهلي","البنك الأهلي السعودي"]]],["الخدمات المالية",[["2120","متطورة","الشركة السعودية للصناعات المتطورة"],["4280","المملكة","شركة المملكة القابضة"],["4130","درب السعودية","شركة درب السعودية الأستثمارية"],["4081","النايفات","شركة النايفات للتمويل"],["1111","مجموعة تداول","شركة مجموعة تداول السعودية القابضة"],["4082","مرنة","شركة المرابحة المرنة للتمويل"],["1182","أملاك","شركة أملاك العالمية للتمويل"],["1183","سهل","شركة سهل للتمويل"],["4083","تسهيل","الشركة المتحدة الدولية القابضة"],["4084","دراية","شركة دراية المالية"]]],["التأمين",[["8010","التعاونية","الشركة التعاونية للتأمين"],["8012","جزيرة تكافل","شركة الجزيرة تكافل تعاوني"],["8020","ملاذ للتأمين","شركة ملاذ للتأمين التعاوني"],["8030","ميدغلف للتأمين","شركة المتوسط والخليج للتأمين وإعادة التأمين التعاوني"],["8040","متكاملة","شركة متكاملة للتأمين"],["8050","سلامة","شركة سلامة للتأمين التعاوني"],["8060","ولاء","شركة ولاء للتأمين التعاوني"],["8070","الدرع العربي","شركة الدرع العربي للتأمين التعاوني"],["8190","المتحدة للتأمين","الشركة المتحدة للتأمين التعاوني"],["8230","تكافل الراجحي","شركة الراجحي للتأمين التعاوني"],["8280","ليفا","شركة ليفا للتأمين"],["8150","أسيج","المجموعة المتحدة للتأمين التعاوني"],["8210","بوبا العربية","شركة بوبا العربية للتأمين التعاوني"],["8180","الصقر للتأمين","شركة الصقر للتأمين التعاوني"],["8170","الاتحاد","شركة الاتحاد للتأمين التعاوني"],["8100","سايكو","الشركة العربية السعودية للتأمين التعاوني"],["8120","إتحاد الخليج الأهلية","شركة إتحاد الخليج الأهلية للتأمين التعاوني"],["8200","الإعادة السعودية","الشركة السعودية لإعادة التأمين"],["8160","التأمين العربية","شركة التأمين العربية التعاونية"],["8250","جي آي جي","مجموعة الخليج للتأمين"],["8240","تْشب","شركة تْشب العربية للتأمين التعاوني"],["8260","الخليجية العامة","الشركة الخليجية العامة للتأمين التعاوني"],["8300","الوطنية","الشركة الوطنية للتأمين"],["8310","أمانة للتأمين","شركة أمانة للتأمين التعاوني"],["8311","عناية","شركة عناية السعودية للتأمين التعاوني"],["8313","رسن","شركة رسن لتقنية المعلومات"]]],["الإتصالات",[["7010","اس تي سي","شركة الإتصالات السعودية"],["7020","إتحاد إتصالات","شركة إتحاد إتصالات"],["7030","زين السعودية","شركة الإتصالات المتنقلة السعودية"],["7040","قو للإتصالات","شركة إتحاد قو للإتصالات"]]],["المرافق العامة",[["2080","الغاز القابضة","شركة الغاز والتصنيع الأهلية القابضة"],["5110","السعودية للطاقة","الشركة السعودية للطاقة"],["2081","الخريف","شركة الخريف لتقنية المياه والطاقة"],["2082","أكوا","شركة أكوا باور"],["2083","مرافق","شركة مرافق الكهرباء والمياه بالجبيل وينبع"],["2084","مياهنا","شركة مياهنا"]]],["الصناديق العقارية المتداولة",[["4330","الرياض ريت","الرياض ريت"],["4331","الجزيرة ريت","صندوق الجزيرة ريت"],["4332","جدوى ريت الحرمين","صندوق جدوى ريت الحرمين"],["4333","تعليم ريت","صندوق تعليم ريت"],["4334","المعذر ريت","صندوق المعذر ريت"],["4335","مشاركة ريت","صندوق مشاركة ريت"],["4336","ملكية ريت","صندوق مُلكيّة - عقارات الخليج ريت"],["4338","الأهلي ريت 1","صندوق الأهلي ريت 1"],["4337","العزيزية ريت","صندوق العزيزية ريت"],["4342","جدوى ريت السعودية","صندوق جدوى ريت السعودية"],["4340","الراجحي ريت","صندوق الراجحي ريت"],["4339","دراية ريت","صندوق دراية ريت"],["4344","سدكو كابيتال ريت","صندوق سدكو كابيتال ريت"],["4347","بنيان ريت","صندوق بنيان ريت"],["4345","الإنماء ريت للتجزئة","صندوق الإنماء ريت لقطاع التجزئة"],["4346","ميفك ريت","صندوق ميفك ريت"],["4348","الخبير ريت","صندوق الخبير ريت"],["4349","الإنماء ريت الفندقي","صندوق الإنماء ريت الفندقي"],["4350","الاستثمار ريت","صندوق الاستثمار اريك ريت المتنوع"]]],["إدارة وتطوير العقارات",[["4020","العقارية","الشركة العقارية السعودية"],["4324","بنان","شركة بنان العقارية"],["4328","لدن","شركة لدن للاستثمار"],["4323","سمو","شركة سمو العقارية"],["4100","مكة","شركة مكة للإنشاء والتعمير"],["4150","التعمير","شركة الرياض للتعمير"],["4220","إعمار","إعمار المدينة الإقتصادية"],["4230","البحر الأحمر","شركة البحر الأحمر العالمية"],["4300","دار الأركان","شركة دار الأركان للتطوير العقاري"],["4310","مدينة المعرفة","مدينة المعرفة الإقتصادية"],["4320","الأندلس","شركة الأندلس العقارية"],["4321","سينومي سنترز","شركة المراكز العربية"],["4322","رتال","شركة رتال للتطوير العمراني"],["4326","الماجدية","شركة دار الماجد العقارية"],["4325","مسار","شركة أم القرى للتنمية والإعمار"],["4327","الرمز","شركة الرمز للعقارات"]]],["التطبيقات وخدمات التقنية",[["7201","بحر العرب","شركة بحر العرب لأنظمة المعلومات"],["7211","عزم","شركة عزم السعودية للاتصالات وتقنية المعلومات"],["7200","ام آي اس","شركة المعمر لأنظمة المعلومات"],["7202","سلوشنز","الشركة العربية لخدمات الإنترنت والاتصالات"],["7203","علم","شركة علم"],["7204","توبي","شركة العرض المتقن للخدمات التجارية"],["7205","دي بي اس","شرکة دار البلد لحلول الأعمال"]]],["المنتجات المنزلية والشخصية",[["4165","الماجد للعود","شركة الماجد للعود"]]],["صناديق الاستثمار المغلقة",[["4700","الخبير للدخل",""],["4702","الخبير للدخل 2030",""],["4703","سدكو متعدد الأصول",""]]],["صناديق المؤشرات المتداولة",[["9400","صندوق يقين 30","صندوق يقين المتداول للأسهم السعودية"],["9401","صندوق يقين للبتروكيماويات","صندوق يقين المتداول لقطاع البتروكيماويات"],["9402","صندوق الأول للاستثمار الكمي المتداول","صندوق الأول للاستثمار السعودي الكمي المتداول"],["9403","صندوق البلاد للصكوك السيادية","صندوق البلاد المتداول للصكوك السيادية السعودية"],["9404","صندوق الإنماء للصكوك الحكومية","صندوق الإنماء المتداول لصكوك الحكومة السعودية المحلية"],["9405","صندوق البلاد للذهب","صندوق البلاد المتداول للمتاجرة بالذهب"],["9406","صندوق البلاد الأمريكي","صندوق البلاد إم إس سي آي المتداول للأسهم الأمريكية"],["9407","صندوق البلاد التقني الأمريكي","صندوق البلاد إم إس سي آي المتداول للأسهم التقنية الأمريكية"],["9408","صندوق البلاد للنمو السعودي","صندوق البلاد إم إس سي آي المتداول لأسهم النمو السعودية"],["9409","صندوق يقين إي إس جي","صندوق يقين اس آند بي إي إس جي المتداول في الشرق الأوسط و شمال أفريقيا"],["9410","صندوق البلاد هونج كونج الصين","صندوق البلاد سي سوب إم إس سي آي المتداول لأسهم هونج كونج الصين"],["9411","صندوق الأول للاستثمار هونج كونج","صندوق الأول للاستثمار هانغ سينغ هونج كونج المتداول"],["9412","صندوق البلاد للأسهم السعودية",""],["9413","صندوق الراجحي إي تي إف للأسهم السعودية",""]]]];
+const SA_MAP = {};
+SA_SECTORS.forEach(([sec, list]) => list.forEach(([c, n, f]) => { SA_MAP[c] = { n, f, sec }; }));
+const saName = (s) => (SA_MAP[s] ? SA_MAP[s].n : "");
+let syQ = "", syOpen = null;
+const SY_IC = {
+  "البنوك": "bank", "الطاقة": "energy", "الإتصالات": "tel", "المواد الاساسية": "mat", "التأمين": "ins"
+};
+function pageSymbols() {
+  const q = syQ.trim(), nq = typeof shNorm === "function" ? shNorm(q) : q.toLowerCase();
+  const match = (r) => !q || r[0].startsWith(q) || (typeof shNorm === "function" ? shNorm(r[1] + " " + r[2]) : (r[1] + " " + r[2]).toLowerCase()).includes(nq);
+  let total = 0;
+  const groups = SA_SECTORS.map(([sec, list], i) => {
+    const rows = list.filter(match); total += rows.length; if (!rows.length) return "";
+    const open = q ? true : syOpen === "all" ? true : syOpen === "none" ? false : i < 1;
+    return '<details class="panel sy-sec"' + (open ? " open" : "") + '><summary><b>' + esc(sec) + '</b><span class="tag amber">' + esc(t("sy_n").replace("{n}", rows.length)) + '</span></summary><ul class="sy-list">' +
+      rows.slice().sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([c, n, f]) => { const has = typeof chartData === "function" && chartData(c).length > 1; return '<li><span class="sy-code num">' + esc(c) + '</span><span class="sy-nm"><b>' + esc(n) + "</b>" + (f && f !== n ? '<small class="muted">' + esc(f) + "</small>" : "") + "</span>" + (has ? '<button class="btn sm ghost" data-act="sy-chart" data-s="' + esc(c) + '">' + esc(t("sy_chart")) + "</button>" : "") + "</li>"; }).join("") + "</ul></details>";
+  }).join("");
+  const n = SA_SECTORS.reduce((a, [, l]) => a + l.length, 0);
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sy_h")) + "</h1><p>" + esc(t("sy_p")) + '</p></div><div class="stack" style="padding-block:18px 40px"><div class="sy-bar"><input id="sy-q" type="search" data-sy="q" autocomplete="off" placeholder="' + esc(t("sy_q")) + '" value="' + esc(syQ) + '"><button class="btn sm" data-act="sy-all">' + esc(t("sy_open")) + '</button><button class="btn sm ghost" data-act="sy-none">' + esc(t("sy_close")) + '</button></div><p class="small muted" style="margin:0">' + esc(t("sy_all").replace("{n}", n).replace("{s}", SA_SECTORS.length)) + '</p><div id="sy-out" class="stack" style="gap:10px">' + (groups || '<div class="notice">' + esc(t("sy_none")) + "</div>") + '</div><p class="small muted" style="margin:0">' + esc(t("sy_src")) + ' <a href="https://www.argaam.com/ar/company/companies-prices" target="_blank" rel="noopener">argaam.com</a></p></div></div>';
+}
+document.addEventListener("input", (e) => {
+  if (!e.target.dataset || e.target.dataset.sy !== "q") return;
+  syQ = e.target.value; const box = document.getElementById("sy-out"); if (!box) return;
+  const tmp = document.createElement("div"); tmp.innerHTML = pageSymbols(); const nb = tmp.querySelector("#sy-out"); if (nb) box.innerHTML = nb.innerHTML;
+});
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act^="sy-"]'); if (!el) return;
+  const a = el.dataset.act;
+  if (a === "sy-all" || a === "sy-none") { syOpen = a === "sy-all" ? "all" : "none"; document.querySelectorAll(".sy-sec").forEach((d) => { d.open = syOpen === "all"; }); }
+  else if (a === "sy-chart") { S.chart.sym = el.dataset.s; save(); location.hash = "chart"; }
+});
 /* ===== مِراس: دليل المؤشرات ===== */
 Object.assign(UI, {
   il_title: ["دليل المؤشرات", "Indicator guide"],
@@ -3885,7 +4003,7 @@ function pageDividends() {
   const rows = list.map((x, i) => {
     const on = DIVW && DIVW.includes(x.s);
     const ex = x.next_ex ? '<span class="num">' + esc(x.next_ex) + '</span> <span class="tag' + (x.announced ? " up" : "") + '">' + esc(t(x.announced ? "dv_ann" : "dv_exp")) + "</span>" : '<span class="muted">' + esc(t("dv_none")) + "</span>";
-    return '<tr id="dv-r' + i + '" data-s="' + esc(x.s) + '" data-n="' + esc(String(x.name || "").toLowerCase()) + '"><td><button type="button" class="dv-star" data-act="dv-star" data-sym="' + esc(x.s) + '" aria-pressed="' + !!on + '" title="' + esc(t("dv_star")) + '" aria-label="' + esc(t("dv_star")) + " " + esc(x.s) + '">' + (on ? "★" : "☆") + '</button></td><td><span class="num">' + esc(x.s) + "</span> " + esc(x.name || "") + (/^9/.test(x.s) ? ' <span class="tag">' + esc(t("dv_nomu_tag")) + "</span>" : "") + '</td><td class="num" id="dv-p' + i + '"></td><td class="num">' + (x.next_amt ? fmt(x.next_amt, x.next_amt < 1 ? 3 : 2) : "–") + "</td><td>" + ex + '</td><td id="dv-d' + i + '"></td><td class="num">' + (x.next_ex ? esc(buyBy(x.next_ex)) : "–") + '</td><td class="num" id="dv-y' + i + '"></td><td class="num" id="dv-m' + i + '"></td><td class="num" id="dv-s' + i + '"></td><td class="num pos" id="dv-a' + i + '"></td></tr>';
+    return '<tr id="dv-r' + i + '" data-s="' + esc(x.s) + '" data-n="' + esc(String(x.name || "").toLowerCase()) + '"><td><button type="button" class="dv-star" data-act="dv-star" data-sym="' + esc(x.s) + '" aria-pressed="' + !!on + '" title="' + esc(t("dv_star")) + '" aria-label="' + esc(t("dv_star")) + " " + esc(x.s) + '">' + (on ? "★" : "☆") + '</button></td><td title="' + esc(x.s) + '"><b>' + esc((typeof saName === "function" && saName(x.s)) || x.name || x.s) + "</b>" + (/^9/.test(x.s) ? ' <span class="tag">' + esc(t("dv_nomu_tag")) + "</span>" : "") + '</td><td class="num" id="dv-p' + i + '"></td><td class="num">' + (x.next_amt ? fmt(x.next_amt, x.next_amt < 1 ? 3 : 2) : "–") + "</td><td>" + ex + '</td><td id="dv-d' + i + '"></td><td class="num">' + (x.next_ex ? esc(buyBy(x.next_ex)) : "–") + '</td><td class="num" id="dv-y' + i + '"></td><td class="num" id="dv-m' + i + '"></td><td class="num" id="dv-s' + i + '"></td><td class="num pos" id="dv-a' + i + '"></td></tr>';
   }).join("");
   const count = real ? '<span class="small muted">' + esc(t("dv_count").replace("{n}", list.length).replace("{d}", DIV.as_of || whenText(DIV.fetched_at))) + "</span>" : "";
   return svcShell("dividends",
@@ -4057,7 +4175,7 @@ function pageTech() {
   if (techCan() && TECHL == null) setTimeout(loadTech, 0);
   let cur = list.find((x) => x.s === c.s) || list[0];
   const tf = cur && cur.tf[c.tf] ? c.tf : "1D", d = cur && cur.tf[tf];
-  const chips = list.map((x) => '<button type="button" class="btn sm tgl' + (cur && x.s === cur.s ? " on" : "") + '" data-act="tc-s" data-s="' + esc(x.s) + '" aria-pressed="' + !!(cur && x.s === cur.s) + '"><span class="num">' + esc(x.s) + "</span> " + esc(x.name || "") + "</button>").join("");
+  const chips = list.map((x) => '<button type="button" class="btn sm tgl' + (cur && x.s === cur.s ? " on" : "") + '" data-act="tc-s" data-s="' + esc(x.s) + '" aria-pressed="' + !!(cur && x.s === cur.s) + '" title="' + esc((typeof saName === "function" && saName(x.s)) || x.name || "") + '"><span class="num">' + esc(x.s) + "</span></button>").join("");
   const tfb = (v, k) => '<button type="button" class="btn sm tgl' + (tf === v ? " on" : "") + '" data-act="tc-tf" data-tf="' + v + '" aria-pressed="' + (tf === v) + '">' + esc(t(k)) + "</button>";
   const add = techCan() ? '<form class="row" data-form="tc-add" style="gap:8px"><label class="small muted" for="tc-new">' + esc(t("tc_add")) + '</label><input id="tc-new" class="num" inputmode="numeric" maxlength="4" style="width:90px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)"><button class="btn sm" type="submit">' + esc(t("tc_add_btn")) + "</button>" + (cur && TECHL && TECHL.includes(cur.s) ? '<button type="button" class="btn sm ghost" data-act="tc-rm" data-s="' + esc(cur.s) + '">' + esc(t("tc_rm")) + "</button>" : "") + "</form>" : "";
   const upd = real ? '<span class="small muted">' + esc(t("tc_updated").replace("{d}", whenText(TECH.fetched_at)).replace("{n}", list.length)) + "</span>" : "";
@@ -4068,7 +4186,7 @@ function pageTech() {
   const pivT = kinds.length ? '<div class="tablewrap"><table class="tc-piv"><thead><tr><th></th>' + kinds.map((k) => "<th>" + esc(k[0].toUpperCase() + k.slice(1)) + "</th>").join("") + "</tr></thead><tbody>" +
     ["R3", "R2", "R1", "P", "S1", "S2", "S3"].map((p) => '<tr><th class="num ' + (p[0] === "R" ? "neg" : p[0] === "S" ? "pos" : "") + '">' + p + "</th>" + kinds.map((k) => '<td class="num">' + (pv[k][p] == null ? "–" : fmt(pv[k][p])) + "</td>").join("") + "</tr>").join("") + "</tbody></table></div>" : "";
   const allRows = list.map((x) => { const a = x.tf["1D"] || {}, w = x.tf["1W"] || {}; const tg = (v) => '<span class="tag ' + tcCls(v) + '">' + esc(t(tcLabel(v))) + "</span>";
-    return '<tr data-act="tc-s" data-s="' + esc(x.s) + '" style="cursor:pointer"><td><span class="num">' + esc(x.s) + "</span> " + esc(x.name || "") + '</td><td class="num">' + (a.close != null ? fmt(a.close) : "–") + '</td><td class="num ' + (a.change > 0 ? "pos" : a.change < 0 ? "neg" : "") + '">' + (a.change != null ? (a.change > 0 ? "+" : "") + fmt(a.change) + "%" : "–") + "</td><td>" + tg(a.all) + "</td><td>" + tg(w.all) + "</td></tr>"; }).join("");
+    return '<tr data-act="tc-s" data-s="' + esc(x.s) + '" style="cursor:pointer"><td title="' + esc((typeof saName === "function" && saName(x.s)) || x.name || "") + '"><span class="num">' + esc(x.s) + '</span></td><td class="num">' + (a.close != null ? fmt(a.close) : "–") + '</td><td class="num ' + (a.change > 0 ? "pos" : a.change < 0 ? "neg" : "") + '">' + (a.change != null ? (a.change > 0 ? "+" : "") + fmt(a.change) + "%" : "–") + "</td><td>" + tg(a.all) + "</td><td>" + tg(w.all) + "</td></tr>"; }).join("");
   return svcShell("tech",
     '<p class="muted" style="max-width:64ch">' + esc(t("tc_p")) + "</p>" + (real ? "" : '<div class="notice">' + esc(t("tc_sample")) + "</div>") +
     '<div class="panel stack"><div class="row tc-chips">' + chips + "</div>" + add + "</div>" +
@@ -4481,7 +4599,7 @@ Object.assign(UI, {
 });
 
 const NAV_GROUPS = {
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["glossary", "tab_gloss", "d_gloss"], ["progress", "nav_progress", "d_prog"]] },
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] },
   services: { label: "nav_svc", items: [["journal", "tab_journal", "d_journal"], ["invest", "tab_inv", "d_invest"], ["tech", "tab_tech", "d_tech"], ["dividends", "tab_div", "d_div"], ["metals", "tab_met", "d_met"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] }
 };
 function groupOf(r) {
@@ -4572,6 +4690,7 @@ const SEC_IC = {
   lab: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 15h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   guides: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5M9 8h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
   glossary: '<path d="M4 18l4-12 4 12M5.5 14h5M14 7h6l-6 10h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  symbols: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4L7 20M17 4l-2 16M4 9h16M3 15h16"/></g>',
   progress: '<g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></g>',
   journal: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></g>',
   invest: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M16.5 7.5c-.8-1.3-2.4-2-4.5-2-2.5 0-4 1.2-4 3s1.5 2.6 4 3.2 4 1.4 4 3.3-1.6 3.2-4.2 3.2c-2.1 0-3.7-.8-4.5-2.2"/></g>',
@@ -4588,7 +4707,9 @@ const secIc = (k, sz) => '<svg viewBox="0 0 24 24" width="' + (sz || 20) + '" he
 Object.assign(UI, {
   map_root: ["مِراس", "Meras"], map_admin: ["الإدارة", "Admin"], map_admin_p: ["تظهر لك بس", "Only you see this"],
   map_h: ["هيكل المنصة", "How Meras is organised"], map_p: ["كل أقسام مِراس في مكان واحد. اضغط أي قسم وتدخله على طول.", "Every part of Meras in one place. Tap any section to open it."],
-  map_tree: ["عرض الشجرة", "Tree view"], map_cols: ["عرض الأعمدة", "Columns view"], map_q: ["ابحث عن قسم…", "Find a section…"], map_n: ["{n} أقسام", "{n} sections"],
+  map_tree: ["الشجرة", "Tree"], map_cols: ["الأعمدة", "Columns"], map_cards: ["البطاقات", "Cards"],
+  map_learn_s: ["المسارات والشروحات والممارسة", "Tracks, guides and practice"], map_svc_s: ["أدوات يومية: سجل، تحليل، توزيعات، فرز شرعي", "Daily tools: journal, analysis, payouts, screening"],
+  map_plans_s: ["أول درجتين مجانية في كل مسار", "The first two steps are free"], map_admin_s: ["تظهر لك بس", "Only you see this"], map_plan_free: ["البداية المجانية", "Free start"], map_q: ["ابحث عن قسم…", "Find a section…"], map_n: ["{n} أقسام", "{n} sections"],
   map_plans_go: ["أول درجتين مجانية، قارن الباقات", "First two steps free, compare plans"],
   map_plans_p: ["أول درجتين في كل مسار مجانية، والباقي بالاشتراك.", "The first two steps of every track are free; the rest comes with a plan."],
   map_owner_p: ["لوحة المالك والمستخدمين والبيانات.", "Owner dashboard, users and data."], map_desk_p: ["محفظتك وأدواتك الخاصة.", "Your portfolio and private tools."]
@@ -4625,11 +4746,21 @@ function mapSection() {
     grp("calc", t("nav_svc"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => pill(h, k)).join("")) +
     grp("plans", t("nav_plans"), 0, pill("plans", "map_plans_go")) +
     (owner ? grp("owner", t("map_admin"), 0, pill("owner", "ow_h") + MAP_DESK.map(([k, l]) => pill("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "tr-admin") : "") + "</div>";
+  /* cards view: a card per group, its sections in a two-column grid */
+  const cl = (h, k, extra, ic) => '<a class="cd-it" href="#' + h + '"' + (extra || "") + '><span class="cd-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' + ic + "</svg>" : secIc(h, 15)) + "</span><span>" + esc(t(k)) + "</span></a>";
+  const card = (ic, title, sub, n, items, cls) => '<div class="cd' + (cls ? " " + cls : "") + '"><div class="cd-h"><span class="cd-hi">' + (cls ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg>' : secIc(ic, 20)) + '</span><span class="cd-ht"><b>' + esc(title) + "</b><small>" + esc(sub) + "</small></span>" + (n ? '<span class="cd-n">' + esc(t("map_n").replace("{n}", n)) + "</span>" : "") + '</div><div class="cd-grid">' + items + "</div></div>";
+  const cards = '<div class="cds">' +
+    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) +
+    (owner ? card("owner", t("map_admin"), t("map_admin_s"), 0, cl("owner", "ow_h") + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "cd-admin") : "") + "</div>";
   const v = mapView();
-  const bar = '<div class="map-bar"><div class="map-sw" role="group" aria-label="' + esc(t("map_h")) + '"><button data-act="map-view" data-v="tree" aria-pressed="' + (v === "tree") + '">' + esc(t("map_tree")) + '</button><button data-act="map-view" data-v="cols" aria-pressed="' + (v === "cols") + '">' + esc(t("map_cols")) + '</button></div><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div>';
-  return '<section class="sec org"><div class="sec-head" style="align-self:stretch"><h2>' + esc(t("map_h")) + "</h2></div>" + bar + '<div class="map-v" data-v="tree"' + (v === "tree" ? "" : " hidden") + ">" + tree + '</div><div class="map-v map-vcols" data-v="cols"' + (v === "cols" ? "" : " hidden") + ">" + columns + "</div></section>";
+  const sw = [["tree", "map_tree"], ["cards", "map_cards"], ["cols", "map_cols"]].map(([k, l]) => '<button data-act="map-view" data-v="' + k + '" aria-pressed="' + (v === k) + '">' + esc(t(l)) + "</button>").join("");
+  const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><div class="map-sw" role="group" aria-label="' + esc(t("map_h")) + '">' + sw + '</div><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
+  const view = (k, inner, cls) => '<div class="map-v' + (cls ? " " + cls : "") + '" data-v="' + k + '"' + (v === k ? "" : " hidden") + ">" + inner + "</div>";
+  return '<section class="sec org">' + bar + view("tree", tree) + view("cards", cards) + view("cols", columns, "map-vcols") + "</section>";
 }
-const mapView = () => { try { return localStorage.getItem("meras.mapview") === "cols" ? "cols" : "tree"; } catch (e) { return "tree"; } };
+const mapView = () => { try { const v = localStorage.getItem("meras.mapview"); return v === "cols" || v === "cards" ? v : "tree"; } catch (e) { return "tree"; } };
 document.addEventListener("click", (e) => {
   const b = e.target.closest && e.target.closest('[data-act="map-view"]'); if (!b) return;
   try { localStorage.setItem("meras.mapview", b.dataset.v); } catch (err) {}
@@ -4639,13 +4770,13 @@ document.addEventListener("click", (e) => {
 document.addEventListener("input", (e) => {
   if (e.target.id !== "map-q") return;
   const q = shNorm ? shNorm(e.target.value) : e.target.value.trim().toLowerCase();
-  document.querySelectorAll(".org .tr-pill, .org .org-it").forEach((a) => { const hit = !q || (shNorm ? shNorm(a.textContent) : a.textContent.toLowerCase()).includes(q); a.classList.toggle("map-dim", !hit); a.classList.toggle("map-hit", !!q && hit); });
+  document.querySelectorAll(".org .tr-pill, .org .org-it, .org .cd-it").forEach((a) => { const hit = !q || (shNorm ? shNorm(a.textContent) : a.textContent.toLowerCase()).includes(q); a.classList.toggle("map-dim", !hit); a.classList.toggle("map-hit", !!q && hit); });
 });
 document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("[data-dktab]"); if (a && typeof dkTab !== "undefined") { dkTab = a.dataset.dktab; dkGrid = false; } });
 
 function pageGate() {
   const first = nextLesson("inv") || LESSONS[0];
-  return '<section class="hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + mapSection() + "</div></section>" +
+  return '<section class="hero gate-hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + mapSection() + "</div></section>" +
     '<div class="wrap"><section class="sec">' + continueHtml() + "</section>" +
     '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + "</div></section>" + GATE_TAIL() + "</div>";
 }
@@ -6347,7 +6478,7 @@ document.addEventListener("click", async (e) => {
    المالك (جهاز فيه رمز المستودع) ومن دخل قبل ما يشوفونها إلا من #welcome. */
 Object.assign(UI, {
   ln_enter: ["دخول", "Enter"], ln_signup: ["إنشاء حساب", "Create account"], ln_explore: ["وش فيها؟", "What is inside?"],
-  ln_eyebrow: ["منصة تعليمية للأسواق المالية", "A learning platform for the markets"],
+  ln_eyebrow: ["منصة تعليمية للسوق المالية السعودية، واستعراض الأسواق العالمية للتعليم على أسعار حقيقية", "A learning platform for the Saudi market, with world markets to learn on real prices"],
   ln_h: ["تعلّم السوق <em>بالمِراس</em>، وطبّق على بيانات حقيقية", "Learn the market <em>by practice</em>, on real data"],
   ln_p: ["دروس مبسطة بالعربي من الصفر، وشارت بمؤشراته، ومختبر تختبر فيه أفكارك على تاريخ الأسهم قبل ما تخاطر بريال واحد.", "Plain Arabic lessons from zero, a chart with its indicators, and a lab to test your ideas on share history before you risk a single riyal."],
   ln_what: ["وش تلقى في مِراس", "What you will find in Meras"],

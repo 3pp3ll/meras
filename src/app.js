@@ -10,7 +10,7 @@ const UI = {
   nav_home: ["الرئيسية", "Home"], nav_tracks: ["المسارات", "Tracks"], nav_services: ["الخدمات", "Services"],
   nav_progress: ["تقدّمي", "My progress"], nav_plans: ["الباقات", "Plans"], nav_account: ["حسابي", "Account"],
   sign_in: ["دخول", "Sign in"],
-  hero_eyebrow: ["منصة تعليمية للسوق المالية السعودية", "A learning platform for the Saudi stock market"],
+  hero_eyebrow: ["منصة تعليمية للسوق المالية السعودية، واستعراض الأسواق العالمية للتعليم على أسعار حقيقية", "A learning platform for the Saudi market, with a look at world markets to learn on real prices"],
   hero_h: ["تعلّم السوق السعودي <em>بالمِراس</em>، درجة درجة", "Learn the Saudi market <em>by practice</em>, one step at a time"],
   hero_p: ["ثلاثة مسارات للمستثمر والمتداول والمبرمج. كل درس شرح، ثم مثال على سهم من تاسي، ثم تمرين تسجله في سجل تداولك.", "Three tracks for the investor, the trader and the developer. Each lesson is an explanation, then an example on a TASI share, then practice you log in your trading journal."],
   start: ["ابدأ من الدرجة الأولى", "Start at step one"], see_tracks: ["شوف المسارات", "See the tracks"],
@@ -402,7 +402,7 @@ function renderNow() {
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; if ((g === "learn" || g === "services") && typeof sideShell === "function") html = sideShell(g, r, html); }
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";

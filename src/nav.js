@@ -25,7 +25,7 @@ Object.assign(UI, {
 });
 
 const NAV_GROUPS = {
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["glossary", "tab_gloss", "d_gloss"], ["progress", "nav_progress", "d_prog"]] },
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] },
   services: { label: "nav_svc", items: [["journal", "tab_journal", "d_journal"], ["invest", "tab_inv", "d_invest"], ["tech", "tab_tech", "d_tech"], ["dividends", "tab_div", "d_div"], ["metals", "tab_met", "d_met"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] }
 };
 function groupOf(r) {
@@ -116,6 +116,7 @@ const SEC_IC = {
   lab: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 15h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   guides: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5M9 8h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
   glossary: '<path d="M4 18l4-12 4 12M5.5 14h5M14 7h6l-6 10h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  symbols: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4L7 20M17 4l-2 16M4 9h16M3 15h16"/></g>',
   progress: '<g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></g>',
   journal: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></g>',
   invest: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M16.5 7.5c-.8-1.3-2.4-2-4.5-2-2.5 0-4 1.2-4 3s1.5 2.6 4 3.2 4 1.4 4 3.3-1.6 3.2-4.2 3.2c-2.1 0-3.7-.8-4.5-2.2"/></g>',
@@ -132,7 +133,9 @@ const secIc = (k, sz) => '<svg viewBox="0 0 24 24" width="' + (sz || 20) + '" he
 Object.assign(UI, {
   map_root: ["مِراس", "Meras"], map_admin: ["الإدارة", "Admin"], map_admin_p: ["تظهر لك بس", "Only you see this"],
   map_h: ["هيكل المنصة", "How Meras is organised"], map_p: ["كل أقسام مِراس في مكان واحد. اضغط أي قسم وتدخله على طول.", "Every part of Meras in one place. Tap any section to open it."],
-  map_tree: ["عرض الشجرة", "Tree view"], map_cols: ["عرض الأعمدة", "Columns view"], map_q: ["ابحث عن قسم…", "Find a section…"], map_n: ["{n} أقسام", "{n} sections"],
+  map_tree: ["الشجرة", "Tree"], map_cols: ["الأعمدة", "Columns"], map_cards: ["البطاقات", "Cards"],
+  map_learn_s: ["المسارات والشروحات والممارسة", "Tracks, guides and practice"], map_svc_s: ["أدوات يومية: سجل، تحليل، توزيعات، فرز شرعي", "Daily tools: journal, analysis, payouts, screening"],
+  map_plans_s: ["أول درجتين مجانية في كل مسار", "The first two steps are free"], map_admin_s: ["تظهر لك بس", "Only you see this"], map_plan_free: ["البداية المجانية", "Free start"], map_q: ["ابحث عن قسم…", "Find a section…"], map_n: ["{n} أقسام", "{n} sections"],
   map_plans_go: ["أول درجتين مجانية، قارن الباقات", "First two steps free, compare plans"],
   map_plans_p: ["أول درجتين في كل مسار مجانية، والباقي بالاشتراك.", "The first two steps of every track are free; the rest comes with a plan."],
   map_owner_p: ["لوحة المالك والمستخدمين والبيانات.", "Owner dashboard, users and data."], map_desk_p: ["محفظتك وأدواتك الخاصة.", "Your portfolio and private tools."]
@@ -169,11 +172,21 @@ function mapSection() {
     grp("calc", t("nav_svc"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => pill(h, k)).join("")) +
     grp("plans", t("nav_plans"), 0, pill("plans", "map_plans_go")) +
     (owner ? grp("owner", t("map_admin"), 0, pill("owner", "ow_h") + MAP_DESK.map(([k, l]) => pill("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "tr-admin") : "") + "</div>";
+  /* cards view: a card per group, its sections in a two-column grid */
+  const cl = (h, k, extra, ic) => '<a class="cd-it" href="#' + h + '"' + (extra || "") + '><span class="cd-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' + ic + "</svg>" : secIc(h, 15)) + "</span><span>" + esc(t(k)) + "</span></a>";
+  const card = (ic, title, sub, n, items, cls) => '<div class="cd' + (cls ? " " + cls : "") + '"><div class="cd-h"><span class="cd-hi">' + (cls ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg>' : secIc(ic, 20)) + '</span><span class="cd-ht"><b>' + esc(title) + "</b><small>" + esc(sub) + "</small></span>" + (n ? '<span class="cd-n">' + esc(t("map_n").replace("{n}", n)) + "</span>" : "") + '</div><div class="cd-grid">' + items + "</div></div>";
+  const cards = '<div class="cds">' +
+    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) +
+    (owner ? card("owner", t("map_admin"), t("map_admin_s"), 0, cl("owner", "ow_h") + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "cd-admin") : "") + "</div>";
   const v = mapView();
-  const bar = '<div class="map-bar"><div class="map-sw" role="group" aria-label="' + esc(t("map_h")) + '"><button data-act="map-view" data-v="tree" aria-pressed="' + (v === "tree") + '">' + esc(t("map_tree")) + '</button><button data-act="map-view" data-v="cols" aria-pressed="' + (v === "cols") + '">' + esc(t("map_cols")) + '</button></div><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div>';
-  return '<section class="sec org"><div class="sec-head" style="align-self:stretch"><h2>' + esc(t("map_h")) + "</h2></div>" + bar + '<div class="map-v" data-v="tree"' + (v === "tree" ? "" : " hidden") + ">" + tree + '</div><div class="map-v map-vcols" data-v="cols"' + (v === "cols" ? "" : " hidden") + ">" + columns + "</div></section>";
+  const sw = [["tree", "map_tree"], ["cards", "map_cards"], ["cols", "map_cols"]].map(([k, l]) => '<button data-act="map-view" data-v="' + k + '" aria-pressed="' + (v === k) + '">' + esc(t(l)) + "</button>").join("");
+  const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><div class="map-sw" role="group" aria-label="' + esc(t("map_h")) + '">' + sw + '</div><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
+  const view = (k, inner, cls) => '<div class="map-v' + (cls ? " " + cls : "") + '" data-v="' + k + '"' + (v === k ? "" : " hidden") + ">" + inner + "</div>";
+  return '<section class="sec org">' + bar + view("tree", tree) + view("cards", cards) + view("cols", columns, "map-vcols") + "</section>";
 }
-const mapView = () => { try { return localStorage.getItem("meras.mapview") === "cols" ? "cols" : "tree"; } catch (e) { return "tree"; } };
+const mapView = () => { try { const v = localStorage.getItem("meras.mapview"); return v === "cols" || v === "cards" ? v : "tree"; } catch (e) { return "tree"; } };
 document.addEventListener("click", (e) => {
   const b = e.target.closest && e.target.closest('[data-act="map-view"]'); if (!b) return;
   try { localStorage.setItem("meras.mapview", b.dataset.v); } catch (err) {}
@@ -183,13 +196,13 @@ document.addEventListener("click", (e) => {
 document.addEventListener("input", (e) => {
   if (e.target.id !== "map-q") return;
   const q = shNorm ? shNorm(e.target.value) : e.target.value.trim().toLowerCase();
-  document.querySelectorAll(".org .tr-pill, .org .org-it").forEach((a) => { const hit = !q || (shNorm ? shNorm(a.textContent) : a.textContent.toLowerCase()).includes(q); a.classList.toggle("map-dim", !hit); a.classList.toggle("map-hit", !!q && hit); });
+  document.querySelectorAll(".org .tr-pill, .org .org-it, .org .cd-it").forEach((a) => { const hit = !q || (shNorm ? shNorm(a.textContent) : a.textContent.toLowerCase()).includes(q); a.classList.toggle("map-dim", !hit); a.classList.toggle("map-hit", !!q && hit); });
 });
 document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("[data-dktab]"); if (a && typeof dkTab !== "undefined") { dkTab = a.dataset.dktab; dkGrid = false; } });
 
 function pageGate() {
   const first = nextLesson("inv") || LESSONS[0];
-  return '<section class="hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + mapSection() + "</div></section>" +
+  return '<section class="hero gate-hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + mapSection() + "</div></section>" +
     '<div class="wrap"><section class="sec">' + continueHtml() + "</section>" +
     '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + "</div></section>" + GATE_TAIL() + "</div>";
 }

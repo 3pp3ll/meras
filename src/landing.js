@@ -4,7 +4,7 @@
    المالك (جهاز فيه رمز المستودع) ومن دخل قبل ما يشوفونها إلا من #welcome. */
 Object.assign(UI, {
   ln_enter: ["دخول", "Enter"], ln_signup: ["إنشاء حساب", "Create account"], ln_explore: ["وش فيها؟", "What is inside?"],
-  ln_eyebrow: ["منصة تعليمية للأسواق المالية", "A learning platform for the markets"],
+  ln_eyebrow: ["منصة تعليمية للسوق المالية السعودية، واستعراض الأسواق العالمية للتعليم على أسعار حقيقية", "A learning platform for the Saudi market, with world markets to learn on real prices"],
   ln_h: ["تعلّم السوق <em>بالمِراس</em>، وطبّق على بيانات حقيقية", "Learn the market <em>by practice</em>, on real data"],
   ln_p: ["دروس مبسطة بالعربي من الصفر، وشارت بمؤشراته، ومختبر تختبر فيه أفكارك على تاريخ الأسهم قبل ما تخاطر بريال واحد.", "Plain Arabic lessons from zero, a chart with its indicators, and a lab to test your ideas on share history before you risk a single riyal."],
   ln_what: ["وش تلقى في مِراس", "What you will find in Meras"],

@@ -2,13 +2,13 @@
 # يبني المنصة من ملفات src:
 #   index.html   النسخة المنشورة على GitHub Pages
 cd "$(dirname "$0")"
-FONTS='<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Carlito:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">'
+FONTS='<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">'
 body() {
   echo "$FONTS"
   echo '<style>'; cat src/style.css; echo '</style>'
   echo '<header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>'
   echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>'
-  echo '<script>'; cat src/content.js src/app.js src/theme.js src/chart.js src/lab.js src/fib.js src/guides.js src/indicators.js src/sync.js src/ai.js src/dividends.js src/tech.js src/invest.js src/metals.js src/nav.js src/owner.js src/desk.js src/us.js src/sharia.js src/screener.js src/top.js src/divglobal.js src/notify.js src/landing.js src/options.js src/boot.js; echo '</script>'
+  echo '<script>'; cat src/content.js src/app.js src/theme.js src/chart.js src/lab.js src/fib.js src/guides.js src/symbols.js src/indicators.js src/sync.js src/ai.js src/dividends.js src/tech.js src/invest.js src/metals.js src/nav.js src/owner.js src/desk.js src/us.js src/sharia.js src/screener.js src/top.js src/divglobal.js src/notify.js src/landing.js src/options.js src/boot.js; echo '</script>'
 }
 {
 cat <<'HEAD'
