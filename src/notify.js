@@ -28,9 +28,10 @@ function ntItems() {
   (NOTICES || []).filter(ntLive).forEach((n) => items.push({ id: "n:" + n.id, kind: "notice", n, date: n.from || "" }));
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   if (owner && typeof TOP !== "undefined" && TOP && Array.isArray(TOP.log)) TOP.log.filter((x) => x.in).slice(-40).forEach((x) => items.push({ id: "m:" + x.s + "|" + x.in, kind: "mover", x, date: x.in }));
+  if (typeof dgBellItems === "function") dgBellItems().forEach((d) => items.push(d));
   return items.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 }
-function ntUnread() { const r = ntRead(); return ntItems().filter((i) => !r.has(i.id) && (i.kind === "notice" || i.x.sharia === "ok")).length; }
+function ntUnread() { const r = ntRead(); return ntItems().filter((i) => !r.has(i.id) && (i.kind === "notice" || i.kind === "div" || i.x.sharia === "ok")).length; }
 function ntPanel() {
   const items = ntItems(), r = ntRead();
   const row = (i) => {
@@ -40,6 +41,7 @@ function ntPanel() {
       return '<li class="nt-i' + (unread ? " unread" : "") + '"><div class="nt-top"><span class="tag ' + (n.kind === "promo" ? "amber" : n.kind === "update" ? "up" : "") + '">' + esc(t("nt_k_" + (n.kind || "info"))) + '</span><b>' + esc(n.t) + "</b></div>" + (n.b ? '<p class="small" style="margin:4px 0 0">' + esc(n.b) + "</p>" : "") +
         '<div class="row" style="gap:6px;margin-top:6px">' + (n.code ? '<span class="nt-code num">' + esc(n.code) + '</span><button class="btn sm" data-act="nt-copy" data-c="' + esc(n.code) + '">' + esc(t("nt_copy")) + "</button>" : "") + (n.url ? '<a class="btn sm ghost" href="' + esc(n.url) + '"' + (/^https?:/.test(n.url) ? ' target="_blank" rel="noopener"' : "") + ">" + esc(t("nt_open")) + "</a>" : "") + (n.to ? '<span class="small muted">' + esc(t("nt_until").replace("{d}", n.to)) + "</span>" : "") + "</div></li>";
     }
+    if (i.kind === "div") { const d = i.r; return '<li class="nt-i' + (unread ? " unread" : "") + '"><a href="#desk" data-act="nt-div" class="nt-link"><div class="nt-top"><span class="tag amber">' + esc(t("nt_div")) + '</span><b>' + esc(t("nt_div_t").replace("{s}", d.s).replace("{n}", d.n || "").replace("{d}", d.next)) + '</b></div><span class="small muted num">' + esc(t("dg_c_yld") + " " + fmt(d.yld, 2) + "%") + "</span></a></li>"; }
     const x = i.x;
     return '<li class="nt-i' + (unread && x.sharia === "ok" ? " unread" : "") + '"><a href="#desk" data-act="nt-mover" class="nt-link"><div class="nt-top"><span class="tag up">' + esc(t("nt_movers")) + '</span><b>' + esc(t("nt_mover").replace("{s}", x.s).replace("{n}", (typeof dkName === "function" && dkName(x.s)) || x.n || "").replace("{x}", x.score)) + '</b></div><span class="small muted num">' + esc(x.in) + "</span>" + (x.sharia && x.sharia !== "ok" ? ' <span class="small muted">· ' + esc(x.sharia === "no" ? t("tp_noshar") : t("nt_unknown_sh")) + "</span>" : "") + "</a></li>";
   };
@@ -61,6 +63,7 @@ document.addEventListener("click", (e) => {
   if (a === "nt-bell") { ntToggle(); return; }
   if (a === "nt-copy") { navigator.clipboard && navigator.clipboard.writeText(el.dataset.c).then(() => toast(t("nt_copied"))).catch(() => {}); }
   else if (a === "nt-readall") { ntMark(ntItems().map((i) => i.id)); ntToggle(true); topBell(); }
+  else if (a === "nt-div") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") dkTab = "dg"; if (route() === "desk") render(); else location.hash = "desk"; }
   else if (a === "nt-mover") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") dkTab = "top"; if (route() === "desk") render(); else location.hash = "desk"; }
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && ntOpen) ntToggle(false); });

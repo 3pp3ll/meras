@@ -644,3 +644,24 @@ p,li,dd{line-height:1.95}
 .clock .sec{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
 .clock .ap{font-size:13px;font-weight:700;color:var(--amber-ink);margin-inline-start:4px;font-family:var(--body)}
 @media (max-width:560px){[dir="rtl"] .clock{margin-left:14px}[dir="ltr"] .clock{margin-right:14px}.clock{font-size:14px}.clock .sec{display:none}}
+/* التوزيعات العالمية */
+.dg-table td{vertical-align:top}
+.dg-table tr.dg-on td{background:var(--sunk)}
+.dg-name{all:unset;cursor:pointer;display:inline;line-height:1.4}
+.dg-name:hover b,.dg-name:focus-visible b{text-decoration:underline}
+.dg-name:focus-visible{outline:2px solid var(--accent,currentColor);outline-offset:2px;border-radius:4px}
+.dg-soon{color:var(--amber-ink);font-weight:700}
+.dg-star{font-size:18px;line-height:1;min-width:36px}
+.dg-star.on{color:var(--amber-ink)}
+.dg-hist{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.dg-hist span{background:var(--sunk);border-radius:6px;padding:2px 8px;font-size:13.5px}
+@media (max-width:640px){
+  .dg-table{overflow:visible;border:0}
+  .dg-table table,.dg-table tbody{display:block}
+  .dg-table thead{display:none}
+  .dg-table tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;position:relative}
+  .dg-table td{border:0;padding:0}
+  .dg-table td[data-l]::before{content:attr(data-l);display:block;font-size:12.5px;color:var(--muted);font-weight:400}
+  .dg-table td.dg-c1{grid-column:1/-1;padding-inline-end:44px;font-size:17px}
+  .dg-table td.dg-cs{position:absolute;top:8px;inset-inline-end:8px}
+}
