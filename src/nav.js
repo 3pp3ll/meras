@@ -117,6 +117,27 @@ function pageGate() {
     '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + '</div></section><section class="sec"><div class="notice">' + esc(t(typeof LIVE !== "undefined" && LIVE.fetchedAt ? "live_note" : "sample_note")) + "</div></section></div>";
 }
 
+/* ----- phone tab bar: التعليم، الخدمات، مكتبي (أو الباقات)، الإشعارات ----- */
+const TB_ICONS = {
+  learn: '<path d="M4 19h4v-4h4v-4h4V7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  services: '<g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></g>',
+  desk: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 9V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></g>',
+  plans: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></g>',
+  bell: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></g>'
+};
+function tabbarSync(r) {
+  let bar = document.getElementById("tabbar");
+  if (r == null) { if (bar) bar.hidden = true; document.body.classList.remove("has-tabbar"); return; }
+  if (!bar) { bar = document.createElement("nav"); bar.id = "tabbar"; document.body.appendChild(bar); }
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token, g = groupOf(r);
+  const items = [["learn", "nav_learn", g === "learn"], ["services", "nav_svc", g === "services"], owner ? ["desk", "dk_h", r === "desk" || r === "owner"] : ["plans", "nav_plans", g === "plans"]];
+  const n = typeof ntUnread === "function" ? ntUnread() : 0;
+  bar.setAttribute("aria-label", S.lang === "ar" ? "التنقل" : "Navigation");
+  bar.innerHTML = '<div class="tb-in">' + items.map(([h, k, on]) => '<a class="tb" href="#' + h + '"' + (on ? ' aria-current="page"' : "") + '><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS[h] + "</svg>" + esc(t(k)) + "</a>").join("") +
+    '<button class="tb" type="button" data-act="nt-bell" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS.bell + "</svg>" + esc(t("nt_h")) + (n ? '<span class="bell-n">' + n + "</span>" : "") + "</button></div>";
+  bar.hidden = false; document.body.classList.add("has-tabbar");
+}
+
 /* ----- back to top ----- */
 (function () {
   const b = document.createElement("button");

@@ -37,6 +37,7 @@ function topBell() {
   const n = typeof ntUnread === "function" ? ntUnread() : Math.max(0, topNewCount());
   b.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' + (n ? '<span class="bell-n">' + n + "</span>" : "");
   b.title = t("nt_h") + (n ? " (" + n + ")" : ""); b.setAttribute("aria-label", b.title);
+  const tb = document.querySelector('#tabbar [data-act="nt-bell"]'); if (tb) { const old = tb.querySelector(".bell-n"); if (old) old.remove(); if (n) tb.insertAdjacentHTML("beforeend", '<span class="bell-n">' + n + "</span>"); }
 }
 function topClock() {
   const el = document.getElementById("topclock"); if (!el) return;

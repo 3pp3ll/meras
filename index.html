@@ -686,6 +686,103 @@ p,li,dd{line-height:1.95}
   .dg-table td.dg-cs{position:absolute;top:8px;inset-inline-end:8px}
 }
 @media (max-width:640px){.dg-none tr{grid-template-columns:1fr 1fr}}
+/* التوزيعات العالمية: الملخص، شريط القوائم، صفوف الجوال، النافذة السفلية */
+.dg-sum{display:grid;gap:8px}
+.dg-stat{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 12px;text-align:start;display:flex;flex-direction:column;gap:2px;min-width:0;font:inherit;color:inherit}
+button.dg-stat{cursor:pointer}
+.dg-stat b{font-size:24px;line-height:1.1}
+.dg-stat span{font-size:12.5px;color:var(--muted)}
+.dg-stat[aria-pressed="true"]{border-color:var(--amber);background:var(--amber-soft)}
+.dg-stat[aria-pressed="true"] span{color:var(--amber-ink)}
+.dg-rail{display:flex;gap:8px;align-items:center}
+.dg-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.dg-chips::-webkit-scrollbar{display:none}
+.dg-chip{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:7px 14px;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.dg-chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.dg-sortb{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;height:36px;padding:0 12px;display:flex;gap:6px;align-items:center;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.dg-lh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dg-lh h3{margin:0;font-size:17px}
+.dgm-empty{padding:22px 14px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+.dg-mob{display:none}
+.dgm-list{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.dgm-list li+li .dgm-row{border-top:1px solid var(--line)}
+.dgm-row{display:flex;align-items:center;gap:12px;width:100%;padding:11px 14px;border:0;background:transparent;color:var(--ink);font:inherit;text-align:start;cursor:pointer;min-height:64px}
+.dgm-row:active{background:var(--sunk)}
+.dgm-av{flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-family:var(--mono);font-weight:700;font-size:14px;direction:ltr}
+.dg-big{background:var(--amber-soft);color:var(--amber-ink)}
+.dg-tech{background:var(--sky-soft);color:var(--ind2)}
+.dg-china,.dg-hk{background:var(--pink-soft);color:var(--ind3)}
+.dgm-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.dgm-nm{font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dgm-nm small{color:var(--muted);font-weight:400;font-size:13px;margin-inline-start:6px}
+.dgm-meta{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.dgm-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--line)}
+.dgm-dot.ok{background:var(--up)}.dgm-dot.review{background:var(--amber)}.dgm-dot.no{background:var(--down)}
+.dgm-end{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.dgm-end b{font-size:20px;line-height:1.1}
+.dgm-end small{font-size:12px;color:var(--muted)}
+.dg-star-mini{color:var(--amber-ink)}
+.dgm-tog{width:100%;border:1px dashed var(--line);background:transparent;border-radius:12px;padding:10px;font:inherit;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;margin-bottom:10px}
+#dgscrim{position:fixed;inset:0;background:rgba(20,26,40,.42);z-index:60;opacity:0;pointer-events:none;transition:opacity .22s}
+#dgscrim.on{opacity:1;pointer-events:auto}
+#dgsheet{position:fixed;left:0;right:0;bottom:0;z-index:61;margin:0 auto;max-width:560px;max-height:88vh;background:var(--surface);color:var(--ink);border-radius:22px 22px 0 0;box-shadow:0 -10px 30px rgba(20,26,40,.18);transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding:0 max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px))}
+#dgsheet.on{transform:translateY(0)}
+body.dg-lock{overflow:hidden}
+.dgs-grab{padding:10px 0 4px;display:grid;place-items:center;cursor:pointer;touch-action:none}
+.dgs-grab i{width:42px;height:5px;border-radius:3px;background:var(--line)}
+.dgs-body{overflow-y:auto;padding-block:4px 20px;display:flex;flex-direction:column;gap:14px}
+.dgs-top{display:flex;align-items:center;gap:12px}
+.dgs-top h3{margin:0;font-size:18px;line-height:1.3}
+.dgs-top p{margin:0;font-size:13px;color:var(--muted)}
+.dgs-star{margin-inline-start:auto;flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;height:40px;padding:0 12px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer;white-space:nowrap}
+.dgs-star[aria-pressed="true"]{background:var(--amber-soft);border-color:var(--amber);color:var(--amber-ink)}
+.dgs-kv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dgs-kv div{background:var(--sunk);border-radius:12px;padding:9px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.dgs-kv span{font-size:12.5px;color:var(--muted)}
+.dgs-kv b{font-size:17px}
+.dgs-h{margin:0 0 8px;font-size:14.5px}
+.dgs-bars{display:flex;align-items:flex-end;gap:5px;height:86px;direction:ltr}
+.dgs-bars div{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}
+.dgs-bars i{display:block;width:100%;max-width:26px;border-radius:5px 5px 2px 2px;background:var(--sky)}
+.dgs-bars div:last-child i{background:var(--amber)}
+.dgs-bars small{font-size:10.5px;color:var(--muted)}
+.dgs-calc{display:grid;grid-template-columns:1.4fr 1fr;gap:8px}
+.dgs-calc input{font-family:var(--mono);font-size:18px}
+.dgs-res{background:var(--up-soft);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.dgs-big{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dgs-big b{font-size:26px;color:var(--up)}
+.dgs-ln{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted)}
+.dgs-ln b{color:var(--ink)}
+@media (max-width:640px){
+  .dg-desk,.dg-desk-i{display:none!important}
+  .dg-mob{display:block}
+  .dg-stat b{font-size:21px}
+}
+@media (prefers-reduced-motion:reduce){#dgsheet,#dgscrim{transition:none}}
+
+/* شريط التنقل السفلي للجوال */
+#tabbar{display:none}
+@media (max-width:640px){
+  #tabbar:not([hidden]){display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .tb-in{display:grid;grid-template-columns:repeat(4,1fr);height:62px}
+  .tb{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
+  .tb svg{width:23px;height:23px}
+  .tb[aria-current="page"]{color:var(--amber-ink)}
+  .tb[aria-current="page"]::before{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--amber)}
+  .tb .bell-n{position:absolute;top:6px;inset-inline-end:calc(50% - 22px)}
+  body.has-tabbar{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  body.has-tabbar #totop{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  body.has-tabbar #backfab:not([hidden]){bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  body.has-tabbar .top .nav.top3,body.has-tabbar #topbell,body.has-tabbar .top .th-btn[href="#chart"]{display:none}
+  body.has-tabbar .top .wrap{flex-wrap:nowrap;gap:8px;padding-block:8px}
+  body.has-tabbar .top .tools{margin-inline-start:auto;gap:6px;flex-wrap:nowrap;min-width:0}
+  body.has-tabbar #ntpanel{top:auto!important;bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+}
+.dgm-nm small{display:inline-block;margin-inline:6px 0}
+@media (max-width:640px){.dg-intro{display:none}}
+.dgm-nm{display:flex;align-items:baseline;gap:6px;min-width:0}
+.dgm-n{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.dgm-nm small{margin:0;flex:none}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1753,7 +1850,9 @@ function render() {
 function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
-  $("#top").innerHTML = typeof lnShow === "function" && lnShow() ? lnHeader() : headerHtml(r);
+  const lnOn = typeof lnShow === "function" && lnShow();
+  $("#top").innerHTML = lnOn ? lnHeader() : headerHtml(r);
+  if (typeof tabbarSync === "function") tabbarSync(lnOn ? null : r);
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
@@ -4203,6 +4302,27 @@ function pageGate() {
     '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + '</div></section><section class="sec"><div class="notice">' + esc(t(typeof LIVE !== "undefined" && LIVE.fetchedAt ? "live_note" : "sample_note")) + "</div></section></div>";
 }
 
+/* ----- phone tab bar: التعليم، الخدمات، مكتبي (أو الباقات)، الإشعارات ----- */
+const TB_ICONS = {
+  learn: '<path d="M4 19h4v-4h4v-4h4V7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  services: '<g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></g>',
+  desk: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 9V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></g>',
+  plans: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></g>',
+  bell: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></g>'
+};
+function tabbarSync(r) {
+  let bar = document.getElementById("tabbar");
+  if (r == null) { if (bar) bar.hidden = true; document.body.classList.remove("has-tabbar"); return; }
+  if (!bar) { bar = document.createElement("nav"); bar.id = "tabbar"; document.body.appendChild(bar); }
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token, g = groupOf(r);
+  const items = [["learn", "nav_learn", g === "learn"], ["services", "nav_svc", g === "services"], owner ? ["desk", "dk_h", r === "desk" || r === "owner"] : ["plans", "nav_plans", g === "plans"]];
+  const n = typeof ntUnread === "function" ? ntUnread() : 0;
+  bar.setAttribute("aria-label", S.lang === "ar" ? "التنقل" : "Navigation");
+  bar.innerHTML = '<div class="tb-in">' + items.map(([h, k, on]) => '<a class="tb" href="#' + h + '"' + (on ? ' aria-current="page"' : "") + '><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS[h] + "</svg>" + esc(t(k)) + "</a>").join("") +
+    '<button class="tb" type="button" data-act="nt-bell" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS.bell + "</svg>" + esc(t("nt_h")) + (n ? '<span class="bell-n">' + n + "</span>" : "") + "</button></div>";
+  bar.hidden = false; document.body.classList.add("has-tabbar");
+}
+
 /* ----- back to top ----- */
 (function () {
   const b = document.createElement("button");
@@ -5177,6 +5297,7 @@ function topBell() {
   const n = typeof ntUnread === "function" ? ntUnread() : Math.max(0, topNewCount());
   b.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>' + (n ? '<span class="bell-n">' + n + "</span>" : "");
   b.title = t("nt_h") + (n ? " (" + n + ")" : ""); b.setAttribute("aria-label", b.title);
+  const tb = document.querySelector('#tabbar [data-act="nt-bell"]'); if (tb) { const old = tb.querySelector(".bell-n"); if (old) old.remove(); if (n) tb.insertAdjacentHTML("beforeend", '<span class="bell-n">' + n + "</span>"); }
 }
 function topClock() {
   const el = document.getElementById("topclock"); if (!el) return;
@@ -5266,6 +5387,14 @@ Object.assign(UI, {
   dg_wht_note: ["الاستقطاع تقديري: الأسهم الأمريكية 30% عادةً لغير المقيم بدون اتفاقية ضريبية، والصينية المدرجة في أمريكا 10% غالباً، وهونغ كونغ تختلف حسب الشركة. تأكد من كشف الوسيط.", "Withholding is an estimate: US shares usually 30% for non-residents without a treaty, US-listed Chinese shares often 10%, Hong Kong varies by company. Check your broker statement."],
   dg_next_note: ["موعد الاستحقاق المتوقع محسوب من نمط التوزيعات السابقة، والرسمي يعلنه السهم. لازم تملك السهم قبل تاريخ الاستحقاق (Ex-date) عشان يجيك التوزيع.", "The expected ex-date is estimated from past payouts; the company announces the official one. You must own the share before the ex-date to receive the payout."],
   dg_none_h: ["ما توزع حالياً", "No payout right now"], dg_none_p: ["شركات نمو تعيد استثمار أرباحها بدل ما توزعها. تنتقل للجدول الأول تلقائياً أول ما توزع.", "Growth companies that reinvest their profits instead of paying them out. They move to the main table as soon as they pay."], dg_nopay: ["ما فيه سهم موزّع في هالقائمة.", "No paying stock in this list."],
+  dg_st_soon: ["استحقاق خلال 14 يوم", "Ex-date within 14 days"], dg_st_avg: ["متوسط العائد", "Average yield"], dg_st_watch: ["أتابعها ★", "Starred ★"],
+  dg_lh_pay: ["الموزّعة", "Paying"], dg_lh_soon: ["استحقاقها قريب", "Ex-date soon"], dg_lh_watch: ["اللي أتابعها", "Starred"], dg_n: ["{n} سهم", "{n} stocks"],
+  dg_e_watch: ["ما فيه سهم متابَع هنا. افتح أي سهم واضغط ☆.", "No starred stock here. Open any stock and tap ☆."], dg_e_soon: ["ما فيه استحقاق خلال 14 يوم في هالقائمة.", "No ex-date within 14 days in this list."],
+  dg_none_show: ["اعرض اللي ما توزع ({n})", "Show non-payers ({n})"], dg_none_hide: ["اخفِ اللي ما توزع ({n})", "Hide non-payers ({n})"], dg_none_s: ["شركات نمو تعيد استثمار أرباحها", "Growth companies that reinvest profits"],
+  dg_m_next: ["الاستحقاق بعد {n} يوم", "Ex-date in {n} days"], dg_watching: ["أتابعه", "Following"], dg_follow: ["تابعه", "Follow"],
+  dg_own_before: [". لازم تملك السهم قبل هالتاريخ عشان يجيك التوزيع.", ". Own the share before this date to receive the payout."], dg_est: ["الموعد تقديري من نمط التوزيعات السابقة، والرسمي تعلنه الشركة.", "The date is estimated from past payouts; the company announces the official one."],
+  dg_how_much: ["كم يجيك منه؟", "How much would you get?"], dg_net_y: ["يوصلك بالسنة تقريباً", "You receive per year, about"], dg_gross: ["قبل الضريبة", "Before tax"], dg_each: ["كل توزيع ({f})", "Each payout ({f})"], dg_pur_of: ["منه تطهير", "Of which purification"], dg_enter_amt: ["اكتب المبلغ.", "Enter an amount."],
+  dg_nodiv_long: ["هالشركة ما وزّعت آخر سنة. لو بدأت توزع، تنتقل لقائمة الموزّعة لحالها.", "This company paid nothing in the last year. If it starts paying, it moves to the paying list."],
   dg_hist: ["آخر التوزيعات", "Recent payouts"],
   dg_share_h: ["مشاركة القسم", "Share this section"],
   dg_share_p: ["حط كلمة سر وعطها للي تبيه يشوف القسم (مثل أخوك). يفتح الرابط ويكتبها ويشوف الجدول والحاسبة، بدون نجوم ولا شي من مكتبك. تقدر توقفها أو تغيّر كلمة السر متى ما بغيت.", "Set a password and give it to whoever should see this section. They open the link, enter it and see the table and calculator, nothing else from your desk. You can stop or change it any time."],
@@ -5283,7 +5412,7 @@ Object.assign(UI, {
 const DG = { data: null, watch: null, watchSha: undefined, loaded: false, loading: false, view: null, viewAt: null };
 const DG_FILE = "shared/dg.json", DG_ITER = 310000, DG_KEY = "meras.dgshare", DG_PASS = "meras.dgpass";
 const DG_WHT = { big: 30, tech: 30, china: 10, hk: 0 };
-let dgGrp = "all", dgSort = "yld", dgStar = false, dgPick = null, dgAmt = "1000", dgWht = null, dgPub = null, dgBusy = false;
+let dgGrp = "all", dgSort = "yld", dgF = null, dgNone = false, dgPick = null, dgAmt = "1000", dgWht = null, dgPub = null, dgBusy = false;
 const dgOwner = () => typeof HOSTED !== "undefined" && HOSTED && !!CFG.token;
 const dgLocal = () => { try { return JSON.parse(localStorage.getItem(DG_KEY) || "null"); } catch (e) { return null; } };
 
@@ -5350,25 +5479,96 @@ function dgCalc(list, opt) {
   const r0 = list.find((x) => x.s === dgPick), wv = dgWht == null ? (r0 && DG_WHT[r0.g] != null ? DG_WHT[r0.g] : 30) : dgWht;
   return owPanel(t("dg_calc_h") + (r ? " · " + r.s : ""), '<div class="row" style="align-items:flex-end"><div class="field" style="width:170px"><label for="dg-amt">' + esc(t("dg_calc_amt")) + (r ? " (" + esc(dgCurName(r.cur)) + ")" : "") + '</label><input id="dg-amt" data-dg="amt" type="number" min="0" step="any" inputmode="decimal" value="' + esc(dgAmt) + '"></div><div class="field" style="width:150px"><label for="dg-wht">' + esc(t("dg_calc_wht")) + '</label><input id="dg-wht" data-dg="wht" type="number" min="0" max="100" step="any" inputmode="decimal" value="' + esc(wv) + '"></div></div><div id="dg-res" class="stack" style="gap:8px">' + body + '</div><p class="small muted" style="margin:0">' + esc(t("dg_wht_note")) + "</p>");
 }
+const dgSoon = (r) => { const n = dgDays(r.next); return r.ttm > 0 && n != null && n >= 0 && n <= 14; };
+const dgShort = (s) => s.replace(".HK", "").slice(0, 4);
+function dgNextTxt(r) { const n = dgDays(r.next); if (n == null) return ""; return n < -3 ? t("dg_past") : n <= 0 ? t("dg_today") : t("dg_m_next").replace("{n}", n); }
+function dgSorted(list) {
+  const key = { yld: (r) => -(r.yld || 0), next: (r) => { const n = dgDays(r.next); return n == null || n < -3 ? 1e9 : n; }, sym: (r) => r.s }[dgSort];
+  return list.slice().sort((a, b) => { const x = key(a), y = key(b); return x < y ? -1 : x > y ? 1 : 0; });
+}
+function dgMobRow(r, opt) {
+  const sh = opt.sh(r.s), st = sh && sh.st, on = opt.watch && opt.watch.includes(r.s), paid = r.ttm > 0;
+  return '<li><button class="dgm-row" data-act="dg-open" data-s="' + esc(r.s) + '"><span class="dgm-av dg-' + r.g + '">' + esc(dgShort(r.s)) + '</span><span class="dgm-mid"><span class="dgm-nm"><span class="dgm-n">' + esc(r.n || r.s) + '</span><small class="num">' + esc(r.s) + '</small></span><span class="dgm-meta"><i class="dgm-dot ' + esc(st || "") + '" title="' + esc(st ? t("sh_" + st) : t("dg_sh_none")) + '"></i>' +
+    (paid ? '<span class="' + (dgSoon(r) ? "dg-soon" : "") + '">' + esc(dgNextTxt(r)) + "</span>" : esc(st ? t("sh_" + st) : t("dg_sh_none"))) + '</span></span><span class="dgm-end">' +
+    (paid ? '<b class="num">' + fmt(r.yld, 2) + "%</b><small>" + (on ? '<span class="dg-star-mini">★</span> ' : "") + esc(dgFreq(r.freq)) + "</small>" : '<span class="num">' + esc(dgMoney(r.price, r.cur)) + "</span>") + "</span></button></li>";
+}
 function dgTable(data, opt) {
   if (!data || !Array.isArray(data.stocks) || !data.stocks.length) return '<div class="notice">' + esc(t("dg_empty")) + "</div>";
-  let list = data.stocks.filter((r) => dgGrp === "all" || r.g === dgGrp);
-  if (dgStar && opt.watch) list = list.filter((r) => opt.watch.includes(r.s));
+  const inGrp = data.stocks.filter((r) => dgGrp === "all" || r.g === dgGrp), paid = inGrp.filter((r) => r.ttm > 0);
+  if (dgF === "watch" && !opt.watch) dgF = null;
+  let list = paid;
+  if (dgF === "soon") list = list.filter(dgSoon); else if (dgF === "watch") list = list.filter((r) => opt.watch.includes(r.s));
+  list = dgSorted(list);
+  const none = dgF ? [] : inGrp.filter((r) => !(r.ttm > 0)).sort((a, b) => (a.s < b.s ? -1 : 1));
+  const avg = paid.length ? paid.reduce((a, r) => a + r.yld, 0) / paid.length : 0;
+  const stats = [["soon", paid.filter(dgSoon).length, "dg_st_soon"], ["avg", fmt(avg, 2) + "%", "dg_st_avg"]].concat(opt.watch ? [["watch", paid.filter((r) => opt.watch.includes(r.s)).length, "dg_st_watch"]] : []);
+  const sum = '<div class="dg-sum" style="grid-template-columns:repeat(' + stats.length + ',minmax(0,1fr))">' + stats.map(([k, v, l]) => k === "avg" ? '<div class="dg-stat"><b class="num">' + v + "</b><span>" + esc(t(l)) + "</span></div>" : '<button class="dg-stat" data-act="dg-f" data-f="' + k + '" aria-pressed="' + (dgF === k) + '"><b class="num">' + v + "</b><span>" + esc(t(l)) + "</span></button>").join("") + "</div>";
   const grps = ["all", "big", "tech", "china", "hk"].filter((g) => g === "all" || data.stocks.some((r) => r.g === g));
-  const bar = '<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="row" style="gap:6px" role="group">' + grps.map((g) => '<button class="btn sm' + (dgGrp === g ? " primary" : "") + '" data-act="dg-grp" data-g="' + g + '" aria-pressed="' + (dgGrp === g) + '">' + esc(t("dg_g_" + g)) + "</button>").join("") + '</div><div class="row" style="gap:8px;align-items:center">' + (opt.watch ? '<label class="small"><input type="checkbox" data-dg="star"' + (dgStar ? " checked" : "") + "> " + esc(t("dg_only_star")) + "</label>" : "") + '<label class="small" for="dg-sort">' + esc(t("dg_sort")) + '</label><select id="dg-sort" data-dg="sort">' + ["yld", "next", "sym"].map((k) => '<option value="' + k + '"' + (dgSort === k ? " selected" : "") + ">" + esc(t("dg_s_" + k)) + "</option>").join("") + "</select></div></div>";
+  const rail = '<div class="dg-rail"><div class="dg-chips" role="group" aria-label="' + esc(t("dg_h")) + '">' + grps.map((g) => '<button class="dg-chip" data-act="dg-grp" data-g="' + g + '" aria-pressed="' + (dgGrp === g) + '">' + esc(t("dg_g_" + g)) + "</button>").join("") + '</div><button class="dg-sortb" data-act="dg-sort" aria-label="' + esc(t("dg_sort")) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' + esc(t("dg_s_" + dgSort)) + "</button></div>";
+  const listH = '<div class="dg-lh"><h3>' + esc(t(dgF === "soon" ? "dg_lh_soon" : dgF === "watch" ? "dg_lh_watch" : "dg_lh_pay")) + '</h3><span class="small muted">' + esc(t("dg_n").replace("{n}", list.length)) + "</span></div>";
+  const emptyTxt = t(dgF === "watch" ? "dg_e_watch" : dgF === "soon" ? "dg_e_soon" : "dg_nopay");
   const head = ["dg_c_sym", "dg_c_px", "dg_c_yld", "dg_c_ttm", "dg_c_freq", "dg_c_last", "dg_c_next", "dg_c_sh"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + (opt.watch ? "<th></th>" : "");
-  const pay = list.filter((r) => r.ttm > 0), none = list.filter((r) => !(r.ttm > 0));
-  const noneBox = none.length ? owPanel(t("dg_none_h") + " (" + none.length + ")", '<p class="small muted" style="margin:0">' + esc(t("dg_none_p")) + '</p><div class="tablewrap dg-table dg-none"><table><thead><tr>' + ["dg_c_sym", "dg_c_px", "dg_c_sh"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "</tr></thead><tbody>" +
-    none.slice().sort((a, b) => (a.s < b.s ? -1 : 1)).map((r) => { const sh = opt.sh(r.s); return '<tr><td class="dg-c1"><b class="num">' + esc(r.s) + "</b> " + esc(r.n || "") + '<br><span class="small muted">' + esc(t("dg_g_" + r.g)) + '</span></td><td class="num" data-l="' + esc(t("dg_c_px")) + '">' + (r.price ? esc(dgMoney(r.price, r.cur)) : "–") + '</td><td data-l="' + esc(t("dg_c_sh")) + '">' + (sh ? shTag(sh.st) : '<span class="small muted">' + esc(t("dg_sh_none")) + "</span>") + "</td></tr>"; }).join("") + "</tbody></table></div>") : "";
-  return bar + (pay.length ? '<div class="tablewrap dg-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + dgRows(pay, opt) + "</tbody></table></div>" : '<div class="notice">' + esc(t("dg_nopay")) + "</div>") +
-    '<p class="small muted" style="margin:0">' + esc(t("dg_asof").replace("{d}", whenText(data.fetched_at))) + " · " + esc(t("dg_next_note")) + "</p>" + dgCalc(data.stocks.filter((r) => r.ttm > 0), opt) + noneBox;
+  const desk = list.length ? '<div class="tablewrap dg-table dg-desk"><table><thead><tr>' + head + "</tr></thead><tbody>" + dgRows(list, opt) + "</tbody></table></div>" : "";
+  const mob = list.length ? '<ul class="dgm-list dg-mob">' + list.map((r) => dgMobRow(r, opt)).join("") + "</ul>" : "";
+  const empty = list.length ? "" : '<div class="dgm-empty">' + esc(emptyTxt) + "</div>";
+  let noneBox = "";
+  if (none.length) {
+    const deskNone = '<div class="dg-desk">' + owPanel(t("dg_none_h") + " (" + none.length + ")", '<p class="small muted" style="margin:0">' + esc(t("dg_none_p")) + '</p><div class="tablewrap dg-table"><table><thead><tr>' + ["dg_c_sym", "dg_c_px", "dg_c_sh"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + "</tr></thead><tbody>" +
+      none.map((r) => { const sh = opt.sh(r.s); return '<tr><td><b class="num">' + esc(r.s) + "</b> " + esc(r.n || "") + '<br><span class="small muted">' + esc(t("dg_g_" + r.g)) + '</span></td><td class="num">' + (r.price ? esc(dgMoney(r.price, r.cur)) : "–") + "</td><td>" + (sh ? shTag(sh.st) : '<span class="small muted">' + esc(t("dg_sh_none")) + "</span>") + "</td></tr>"; }).join("") + "</tbody></table></div>") + "</div>";
+    const mobNone = '<div class="dg-mob"><button class="dgm-tog" data-act="dg-none">' + esc(t(dgNone ? "dg_none_hide" : "dg_none_show").replace("{n}", none.length)) + "</button>" + (dgNone ? '<div class="dg-lh"><h3>' + esc(t("dg_none_h")) + '</h3><span class="small muted">' + esc(t("dg_none_s")) + '</span></div><ul class="dgm-list">' + none.map((r) => dgMobRow(r, opt)).join("") + "</ul>" : "") + "</div>";
+    noneBox = deskNone + mobNone;
+  }
+  return '<div class="stack dg-wrap" style="gap:12px">' + sum + rail + listH + desk + mob + empty +
+    '<p class="small muted" style="margin:0">' + esc(t("dg_asof").replace("{d}", whenText(data.fetched_at))) + '<span class="dg-desk-i"> · ' + esc(t("dg_next_note")) + "</span></p>" + '<div class="dg-desk">' + dgCalc(paid, opt) + "</div>" + noneBox + "</div>";
 }
+
+/* ----- bottom sheet (phone): details, payout bars, calculator, star ----- */
+let dgSheetS = null, dgSheetFocus = null;
+function dgCtx() { return route() === "shared" ? { data: DG.view, opt: { sh: (s) => { const r = DG.view && DG.view.stocks.find((x) => x.s === s); return r && r.sh; }, watch: null } } : { data: DG.data, opt: { sh: dgSharia, watch: DG.watch || [] } }; }
+function dgSheetHtml() {
+  const { data, opt } = dgCtx(), r = data && data.stocks.find((x) => x.s === dgSheetS); if (!r) return "";
+  const sh = opt.sh(r.s), st = sh && sh.st, on = opt.watch && opt.watch.includes(r.s), paid = r.ttm > 0;
+  const kv = [[t("dg_c_px"), dgMoney(r.price, r.cur)]];
+  if (paid) { kv.push([t("dg_c_yld"), fmt(r.yld, 2) + "%"], [t("dg_c_ttm"), dgMoney(r.ttm, r.cur)], [t("dg_c_freq"), dgFreq(r.freq), 1]); if (r.last) kv.push([t("dg_c_last"), r.last[0]]); if (r.next) kv.push([t("dg_c_next"), r.next]); }
+  let h = '<div class="dgs-top"><span class="dgm-av dg-' + r.g + '">' + esc(dgShort(r.s)) + '</span><div style="min-width:0"><h3 id="dgs-name">' + esc(r.n || r.s) + '</h3><p><span class="num">' + esc(r.s) + "</span> · " + esc(t("dg_g_" + r.g)) + "</p></div>" +
+    (opt.watch ? '<button class="dgs-star" data-act="dg-star" data-s="' + esc(r.s) + '" aria-pressed="' + !!on + '">' + (on ? "★ " + esc(t("dg_watching")) : "☆ " + esc(t("dg_follow"))) + "</button>" : "") + "</div>";
+  h += '<div class="row" style="gap:6px">' + (st ? shTag(st) : '<span class="tag">' + esc(t("dg_sh_none")) + "</span>") + (sh && sh.p != null ? '<span class="tag">' + esc(t("sh_purify")) + " " + fmt(sh.p, 2) + "%</span>" : "") + (!st && opt.watch && r.g !== "hk" && typeof SHQ !== "undefined" ? (SHQ && SHQ.includes(r.s) ? '<span class="small muted">' + esc(t("dg_sh_q")) + "</span>" : '<button class="btn sm ghost" data-act="sh-queue" data-s="' + esc(r.s) + '">' + esc(t("dg_sh_calc")) + "</button>") : "") + "</div>";
+  h += '<div class="dgs-kv">' + kv.map(([k, v, ar]) => "<div><span>" + esc(k) + '</span><b class="' + (ar ? "" : "num") + '">' + esc(v) + "</b></div>").join("") + "</div>";
+  if (paid && r.next) { const n = dgDays(r.next); h += '<p class="small muted" style="margin:0">' + esc(dgNextTxt(r) + (n != null && n >= 0 ? t("dg_own_before") : ".") + " " + t("dg_est")) + "</p>"; }
+  if (r.hist && r.hist.length) { const hs = r.hist.slice(-8), mx = Math.max.apply(null, hs.map((x) => x[1])); h += '<div><h4 class="dgs-h">' + esc(t("dg_hist")) + '</h4><div class="dgs-bars">' + hs.map((x) => '<div title="' + esc(x[0] + " · " + dgMoney(x[1], r.cur)) + '"><small class="num">' + fmt(x[1], 2) + '</small><i style="height:' + Math.max(6, Math.round((x[1] / mx) * 52)) + 'px"></i><small class="num">' + esc(x[0].slice(2, 7).replace("-", "/")) + "</small></div>").join("") + "</div></div>"; }
+  if (paid) { const w = dgWht == null ? (DG_WHT[r.g] == null ? 30 : DG_WHT[r.g]) : dgWht; h += '<div><h4 class="dgs-h">' + esc(t("dg_how_much")) + '</h4><div class="dgs-calc"><div class="field"><label for="dgs-amt">' + esc(t("dg_calc_amt")) + " (" + esc(dgCurName(r.cur)) + ')</label><input id="dgs-amt" data-dg="samt" type="number" min="0" step="any" inputmode="decimal" value="' + esc(dgAmt) + '"></div><div class="field"><label for="dgs-wht">' + esc(t("dg_calc_wht")) + '</label><input id="dgs-wht" data-dg="swht" type="number" min="0" max="100" step="any" inputmode="decimal" value="' + esc(w) + '"></div></div></div><div class="dgs-res" id="dgs-res">' + dgSheetRes(r, opt) + '</div><p class="small muted" style="margin:0">' + esc(t("dg_wht_note")) + "</p>"; }
+  else h += '<p class="small muted" style="margin:0">' + esc(t("dg_nodiv_long")) + "</p>";
+  return h;
+}
+function dgSheetRes(r, opt) {
+  const a = parseFloat(dgAmt), w = parseFloat(dgWht == null ? (DG_WHT[r.g] == null ? 30 : DG_WHT[r.g]) : dgWht) || 0;
+  if (!(a > 0)) return '<span class="small muted">' + esc(t("dg_enter_amt")) + "</span>";
+  const sh = opt.sh(r.s), g = a * r.yld / 100, net = g * (1 - w / 100), pur = sh && sh.p ? g * sh.p / 100 : 0, c = dgCurName(r.cur);
+  const ln = (k, v) => '<div class="dgs-ln"><span>' + esc(k) + '</span><b class="num">' + v + "</b></div>";
+  return '<div class="dgs-big"><span>' + esc(t("dg_net_y")) + '</span><b class="num">' + c + fmt(net, 2) + "</b></div>" + ln(t("dg_gross"), c + fmt(g, 2)) + ln(t("dg_calc_wht").replace(" %", "") + " " + fmt(w, 0) + "%", "−" + c + fmt(g - net, 2)) + (r.freq ? ln(t("dg_each").replace("{f}", dgFreq(r.freq)), c + fmt(net / r.freq, 2)) : "") + (pur ? ln(t("dg_pur_of"), c + fmt(pur, 2)) : "");
+}
+function dgSheet(open) {
+  let sc = document.getElementById("dgscrim"), sh = document.getElementById("dgsheet");
+  if (!open) { if (sh) { sh.classList.remove("on"); sh.style.transform = ""; } if (sc) sc.classList.remove("on"); document.body.classList.remove("dg-lock"); dgSheetS = null; if (dgSheetFocus && document.contains(dgSheetFocus)) dgSheetFocus.focus({ preventScroll: true }); return; }
+  if (!sc) { sc = document.createElement("div"); sc.id = "dgscrim"; sc.setAttribute("data-act", "dg-close"); document.body.appendChild(sc); }
+  if (!sh) {
+    sh = document.createElement("section"); sh.id = "dgsheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true"); sh.setAttribute("aria-labelledby", "dgs-name"); sh.dir = S.lang === "ar" ? "rtl" : "ltr";
+    sh.innerHTML = '<div class="dgs-grab" data-act="dg-close" aria-hidden="true"><i></i></div><div class="dgs-body" id="dgs-body"></div>'; document.body.appendChild(sh);
+    let y0 = null, dy = 0; const body = sh.querySelector(".dgs-body");
+    sh.addEventListener("touchstart", (e) => { if (body.scrollTop > 0 && !e.target.closest(".dgs-grab")) return; y0 = e.touches[0].clientY; dy = 0; sh.style.transition = "none"; }, { passive: true });
+    sh.addEventListener("touchmove", (e) => { if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); sh.style.transform = "translateY(" + dy + "px)"; }, { passive: true });
+    sh.addEventListener("touchend", () => { if (y0 == null) return; sh.style.transition = ""; if (dy > 90) dgSheet(false); else sh.style.transform = ""; y0 = null; });
+  }
+  sh.querySelector("#dgs-body").innerHTML = dgSheetHtml();
+  requestAnimationFrame(() => { sc.classList.add("on"); sh.classList.add("on"); document.body.classList.add("dg-lock"); });
+}
+function dgSheetRefresh() { const b = document.getElementById("dgs-body"); if (b && dgSheetS) b.innerHTML = dgSheetHtml(); }
 
 /* ----- owner tab inside مكتبي ----- */
 function dkDivGlobal() {
   if (!DG.loaded) { loadDG(); return '<div class="notice">' + esc(t("dg_loading")) + "</div>"; }
   const opt = { sh: dgSharia, watch: DG.watch || [] };
-  return '<div class="stack"><div><h2 style="margin:0">' + esc(t("dg_h")) + '</h2><p class="muted" style="margin:4px 0 0">' + esc(t("dg_p")) + "</p></div>" + dgTable(DG.data, opt) + dgShareBox() + "</div>";
+  return '<div class="stack"><div class="dg-intro"><h2 style="margin:0">' + esc(t("dg_h")) + '</h2><p class="muted" style="margin:4px 0 0">' + esc(t("dg_p")) + "</p></div>" + dgTable(DG.data, opt) + dgShareBox() + "</div>";
 }
 function dgShareBox() {
   const loc = dgLocal(), on = !!dgPub, link = location.origin + location.pathname + "#shared";
@@ -5445,19 +5645,25 @@ document.addEventListener("click", async (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="dg-"],[data-act^="sd-"]'); if (!el) return;
   const a = el.dataset.act;
   if (a === "dg-grp") { dgGrp = el.dataset.g; render(); }
+  else if (a === "dg-f") { dgF = dgF === el.dataset.f ? null : el.dataset.f; render(); }
+  else if (a === "dg-sort") { const o = ["yld", "next", "sym"]; dgSort = o[(o.indexOf(dgSort) + 1) % o.length]; render(); }
+  else if (a === "dg-none") { dgNone = !dgNone; render(); }
+  else if (a === "dg-open") { dgSheetFocus = el; dgSheetS = el.dataset.s; dgWht = null; dgSheet(true); }
+  else if (a === "dg-close") { dgSheet(false); }
   else if (a === "dg-pick") { dgPick = dgPick === el.dataset.s ? null : el.dataset.s; dgWht = null; render(); const c = document.getElementById("dg-amt"); if (dgPick && c) c.scrollIntoView({ behavior: "smooth", block: "center" }); }
-  else if (a === "dg-star") { const s = el.dataset.s, w = DG.watch || (DG.watch = []), i = w.indexOf(s); if (i >= 0) w.splice(i, 1); else { w.push(s); toast(t("dg_starred")); } render(); await dgSaveWatch(); if (typeof topBell === "function") topBell(); }
+  else if (a === "dg-star") { const s = el.dataset.s, w = DG.watch || (DG.watch = []), i = w.indexOf(s); if (i >= 0) w.splice(i, 1); else { w.push(s); toast(t("dg_starred")); } render(); dgSheetRefresh(); await dgSaveWatch(); if (typeof topBell === "function") topBell(); }
   else if (a === "dg-copy") { navigator.clipboard && navigator.clipboard.writeText(el.dataset.c).then(() => toast(t("nt_copied"))).catch(() => {}); }
   else if (a === "dg-share-off") { dgBusy = true; render(); await dgStopShare(); dgBusy = false; render(); }
   else if (a === "sd-lock") { DG.view = null; try { localStorage.removeItem(DG_PASS); } catch (err) {} render(); }
 });
 document.addEventListener("change", (e) => {
   const k = e.target.dataset && e.target.dataset.dg; if (!k) return;
-  if (k === "sort") { dgSort = e.target.value; render(); } else if (k === "star") { dgStar = e.target.checked; render(); }
+  if (k === "sort") { dgSort = e.target.value; render(); }
 });
 document.addEventListener("input", (e) => {
   const k = e.target.dataset && e.target.dataset.dg; if (!k) return;
   if (k === "amt") { dgAmt = e.target.value; dgRepaintCalc(); } else if (k === "wht") { dgWht = e.target.value; dgRepaintCalc(); }
+  else if (k === "samt" || k === "swht") { if (k === "samt") dgAmt = e.target.value; else dgWht = e.target.value; const { data, opt } = dgCtx(), r = data && data.stocks.find((x) => x.s === dgSheetS), box = document.getElementById("dgs-res"); if (r && box) box.innerHTML = dgSheetRes(r, opt); }
 });
 document.addEventListener("submit", async (e) => {
   const f = e.target.closest && e.target.closest('[data-form="dg-share"],[data-form="sd-open"]'); if (!f) return;
@@ -5469,6 +5675,8 @@ document.addEventListener("submit", async (e) => {
   try { await dgPublish(p); toast(t("dg_share_done")); } catch (err) { toast(err && (err.code === "403" || err.code === "404") ? t("sh_admin_nopub") : errText(err)); }
   dgBusy = false; render();
 });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && dgSheetS) dgSheet(false); });
+window.addEventListener("hashchange", () => { if (dgSheetS) dgSheet(false); });
 if (dgOwner()) setTimeout(() => loadDG(), 1500);
 /* ===== مِراس: قائمة التنبيهات =====
    الجرس فوق يفتح قائمة فيها:

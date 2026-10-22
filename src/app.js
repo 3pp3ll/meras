@@ -396,7 +396,9 @@ function render() {
 function renderNow() {
   const r = route();
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
-  $("#top").innerHTML = typeof lnShow === "function" && lnShow() ? lnHeader() : headerHtml(r);
+  const lnOn = typeof lnShow === "function" && lnShow();
+  $("#top").innerHTML = lnOn ? lnHeader() : headerHtml(r);
+  if (typeof tabbarSync === "function") tabbarSync(lnOn ? null : r);
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
