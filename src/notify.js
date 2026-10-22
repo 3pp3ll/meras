@@ -32,37 +32,126 @@ function ntItems() {
   return items.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 }
 function ntUnread() { const r = ntRead(); return ntItems().filter((i) => !r.has(i.id) && (i.kind === "notice" || i.kind === "div" || i.x.sharia === "ok")).length; }
+/* ----- the list as a sheet: from the bottom on the phone (above the tab bar), from the top on a wide screen.
+   Rests at half the screen, drags to full screen, drags away to close. ----- */
+Object.assign(UI, {
+  nt_f_all: ["الكل", "All"], nt_f_promo: ["عروض", "Offers"], nt_f_mover: ["أفضل حركة", "Best movers"], nt_f_div: ["توزيع", "Payouts"], nt_f_news: ["إعلانات", "News"],
+  nt_new: ["{n} جديد", "{n} new"], nt_d_today: ["اليوم", "Today"], nt_d_yday: ["أمس", "Yesterday"], nt_d_week: ["هذا الأسبوع", "This week"], nt_d_old: ["أقدم", "Earlier"],
+  nt_resize: ["كبّر أو صغّر القائمة", "Expand or shrink the list"], nt_close: ["سكّر", "Close"], nt_go_stock: ["افتح السهم", "Open stock"], nt_go_why: ["شوف السبب", "See why"],
+  nt_div_p: ["العائد السنوي {y}% · لازم تملك السهم قبل تاريخ الاستحقاق.", "Yearly yield {y}% · own the share before the ex-date."]
+});
+let ntF = "all", ntState = "closed";
+const NT_IC = {
+  promo: '<path d="M3 10V6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v4a2 2 0 0 0 0 4v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-4a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  mover: '<path d="M4 17l6-6 4 4 6-7M15 8h5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  div: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></g>',
+  news: '<path d="M12 3v4M12 17v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M3 12h4M17 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+};
+const ntCat = (i) => (i.kind === "notice" ? (i.n.kind === "promo" ? "promo" : "news") : i.kind);
+const ntIsUnread = (i, r) => !r.has(i.id) && (i.kind !== "mover" || i.x.sharia === "ok");
+function ntDay(d) {
+  if (!d) return t("nt_d_old");
+  const n = Math.round((new Date(today() + "T00:00:00") - new Date(String(d).slice(0, 10) + "T00:00:00")) / 864e5);
+  return n <= 0 ? t("nt_d_today") : n === 1 ? t("nt_d_yday") : n < 7 ? t("nt_d_week") : t("nt_d_old");
+}
+function ntRow(i, r) {
+  const c = ntCat(i), un = ntIsUnread(i, r);
+  let title, body = "", acts = "", when = i.date || "";
+  if (i.kind === "notice") {
+    const n = i.n; title = n.t; body = n.b || "";
+    acts = (n.code ? '<span class="nt-code num" dir="ltr">' + esc(n.code) + '</span><button class="btn sm" data-act="nt-copy" data-c="' + esc(n.code) + '">' + esc(t("nt_copy")) + "</button>" : "") + (n.url ? '<a class="btn sm" href="' + esc(n.url) + '" data-act="nt-go"' + (/^https?:/.test(n.url) ? ' target="_blank" rel="noopener"' : "") + ">" + esc(t("nt_open")) + "</a>" : "") + (n.to ? '<span class="small muted">' + esc(t("nt_until").replace("{d}", n.to)) + "</span>" : "");
+  } else if (i.kind === "div") {
+    const d = i.r; title = t("nt_div_t").replace("{s}", d.s).replace("{n}", d.n || "").replace("{d}", d.next); body = t("nt_div_p").replace("{y}", fmt(d.yld, 2)); when = "";
+    acts = '<button class="btn sm" data-act="nt-div">' + esc(t("nt_go_stock")) + "</button>";
+  } else {
+    const x = i.x; title = t("nt_mover").replace("{s}", x.s).replace("{n}", (typeof dkName === "function" && dkName(x.s)) || x.n || "").replace("{x}", x.score);
+    body = x.sharia === "ok" ? t("sh_ok") : x.sharia === "no" ? t("tp_noshar") : t("nt_unknown_sh");
+    acts = '<button class="btn sm" data-act="nt-mover">' + esc(t("nt_go_why")) + "</button>";
+  }
+  return '<li class="nt-it' + (un ? " unread" : "") + '"><span class="nt-ic ' + c + '"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + NT_IC[c] + '</svg></span><div class="nt-tx"><b>' + esc(title) + "</b>" + (body ? "<p>" + esc(body) + "</p>" : "") + '<div class="nt-acts">' + (when ? '<span class="small muted num">' + esc(when) + "</span>" : "") + acts + "</div></div></li>";
+}
 function ntPanel() {
-  const items = ntItems(), r = ntRead();
-  const row = (i) => {
-    const unread = !r.has(i.id);
-    if (i.kind === "notice") {
-      const n = i.n;
-      return '<li class="nt-i' + (unread ? " unread" : "") + '"><div class="nt-top"><span class="tag ' + (n.kind === "promo" ? "amber" : n.kind === "update" ? "up" : "") + '">' + esc(t("nt_k_" + (n.kind || "info"))) + '</span><b>' + esc(n.t) + "</b></div>" + (n.b ? '<p class="small" style="margin:4px 0 0">' + esc(n.b) + "</p>" : "") +
-        '<div class="row" style="gap:6px;margin-top:6px">' + (n.code ? '<span class="nt-code num">' + esc(n.code) + '</span><button class="btn sm" data-act="nt-copy" data-c="' + esc(n.code) + '">' + esc(t("nt_copy")) + "</button>" : "") + (n.url ? '<a class="btn sm ghost" href="' + esc(n.url) + '"' + (/^https?:/.test(n.url) ? ' target="_blank" rel="noopener"' : "") + ">" + esc(t("nt_open")) + "</a>" : "") + (n.to ? '<span class="small muted">' + esc(t("nt_until").replace("{d}", n.to)) + "</span>" : "") + "</div></li>";
-    }
-    if (i.kind === "div") { const d = i.r; return '<li class="nt-i' + (unread ? " unread" : "") + '"><a href="#desk" data-act="nt-div" class="nt-link"><div class="nt-top"><span class="tag amber">' + esc(t("nt_div")) + '</span><b>' + esc(t("nt_div_t").replace("{s}", d.s).replace("{n}", d.n || "").replace("{d}", d.next)) + '</b></div><span class="small muted num">' + esc(t("dg_c_yld") + " " + fmt(d.yld, 2) + "%") + "</span></a></li>"; }
-    const x = i.x;
-    return '<li class="nt-i' + (unread && x.sharia === "ok" ? " unread" : "") + '"><a href="#desk" data-act="nt-mover" class="nt-link"><div class="nt-top"><span class="tag up">' + esc(t("nt_movers")) + '</span><b>' + esc(t("nt_mover").replace("{s}", x.s).replace("{n}", (typeof dkName === "function" && dkName(x.s)) || x.n || "").replace("{x}", x.score)) + '</b></div><span class="small muted num">' + esc(x.in) + "</span>" + (x.sharia && x.sharia !== "ok" ? ' <span class="small muted">· ' + esc(x.sharia === "no" ? t("tp_noshar") : t("nt_unknown_sh")) + "</span>" : "") + "</a></li>";
-  };
-  return '<div class="nt-head"><b>' + esc(t("nt_h")) + "</b>" + (items.length ? '<button class="btn sm ghost" data-act="nt-readall">' + esc(t("nt_all_read")) + "</button>" : "") + "</div>" + (items.length ? '<ul class="nt-list">' + items.map(row).join("") + "</ul>" : '<p class="muted small" style="margin:8px 0">' + esc(t("nt_empty")) + "</p>");
+  const all = ntItems(), r = ntRead(), un = all.filter((i) => ntIsUnread(i, r)).length;
+  const cats = ["all"].concat(["promo", "mover", "div", "news"].filter((k) => all.some((i) => ntCat(i) === k)));
+  if (!cats.includes(ntF)) ntF = "all";
+  const list = all.filter((i) => ntF === "all" || ntCat(i) === ntF);
+  let day = "", rows = "";
+  list.forEach((i) => { const d = ntDay(i.date); if (d !== day) { day = d; rows += '<li class="nt-day">' + esc(d) + "</li>"; } rows += ntRow(i, r); });
+  return '<div class="nt-shead" data-nt-drag><h2 id="nt-title">' + esc(t("nt_h")) + (un ? "<small>" + esc(t("nt_new").replace("{n}", un)) + "</small>" : "") + "</h2>" + (un ? '<button class="nt-ghost" data-act="nt-readall">' + esc(t("nt_all_read")) + "</button>" : "") + '<button class="nt-x" data-act="nt-close" aria-label="' + esc(t("nt_close")) + '">×</button></div>' +
+    (cats.length > 2 ? '<div class="nt-filters" role="group">' + cats.map((k) => '<button class="dg-chip" data-act="nt-f" data-f="' + k + '" aria-pressed="' + (ntF === k) + '">' + esc(t("nt_f_" + k)) + "</button>").join("") + "</div>" : "") +
+    '<ul class="nt-list2">' + (rows || '<li class="nt-empty">' + esc(t("nt_empty")) + "</li>") + "</ul>";
+}
+const ntTop = () => !(document.body.classList.contains("has-tabbar") && window.matchMedia("(max-width:640px)").matches);   // wide screens: the sheet drops from the top
+function ntEls() {
+  let sc = document.getElementById("ntscrim"), sh = document.getElementById("ntsheet");
+  if (!sc) { sc = document.createElement("div"); sc.id = "ntscrim"; sc.setAttribute("data-act", "nt-close"); document.body.appendChild(sc); }
+  if (!sh) {
+    sh = document.createElement("section"); sh.id = "ntsheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true"); sh.setAttribute("aria-labelledby", "nt-title");
+    sh.innerHTML = '<button class="nt-grab" data-nt-drag data-nt-grab aria-label="' + esc(t("nt_resize")) + '"><i></i></button><div class="nt-body" id="nt-body"></div>';
+    document.body.appendChild(sh); ntDrag(sh);
+  }
+  return { sc, sh };
+}
+function ntH() { return window.innerHeight - 8; }   // the sheet's full height
+function ntPlace(px, anim) {   // px = how much of the sheet is hidden off-screen
+  const { sc, sh } = ntEls(), top = ntTop();
+  sh.style.transition = anim ? "" : "none"; sc.style.transition = anim ? "" : "none";
+  if (top) { sh.style.transform = px >= ntH() ? "translateY(-110%)" : "none"; sh.style.height = Math.max(0, ntH() - px) + "px"; }   // from the top it grows, so the header stays in view
+  else { sh.style.height = ""; sh.style.transform = "translateY(" + px + "px)"; }
+  sc.style.opacity = Math.max(0, Math.min(1, (1 - px / ntH()) / 0.5));
+}
+function ntGo(s) {
+  const { sc, sh } = ntEls(); ntState = s; ntOpen = s !== "closed";
+  sh.classList.toggle("top", ntTop()); sh.classList.toggle("full", s === "full"); sc.classList.toggle("on", ntOpen);
+  sh.dir = S.lang === "ar" ? "rtl" : "ltr";
+  if (ntOpen) document.body.classList.add("nt-lock"); else document.body.classList.remove("nt-lock");
+  requestAnimationFrame(() => ntPlace(s === "closed" ? ntH() + 20 : s === "half" ? ntH() * 0.5 : 0, true));
+  if (!ntOpen) { ntMark(ntItems().map((i) => i.id)); if (typeof topBell === "function") topBell(); const b = document.querySelector('#tabbar [data-act="nt-bell"]') || document.getElementById("topbell"); if (b && b.offsetParent) b.focus({ preventScroll: true }); }
 }
 function ntToggle(open) {
-  let p = document.getElementById("ntpanel");
-  ntOpen = open == null ? !ntOpen : open;
-  if (!ntOpen) { if (p) p.remove(); return; }
-  if (!p) { p = document.createElement("div"); p.id = "ntpanel"; p.setAttribute("role", "dialog"); p.setAttribute("aria-label", t("nt_h")); document.body.appendChild(p); }
-  p.innerHTML = ntPanel();
-  const b = document.getElementById("topbell"); if (b) { const r = b.getBoundingClientRect(); p.style.top = Math.round(r.bottom + 8) + "px"; }
-  setTimeout(() => { ntMark(ntItems().map((i) => i.id)); if (typeof topBell === "function") topBell(); }, 1200);
+  const want = open == null ? !ntOpen : open;
+  if (!want) { if (ntOpen) ntGo("closed"); return; }
+  const { sh } = ntEls();
+  document.getElementById("nt-body").innerHTML = ntPanel();
+  if (!ntOpen) { sh.classList.toggle("top", ntTop()); ntPlace(ntH() + 20, false); ntGo("half"); setTimeout(() => { const x = sh.querySelector(".nt-x"); if (x) x.focus({ preventScroll: true }); }, 320); }
 }
+function ntDrag(sh) {
+  let y0 = null, start = 0, last = 0, lastT = 0, v = 0, moved = false, grab = false;
+  const sign = () => (ntTop() ? -1 : 1);   // dragging toward the edge hides it
+  sh.addEventListener("pointerdown", (e) => {
+    const d = e.target.closest("[data-nt-drag]"); if (!d || ntState === "closed" || (e.target.closest("button,a") && !e.target.closest("[data-nt-grab]"))) return;
+    grab = !!e.target.closest("[data-nt-grab]"); y0 = e.clientY; last = y0; lastT = performance.now(); v = 0; moved = false;
+    start = ntState === "full" ? 0 : ntH() * 0.5; sh.setPointerCapture(e.pointerId);
+  });
+  sh.addEventListener("pointermove", (e) => {
+    if (y0 == null) return; const dy = (e.clientY - y0) * sign(); if (Math.abs(dy) > 4) moved = true;
+    const now = performance.now(); v = ((e.clientY - last) * sign()) / Math.max(1, now - lastT); last = e.clientY; lastT = now;
+    ntPlace(Math.max(0, Math.min(ntH(), start + dy)), false);
+  });
+  const end = (e) => {
+    if (y0 == null) return; const pos = Math.max(0, Math.min(ntH(), start + (e.clientY - y0) * sign())); y0 = null;
+    if (!moved) { if (grab) ntGo(ntState === "full" ? "half" : "full"); else ntPlace(start, true); return; }
+    const f = pos / ntH();
+    if (v > 0.6) ntGo(ntState === "full" && f < 0.45 ? "half" : "closed"); else if (v < -0.6) ntGo("full"); else ntGo(f < 0.25 ? "full" : f < 0.72 ? "half" : "closed");
+  };
+  sh.addEventListener("pointerup", end); sh.addEventListener("pointercancel", end);
+  /* on the phone, pulling the list down while it sits at its top moves the whole sheet */
+  let ly = null;
+  sh.addEventListener("touchstart", (e) => { const l = e.target.closest(".nt-list2"); ly = l && l.scrollTop <= 0 && !ntTop() ? e.touches[0].clientY : null; start = ntState === "full" ? 0 : ntH() * 0.5; }, { passive: true });
+  sh.addEventListener("touchmove", (e) => { if (ly == null) return; const dy = e.touches[0].clientY - ly; if (dy > 0 || ntState === "half") ntPlace(Math.max(0, start + dy), false); }, { passive: true });
+  sh.addEventListener("touchend", () => { if (ly == null) return; ly = null; const m = new DOMMatrix(getComputedStyle(sh).transform).m42, f = m / ntH(); if (Math.abs(m - start) < 6) return; ntGo(f < 0.3 ? "full" : f < 0.72 ? "half" : "closed"); });
+}
+window.addEventListener("resize", () => { if (ntOpen) ntGo(ntState); });
 document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="nt-"]');
-  if (!el) { if (ntOpen && !e.target.closest("#ntpanel") && !e.target.closest("#topbell")) ntToggle(false); return; }
+  if (!el) return;
   const a = el.dataset.act;
   if (a === "nt-bell") { ntToggle(); return; }
+  if (a === "nt-close") { ntToggle(false); return; }
+  if (a === "nt-f") { ntF = el.dataset.f; document.getElementById("nt-body").innerHTML = ntPanel(); return; }
+  if (a === "nt-go") { ntToggle(false); return; }
   if (a === "nt-copy") { navigator.clipboard && navigator.clipboard.writeText(el.dataset.c).then(() => toast(t("nt_copied"))).catch(() => {}); }
-  else if (a === "nt-readall") { ntMark(ntItems().map((i) => i.id)); ntToggle(true); topBell(); }
+  else if (a === "nt-readall") { ntMark(ntItems().map((i) => i.id)); document.getElementById("nt-body").innerHTML = ntPanel(); topBell(); }
   else if (a === "nt-div") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") dkTab = "dg"; if (route() === "desk") render(); else location.hash = "desk"; }
   else if (a === "nt-mover") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") dkTab = "top"; if (route() === "desk") render(); else location.hash = "desk"; }
 });
