@@ -4689,14 +4689,16 @@ function pageLabel(p) {
   if (!p) return "";
   if (p.r.startsWith("g-")) { const g = typeof GUIDES !== "undefined" && GUIDES.find((x) => "g-" + x.id === p.r); return g ? L(g.title) : t("nav_guides"); }
   for (const g in NAV_GROUPS) { const it = NAV_GROUPS[g].items.find((x) => x[0] === p.r); if (it) return t(it[1]) + (p.sym && typeof symName === "function" ? ": " + symName(p.sym) : ""); }
-  return p.r;
+  const extra = { desk: "dk_h", owner: "ow_h", plans: "nav_plans", account: "nav_account", learn: "nav_learn", services: "nav_svc", tracks: "nav_tracks", settings: "set_h", shared: "dg_h", symbols: "nav_symbols" }[p.r];
+  if (extra) return t(extra) + (p.r === "desk" && typeof dkTab !== "undefined" && typeof MAP_DESK !== "undefined" ? (MAP_DESK.find((x) => x[0] === dkTab) ? " · " + t(MAP_DESK.find((x) => x[0] === dkTab)[1]) : "") : "");
+  return "";
 }
 function continueHtml() {
   const ls = LAST.lesson && LESSONS.find((x) => x.id === LAST.lesson), next = ls ? (lessonsOf(ls.track).find((x) => !isDone(x.id) && canOpen(x)) || null) : nextLesson("inv");
   const cards = [];
   if (ls) cards.push(['#l-' + ls.id, t("cont_lesson"), L(ls.title), L(trackById(ls.track).name)]);
   if (next && (!ls || next.id !== ls.id)) cards.push(['#l-' + next.id, t("cont_next"), L(next.title), L(trackById(next.track).name)]);
-  if (LAST.page) cards.push(["#" + LAST.page.r, t("cont_page"), pageLabel(LAST.page), ""]);
+  if (LAST.page && pageLabel(LAST.page)) cards.push(["#" + LAST.page.r, t("cont_page"), pageLabel(LAST.page), ""]);
   if (!cards.length) return '<div class="cont"><b>' + esc(t("cont_h")) + '</b><a class="cont-card" href="#l-' + LESSONS[0].id + '"><span class="small muted">' + esc(t("cont_none")) + "</span></a></div>";
   return '<div class="cont"><b>' + esc(t("cont_h")) + '</b><div class="cont-row">' + cards.slice(0, 3).map(([h, k, title, sub]) => '<a class="cont-card" href="' + h + '"><span class="small muted">' + esc(k) + "</span><strong>" + esc(title) + "</strong>" + (sub ? '<span class="small muted">' + esc(sub) + "</span>" : "") + "</a>").join("") + "</div></div>";
 }
