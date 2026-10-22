@@ -111,7 +111,7 @@ function backtest(data, c) {
   };
 }
 
-const labW = () => Math.max(300, Math.min(920, (document.documentElement.clientWidth || 960) - 74));
+const labW = () => Math.max(300, Math.min(920, (document.documentElement.clientWidth || 960) - 74 - (typeof sideW === "function" ? sideW() : 0)));
 function labLine(series, colors, labels) {
   const W = labW(), H = W < 560 ? 200 : 230, x0 = 6, x1 = W - 70, top = 10, ph = H - 34, n = series[0].length;
   let min = Infinity, max = -Infinity; series.forEach((s) => s.forEach((v) => { min = Math.min(min, v); max = Math.max(max, v); }));

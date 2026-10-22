@@ -109,12 +109,75 @@ function hubCards(g) {
 function pageLearn() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("learn_h")) + "</h1><p>" + esc(t("learn_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + continueHtml() + hubCards("learn") + "</div></div>"; }
 function pageServicesHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("svc_hub_h")) + "</h1><p>" + esc(t("svc_hub_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("services") + "</div></div>"; }
 
+/* ----- icons for every section (used by the side menu and the platform map) ----- */
+const SEC_IC = {
+  tracks: '<path d="M4 19h4v-4h4v-4h4V7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  chart: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v4M7 15v6M17 2v4M17 14v8"/><rect x="5" y="7" width="4" height="8" rx="1"/><rect x="15" y="6" width="4" height="8" rx="1"/></g>',
+  lab: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 15h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  guides: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5M9 8h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  glossary: '<path d="M4 18l4-12 4 12M5.5 14h5M14 7h6l-6 10h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  progress: '<g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></g>',
+  journal: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></g>',
+  invest: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M16.5 7.5c-.8-1.3-2.4-2-4.5-2-2.5 0-4 1.2-4 3s1.5 2.6 4 3.2 4 1.4 4 3.3-1.6 3.2-4.2 3.2c-2.1 0-3.7-.8-4.5-2.2"/></g>',
+  tech: '<path d="M4 17l6-6 4 4 6-7M15 8h5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  dividends: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15.5" r="2.5"/></g>',
+  metals: '<path d="M3 19l3-6h6l3 6zM9 13l3-6h6l3 6M12 7l2-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  sharia: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6zM9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  calc: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h1M12 12h1M16 12h0M8 16h1M12 16h1M16 16h0"/></g>',
+  plans: '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  owner: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></g>',
+  desk: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 9V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></g>'
+};
+const secIc = (k, sz) => '<svg viewBox="0 0 24 24" width="' + (sz || 20) + '" height="' + (sz || 20) + '" aria-hidden="true">' + (SEC_IC[k] || "") + "</svg>";
+Object.assign(UI, {
+  map_root: ["مِراس", "Meras"], map_admin: ["الإدارة", "Admin"], map_admin_p: ["تظهر لك بس", "Only you see this"],
+  map_h: ["هيكل المنصة", "How Meras is organised"], map_p: ["كل أقسام مِراس في مكان واحد. اضغط أي قسم وتدخله على طول.", "Every part of Meras in one place. Tap any section to open it."],
+  map_plans_p: ["أول درجتين في كل مسار مجانية، والباقي بالاشتراك.", "The first two steps of every track are free; the rest comes with a plan."],
+  map_owner_p: ["لوحة المالك والمستخدمين والبيانات.", "Owner dashboard, users and data."], map_desk_p: ["محفظتك وأدواتك الخاصة.", "Your portfolio and private tools."]
+});
+const MAP_DESK = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
+function siteMap() {
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  const leaf = (h, k) => '<a class="smap-leaf" href="#' + h + '">' + secIc(h, 15) + "<span>" + esc(t(k)) + "</span></a>";
+  const branch = (h, k, kids, cls) => '<li class="smap-br' + (cls ? " " + cls : "") + '"><a class="smap-node" href="#' + h + '">' + esc(t(k)) + "</a>" + (kids ? '<div class="smap-kids">' + kids + "</div>" : "") + "</li>";
+  return '<div class="smap" aria-label="' + esc(t("map_h")) + '"><div class="smap-root">' + LOGO + "<b>" + esc(t("map_root")) + '</b></div><ul class="smap-tree">' +
+    branch("learn", "nav_learn", NAV_GROUPS.learn.items.map(([h, k]) => leaf(h, k)).join("")) +
+    branch("services", "nav_svc", NAV_GROUPS.services.items.map(([h, k]) => leaf(h, k)).join("")) +
+    branch("plans", "nav_plans", "") +
+    (owner ? branch("owner", "map_admin", leaf("owner", "ow_h") + leaf("desk", "dk_h"), "smap-admin") : "") + "</ul></div>";
+}
+function mapSection() {
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  const card = (h, k, d, stat, extra) => '<a class="panel map-card" href="#' + h + '"' + (extra || "") + '><span class="map-ic">' + secIc(h.startsWith("desk") ? "desk" : h, 22) + '</span><span class="map-tx"><b>' + esc(t(k)) + '</b><span class="muted small">' + esc(t(d)) + "</span>" + (stat ? '<span class="tag amber">' + esc(stat) + "</span>" : "") + "</span></a>";
+  const group = (title, sub, cards, cls) => '<div class="map-grp' + (cls ? " " + cls : "") + '"><div class="map-gh"><h3>' + esc(title) + "</h3>" + (sub ? '<span class="muted small">' + esc(sub) + "</span>" : "") + '</div><div class="map-cards">' + cards + "</div></div>";
+  return '<section class="sec"><div class="sec-head"><h2>' + esc(t("map_h")) + '</h2></div><p class="muted" style="margin:-6px 0 16px">' + esc(t("map_p")) + "</p>" +
+    group(t("nav_learn"), t("learn_p"), NAV_GROUPS.learn.items.map(([h, k, d]) => card(h, k, d, hubStat(h))).join("")) +
+    group(t("nav_svc"), t("svc_hub_p"), NAV_GROUPS.services.items.map(([h, k, d]) => card(h, k, d, hubStat(h))).join("")) +
+    group(t("nav_plans"), "", card("plans", "nav_plans", "map_plans_p")) +
+    (owner ? group(t("map_admin"), t("map_admin_p"), card("owner", "ow_h", "map_owner_p") + MAP_DESK.map(([k, l]) => card("desk", l, "dk_g_" + k, "", ' data-dktab="' + k + '"')).join(""), "map-admin") : "") + "</section>";
+}
+document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("[data-dktab]"); if (a && typeof dkTab !== "undefined") { dkTab = a.dataset.dktab; dkGrid = false; } });
+
 function pageGate() {
   const first = nextLesson("inv") || LESSONS[0];
-  const gate = (g, h, p) => '<a class="panel gate" href="#' + g + '"><h2>' + esc(t(h)) + '</h2><p class="muted">' + esc(t(p)) + '</p><span class="row" style="gap:6px">' + NAV_GROUPS[g].items.map(([, k]) => '<span class="tag">' + esc(t(k)) + "</span>").join("") + "</span></a>";
-  return '<section class="hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + stairs(null, true) + "</div></section>" +
-    '<div class="wrap"><section class="sec">' + continueHtml() + '</section><section class="sec"><div class="gates">' + gate("learn", "learn_h", "learn_p") + gate("services", "svc_hub_h", "svc_hub_p") + "</div></section>" +
-    '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + '</div></section><section class="sec"><div class="notice">' + esc(t(typeof LIVE !== "undefined" && LIVE.fetchedAt ? "live_note" : "sample_note")) + "</div></section></div>";
+  return '<section class="hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + siteMap() + "</div></section>" +
+    '<div class="wrap"><section class="sec">' + continueHtml() + "</section>" + mapSection() +
+    '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + "</div></section>" + GATE_TAIL() + "</div>";
+}
+const GATE_TAIL = () => '<section class="sec"><div class="notice">' + esc(t(typeof LIVE !== "undefined" && LIVE.fetchedAt ? "live_note" : "sample_note")) + "</div></section>";
+
+/* ----- learn and services on a wide screen: the section list on the side, the chosen page beside it ----- */
+const SIDE_MINI = ["chart", "lab"];
+function sideW() {
+  const vw = document.documentElement.clientWidth || 0, g = groupOf(route());
+  if (vw < 1000 || (g !== "learn" && g !== "services")) return 0;
+  return SIDE_MINI.includes(route()) ? 92 : 258;
+}
+function sideShell(g, r, html) {
+  const sub = subOf(r), mini = SIDE_MINI.includes(r);
+  const hub = '<a class="side-hub" href="#' + g + '"' + (r === g ? ' aria-current="page"' : "") + ' title="' + esc(t(g === "learn" ? "learn_h" : "svc_hub_h")) + '"><span class="dk-si">' + secIc(g === "learn" ? "tracks" : "calc", 18).replace("tracks", "") + '</span><span class="dk-sl"><b>' + esc(t(g === "learn" ? "nav_learn" : "nav_svc")) + "</b></span></a>";
+  const items = NAV_GROUPS[g].items.map(([h, k, d]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ' title="' + esc(t(k)) + '"><span class="dk-si">' + secIc(h, 20) + '</span><span class="dk-sl"><b>' + esc(t(k)) + "</b><small>" + esc(t(d)) + "</small></span></a>").join("");
+  return '<div class="wrap side-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + hub + items + '</nav></aside><div class="side-main">' + html + "</div></div>";
 }
 
 /* ----- phone tab bar: التعليم، الخدمات، مكتبي (أو الباقات)، الإشعارات ----- */

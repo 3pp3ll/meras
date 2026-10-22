@@ -392,7 +392,7 @@ function chartSvg(cfg, full) {
 
   /* geometry follows the real pixel width, so text never shrinks on a phone */
   const vw = document.documentElement.clientWidth || 960, vhgt = window.innerHeight || 700;
-  const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62 - (chSide() ? 272 : 0))), axis = W < 520 ? 50 : 62;
+  const W = chFull ? Math.max(300, vw - 16) : Math.max(280, Math.min(1056, vw - 62 - (chSide() ? 272 : 0) - (typeof sideW === "function" ? sideW() : 0))), axis = W < 520 ? 50 : 62;
   const x0 = 6, x1 = W - axis, top = 8, tight = chFull && vhgt < 460, vh = cfg.vol ? (tight ? 26 : W < 520 ? 40 : 56) : 0, rh = rs ? (tight ? 50 : W < 520 ? 70 : 96) : 0, mh = md ? (tight ? 50 : W < 520 ? 70 : 96) : 0, fh = tight ? 46 : W < 520 ? 64 : 84, extra = (vh ? vh + 12 : 0) + (rh ? rh + 14 : 0) + (mh ? mh + 14 : 0) + fl.length * (fh + 14) + 20;
   const ph = chFull ? Math.max(70, vhgt - chFullPad - extra) : Math.round(Math.max(200, Math.min(340, W * 0.5)));
   const vtop = top + ph + 12, rtop = vtop + (vh ? vh + 14 : 0), mtop = rtop + (rh ? rh + 14 : 0), H = top + ph + extra;
