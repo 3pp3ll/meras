@@ -132,6 +132,8 @@ const secIc = (k, sz) => '<svg viewBox="0 0 24 24" width="' + (sz || 20) + '" he
 Object.assign(UI, {
   map_root: ["مِراس", "Meras"], map_admin: ["الإدارة", "Admin"], map_admin_p: ["تظهر لك بس", "Only you see this"],
   map_h: ["هيكل المنصة", "How Meras is organised"], map_p: ["كل أقسام مِراس في مكان واحد. اضغط أي قسم وتدخله على طول.", "Every part of Meras in one place. Tap any section to open it."],
+  map_tree: ["عرض الشجرة", "Tree view"], map_cols: ["عرض الأعمدة", "Columns view"], map_q: ["ابحث عن قسم…", "Find a section…"], map_n: ["{n} أقسام", "{n} sections"],
+  map_plans_go: ["أول درجتين مجانية، قارن الباقات", "First two steps free, compare plans"],
   map_plans_p: ["أول درجتين في كل مسار مجانية، والباقي بالاشتراك.", "The first two steps of every track are free; the rest comes with a plan."],
   map_owner_p: ["لوحة المالك والمستخدمين والبيانات.", "Owner dashboard, users and data."], map_desk_p: ["محفظتك وأدواتك الخاصة.", "Your portfolio and private tools."]
 });
@@ -158,8 +160,31 @@ function mapSection() {
     col("plans", t("nav_plans"), "plans", '<a class="org-plans" href="#plans">' + secIc("plans", 30) + "<span>" + esc(t("map_plans_p")) + "</span></a>"),
   ];
   if (owner) cols.push(col("owner", t("map_admin"), "owner", '<ul class="org-list">' + item("owner", "ow_h") + MAP_DESK.map(([k, l]) => item("desk", l, "", ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + '</ul><p class="org-note">🔒 ' + esc(t("map_admin_p")) + "</p>", "org-admin"));
-  return '<section class="sec org"><div class="org-root">' + LOGO + "<div><b>" + esc(t("map_root")) + "</b><span>" + esc(t("map_h")) + '</span></div></div><div class="org-stem" aria-hidden="true"></div><div class="org-cols" style="--n:' + cols.length + '">' + cols.join("") + "</div></section>";
+  const columns = '<div class="org-root">' + LOGO + "<div><b>" + esc(t("map_root")) + "</b><span>" + esc(t("map_h")) + '</span></div></div><div class="org-stem" aria-hidden="true"></div><div class="org-cols" style="--n:' + cols.length + '">' + cols.join("") + "</div>";
+  /* tree view: one trunk, a branch per group, the sections as pills */
+  const pill = (h, k, extra, ic) => '<a class="tr-pill" href="#' + h + '"' + (extra || "") + '><span class="tr-pi">' + (ic ? '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' + ic + "</svg>" : secIc(h, 15)) + "</span><span>" + esc(t(k)) + "</span></a>";
+  const grp = (ic, title, n, pills, cls) => '<div class="tr-grp' + (cls ? " " + cls : "") + '"><div class="tr-head">' + (cls ? "🔒" : secIc(ic, 17)) + "<b>" + esc(title) + "</b>" + (n ? '<small>' + esc(t("map_n").replace("{n}", n)) + "</small>" : "") + '</div><div class="tr-pills">' + pills + "</div></div>";
+  const tree = '<div class="tr"><span class="tr-trunk" aria-hidden="true"></span>' +
+    grp("tracks", t("nav_learn"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => pill(h, k)).join("")) +
+    grp("calc", t("nav_svc"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => pill(h, k)).join("")) +
+    grp("plans", t("nav_plans"), 0, pill("plans", "map_plans_go")) +
+    (owner ? grp("owner", t("map_admin"), 0, pill("owner", "ow_h") + MAP_DESK.map(([k, l]) => pill("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "tr-admin") : "") + "</div>";
+  const v = mapView();
+  const bar = '<div class="map-bar"><div class="map-sw" role="group" aria-label="' + esc(t("map_h")) + '"><button data-act="map-view" data-v="tree" aria-pressed="' + (v === "tree") + '">' + esc(t("map_tree")) + '</button><button data-act="map-view" data-v="cols" aria-pressed="' + (v === "cols") + '">' + esc(t("map_cols")) + '</button></div><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div>';
+  return '<section class="sec org"><div class="sec-head" style="align-self:stretch"><h2>' + esc(t("map_h")) + "</h2></div>" + bar + '<div class="map-v" data-v="tree"' + (v === "tree" ? "" : " hidden") + ">" + tree + '</div><div class="map-v map-vcols" data-v="cols"' + (v === "cols" ? "" : " hidden") + ">" + columns + "</div></section>";
 }
+const mapView = () => { try { return localStorage.getItem("meras.mapview") === "cols" ? "cols" : "tree"; } catch (e) { return "tree"; } };
+document.addEventListener("click", (e) => {
+  const b = e.target.closest && e.target.closest('[data-act="map-view"]'); if (!b) return;
+  try { localStorage.setItem("meras.mapview", b.dataset.v); } catch (err) {}
+  document.querySelectorAll(".map-v").forEach((x) => { x.hidden = x.dataset.v !== b.dataset.v; });
+  document.querySelectorAll('[data-act="map-view"]').forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+});
+document.addEventListener("input", (e) => {
+  if (e.target.id !== "map-q") return;
+  const q = shNorm ? shNorm(e.target.value) : e.target.value.trim().toLowerCase();
+  document.querySelectorAll(".org .tr-pill, .org .org-it").forEach((a) => { const hit = !q || (shNorm ? shNorm(a.textContent) : a.textContent.toLowerCase()).includes(q); a.classList.toggle("map-dim", !hit); a.classList.toggle("map-hit", !!q && hit); });
+});
 document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("[data-dktab]"); if (a && typeof dkTab !== "undefined") { dkTab = a.dataset.dktab; dkGrid = false; } });
 
 function pageGate() {
