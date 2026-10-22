@@ -661,9 +661,9 @@ p,li,dd{line-height:1.95}
 .clock{display:inline-flex;flex-direction:row;align-items:baseline;gap:1px;white-space:nowrap;direction:ltr;unicode-bidi:isolate;font-family:var(--mono);font-size:16px;color:var(--ink);padding:0 2px}
 [dir="rtl"] .clock{margin-left:36px}[dir="ltr"] .clock{margin-right:36px}
 .clock b{font-weight:700;font-variant-numeric:tabular-nums}
-.clock .sec{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.clock .csec{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
 .clock .ap{font-size:13px;font-weight:700;color:var(--amber-ink);margin-inline-start:4px;font-family:var(--body)}
-@media (max-width:560px){[dir="rtl"] .clock{margin-left:14px}[dir="ltr"] .clock{margin-right:14px}.clock{font-size:14px}.clock .sec{display:none}}
+@media (max-width:560px){[dir="rtl"] .clock{margin-left:14px}[dir="ltr"] .clock{margin-right:14px}.clock{font-size:14px}.clock .csec{display:none}}
 /* التوزيعات العالمية */
 .dg-table td{vertical-align:top}
 .dg-table tr.dg-on td{background:var(--sunk)}
@@ -805,7 +805,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .page-head p{margin-top:2px;font-size:14.5px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
   .page-head p.open{display:block}
 }
-@media (max-width:640px){.acct-owner{display:none}}
+.acct-owner{display:none!important}
 /* التنبيهات: نافذة تنسحب (من تحت في الجوال، ومن فوق في الشاشة العريضة) */
 #ntscrim{position:fixed;inset:0;z-index:62;background:rgba(20,26,40,.38);opacity:0;pointer-events:none;transition:opacity .25s}
 #ntscrim.on{pointer-events:auto}
@@ -888,6 +888,32 @@ body.nt-lock{overflow:hidden}
   .sc-tog small{color:var(--muted);font-size:12.5px}
   .sc-set:not(.open){display:none}
 }
+
+/* الهيدر: الساعة كانت تطوّله */
+.clock{line-height:1;align-items:center;align-self:center}
+/* مكتبي على الكمبيوتر: قائمة جانبية بالأيقونات */
+.dk-layout{display:block}
+.dk-side{display:none}
+@media (min-width:1000px){
+  .dk-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;align-items:start;padding-top:18px}
+  .dk-side{display:block;position:sticky;top:calc(80px + env(safe-area-inset-top,0px))}
+  .dk-side nav{display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px}
+  .dk-side a{position:relative;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;text-decoration:none;color:var(--ink)}
+  .dk-side a:hover{background:var(--sunk)}
+  .dk-side a[aria-current="page"]{background:var(--amber-soft)}
+  .dk-side a[aria-current="page"] .dk-si{background:var(--amber);color:var(--on-amber)}
+  .dk-si{flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--sunk);color:var(--muted)}
+  .dk-sl{display:flex;flex-direction:column;min-width:0;line-height:1.35}
+  .dk-sl b{font-size:15px}
+  .dk-sl small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dk-side .bell-n{position:static;margin-inline-start:auto}
+  .dk-main .dk-tabs{display:none}
+  .dk-main > .stack{padding-top:0!important}
+}
+@media (min-width:1000px){body:has(.dk-layout) .wrap{max-width:1320px}}
+.dg-desk.dg-table th,.dg-desk.dg-table td{padding-inline:9px}
+.dg-desk.dg-table .btn.sm{padding:3px 9px;font-size:13px}
+.dg-desk.dg-table table{font-size:15px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -4956,11 +4982,12 @@ Object.assign(UI, {
   dk_g_pf: ["فلوسك وصفقاتك", "Your money and trades"], dk_g_ch: ["تحليلاتك وخططك", "Your analyses and plans"], dk_g_sc: ["أسهم تطابق شروطك", "Stocks that match your rules"], dk_g_top: ["المرشحة 5 و6 من 6", "Scoring 5 or 6 of 6"],
   dk_g_tech: ["قراءات المؤشرات", "Indicator readings"], dk_g_dg: ["أمريكا والصين", "US and China"], dk_g_us: ["الأسهم والعملات والمعادن", "Stocks, FX and metals"], dk_g_op: ["دروس الخيارات", "Options lessons"]
 });
+function dkBadge(k) { try {
+  if (k === "top" && typeof topActive === "function" && TOP) { const n = topActive().length; return n ? String(n) : ""; }
+  if (k === "dg" && DG.data && DG.data.stocks) { const n = DG.data.stocks.filter(dgSoon).length; return n ? String(n) : ""; }
+} catch (e) {} return ""; }
 function dkGridHtml(tabs) {
-  const badge = (k) => { try {
-    if (k === "top" && typeof topActive === "function" && TOP) { const n = topActive().length; return n ? String(n) : ""; }
-    if (k === "dg" && DG.data && DG.data.stocks) { const n = DG.data.stocks.filter(dgSoon).length; return n ? String(n) : ""; }
-  } catch (e) {} return ""; };
+  const badge = dkBadge;
   return '<div class="dk-grid">' + tabs.map(([k, l]) => { const b = badge(k); return '<button class="dk-tile" data-act="dk-tab" data-tab="' + k + '"><span class="dk-ti">' + '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">' + (DK_IC[k] || "") + "</svg>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</span><b>" + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></button>"; }).join("") + "</div>";
 }
 function pageDesk() {
@@ -4972,7 +4999,8 @@ function pageDesk() {
   if (dkGrid && dkPhone()) return head + dkGridHtml(tabs) + "</div>";
   const cur = tabs.find(([k]) => k === dkTab) || tabs[0];
   const mbar = '<div class="dk-mbar"><button class="dk-mback" data-act="dk-grid"><span aria-hidden="true">›</span> ' + esc(t("dk_h")) + "</button><b>" + esc(t(cur[1])) + "</b></div>";
-  return head + mbar + '<div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
+  const side = '<aside class="dk-side"><nav aria-label="' + esc(t("dk_h")) + '">' + tabs.map(([k, l]) => { const b = dkBadge(k); return '<a href="#desk" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page"' : "") + '><span class="dk-si"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + (DK_IC[k] || "") + '</svg></span><span class="dk-sl"><b>' + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></span>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</a>"; }).join("") + "</nav></aside>";
+  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
 }
 
 function dkExport() {
@@ -5493,7 +5521,7 @@ function topClock() {
   const p = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Riyadh", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }).formatToParts(new Date());
   const g = (k) => (p.find((x) => x.type === k) || {}).value || "";
   const ap = g("dayPeriod").toUpperCase() === "AM" ? (S.lang === "ar" ? "ص" : "AM") : (S.lang === "ar" ? "م" : "PM");
-  el.innerHTML = '<b>' + g("hour") + ":" + g("minute") + '</b><span class="sec">:' + g("second") + '</span> <span class="ap">' + ap + "</span>";
+  el.innerHTML = '<b>' + g("hour") + ":" + g("minute") + '</b><span class="csec">:' + g("second") + '</span> <span class="ap">' + ap + "</span>";
   el.title = S.lang === "ar" ? "توقيت الرياض" : "Riyadh time";
 }
 setInterval(topClock, 1000);

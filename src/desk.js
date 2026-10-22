@@ -175,11 +175,12 @@ Object.assign(UI, {
   dk_g_pf: ["فلوسك وصفقاتك", "Your money and trades"], dk_g_ch: ["تحليلاتك وخططك", "Your analyses and plans"], dk_g_sc: ["أسهم تطابق شروطك", "Stocks that match your rules"], dk_g_top: ["المرشحة 5 و6 من 6", "Scoring 5 or 6 of 6"],
   dk_g_tech: ["قراءات المؤشرات", "Indicator readings"], dk_g_dg: ["أمريكا والصين", "US and China"], dk_g_us: ["الأسهم والعملات والمعادن", "Stocks, FX and metals"], dk_g_op: ["دروس الخيارات", "Options lessons"]
 });
+function dkBadge(k) { try {
+  if (k === "top" && typeof topActive === "function" && TOP) { const n = topActive().length; return n ? String(n) : ""; }
+  if (k === "dg" && DG.data && DG.data.stocks) { const n = DG.data.stocks.filter(dgSoon).length; return n ? String(n) : ""; }
+} catch (e) {} return ""; }
 function dkGridHtml(tabs) {
-  const badge = (k) => { try {
-    if (k === "top" && typeof topActive === "function" && TOP) { const n = topActive().length; return n ? String(n) : ""; }
-    if (k === "dg" && DG.data && DG.data.stocks) { const n = DG.data.stocks.filter(dgSoon).length; return n ? String(n) : ""; }
-  } catch (e) {} return ""; };
+  const badge = dkBadge;
   return '<div class="dk-grid">' + tabs.map(([k, l]) => { const b = badge(k); return '<button class="dk-tile" data-act="dk-tab" data-tab="' + k + '"><span class="dk-ti">' + '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">' + (DK_IC[k] || "") + "</svg>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</span><b>" + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></button>"; }).join("") + "</div>";
 }
 function pageDesk() {
@@ -191,7 +192,8 @@ function pageDesk() {
   if (dkGrid && dkPhone()) return head + dkGridHtml(tabs) + "</div>";
   const cur = tabs.find(([k]) => k === dkTab) || tabs[0];
   const mbar = '<div class="dk-mbar"><button class="dk-mback" data-act="dk-grid"><span aria-hidden="true">›</span> ' + esc(t("dk_h")) + "</button><b>" + esc(t(cur[1])) + "</b></div>";
-  return head + mbar + '<div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
+  const side = '<aside class="dk-side"><nav aria-label="' + esc(t("dk_h")) + '">' + tabs.map(([k, l]) => { const b = dkBadge(k); return '<a href="#desk" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page"' : "") + '><span class="dk-si"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + (DK_IC[k] || "") + '</svg></span><span class="dk-sl"><b>' + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></span>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</a>"; }).join("") + "</nav></aside>";
+  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
 }
 
 function dkExport() {

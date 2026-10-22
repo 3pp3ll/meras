@@ -44,7 +44,7 @@ function topClock() {
   const p = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Riyadh", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }).formatToParts(new Date());
   const g = (k) => (p.find((x) => x.type === k) || {}).value || "";
   const ap = g("dayPeriod").toUpperCase() === "AM" ? (S.lang === "ar" ? "ص" : "AM") : (S.lang === "ar" ? "م" : "PM");
-  el.innerHTML = '<b>' + g("hour") + ":" + g("minute") + '</b><span class="sec">:' + g("second") + '</span> <span class="ap">' + ap + "</span>";
+  el.innerHTML = '<b>' + g("hour") + ":" + g("minute") + '</b><span class="csec">:' + g("second") + '</span> <span class="ap">' + ap + "</span>";
   el.title = S.lang === "ar" ? "توقيت الرياض" : "Riyadh time";
 }
 setInterval(topClock, 1000);
