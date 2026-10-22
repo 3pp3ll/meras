@@ -247,8 +247,9 @@ function pageHome() {
 function levelBlock(tr, n) {
   const ls = lessonsOf(tr.id, n), name = L(LEVELS[tr.id][n - 1]);
   if (n > 2 && !(ls.length && unlocked())) return '<div class="level locked"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag">' + esc(ls.length ? t("locked") : t("soon")) + "</span></div></div>";
-  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : n > 2 ? t("paid") : t("free")) + '</span></div><ul class="lessons">' +
-    ls.map((l) => '<li><a href="#l-' + l.id + '"><span class="dot ' + (isDone(l.id) ? "done" : "") + '">' + (isDone(l.id) ? "✓" : "") + "</span><span>" + esc(L(l.title)) + '</span><span class="small muted" style="margin-inline-start:auto">' + l.mins + " " + esc(t("mins")) + "</span></a></li>").join("") + "</ul></div>";
+  const ORD = S.lang === "ar" ? ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن"] : ["1", "2", "3", "4", "5", "6", "7", "8"];
+  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : n > 2 ? t("paid") : t("free")) + '</span></div><div class="ls-grid">' +
+    ls.map((l, i) => { const d = isDone(l.id); return '<a class="ls-tile' + (d ? " done" : "") + '" href="#l-' + l.id + '"><span class="ls-ic" aria-hidden="true">' + (d ? "✓" : String(i + 1)) + '</span><b>' + esc((S.lang === "ar" ? "الدرس " : "Lesson ") + (ORD[i] || i + 1)) + "</b><span class=\"ls-t\">" + esc(L(l.title)) + '</span><small class="muted">' + l.mins + " " + esc(t("mins")) + "</small></a>"; }).join("") + "</div></div>";
 }
 
 function pageTracks() {

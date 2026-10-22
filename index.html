@@ -1144,6 +1144,16 @@ h1,h2,h3,.hero h1{font-weight:700}
 /* زر لوحة المالك في مكتبي */
 .owner-go{display:inline-flex;align-items:center;gap:6px;border-color:var(--amber);color:var(--amber-ink);text-decoration:none}
 .org .cds{width:100%}
+/* الدروس كأيقونات */
+.ls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.ls-tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px;border-radius:16px;background:var(--surface);border:1px solid var(--line);color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s,box-shadow .2s;min-width:0}
+.ls-tile:hover,.ls-tile:focus-visible{border-color:var(--amber);transform:translateY(-2px);box-shadow:0 10px 20px -14px rgba(20,26,40,.35)}
+.ls-ic{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:var(--amber-soft);color:var(--amber-ink);font-family:var(--mono);font-weight:700;font-size:18px;margin-bottom:4px}
+.ls-tile.done .ls-ic{background:var(--up-soft);color:var(--up)}
+.ls-tile b{font-size:15px}
+.ls-t{font-size:13px;color:var(--muted);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ls-tile small{font-size:12px}
+@media (max-width:560px){.ls-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2062,8 +2072,9 @@ function pageHome() {
 function levelBlock(tr, n) {
   const ls = lessonsOf(tr.id, n), name = L(LEVELS[tr.id][n - 1]);
   if (n > 2 && !(ls.length && unlocked())) return '<div class="level locked"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag">' + esc(ls.length ? t("locked") : t("soon")) + "</span></div></div>";
-  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : n > 2 ? t("paid") : t("free")) + '</span></div><ul class="lessons">' +
-    ls.map((l) => '<li><a href="#l-' + l.id + '"><span class="dot ' + (isDone(l.id) ? "done" : "") + '">' + (isDone(l.id) ? "✓" : "") + "</span><span>" + esc(L(l.title)) + '</span><span class="small muted" style="margin-inline-start:auto">' + l.mins + " " + esc(t("mins")) + "</span></a></li>").join("") + "</ul></div>";
+  const ORD = S.lang === "ar" ? ["الأول", "الثاني", "الثالث", "الرابع", "الخامس", "السادس", "السابع", "الثامن"] : ["1", "2", "3", "4", "5", "6", "7", "8"];
+  return '<div class="level"><div class="level-head"><b>' + n + "</b><h4>" + esc(name) + '</h4><span class="tag amber">' + esc(levelDone(tr.id, n) ? t("done") : n > 2 ? t("paid") : t("free")) + '</span></div><div class="ls-grid">' +
+    ls.map((l, i) => { const d = isDone(l.id); return '<a class="ls-tile' + (d ? " done" : "") + '" href="#l-' + l.id + '"><span class="ls-ic" aria-hidden="true">' + (d ? "✓" : String(i + 1)) + '</span><b>' + esc((S.lang === "ar" ? "الدرس " : "Lesson ") + (ORD[i] || i + 1)) + "</b><span class=\"ls-t\">" + esc(L(l.title)) + '</span><small class="muted">' + l.mins + " " + esc(t("mins")) + "</small></a>"; }).join("") + "</div></div>";
 }
 
 function pageTracks() {
