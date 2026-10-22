@@ -763,3 +763,25 @@ body.dg-lock{overflow:hidden}
 .dgm-nm{display:flex;align-items:baseline;gap:6px;min-width:0}
 .dgm-n{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .dgm-nm small{margin:0;flex:none}
+/* ثبّت التطبيق */
+#instbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:45;width:min(520px,calc(100vw - 24px));background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 32px rgba(20,26,40,.18);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+body.has-tabbar #instbar{bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+.in-row{display:flex;align-items:center;gap:10px}
+.in-row img{border-radius:11px;flex:none}
+.in-txt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.35}
+.in-txt b{font-size:15px}
+.in-txt span{font-size:12.5px;color:var(--muted)}
+.in-x{flex:none;border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;width:32px;height:32px;border-radius:8px;cursor:pointer}
+.in-x:hover{background:var(--sunk)}
+.in-ios{margin:0;font-size:13.5px;background:var(--sunk);border-radius:10px;padding:8px 10px}
+/* وضع التطبيق في الآيفون: نلوّن شريط الحالة فوق */
+body{padding-top:env(safe-area-inset-top,0px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--surface)}
+/* عنوان الصفحة على الجوال: سطر واحد، والوصف يفتح بالضغط */
+@media (max-width:640px){
+  .page-head{padding-block:14px 4px}
+  .page-head h1{font-size:25px;line-height:1.25}
+  .page-head .crumbs{font-size:13px}
+  .page-head p{margin-top:2px;font-size:14.5px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+  .page-head p.open{display:block}
+}

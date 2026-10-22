@@ -138,6 +138,42 @@ function tabbarSync(r) {
   bar.hidden = false; document.body.classList.add("has-tabbar");
 }
 
+/* ----- ثبّت مِراس على جوالك: أندرويد يفتح نافذة التثبيت، والآيفون نشرح له الخطوتين ----- */
+Object.assign(UI, {
+  in_h: ["ثبّت مِراس على جوالك", "Install Meras on your phone"], in_p: ["أيقونة في الشاشة الرئيسية، ويفتح كامل الشاشة مثل التطبيق.", "An icon on your home screen that opens full screen like an app."],
+  in_btn: ["ثبّت", "Install"], in_how: ["كيف؟", "How?"], in_close: ["مو الحين", "Not now"],
+  in_ios: ["من Safari: اضغط زر المشاركة <b>⬆︎</b> تحت، ثم اختر <b>«إضافة إلى الشاشة الرئيسية»</b>، ثم <b>«إضافة»</b>.", "In Safari: tap the Share button <b>⬆︎</b>, choose <b>Add to Home Screen</b>, then <b>Add</b>."],
+  in_ios_other: ["افتح الرابط في Safari أول، لأن الآيفون يثبّت من Safari بس.", "Open the link in Safari first; iPhone installs from Safari only."],
+  in_done: ["تم التثبيت، تلقاه في الشاشة الرئيسية", "Installed. Find it on your home screen"]
+});
+let INST_EVT = null, instHow = false;
+const instStandalone = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+const instIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const instSafari = () => instIOS() && !/crios|fxios|edgios|gsa\//i.test(navigator.userAgent);
+const instSnoozed = () => { try { const v = +localStorage.getItem("meras.inst") || 0; return Date.now() - v < 21 * 864e5; } catch (e) { return false; } };
+function instBar() {
+  let el = document.getElementById("instbar");
+  const want = !instStandalone() && !instSnoozed() && (INST_EVT || instIOS()) && !(typeof lnShow === "function" && lnShow());
+  if (!want) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement("div"); el.id = "instbar"; el.setAttribute("role", "region"); el.setAttribute("aria-label", t("in_h")); document.body.appendChild(el); }
+  el.dir = S.lang === "ar" ? "rtl" : "ltr";
+  const ios = !INST_EVT && instIOS();
+  el.innerHTML = '<div class="in-row"><img src="icons/icon-192.png" alt="" width="44" height="44"><div class="in-txt"><b>' + esc(t("in_h")) + "</b><span>" + esc(t("in_p")) + '</span></div><button class="btn sm primary" data-act="in-go">' + esc(t(ios ? "in_how" : "in_btn")) + '</button><button class="in-x" data-act="in-close" aria-label="' + esc(t("in_close")) + '">×</button></div>' +
+    (ios && instHow ? '<p class="in-ios">' + (instSafari() ? t("in_ios") : esc(t("in_ios_other"))) + "</p>" : "");
+}
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); INST_EVT = e; setTimeout(instBar, 2500); });
+window.addEventListener("appinstalled", () => { INST_EVT = null; const el = document.getElementById("instbar"); if (el) el.remove(); toast(t("in_done")); });
+document.addEventListener("click", async (e) => {
+  const el = e.target.closest && e.target.closest('[data-act^="in-"]'); if (!el) return;
+  if (el.dataset.act === "in-close") { try { localStorage.setItem("meras.inst", String(Date.now())); } catch (err) {} const b = document.getElementById("instbar"); if (b) b.remove(); return; }
+  if (INST_EVT) { const ev = INST_EVT; INST_EVT = null; ev.prompt(); try { const r = await ev.userChoice; if (r && r.outcome !== "accepted") { try { localStorage.setItem("meras.inst", String(Date.now())); } catch (err) {} } } catch (err) {} instBar(); }
+  else { instHow = !instHow; instBar(); }
+});
+window.addEventListener("hashchange", () => setTimeout(instBar, 50));
+setTimeout(instBar, 4000);
+
+document.addEventListener("click", (e) => { const p = e.target.closest && e.target.closest(".page-head > p"); if (p && window.matchMedia("(max-width:640px)").matches) p.classList.toggle("open"); });
+
 /* ----- back to top ----- */
 (function () {
   const b = document.createElement("button");
