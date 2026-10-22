@@ -27,6 +27,7 @@ Object.assign(UI, {
   st_rsi: ["نزول RSI 14 تحت 30: صار {n} مرة، وبعد 5 شموع كان السعر أعلى في {k} منها ({p}%).", "RSI 14 dropping below 30: happened {n} time(s); 5 candles later price was higher in {k} of them ({p}%)."],
   st_none_cross: ["تقاطع متوسط 5 فوق متوسط 20: ما صار في هذي الشموع.", "5 average crossing above the 20: did not occur in these candles."],
   st_none_rsi: ["نزول RSI 14 تحت 30: ما صار في هذي الشموع.", "RSI 14 dropping below 30: did not occur in these candles."],
+  st_tiny: ["(أقل من 5 مرات: النسبة غير موثوقة)", "(fewer than 5 times: the percentage is unreliable)"],
   st_small: ["العينة صغيرة، فالنسبة ما يعتمد عليها. وأداء الإشارة في الماضي ما يضمن أداءها بعدين.", "The sample is small, so the percentage is not dependable. A signal's past record does not guarantee its future one."],
   st_caveat: ["هذا عدّ لما صار في هذي الشموع فقط. أداء الإشارة في الماضي ما يضمن أداءها بعدين.", "This counts only what happened in these candles. A signal's past record does not guarantee its future one."]
 });
@@ -42,7 +43,7 @@ function signalStats(data, end) {
   return { cross, low };
 }
 function statsLines(st) {
-  const one = (x, k, none) => (x.n ? t(k).replace("{n}", x.n).replace("{k}", x.k).replace("{p}", Math.round((x.k / x.n) * 100)) : t(none));
+  const one = (x, k, none) => (x.n ? t(k).replace("{n}", x.n).replace("{k}", x.k).replace("{p}", Math.round((x.k / x.n) * 100)) + (x.n < 5 ? " " + t("st_tiny") : "") : t(none));
   return [one(st.cross, "st_cross", "st_none_cross"), one(st.low, "st_rsi", "st_none_rsi"), t(st.cross.n + st.low.n < 8 ? "st_small" : "st_caveat")];
 }
 

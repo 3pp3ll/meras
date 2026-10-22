@@ -20,6 +20,9 @@ Object.assign(UI, {
   ],
   fb_auto: ["حلّل تلقائياً لما توصل أسعار جديدة", "Analyse automatically when new prices arrive"],
   fb_auto_note: ["يشتغل لما تفتح الشارت على سهم حقيقي وفيه شمعة جديدة. شرح الذكاء الاصطناعي ينطلب مرة وحدة لكل شمعة جديدة وينحفظ.", "Runs when you open the chart on a real share that has a new candle. The AI explanation is requested once per new candle and saved."],
+  fb_open: ["تنبيه: نهاية الحركة ({p}) كانت قبل {n} شمعة فقط، فلسه ما تأكدت. لو تجاوزها السعر، تتغير كل المستويات وتحتاج تحليل من جديد.", "Note: the end of the move ({p}) was only {n} candle(s) ago, so it is not confirmed. If price goes past it, every level changes and needs a fresh analysis."],
+  fb_mine: ["خط رسمته", "your line"],
+  fb_conf_note: ["التلاقي مع متوسط أو بولنجر تأكيد مستقل. التلاقي مع خط رسمته أنت يعكس قراءتك، فوزنه أقل.", "Confluence with an average or Bollinger is independent confirmation. Confluence with a line you drew reflects your own reading, so it weighs less."],
   fb_cached: ["من تحليل محفوظ", "From a saved analysis"],
   fb_q: ["اشرح مستويات فيبوناتشي المرسومة على هذا الشارت: وش معنى كل مستوى، وأي مستوى السعر قريب منه الحين، وكيف تتفق أو تختلف مع المؤشرات الثانية المفعّلة.", "Explain the Fibonacci levels drawn on this chart: what each level means, which level price is near now, and how they agree or disagree with the other active indicators."]
 });
@@ -56,19 +59,21 @@ function fibSection() {
   const day = (i) => (CH.data[i] && CH.data[i].d) || t("ch_day") + " " + (i + 1);
   const head = t(up ? "fb_p_up" : "fb_p_down").replace("{a}", f.p1.toFixed(2)).replace("{da}", day(f.i1)).replace("{b}", f.p2.toFixed(2)).replace("{db}", day(f.i2));
   const rows = rs.slice().sort((a, b) => price(b) - price(a)).map((r) => {
-    const p = price(r), d = ((c - p) / p) * 100, st = Math.abs(d) < 0.3 ? t("fb_at") : t(d > 0 ? "fb_above" : "fb_below").replace("{p}", Math.abs(d).toFixed(1));
+    const p = price(r), d = ((c - p) / c) * 100, st = Math.abs(d) < 0.3 ? t("fb_at") : t(d > 0 ? "fb_above" : "fb_below").replace("{p}", Math.abs(d).toFixed(1));
     return '<tr class="' + (r < 0 ? "ext" : r === 0.5 || r === 0.618 ? "key" : "") + '"><td class="num"><b>' + fibLabel(r) + '</b></td><td class="num">' + p.toFixed(2) + '</td><td class="small">' + esc(st) + '</td><td class="note">' + esc(L(FIB_MEAN[String(r)])) + "</td></tr>";
   }).join("");
   /* confluence: fibonacci levels within 1% of an indicator value or a drawn line */
   const refs = [], li = CH.e - 1;
   CH.lines.forEach((ln) => { if (ln.v[li] != null) refs.push([ln.name, ln.v[li]]); });
   if (CH.bb && CH.bb.up[li] != null) { refs.push([t("ch_bb") + " " + t("ch_up"), CH.bb.up[li]]); refs.push([t("ch_bb") + " " + t("ch_low"), CH.bb.lo[li]]); }
-  list.filter((d) => d.t === "h").forEach((d) => refs.push([t("ch_h_lbl") + " " + d.p.toFixed(2), d.p]));
+  list.filter((d) => d.t === "h").forEach((d) => refs.push([t("ch_h_lbl") + " " + d.p.toFixed(2) + " (" + t("fb_mine") + ")", d.p, 1]));
   const conf = [];
-  rs.forEach((r) => refs.forEach(([n, v]) => { const p = price(r), dd = Math.abs(p - v) / p * 100; if (dd < 1) conf.push(t("fb_conf").replace("{l}", fibLabel(r)).replace("{p}", p.toFixed(2)).replace("{n}", n).replace("{v}", v.toFixed(2)).replace("{d}", dd.toFixed(2))); }));
+  rs.forEach((r) => refs.forEach(([n, v, mine]) => { const p = price(r), dd = Math.abs(p - v) / p * 100; if (dd < 1) conf.push([mine ? 1 : 0, dd, t("fb_conf").replace("{l}", fibLabel(r)).replace("{p}", p.toFixed(2)).replace("{n}", n).replace("{v}", v.toFixed(2)).replace("{d}", dd.toFixed(2))]); }));
+  conf.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const ago = CH.e - 1 - f.i2, open = ago <= 2 ? '<p class="small neg">' + esc(t("fb_open").replace("{p}", f.p2.toFixed(2)).replace("{n}", ago)) + "</p>" : "";
   return '<div class="fibbox stack"><h3>' + esc(t("fb_h")) + '</h3><p class="small">' + esc(head) + '</p><div class="tablewrap"><table class="fibtbl"><thead><tr><th>' + esc(t("fb_lvl")) + "</th><th>" + esc(t("fb_px")) + "</th><th>" + esc(t("fb_now")) + "</th><th>" + esc(t("fb_mean")) + "</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
-    (f.ext ? '<p class="small muted">' + esc(t("fb_ext_note")) + "</p>" : "") +
-    '<div class="stack" style="gap:8px"><b>' + esc(t("fb_conf_h")) + '</b><p class="small muted">' + esc(t("fb_conf_p")) + "</p>" + (conf.length ? conf.slice(0, 5).map((x) => '<p class="conf">' + esc(x) + "</p>").join("") : '<p class="small">' + esc(t("fb_conf_none")) + "</p>") + "<ul class=\"small\" style=\"margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px\">" + UI.fb_cmp.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul></div></div>";
+    open + (f.ext ? '<p class="small muted">' + esc(t("fb_ext_note")) + "</p>" : "") +
+    '<div class="stack" style="gap:8px"><b>' + esc(t("fb_conf_h")) + '</b><p class="small muted">' + esc(t("fb_conf_p")) + "</p>" + (conf.length ? conf.slice(0, 5).map((x) => '<p class="conf' + (x[0] ? " mine" : "") + '">' + esc(x[2]) + "</p>").join("") + (conf.some((x) => x[0]) ? '<p class="small muted">' + esc(t("fb_conf_note")) + "</p>" : "") : '<p class="small">' + esc(t("fb_conf_none")) + "</p>") + "<ul class=\"small\" style=\"margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px\">" + UI.fb_cmp.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul></div></div>";
 }
 
 /* ----- analysis: draw the auto fib, open the reading, ask the model once per candle ----- */

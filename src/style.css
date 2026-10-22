@@ -385,7 +385,7 @@ td .num,td.num{font-size:15px}
 .fibtbl td.note{white-space:normal;min-width:220px}
 .fibtbl tr.key td{background:var(--amber-soft)}
 .fibtbl tr.ext td:first-child b{color:var(--ind3)}
-.conf{background:var(--up-soft);border-radius:8px;padding:8px 12px;font-size:16px}
+.conf{background:var(--up-soft);border-radius:8px;padding:8px 12px;font-size:16px}.conf.mine{background:var(--sunk);color:var(--muted)}
 /* dividends */
 .dv-star{border:0;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:var(--amber);padding:2px 4px}
 .dv-table tr.dv-soon td{background:var(--amber-soft)}

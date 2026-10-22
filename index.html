@@ -405,7 +405,7 @@ td .num,td.num{font-size:15px}
 .fibtbl td.note{white-space:normal;min-width:220px}
 .fibtbl tr.key td{background:var(--amber-soft)}
 .fibtbl tr.ext td:first-child b{color:var(--ind3)}
-.conf{background:var(--up-soft);border-radius:8px;padding:8px 12px;font-size:16px}
+.conf{background:var(--up-soft);border-radius:8px;padding:8px 12px;font-size:16px}.conf.mine{background:var(--sunk);color:var(--muted)}
 /* dividends */
 .dv-star{border:0;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:var(--amber);padding:2px 4px}
 .dv-table tr.dv-soon td{background:var(--amber-soft)}
@@ -1971,10 +1971,47 @@ Object.assign(UI, {
   rd_vol_hi: ["متوسط حجم آخر 5 شموع أعلى من متوسط العشرين اللي قبلها بـ {p}%: الحركة الأخيرة معها مشاركة.", "Average volume of the last 5 candles is {p}% above the 20 before them: the latest move has participation."],
   rd_vol_lo: ["متوسط حجم آخر 5 شموع أقل من متوسط العشرين اللي قبلها بـ {p}%: الحركة الأخيرة بمشاركة ضعيفة.", "Average volume of the last 5 candles is {p}% below the 20 before them: the latest move has weak participation."],
   rd_vol_same: ["حجم آخر 5 شموع قريب من المعتاد.", "Volume over the last 5 candles is close to normal."],
+  rd_verdict: ["الصورة العامة", "Overall picture"],
+  rd_v_pos: ["إيجابية: {k} من {n} إشارات في صالح الصعود. هذا وصف لما يظهر في الشارت، وليس توصية.", "Positive: {k} of {n} signals favour the upside. This describes the chart; it is not a recommendation."],
+  rd_v_neg: ["سلبية: {k} من {n} إشارات في صالح النزول. هذا وصف لما يظهر في الشارت، وليس توصية.", "Negative: {k} of {n} signals favour the downside. This describes the chart; it is not a recommendation."],
+  rd_v_mix: ["مختلطة: {k} من {n} إشارات إيجابية والباقي سلبية. الإشارات ما تتفق، فالحذر أولى. هذا وصف وليس توصية.", "Mixed: {k} of {n} signals are positive and the rest negative. They disagree, so caution comes first. This is a description, not a recommendation."],
+  rd_v_list: ["في صالحه: {a}. ضده: {b}.", "For: {a}. Against: {b}."],
+  rd_sg_m20: ["السعر فوق متوسط 20", "price above the 20 average"], rd_sg_m20n: ["السعر تحت متوسط 20", "price below the 20 average"],
+  rd_sg_m50: ["السعر فوق متوسط 50", "price above the 50 average"], rd_sg_m50n: ["السعر تحت متوسط 50", "price below the 50 average"],
+  rd_sg_ord: ["متوسط 20 فوق متوسط 50", "20 average above the 50"], rd_sg_ordn: ["متوسط 20 تحت متوسط 50", "20 average below the 50"],
+  rd_sg_macd: ["الماكد فوق خط الإشارة", "MACD above its signal"], rd_sg_macdn: ["الماكد تحت خط الإشارة", "MACD below its signal"],
+  rd_sg_rsi: ["RSI فوق 50", "RSI above 50"], rd_sg_rsin: ["RSI تحت 50", "RSI below 50"],
+  rd_sg_trend: ["الاتجاه صاعد", "uptrend"], rd_sg_trendn: ["الاتجاه هابط", "downtrend"],
+  rd_bounce: ["لكن من القاع {v} ({d}) ارتفع السعر {p}%، فالحركة الأخيرة ارتداد صاعد داخل المسار.", "But from the low {v} ({d}) price has risen {p}%, so the latest move is a rebound within the range."],
+  rd_slide: ["لكن من القمة {v} ({d}) نزل السعر {p}%، فالحركة الأخيرة تراجع داخل المسار.", "But from the high {v} ({d}) price has fallen {p}%, so the latest move is a pullback within the range."],
+  rd_m50_above: ["الإغلاق فوق متوسط 50 ({m}) بنسبة {p}%: الاتجاه المتوسط إيجابي.", "The close is {p}% above the 50 average ({m}): the medium-term trend is positive."],
+  rd_m50_below: ["الإغلاق تحت متوسط 50 ({m}) بنسبة {p}%: الاتجاه المتوسط ما زال سلبي، ومتوسط 50 يشتغل كمقاومة.", "The close is {p}% below the 50 average ({m}): the medium-term trend is still negative, and the 50 average acts as resistance."],
+  rd_ord_up: ["متوسط 20 ({a}) فوق متوسط 50 ({b}): ترتيب إيجابي.", "The 20 average ({a}) is above the 50 ({b}): a positive order."],
+  rd_ord_down: ["متوسط 20 ({a}) تحت متوسط 50 ({b}): ترتيب سلبي.", "The 20 average ({a}) is below the 50 ({b}): a negative order."],
+  rd_cross_fade_up: ["لكن الإغلاق رجع تحت متوسط 20، فإشارة التقاطع تضعف.", "But the close is back below the 20 average, so the crossover is weakening."],
+  rd_cross_fade_down: ["لكن الإغلاق رجع فوق متوسط 20، فإشارة التقاطع تضعف وممكن تنعكس.", "But the close is back above the 20 average, so the crossover is weakening and may reverse."],
+  rd_macd_pa: ["الماكد موجب ({m}) وفوق خط الإشارة ({g}): زخم صاعد.", "MACD is positive ({m}) and above its signal ({g}): upward momentum."],
+  rd_macd_pb: ["الماكد موجب ({m}) لكنه تحت خط الإشارة ({g}): الصعود يفقد زخمه.", "MACD is positive ({m}) but below its signal ({g}): the rise is losing momentum."],
+  rd_macd_na: ["الماكد سالب ({m}) لكنه فوق خط الإشارة ({g}): زخم يتحسن من منطقة ضعيفة.", "MACD is negative ({m}) but above its signal ({g}): momentum is improving from a weak area."],
+  rd_macd_nb: ["الماكد سالب ({m}) وتحت خط الإشارة ({g}): زخم هابط.", "MACD is negative ({m}) and below its signal ({g}): downward momentum."],
+  rd_candle: ["آخر شمعة", "Last candle"],
+  rd_c_reject: ["شمعة رفض: افتتحت عند {o} قريب من المقاومة {v} وأغلقت {c} بنزول {p}%. البائعون ردّوا السعر من المقاومة.", "Rejection candle: opened at {o} near resistance {v} and closed at {c}, down {p}%. Sellers pushed price back from resistance."],
+  rd_c_wick_up: ["ذيل علوي طويل: السعر وصل {h} ورجع يغلق {c}. البائعون ظهروا في الأعلى.", "Long upper wick: price reached {h} and closed back at {c}. Sellers showed up at the top."],
+  rd_c_wick_dn: ["ذيل سفلي طويل: السعر نزل إلى {l} ورجع يغلق {c}. المشترون ظهروا في الأسفل.", "Long lower wick: price dropped to {l} and closed back at {c}. Buyers showed up at the bottom."],
+  rd_c_test: ["أغلقت {c} بارتفاع {p}% قريب من أعلاها، وتختبر المقاومة {v} (الفرق {d}%). الاختراق يحتاج إغلاق فوقها.", "Closed at {c}, up {p}%, near its high, testing resistance {v} ({d}% away). A breakout needs a close above it."],
+  rd_c_big_up: ["شمعة صاعدة قوية: ارتفعت {p}% من افتتاحها وأغلقت قريب من أعلاها.", "Strong up candle: rose {p}% from its open and closed near its high."],
+  rd_c_big_dn: ["شمعة هابطة قوية: نزلت {p}% من افتتاحها وأغلقت قريب من أدناها.", "Strong down candle: fell {p}% from its open and closed near its low."],
+  rd_c_plain: ["شمعة عادية بتغير {p}%، ما فيها إشارة واضحة.", "An ordinary candle with a {p}% change and no clear signal."],
+  rd_src_sw: ["قاع سابق لمسه السعر {n} مرة", "a prior low touched {n} time(s)"], rd_src_swh: ["قمة سابقة لمسها السعر {n} مرة", "a prior high touched {n} time(s)"],
+  rd_src_m20: ["متوسط أسي 20", "20 EMA"], rd_src_m50: ["متوسط بسيط 50", "50 SMA"], rd_src_line: ["خط أفقي رسمته", "a horizontal line you drew"], rd_src_fib: ["فيبوناتشي {l}", "Fibonacci {l}"],
+  rd_sup2: ["أقرب دعم: {v} ({s})، تحت السعر بـ {d}%.", "Nearest support: {v} ({s}), {d}% below price."],
+  rd_res2: ["أقرب مقاومة: {v} ({s})، فوق السعر بـ {d}%.", "Nearest resistance: {v} ({s}), {d}% above price."],
+  rd_sup_far: ["دعم سعري أقوى أبعد: {v} (قاع لمسه السعر {n} مرة)، تحت السعر بـ {d}%.", "A stronger price support further down: {v} (a low touched {n} time(s)), {d}% below price."],
+  rd_res_far: ["مقاومة سعرية أقوى أبعد: {v} (قمة لمسها السعر {n} مرة)، فوق السعر بـ {d}%.", "A stronger price resistance further up: {v} (a high touched {n} time(s)), {d}% above price."],
   rd_sup: ["أقرب دعم تحت السعر: {v} (لمسه السعر {n} مرة).", "Nearest support below price: {v} (touched {n} time(s))."],
   rd_res: ["أقرب مقاومة فوق السعر: {v} (لمسها السعر {n} مرة).", "Nearest resistance above price: {v} (touched {n} time(s))."],
-  rd_no_sup: ["ما فيه قاع واضح تحت السعر في الشموع الظاهرة.", "No clear low below price in the candles shown."],
-  rd_no_res: ["السعر عند أعلى مستوياته في الشموع الظاهرة، فما فيه مقاومة فوقه هنا.", "Price is at its highest in the candles shown, so there is no resistance above it here."],
+  rd_no_sup: ["ما فيه قاع واضح أو متوسط أو خط مرسوم تحت السعر في الشموع الظاهرة.", "No clear low below price in the candles shown."],
+  rd_no_res: ["السعر عند أعلى مستوياته في الشموع الظاهرة، وما فيه متوسط أو خط مرسوم فوقه، فالمقاومة القادمة غير محددة هنا.", "Price is at its highest in the candles shown and no average or drawn line sits above it, so the next resistance is not defined here."],
   rd_try_up: ["ارسم خط اتجاه يوصل آخر قاعين صاعدين. شغّل متوسط 20 وشوف كيف السعر يرتد منه. RSI يبقى مرتفع طويلاً في الاتجاه الصاعد، فلا تعتمد عليه هنا.", "Draw a trend line through the last two rising lows. Switch on the 20 average and watch price bounce from it. RSI stays high for long in an uptrend, so do not lean on it here."],
   rd_try_down: ["ارسم خط اتجاه يوصل آخر قمتين هابطتين. شغّل متوسط 20 وراقب هل السعر يرجع فوقه. الشراء ضد الاتجاه أصعب تمرين للمبتدئ.", "Draw a trend line through the last two falling highs. Switch on the 20 average and watch whether price reclaims it. Buying against the trend is the hardest exercise for a beginner."],
   rd_try_range: ["ارسم خط أفقي عند الدعم وخط عند المقاومة. شغّل RSI 14 وشوف قراءته كل مرة يلمس السعر أحد الخطين. تقاطعات المتوسطات تفشل كثير في العرضي.", "Draw one horizontal line at support and one at resistance. Switch on RSI 14 and read it each time price touches a line. Average crossovers fail often in a range."],
@@ -2064,32 +2101,90 @@ function analyze(data, s, e) {
   const net = cl[last] - cl[s], eff = path ? Math.abs(net) / path : 0, pct = Math.abs((net / cl[s]) * 100).toFixed(1);
   const regime = eff >= 0.3 ? (net > 0 ? "up" : "down") : "range";
   const out = { regime, items: [], auto: [] }, f = (v) => v.toFixed(2), fill = (k, o) => t(k).replace(/\{(\w+)\}/g, (_, x) => o[x]);
-  out.items.push(["rd_trend", [fill("rd_" + regime, { p: pct }), t(hh && hl ? "rd_hh" : lh && ll ? "rd_ll" : "rd_mixed")]]);
+  const day = (i) => (data[i] && data[i].d) || t("ch_day") + " " + (i + 1), pc = (x) => Math.abs(x).toFixed(1);
+  const trend = [fill("rd_" + regime, { p: pct }), t(hh && hl ? "rd_hh" : lh && ll ? "rd_ll" : "rd_mixed")];
+  if (regime === "range") {
+    let lo = s, hi = s; for (let i = s; i < e; i++) { if (data[i].l < data[lo].l) lo = i; if (data[i].h > data[hi].h) hi = i; }
+    const up = ((c - data[lo].l) / data[lo].l) * 100, dn = ((data[hi].h - c) / data[hi].h) * 100;
+    if (lo > hi && up >= 5) trend.push(fill("rd_bounce", { v: f(data[lo].l), d: day(lo), p: pc(up) }));
+    else if (hi > lo && dn >= 5) trend.push(fill("rd_slide", { v: f(data[hi].h), d: day(hi), p: pc(dn) }));
+  }
+  /* signals for the overall picture: [positive?, key] */
+  const m50 = sma(cl, 50), e20 = ema(cl, 20), md = macd(cl, 12, 26, 9), sig = [];
   const ma = [];
-  if (m20[last] != null) ma.push(fill(c >= m20[last] ? "rd_ma_above" : "rd_ma_below", { c: f(c), m: f(m20[last]), p: Math.abs(((c - m20[last]) / m20[last]) * 100).toFixed(1) }));
+  if (m20[last] != null) { ma.push(fill(c >= m20[last] ? "rd_ma_above" : "rd_ma_below", { c: f(c), m: f(m20[last]), p: Math.abs(((c - m20[last]) / m20[last]) * 100).toFixed(1) })); sig.push([c >= m20[last], "m20"]); }
+  if (m50[last] != null) {
+    ma.push(fill(c >= m50[last] ? "rd_m50_above" : "rd_m50_below", { m: f(m50[last]), p: pc(((c - m50[last]) / m50[last]) * 100) })); sig.push([c >= m50[last], "m50"]);
+    if (e20[last] != null) { ma.push(fill(e20[last] >= m50[last] ? "rd_ord_up" : "rd_ord_down", { a: f(e20[last]), b: f(m50[last]) })); sig.push([e20[last] >= m50[last], "ord"]); }
+  }
   for (let i = last; i > Math.max(s, last - 15); i--) {
     if (m5[i] == null || m20[i] == null || m5[i - 1] == null || m20[i - 1] == null) break;
     const now = m5[i] - m20[i], was = m5[i - 1] - m20[i - 1];
-    if (now > 0 && was <= 0) { ma.push(fill("rd_cross_up", { n: last - i })); break; }
-    if (now < 0 && was >= 0) { ma.push(fill("rd_cross_down", { n: last - i })); break; }
+    if (now > 0 && was <= 0) { ma.push(fill("rd_cross_up", { n: last - i })); if (c < m20[last]) ma.push(t("rd_cross_fade_up")); break; }
+    if (now < 0 && was >= 0) { ma.push(fill("rd_cross_down", { n: last - i })); if (c > m20[last]) ma.push(t("rd_cross_fade_down")); break; }
   }
+  const mom = [];
+  if (r14[last] != null) { mom.push(fill(r14[last] > 70 ? "rd_rsi_hi" : r14[last] < 30 ? "rd_rsi_lo" : "rd_rsi_mid", { v: r14[last].toFixed(1) })); sig.push([r14[last] >= 50, "rsi"]); }
+  if (md.line[last] != null && md.sig[last] != null) {
+    const ml = md.line[last], sg = md.sig[last];
+    mom.push(fill(ml >= 0 ? (ml >= sg ? "rd_macd_pa" : "rd_macd_pb") : ml >= sg ? "rd_macd_na" : "rd_macd_nb", { m: f(ml), g: f(sg) })); sig.push([ml >= sg, "macd"]);
+  }
+  if (regime !== "range") sig.push([regime === "up", "trend"]);
+  /* overall picture first */
+  const k = sig.filter((x) => x[0]).length, nn = sig.length;
+  if (nn >= 3) {
+    const name = (x) => t("rd_sg_" + x[1] + (x[0] ? "" : "n"));
+    out.items.push(["rd_verdict", [fill(k / nn >= 0.7 ? "rd_v_pos" : k / nn <= 0.3 ? "rd_v_neg" : "rd_v_mix", { k: k / nn <= 0.3 ? nn - k : k, n: nn }),
+      fill("rd_v_list", { a: sig.filter((x) => x[0]).map(name).join("، ") || "–", b: sig.filter((x) => !x[0]).map(name).join("، ") || "–" })]]);
+  }
+  out.items.push(["rd_trend", trend]);
   if (ma.length) out.items.push(["rd_ma", ma]);
-  if (r14[last] != null) out.items.push(["rd_mom", [fill(r14[last] > 70 ? "rd_rsi_hi" : r14[last] < 30 ? "rd_rsi_lo" : "rd_rsi_mid", { v: r14[last].toFixed(1) })]]);
+  if (mom.length) out.items.push(["rd_mom", mom]);
   if (n >= 25) {
     const avg = (a, b) => { let x = 0; for (let i = a; i < b; i++) x += data[i].v || 0; return x / (b - a); };
     const recent = avg(e - 5, e), base = avg(e - 25, e - 5), d = base ? ((recent - base) / base) * 100 : 0;
     if (base) out.items.push(["rd_volume", [d > 15 ? fill("rd_vol_hi", { p: d.toFixed(0) }) : d < -15 ? fill("rd_vol_lo", { p: Math.abs(d).toFixed(0) }) : t("rd_vol_same")]]);
   }
+  /* levels: prior swings, the 20 EMA and 50 SMA, the user's horizontal lines and the drawn Fibonacci levels */
   const touches = (list, p) => list.filter((x) => Math.abs(x.p - p) / p <= 0.012).length;
   const below = sw.lo.filter((x) => x.p < c).sort((a, b) => b.p - a.p)[0], above = sw.hi.filter((x) => x.p > c).sort((a, b) => a.p - b.p)[0];
-  out.items.push(["rd_levels", [below ? fill("rd_sup", { v: f(below.p), n: touches(sw.lo, below.p) }) : t("rd_no_sup"), above ? fill("rd_res", { v: f(above.p), n: touches(sw.hi, above.p) }) : t("rd_no_res")]]);
+  const cand = [];
+  sw.lo.forEach((x) => cand.push({ p: x.p, s: fill("rd_src_sw", { n: touches(sw.lo, x.p) }), sw: 1 }));
+  sw.hi.forEach((x) => cand.push({ p: x.p, s: fill("rd_src_swh", { n: touches(sw.hi, x.p) }), sw: 1 }));
+  if (e20[last] != null) cand.push({ p: e20[last], s: t("rd_src_m20") });
+  if (m50[last] != null) cand.push({ p: m50[last], s: t("rd_src_m50") });
+  const draws = (typeof S !== "undefined" && S.drawings && typeof chartCfg === "function" && S.drawings[chartCfg().sym]) || [];
+  draws.filter((d) => d.t === "h" && !d.auto).forEach((d) => cand.push({ p: d.p, s: t("rd_src_line") }));
+  const fb = draws.filter((d) => d.t === "f").slice(-1)[0];
+  if (fb && typeof FIB_R !== "undefined") FIB_R.forEach((r) => cand.push({ p: fb.p2 - (fb.p2 - fb.p1) * r, s: fill("rd_src_fib", { l: fibLabel(r) }) }));
+  const dist = (p) => Math.abs(((p - c) / c) * 100), near = (x) => dist(x.p) >= 0.15;
+  const sup = cand.filter((x) => x.p < c && near(x)).sort((a, b) => b.p - a.p)[0], res = cand.filter((x) => x.p > c && near(x)).sort((a, b) => a.p - b.p)[0];
+  const lv = [];
+  lv.push(sup ? fill("rd_sup2", { v: f(sup.p), s: sup.s, d: dist(sup.p).toFixed(1) }) : t("rd_no_sup"));
+  if (below && sup && !sup.sw && touches(sw.lo, below.p) >= 2) lv.push(fill("rd_sup_far", { v: f(below.p), n: touches(sw.lo, below.p), d: dist(below.p).toFixed(1) }));
+  lv.push(res ? fill("rd_res2", { v: f(res.p), s: res.s, d: dist(res.p).toFixed(1) }) : t("rd_no_res"));
+  if (above && res && !res.sw && touches(sw.hi, above.p) >= 2) lv.push(fill("rd_res_far", { v: f(above.p), n: touches(sw.hi, above.p), d: dist(above.p).toFixed(1) }));
+  out.items.push(["rd_levels", lv]);
+  /* the last candle, read against the nearest resistance and support */
+  const LC = data[last], rg = LC.h - LC.l, body = Math.abs(LC.c - LC.o), chg = last > 0 ? ((LC.c - cl[last - 1]) / cl[last - 1]) * 100 : 0;
+  let tr = 0, tn = 0; for (let i = Math.max(1, last - 13); i <= last; i++) { tr += Math.max(data[i].h, cl[i - 1]) - Math.min(data[i].l, cl[i - 1]); tn++; }
+  const atr = tn ? tr / tn : rg, resAll = cand.filter((x) => x.p > LC.c), nearRes = resAll.filter((x) => Math.abs(x.p - LC.o) / x.p <= 0.012 || Math.abs(x.p - LC.h) / x.p <= 0.008).sort((a, b) => a.p - b.p)[0];
+  let cnd;
+  if (rg > 0 && LC.c < LC.o && body >= 0.6 * atr && nearRes) cnd = fill("rd_c_reject", { o: f(LC.o), v: f(nearRes.p), c: f(LC.c), p: pc(chg) });
+  else if (rg > 0 && LC.h - Math.max(LC.o, LC.c) >= 0.5 * rg && rg >= 0.6 * atr) cnd = fill("rd_c_wick_up", { h: f(LC.h), c: f(LC.c) });
+  else if (rg > 0 && Math.min(LC.o, LC.c) - LC.l >= 0.5 * rg && rg >= 0.6 * atr) cnd = fill("rd_c_wick_dn", { l: f(LC.l), c: f(LC.c) });
+  else if (rg > 0 && LC.c > LC.o && (LC.h - LC.c) <= 0.3 * rg && res && dist(res.p) <= 1.5) cnd = fill("rd_c_test", { c: f(LC.c), p: pc(chg), v: f(res.p), d: dist(res.p).toFixed(1) });
+  else if (rg > 0 && LC.c > LC.o && body >= atr * 0.6 && (LC.h - LC.c) <= 0.3 * rg) cnd = fill("rd_c_big_up", { p: pc(((LC.c - LC.o) / LC.o) * 100) });
+  else if (rg > 0 && LC.c < LC.o && body >= atr * 0.6 && (LC.c - LC.l) <= 0.3 * rg) cnd = fill("rd_c_big_dn", { p: pc(((LC.c - LC.o) / LC.o) * 100) });
+  else cnd = fill("rd_c_plain", { p: chg.toFixed(1) });
+  out.items.push(["rd_candle", [cnd]]);
   out.items.push(["rd_try", [t("rd_try_" + regime)]]);
   const r2 = (x) => Math.round(x * 100) / 100;
   if (regime === "up" && l2.length === 2 && hl) out.auto.push({ t: "t", i1: l2[0].i, p1: r2(l2[0].p), i2: l2[1].i, p2: r2(l2[1].p), auto: 1 });
   else if (regime === "down" && h2.length === 2 && lh) out.auto.push({ t: "t", i1: h2[0].i, p1: r2(h2[0].p), i2: h2[1].i, p2: r2(h2[1].p), auto: 1 });
   if (below) out.auto.push({ t: "h", p: r2(below.p), auto: 1 });
   if (above) out.auto.push({ t: "h", p: r2(above.p), auto: 1 });
-  out.sup = below ? below.p : null; out.res = above ? above.p : null;
+  out.sup = sup ? sup.p : below ? below.p : null; out.res = res ? res.p : above ? above.p : null;
   return out;
 }
 
@@ -2297,7 +2392,7 @@ function readingHtml() {
   const r = analyze(CH.data, CH.s, CH.e);
   if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p>" + fibSection() + aiPanel() + "</div>";
   return '<div class="panel reading stack"><div class="row" style="justify-content:space-between"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><button class="btn sm ghost" data-act="ch-read">' + esc(t("ch_hide_read")) + '</button></div><p class="small muted">' + esc(t("ch_read_p")) + '</p><dl class="rdlist">' +
-    r.items.slice(0, -1).concat([["rd_stats", statsLines(signalStats(CH.data, CH.e))]], r.items.slice(-1)).map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : k === "rd_stats" ? "wide" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
+    r.items.slice(0, -1).concat([["rd_stats", statsLines(signalStats(CH.data, CH.e))]], r.items.slice(-1)).map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : k === "rd_stats" || k === "rd_verdict" ? "wide" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
     (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + fibSection() + aiPanel() + "</div>";
 }
 
@@ -2745,6 +2840,9 @@ Object.assign(UI, {
   ],
   fb_auto: ["حلّل تلقائياً لما توصل أسعار جديدة", "Analyse automatically when new prices arrive"],
   fb_auto_note: ["يشتغل لما تفتح الشارت على سهم حقيقي وفيه شمعة جديدة. شرح الذكاء الاصطناعي ينطلب مرة وحدة لكل شمعة جديدة وينحفظ.", "Runs when you open the chart on a real share that has a new candle. The AI explanation is requested once per new candle and saved."],
+  fb_open: ["تنبيه: نهاية الحركة ({p}) كانت قبل {n} شمعة فقط، فلسه ما تأكدت. لو تجاوزها السعر، تتغير كل المستويات وتحتاج تحليل من جديد.", "Note: the end of the move ({p}) was only {n} candle(s) ago, so it is not confirmed. If price goes past it, every level changes and needs a fresh analysis."],
+  fb_mine: ["خط رسمته", "your line"],
+  fb_conf_note: ["التلاقي مع متوسط أو بولنجر تأكيد مستقل. التلاقي مع خط رسمته أنت يعكس قراءتك، فوزنه أقل.", "Confluence with an average or Bollinger is independent confirmation. Confluence with a line you drew reflects your own reading, so it weighs less."],
   fb_cached: ["من تحليل محفوظ", "From a saved analysis"],
   fb_q: ["اشرح مستويات فيبوناتشي المرسومة على هذا الشارت: وش معنى كل مستوى، وأي مستوى السعر قريب منه الحين، وكيف تتفق أو تختلف مع المؤشرات الثانية المفعّلة.", "Explain the Fibonacci levels drawn on this chart: what each level means, which level price is near now, and how they agree or disagree with the other active indicators."]
 });
@@ -2781,19 +2879,21 @@ function fibSection() {
   const day = (i) => (CH.data[i] && CH.data[i].d) || t("ch_day") + " " + (i + 1);
   const head = t(up ? "fb_p_up" : "fb_p_down").replace("{a}", f.p1.toFixed(2)).replace("{da}", day(f.i1)).replace("{b}", f.p2.toFixed(2)).replace("{db}", day(f.i2));
   const rows = rs.slice().sort((a, b) => price(b) - price(a)).map((r) => {
-    const p = price(r), d = ((c - p) / p) * 100, st = Math.abs(d) < 0.3 ? t("fb_at") : t(d > 0 ? "fb_above" : "fb_below").replace("{p}", Math.abs(d).toFixed(1));
+    const p = price(r), d = ((c - p) / c) * 100, st = Math.abs(d) < 0.3 ? t("fb_at") : t(d > 0 ? "fb_above" : "fb_below").replace("{p}", Math.abs(d).toFixed(1));
     return '<tr class="' + (r < 0 ? "ext" : r === 0.5 || r === 0.618 ? "key" : "") + '"><td class="num"><b>' + fibLabel(r) + '</b></td><td class="num">' + p.toFixed(2) + '</td><td class="small">' + esc(st) + '</td><td class="note">' + esc(L(FIB_MEAN[String(r)])) + "</td></tr>";
   }).join("");
   /* confluence: fibonacci levels within 1% of an indicator value or a drawn line */
   const refs = [], li = CH.e - 1;
   CH.lines.forEach((ln) => { if (ln.v[li] != null) refs.push([ln.name, ln.v[li]]); });
   if (CH.bb && CH.bb.up[li] != null) { refs.push([t("ch_bb") + " " + t("ch_up"), CH.bb.up[li]]); refs.push([t("ch_bb") + " " + t("ch_low"), CH.bb.lo[li]]); }
-  list.filter((d) => d.t === "h").forEach((d) => refs.push([t("ch_h_lbl") + " " + d.p.toFixed(2), d.p]));
+  list.filter((d) => d.t === "h").forEach((d) => refs.push([t("ch_h_lbl") + " " + d.p.toFixed(2) + " (" + t("fb_mine") + ")", d.p, 1]));
   const conf = [];
-  rs.forEach((r) => refs.forEach(([n, v]) => { const p = price(r), dd = Math.abs(p - v) / p * 100; if (dd < 1) conf.push(t("fb_conf").replace("{l}", fibLabel(r)).replace("{p}", p.toFixed(2)).replace("{n}", n).replace("{v}", v.toFixed(2)).replace("{d}", dd.toFixed(2))); }));
+  rs.forEach((r) => refs.forEach(([n, v, mine]) => { const p = price(r), dd = Math.abs(p - v) / p * 100; if (dd < 1) conf.push([mine ? 1 : 0, dd, t("fb_conf").replace("{l}", fibLabel(r)).replace("{p}", p.toFixed(2)).replace("{n}", n).replace("{v}", v.toFixed(2)).replace("{d}", dd.toFixed(2))]); }));
+  conf.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const ago = CH.e - 1 - f.i2, open = ago <= 2 ? '<p class="small neg">' + esc(t("fb_open").replace("{p}", f.p2.toFixed(2)).replace("{n}", ago)) + "</p>" : "";
   return '<div class="fibbox stack"><h3>' + esc(t("fb_h")) + '</h3><p class="small">' + esc(head) + '</p><div class="tablewrap"><table class="fibtbl"><thead><tr><th>' + esc(t("fb_lvl")) + "</th><th>" + esc(t("fb_px")) + "</th><th>" + esc(t("fb_now")) + "</th><th>" + esc(t("fb_mean")) + "</th></tr></thead><tbody>" + rows + "</tbody></table></div>" +
-    (f.ext ? '<p class="small muted">' + esc(t("fb_ext_note")) + "</p>" : "") +
-    '<div class="stack" style="gap:8px"><b>' + esc(t("fb_conf_h")) + '</b><p class="small muted">' + esc(t("fb_conf_p")) + "</p>" + (conf.length ? conf.slice(0, 5).map((x) => '<p class="conf">' + esc(x) + "</p>").join("") : '<p class="small">' + esc(t("fb_conf_none")) + "</p>") + "<ul class=\"small\" style=\"margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px\">" + UI.fb_cmp.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul></div></div>";
+    open + (f.ext ? '<p class="small muted">' + esc(t("fb_ext_note")) + "</p>" : "") +
+    '<div class="stack" style="gap:8px"><b>' + esc(t("fb_conf_h")) + '</b><p class="small muted">' + esc(t("fb_conf_p")) + "</p>" + (conf.length ? conf.slice(0, 5).map((x) => '<p class="conf' + (x[0] ? " mine" : "") + '">' + esc(x[2]) + "</p>").join("") + (conf.some((x) => x[0]) ? '<p class="small muted">' + esc(t("fb_conf_note")) + "</p>" : "") : '<p class="small">' + esc(t("fb_conf_none")) + "</p>") + "<ul class=\"small\" style=\"margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:4px\">" + UI.fb_cmp.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul></div></div>";
 }
 
 /* ----- analysis: draw the auto fib, open the reading, ask the model once per candle ----- */
@@ -3223,6 +3323,7 @@ Object.assign(UI, {
   st_rsi: ["نزول RSI 14 تحت 30: صار {n} مرة، وبعد 5 شموع كان السعر أعلى في {k} منها ({p}%).", "RSI 14 dropping below 30: happened {n} time(s); 5 candles later price was higher in {k} of them ({p}%)."],
   st_none_cross: ["تقاطع متوسط 5 فوق متوسط 20: ما صار في هذي الشموع.", "5 average crossing above the 20: did not occur in these candles."],
   st_none_rsi: ["نزول RSI 14 تحت 30: ما صار في هذي الشموع.", "RSI 14 dropping below 30: did not occur in these candles."],
+  st_tiny: ["(أقل من 5 مرات: النسبة غير موثوقة)", "(fewer than 5 times: the percentage is unreliable)"],
   st_small: ["العينة صغيرة، فالنسبة ما يعتمد عليها. وأداء الإشارة في الماضي ما يضمن أداءها بعدين.", "The sample is small, so the percentage is not dependable. A signal's past record does not guarantee its future one."],
   st_caveat: ["هذا عدّ لما صار في هذي الشموع فقط. أداء الإشارة في الماضي ما يضمن أداءها بعدين.", "This counts only what happened in these candles. A signal's past record does not guarantee its future one."]
 });
@@ -3238,7 +3339,7 @@ function signalStats(data, end) {
   return { cross, low };
 }
 function statsLines(st) {
-  const one = (x, k, none) => (x.n ? t(k).replace("{n}", x.n).replace("{k}", x.k).replace("{p}", Math.round((x.k / x.n) * 100)) : t(none));
+  const one = (x, k, none) => (x.n ? t(k).replace("{n}", x.n).replace("{k}", x.k).replace("{p}", Math.round((x.k / x.n) * 100)) + (x.n < 5 ? " " + t("st_tiny") : "") : t(none));
   return [one(st.cross, "st_cross", "st_none_cross"), one(st.low, "st_rsi", "st_none_rsi"), t(st.cross.n + st.low.n < 8 ? "st_small" : "st_caveat")];
 }
 
