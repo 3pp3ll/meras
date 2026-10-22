@@ -1154,6 +1154,104 @@ h1,h2,h3,.hero h1{font-weight:700}
 .ls-t{font-size:13px;color:var(--muted);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ls-tile small{font-size:12px}
 @media (max-width:560px){.ls-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* ===== شجرة مِراس ===== */
+:root{
+  --tl:#E9A03B; --tl2:#F4C26B; --tl-soft:#FFF1DC; --tl-ink:#A8650F;
+  --ts:#E8765A; --ts2:#F4A37F; --ts-soft:#FFE9DE; --ts-ink:#B4532E;
+  --tp:#C76BA4; --tp2:#F2A7C0; --tp-soft:#FDEBF5; --tp-ink:#9A3F78;
+  --ta:#24405F; --ta2:#3D6E97; --ta-soft:#E4F4FC; --ta-ink:#24405F;
+  --tg1:#7DC3E6; --tg2:#F4A37F;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --tl:#F0A93A; --tl2:#F7C873; --tl-soft:#33270F; --tl-ink:#FFD58A; --ts:#F2775A; --ts2:#F7A48B; --ts-soft:#3A1E17; --ts-ink:#FFB3A0;
+  --tp:#E07FBC; --tp2:#F4B3D2; --tp-soft:#3A1830; --tp-ink:#FFC2E2; --ta:#4FA3E8; --ta2:#8CC7F2; --ta-soft:#132C47; --ta-ink:#A8D6FF; --tg1:#4FA3E8; --tg2:#F0A93A}}
+:root[data-theme="dark"]{
+  --tl:#F0A93A; --tl2:#F7C873; --tl-soft:#33270F; --tl-ink:#FFD58A; --ts:#F2775A; --ts2:#F7A48B; --ts-soft:#3A1E17; --ts-ink:#FFB3A0;
+  --tp:#E07FBC; --tp2:#F4B3D2; --tp-soft:#3A1830; --tp-ink:#FFC2E2; --ta:#4FA3E8; --ta2:#8CC7F2; --ta-soft:#132C47; --ta-ink:#A8D6FF; --tg1:#4FA3E8; --tg2:#F0A93A}
+.b-l{--c:var(--tl);--c2:var(--tl2);--cs:var(--tl-soft);--ci:var(--tl-ink)}
+.b-s{--c:var(--ts);--c2:var(--ts2);--cs:var(--ts-soft);--ci:var(--ts-ink)}
+.b-p{--c:var(--tp);--c2:var(--tp2);--cs:var(--tp-soft);--ci:var(--tp-ink)}
+.b-a{--c:var(--ta);--c2:var(--ta2);--cs:var(--ta-soft);--ci:var(--ta-ink)}
+.tree2{width:100%;padding-block:18px 44px}
+.tr2-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.tr2-stage{position:relative;border:1px solid var(--line);border-radius:24px;overflow:hidden;touch-action:pan-y;background:linear-gradient(160deg,color-mix(in srgb,var(--surface) 90%,var(--tg1)) 0%,var(--surface) 45%,color-mix(in srgb,var(--surface) 86%,var(--tg2)) 100%)}
+.tr2-stage.zoom{overflow:auto;touch-action:auto}
+.tr2-stage.fit{cursor:zoom-in}
+.tr2-scene{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tr2-scene .g{stroke:var(--tg1);stroke-opacity:.14;stroke-width:1}
+.tr2-scene .wv{fill:none;stroke:var(--tg1);stroke-opacity:.26;stroke-width:1.2}.tr2-scene .w2{stroke:var(--tg2);stroke-opacity:.2}
+.tr2-scene .cu{fill:var(--tg1);fill-opacity:.16}.tr2-scene .cd{fill:var(--tg2);fill-opacity:.18}
+.tr2-scene .wk{stroke:var(--muted);stroke-opacity:.18;stroke-width:1.2}
+.tr2-scene .pr{fill:none;stroke:var(--tg2);stroke-opacity:.35;stroke-width:2}.tr2-scene .ar{fill:var(--tg2);fill-opacity:.06}
+.tr2-scene .dt{fill:var(--tg1);fill-opacity:.35}
+.tr2-canvas{position:relative;width:1180px;padding:22px 18px 30px;transform-origin:top right;z-index:1}
+[dir="ltr"] .tr2-canvas{transform-origin:top left}
+.tr2-wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.tr2-wires path{fill:none;stroke-width:2.5;stroke-linecap:round;opacity:.6;transition:opacity .2s,stroke-width .2s}
+.tr2-wires .w-l{stroke:var(--tl)}.tr2-wires .w-s{stroke:var(--ts)}.tr2-wires .w-p{stroke:var(--tp)}.tr2-wires .w-a{stroke:var(--ta)}
+.tr2-wires path.hot{opacity:1;stroke-width:4}
+.tr2-root{display:block;width:max-content;margin:0 auto 40px;padding:2px 20px;font-size:52px;font-weight:700;line-height:1.25;background:linear-gradient(90deg,var(--tl) 0%,var(--ts2) 45%,var(--ta2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 14px rgba(233,160,59,.25))}
+.tr2-branches{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:16px;align-items:start;position:relative}
+.tr2-br{display:flex;flex-direction:column;align-items:center;gap:40px}
+.tr2-head{border:0;border-radius:99px;padding:12px 28px;font:inherit;font-size:21px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,var(--c2),var(--c));box-shadow:0 0 0 6px color-mix(in srgb,var(--surface) 70%,transparent),0 14px 28px -12px rgba(47,58,79,.45),inset 0 1px 0 rgba(255,255,255,.45);text-shadow:0 1px 2px rgba(0,0,0,.18);transition:transform .2s}
+.tr2-head:hover{transform:translateY(-2px)}
+.tr2-cnt{font-size:13px;background:rgba(255,255,255,.25);border-radius:99px;padding:1px 8px}
+.tr2-car{font-size:12px;opacity:.85}
+.tr2-br.closed .tr2-leaves{display:none}
+.tr2-leaves{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%}
+.tr2-leaf{position:relative;display:flex;align-items:center;gap:6px;min-height:44px;padding:7px 8px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--cs) 88%,transparent);color:var(--ink);text-decoration:none;font-size:14px;font-weight:600;line-height:1.3;box-shadow:0 4px 12px -6px rgba(47,58,79,.25),inset 0 1px 0 rgba(255,255,255,.5);transition:transform .18s,box-shadow .18s}
+.tr2-leaf:hover,.tr2-leaf:focus-visible{transform:translateY(-2px);box-shadow:0 10px 22px -10px rgba(47,58,79,.4)}
+.tr2-leaf i{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 25%,var(--surface));color:var(--ci)}
+.tr2-leaf i svg{width:15px;height:15px}
+.tr2-leaf span{min-width:0}
+.tr2-badge{position:absolute;top:-7px;inset-inline-start:-7px;min-width:19px;height:19px;border-radius:10px;background:var(--down);color:#fff;font-size:11px;display:grid;place-items:center;padding:0 5px}
+.tr2-leaf.map-dim{opacity:.25}.tr2-leaf.map-hit{outline:3px solid var(--tl);outline-offset:2px}
+.tr2-tip{position:absolute;bottom:10px;inset-inline-end:10px;z-index:3;background:var(--ink);color:var(--bg);font-size:12.5px;font-weight:700;border-radius:99px;padding:5px 12px;pointer-events:none;opacity:.88}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tr2-leaf{color:#F4F6FB;background:var(--cs);border-color:color-mix(in srgb,var(--c) 70%,transparent);box-shadow:0 0 14px -6px var(--c)}
+  :root:not([data-theme="light"]) .tr2-leaf i{background:rgba(255,255,255,.08)}
+  :root:not([data-theme="light"]) .tr2-head{color:#101828;text-shadow:none}
+  :root:not([data-theme="light"]) .tr2-wires path{opacity:.85}}
+:root[data-theme="dark"] .tr2-leaf{color:#F4F6FB;background:var(--cs);border-color:color-mix(in srgb,var(--c) 70%,transparent);box-shadow:0 0 14px -6px var(--c)}
+:root[data-theme="dark"] .tr2-leaf i{background:rgba(255,255,255,.08)}
+:root[data-theme="dark"] .tr2-head{color:#101828;text-shadow:none}
+:root[data-theme="dark"] .tr2-wires path{opacity:.85}
+.gate-hero .tree2 .map-q{width:min(280px,100%)}
+@media (prefers-reduced-motion:reduce){.tr2-leaf,.tr2-head{transition:none}.tr2-leaf:hover,.tr2-head:hover{transform:none}}
+/* زر الرجوع العائم */
+#treeback{position:fixed;z-index:34;inset-inline-start:max(16px,env(safe-area-inset-left,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:8px;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);background:var(--surface);color:var(--ci);border-radius:99px;padding:6px 14px 6px 6px;font:inherit;box-shadow:0 10px 26px -10px rgba(47,58,79,.45);cursor:pointer;transition:transform .2s}
+[dir="rtl"] #treeback{padding:6px 6px 6px 14px}
+#treeback[hidden]{display:none}
+#treeback:hover{transform:translateY(-2px)}
+#treeback .tb-spark{width:40px;height:40px;border-radius:50%;background:var(--cs);display:grid;place-items:center}
+#treeback svg{width:34px;height:22px}
+#treeback svg path{fill:none;stroke:var(--ci);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;animation:tbdraw 2.4s ease-in-out infinite}
+#treeback svg circle{fill:var(--ci);animation:tbdot 2.4s ease-in-out infinite}
+#treeback b{font-size:13.5px}
+@keyframes tbdraw{0%{stroke-dashoffset:60}55%,100%{stroke-dashoffset:0}}
+@keyframes tbdot{0%,40%{opacity:0}60%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){#treeback svg path,#treeback svg circle{animation:none;stroke-dashoffset:0;opacity:1}}
+@media (max-width:640px){#treeback b{display:none}#treeback,[dir="rtl"] #treeback{padding:5px}body.has-tabbar #treeback{bottom:calc(78px + env(safe-area-inset-bottom,0px))}body.has-treeback #backfab{display:none!important}}
+/* لون الفرع داخل صفحاته */
+body[data-br="l"]{--c:var(--tl);--cs:var(--tl-soft);--ci:var(--tl-ink)} body[data-br="s"]{--c:var(--ts);--cs:var(--ts-soft);--ci:var(--ts-ink)} body[data-br="p"]{--c:var(--tp);--cs:var(--tp-soft);--ci:var(--tp-ink)} body[data-br="a"]{--c:var(--ta);--cs:var(--ta-soft);--ci:var(--ta-ink)}
+body[data-br] .page-head h1{display:inline-block;border-bottom:3px solid var(--c);padding-bottom:4px}
+body[data-br] .dk-side a[aria-current="page"]{background:var(--cs)}
+body[data-br] .dk-side a[aria-current="page"] .dk-si{background:var(--c);color:#fff}
+body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current="page"]{border-bottom-color:var(--c)}
+/* تحليلاتي */
+.an-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.an-it{border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden}
+.an-it.open{border-color:var(--c,var(--amber))}
+.an-row{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;background:transparent;color:var(--ink);font:inherit;text-align:start;cursor:pointer}
+.an-sym{flex:none;font-weight:700;background:var(--cs,var(--amber-soft));color:var(--ci,var(--amber-ink));border-radius:10px;padding:4px 10px}
+.an-mid{flex:1;min-width:0;display:flex;flex-direction:column}
+.an-mid b{font-size:16px}
+.an-body{padding:0 14px 14px}
+.an-read{white-space:pre-wrap;background:var(--sunk);border-radius:12px;padding:12px;font-size:14.5px;line-height:1.8;max-height:420px;overflow:auto}
+.gate-hero .wrap>*{min-width:0}.tree2,.tr2-stage{min-width:0;max-width:100%}
+/* زر الرجوع على الجهة اللي ما فيها بداية النص، فوق زر "للأعلى" */
+#treeback{inset-inline-start:auto;inset-inline-end:max(18px,env(safe-area-inset-right,0px));bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+[dir="rtl"] #treeback{inset-inline-end:max(18px,env(safe-area-inset-left,0px))}
+@media (max-width:640px){body.has-tabbar #treeback{bottom:calc(130px + env(safe-area-inset-bottom,0px))}}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2214,6 +2312,7 @@ function render() {
   const r = route(), same = r === lastPainted, y = window.scrollY, m = document.getElementById("main");
   if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
+  if (typeof trHook === "function") trHook();
   if (typeof topBell === "function") topBell();
   document.querySelectorAll(".subnav nav, #main .tabs, .dg-chips").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"],[aria-pressed="true"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
@@ -2235,8 +2334,9 @@ function renderNow() {
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; if ((g === "learn" || g === "services") && typeof sideShell === "function") html = sideShell(g, r, html); }
+  { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "services" ? "s" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -2870,7 +2970,7 @@ const ICON_READ = '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="
 function readingHtml() {
   const r = analyze(CH.data, CH.s, CH.e);
   if (r.need != null) return '<div class="panel reading"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><p class="muted">' + esc(t("rd_need").replace("{n}", r.need)) + "</p>" + fibSection() + aiPanel() + "</div>";
-  return '<div class="panel reading stack"><div class="row" style="justify-content:space-between"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><button class="btn sm ghost" data-act="ch-read">' + esc(t("ch_hide_read")) + '</button></div><p class="small muted">' + esc(t("ch_read_p")) + '</p><dl class="rdlist">' +
+  return '<div class="panel reading stack"><div class="row" style="justify-content:space-between"><h3>' + ICON_READ + " " + esc(t("ch_read_h")) + '</h3><div class="row" style="gap:6px"><button class="btn sm primary" data-act="an-save">' + esc(t("an_save")) + '</button><button class="btn sm ghost" data-act="ch-read">' + esc(t("ch_hide_read")) + '</button></div></div><p class="small muted">' + esc(t("ch_read_p")) + '</p><dl class="rdlist">' +
     r.items.slice(0, -1).concat([["rd_stats", statsLines(signalStats(CH.data, CH.e))]], r.items.slice(-1)).map(([k, lines]) => '<div class="' + (k === "rd_try" ? "try" : k === "rd_stats" || k === "rd_verdict" ? "wide" : "") + '"><dt>' + esc(t(k)) + "</dt><dd>" + lines.map((x) => "<p>" + esc(x) + "</p>").join("") + "</dd></div>").join("") + "</dl>" +
     (r.auto.length ? '<div><button class="btn" data-act="ch-auto">' + esc(t("ch_draw_it")) + "</button></div>" : "") + fibSection() + aiPanel() + "</div>";
 }
@@ -3709,7 +3809,7 @@ async function readJson(path) {
 const errText = (e) => t({ "401": "e_401", "404": "e_404", "403": "e_403", net: "e_net" }[e && e.code] || "e_net");
 
 /* ما يتزامن: التقدم، السجل، الباقة، الحساب. اللغة وحالة الدخول تبقى لكل جهاز. */
-const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null, lb: s.lab || null, iv: s.invest || null, mt: s.metals || null });
+const shared = (s) => JSON.stringify({ a: s.account, p: s.plan, d: Object.keys(s.done).sort().map((k) => [k, s.done[k]]), j: s.journal, x: (s.deleted || []).slice().sort(), w: s.drawings || {}, c: s.chart || null, lb: s.lab || null, iv: s.invest || null, mt: s.metals || null, an: s.analyses || null });
 function mergeState(local, remote) {
   if (!remote || typeof remote !== "object") return local;
   const newer = (local.updatedAt || 0) >= (remote.updatedAt || 0) ? local : remote;
@@ -4822,7 +4922,7 @@ document.addEventListener("click", (e) => { const a = e.target.closest && e.targ
 
 function pageGate() {
   const first = nextLesson("inv") || LESSONS[0];
-  return '<section class="hero gate-hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + mapSection() + "</div></section>" +
+  return '<section class="hero gate-hero"><div class="wrap"><div class="copy"><div class="eyebrow">' + esc(t("hero_eyebrow")) + "</div><h1>" + t("hero_h") + '</h1><p class="lead">' + esc(t("hero_p")) + '</p><div class="row"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("start")) + '</a><a class="btn ghost" href="#learn">' + esc(t("learn_h")) + "</a></div></div>" + (typeof treeHtml === "function" ? treeHtml() : mapSection()) + "</div></section>" +
     '<div class="wrap"><section class="sec">' + continueHtml() + "</section>" +
     '<section class="sec"><div class="sec-head"><h2>' + esc(t("how_h")) + '</h2></div><div class="flow">' + UI.how.map((h, i) => '<div><span class="k">' + (i + 1) + "</span><h4>" + esc(L(h[0])) + '</h4><p class="muted small">' + esc(L(h[1])) + "</p></div>").join("") + "</div></section>" + GATE_TAIL() + "</div>";
 }
@@ -6581,6 +6681,160 @@ document.addEventListener("click", (e) => {
   if (a === "ln-enter" || a === "ln-signup") { try { localStorage.setItem(LN_KEY, "1"); } catch (err) {} if (a === "ln-enter") { e.preventDefault(); if (route() === "") { render(); window.scrollTo(0, 0); } else location.hash = ""; } }
   else if (a === "ln-scroll") { e.preventDefault(); const s = document.getElementById("ln-what"); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" }); }
 });
+/* ===== مِراس: شجرة المنصة، زر الرجوع العائم، وتحليلاتي =====
+   الشجرة: الجذر "شجرة مِراس" وأربعة فروع ملوّنة (التعليم ذهبي، الخدمات مرجاني، الباقات وردي، الإدارة كحلي/سماوي).
+   على الجوال تنرسم بعرض ثابت وتتصغّر على قد الشاشة، والضغط في مكان فاضي يكبّرها.
+   أي قسم تفتحه من الشجرة يطلع له زر رجوع عائم يرجعك لنفس مكانك فيها.
+   تحليلاتي: كل قراءة للشارت تنحفظ (باسم السهم وتاريخ ووقت الإنشاء) وترجع لها متى ما بغيت. */
+Object.assign(UI, {
+  tr_root: ["شجرة مِراس", "Meras tree"], tr_q: ["ابحث عن قسم…", "Find a section…"], tr_open: ["افتح الكل", "Expand all"],
+  tr_fit: ["اضغط مكان فاضي للتكبير", "Tap empty space to zoom"], tr_unfit: ["اضغط مكان فاضي للتصغير", "Tap empty space to fit"],
+  tr_back: ["رجوع للهيكل", "Back to the tree"], tr_login: ["دخول", "Sign in"], tr_account: ["حسابي", "My account"],
+  nav_an: ["تحليلاتي", "My analyses"], d_an: ["كل تحليل تسويه في الشارت ينحفظ هنا باسم السهم وتاريخه.", "Every chart analysis you make is saved here by share and date."],
+  an_h: ["تحليلاتي", "My analyses"], an_p: ["كل مرة تقرأ الشارت أو تحلله، ينحفظ التحليل هنا باسم السهم وتاريخ ووقت إنشائه. اضغط أي تحليل يفتح كامل.", "Each time you read or analyse a chart it is saved here with the share and the time it was made. Tap one to open it."],
+  an_none: ["ما فيه تحليلات للحين. افتح الشارت واضغط «اقرأ الشارت» أو «حلّل»، وينحفظ هنا لحاله.", "No analyses yet. Open the chart and tap Read or Analyse; it is saved here automatically."],
+  an_save: ["احفظ في تحليلاتي", "Save to my analyses"], an_saved: ["انحفظ في تحليلاتي", "Saved to my analyses"],
+  an_open: ["افتحه على الشارت", "Open on the chart"], an_del: ["احذف", "Delete"], an_note: ["ملاحظتك", "Your note"], an_note_ph: ["اكتب وش ناوي تسوي، أو وش لاحظت…", "What you plan, or what you noticed…"],
+  an_at: ["أُنشئ {d}", "Created {d}"], an_candle: ["آخر شمعة {d} · السعر {p}", "Last candle {d} · price {p}"], an_draws: ["{n} رسمة", "{n} drawings"], an_q: ["ابحث باسم السهم أو رمزه…", "Search by share name or code…"],
+  an_count: ["{n} تحليل", "{n} analyses"], an_auto: ["تلقائي", "Auto"]
+});
+NAV_GROUPS.learn.items.splice(2, 0, ["analyses", "nav_an", "d_an"]);
+SEC_IC.analyses = '<path d="M4 20V4M4 20h16M8 15l3-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="7" r="2" fill="currentColor"/>';
+
+/* ----- the tree ----- */
+const TR_KEY = "meras.tree", TR_W = 1180;
+let TR = (() => { try { return Object.assign({ closed: [], zoom: false }, JSON.parse(localStorage.getItem(TR_KEY) || "{}")); } catch (e) { return { closed: [], zoom: false }; } })();
+const trSave = () => { try { localStorage.setItem(TR_KEY, JSON.stringify({ closed: TR.closed, zoom: TR.zoom })); } catch (e) {} };
+function trGroups() {
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  const ic = (h) => SEC_IC[h] || "";
+  const g = [
+    { k: "l", name: t("nav_learn"), items: NAV_GROUPS.learn.items.map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: h === "analyses" && (S.analyses || []).length ? String((S.analyses || []).length) : "" })) },
+    { k: "s", name: t("nav_svc"), items: NAV_GROUPS.services.items.map(([h, k]) => ({ h, label: t(k), ic: ic(h) })) },
+    { k: "p", name: t("nav_plans"), items: [{ h: "plans", label: t("map_plan_free"), ic: ic("plans") }, { h: "plans", label: t("plan_full"), ic: ic("plans") }, { h: "account", label: t(S.signedIn ? "tr_account" : "tr_login"), ic: ic("owner") }] }
+  ];
+  if (owner) g.push({ k: "a", name: t("map_admin"), lock: true, items: [{ h: "owner", label: t("ow_h"), ic: ic("owner") }].concat(MAP_DESK.map(([k, l]) => ({ h: "desk", tab: k, label: t(l), ic: typeof DK_IC !== "undefined" ? DK_IC[k] : "", badge: typeof dkBadge === "function" ? dkBadge(k) : "" }))) });
+  return g;
+}
+function treeHtml() {
+  const gs = trGroups();
+  const leaf = (g, it, i) => '<a class="tr2-leaf" href="#' + it.h + '" data-tk="' + g.k + '" data-ti="' + i + '"' + (it.tab ? ' data-dktab="' + it.tab + '"' : "") + "><i>" + '<svg viewBox="0 0 24 24" aria-hidden="true">' + it.ic + "</svg></i><span>" + esc(it.label) + "</span>" + (it.badge ? '<b class="tr2-badge num">' + esc(it.badge) + "</b>" : "") + "</a>";
+  return '<section class="tree2"><div class="tr2-tools"><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("tr_q")) + '" aria-label="' + esc(t("tr_q")) + '" autocomplete="off"><button class="btn sm" data-act="tr-open">' + esc(t("tr_open")) + '</button></div>' +
+    '<div class="tr2-stage" id="tr2-stage"><svg class="tr2-scene" id="tr2-scene" preserveAspectRatio="none" aria-hidden="true"></svg><div class="tr2-canvas" id="tr2-canvas"><svg class="tr2-wires" id="tr2-wires" aria-hidden="true"></svg><div class="tr2-root" id="tr2-root">' + esc(t("tr_root")) + '</div><div class="tr2-branches" style="--n:' + gs.length + '">' +
+    gs.map((g) => { const closed = TR.closed.includes(g.k); return '<div class="tr2-br b-' + g.k + (closed ? " closed" : "") + '" data-k="' + g.k + '"><button class="tr2-head" data-act="tr-br" data-k="' + g.k + '" aria-expanded="' + !closed + '">' + (g.lock ? "🔒 " : "") + esc(g.name) + '<span class="tr2-cnt num">' + g.items.length + '</span><span class="tr2-car" aria-hidden="true">' + (closed ? "▾" : "▴") + '</span></button><div class="tr2-leaves">' + g.items.map((it, i) => leaf(g, it, i)).join("") + "</div></div>"; }).join("") +
+    '</div></div><span class="tr2-tip" id="tr2-tip"></span></div></section>';
+}
+const trScale = () => { const st = document.getElementById("tr2-stage"); if (!st) return 1; const w = st.clientWidth; return TR.zoom || w >= TR_W ? 1 : w / TR_W; };
+function trFit() {
+  const st = document.getElementById("tr2-stage"), cv = document.getElementById("tr2-canvas"); if (!st || !cv) return;
+  const s = trScale(), small = st.clientWidth < TR_W;
+  cv.style.transform = s < 1 ? "scale(" + s + ")" : "none";
+  st.style.height = s < 1 ? Math.ceil(cv.offsetHeight * s) + "px" : "";
+  st.classList.toggle("fit", small && !TR.zoom); st.classList.toggle("zoom", small && TR.zoom);
+  const tip = document.getElementById("tr2-tip"); if (tip) { tip.hidden = !small; tip.textContent = t(TR.zoom ? "tr_unfit" : "tr_fit"); }
+}
+function trWires() {
+  const svg = document.getElementById("tr2-wires"), cv = document.getElementById("tr2-canvas"), root = document.getElementById("tr2-root"); if (!svg || !cv || !root) return;
+  const s = trScale(), base = cv.getBoundingClientRect();
+  const P = (el) => { const r = el.getBoundingClientRect(); return { x: (r.left - base.left + r.width / 2) / s, top: (r.top - base.top) / s, bot: (r.bottom - base.top) / s }; };
+  const elbow = (a, b, key) => { const mid = a.bot + (b.top - a.bot) / 2, dx = b.x - a.x, rr = Math.min(10, Math.abs(dx) / 2), dir = dx > 0 ? 1 : -1;
+    const d = Math.abs(dx) < 1 ? "M" + a.x + " " + a.bot + " V" + b.top : "M" + a.x + " " + a.bot + " V" + (mid - rr) + " Q" + a.x + " " + mid + " " + (a.x + dir * rr) + " " + mid + " H" + (b.x - dir * rr) + " Q" + b.x + " " + mid + " " + b.x + " " + (mid + rr) + " V" + b.top;
+    return '<path class="w-' + key[0] + '" data-w="' + key + '" d="' + d + '"/>'; };
+  const R = P(root); let h = "";
+  cv.querySelectorAll(".tr2-br").forEach((br) => { const k = br.dataset.k, hd = P(br.querySelector(".tr2-head")); h += elbow(R, hd, k);
+    if (br.classList.contains("closed")) return;
+    const ls = [...br.querySelectorAll(".tr2-leaf")].map((el) => ({ el, p: P(el) })), top = Math.min(...ls.map((o) => o.p.top));
+    ls.filter((o) => o.p.top - top < 4).forEach((o) => { h += elbow(hd, o.p, k + o.el.dataset.ti); }); });
+  svg.setAttribute("viewBox", "0 0 " + cv.offsetWidth + " " + cv.offsetHeight); svg.innerHTML = h;
+}
+function trScene() {
+  const sv = document.getElementById("tr2-scene"); if (!sv || sv.childNodes.length) return;
+  const W = 1200, H = 700; let h = "";
+  for (let x = 0; x <= W; x += 40) h += '<line class="g" x1="' + x + '" y1="0" x2="' + x + '" y2="' + H + '"/>';
+  for (let y = 0; y <= H; y += 40) h += '<line class="g" x1="0" y1="' + y + '" x2="' + W + '" y2="' + y + '"/>';
+  for (let i = 0; i < 7; i++) { const a = 60 + i * 26, o = i * 0.55; let d = "M0 " + (520 + i * 10); for (let x = 0; x <= W; x += 40) d += " L" + x + " " + (520 + i * 10 + Math.sin(x / 140 + o) * a * 0.6 + Math.cos(x / 310 + o) * 30).toFixed(1); h += '<path class="wv' + (i % 3 === 0 ? " w2" : "") + '" d="' + d + '"/>'; }
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  let p = 600; const pts = [];
+  for (let i = 0; i < 34; i++) { const x = 40 + i * 34, o = p, c = p + (rnd() - 0.45) * 46, hi = Math.min(o, c) - rnd() * 22, lo = Math.max(o, c) + rnd() * 22; p = c; pts.push([x, c]);
+    h += '<line class="wk" x1="' + x + '" y1="' + hi.toFixed(1) + '" x2="' + x + '" y2="' + lo.toFixed(1) + '"/><rect class="' + (c < o ? "cu" : "cd") + '" x="' + (x - 7) + '" y="' + Math.min(o, c).toFixed(1) + '" width="14" height="' + Math.max(3, Math.abs(c - o)).toFixed(1) + '" rx="2"/>'; }
+  const line = pts.map(([x, y], i) => (i ? "L" : "M") + x + " " + (y - 90).toFixed(1)).join(" ");
+  h += '<path class="ar" d="' + line + " L" + pts[pts.length - 1][0] + " " + H + " L" + pts[0][0] + " " + H + ' Z"/><path class="pr" d="' + line + '"/>';
+  for (let i = 0; i < 18; i++) h += '<circle class="dt" cx="' + (rnd() * W).toFixed(0) + '" cy="' + (rnd() * H).toFixed(0) + '" r="' + (2 + rnd() * 4).toFixed(1) + '"/>';
+  sv.setAttribute("viewBox", "0 0 " + W + " " + H); sv.innerHTML = h;
+}
+function trAfter() { if (!document.getElementById("tr2-stage")) return; trScene(); trFit(); requestAnimationFrame(trWires); }
+const trHot = (key) => { const k = key.slice(0, 1); document.querySelectorAll("#tr2-wires path").forEach((p) => p.classList.toggle("hot", !!key && (p.dataset.w === key || p.dataset.w === k))); };
+document.addEventListener("mouseover", (e) => { if (!e.target.closest) return; const lf = e.target.closest(".tr2-leaf"), hd = e.target.closest(".tr2-head"); if (lf) trHot(lf.dataset.tk + lf.dataset.ti); else if (hd) trHot(hd.dataset.k); else if (e.target.closest(".tr2-stage")) trHot(""); });
+window.addEventListener("resize", () => { if (document.getElementById("tr2-stage")) { trFit(); requestAnimationFrame(trWires); } });
+
+/* ----- the floating back button: shows on any page you opened from the tree ----- */
+const TB_KEY = "meras.treeback";
+const tbGet = () => { try { return JSON.parse(sessionStorage.getItem(TB_KEY) || "null"); } catch (e) { return null; } };
+function tbSync() {
+  let b = document.getElementById("treeback");
+  const st = tbGet(), show = st && route() !== "" && !(typeof lnShow === "function" && lnShow());
+  if (!show) { if (b) b.hidden = true; document.body.classList.remove("has-treeback"); return; }
+  if (!b) { b = document.createElement("button"); b.id = "treeback"; b.type = "button"; b.innerHTML = '<span class="tb-spark"><svg viewBox="0 0 34 22" aria-hidden="true"><path d="M2 18 L9 12 L14 15 L21 7 L26 10 L32 3"/><circle cx="32" cy="3" r="2.6"/></svg></span><b></b>'; document.body.appendChild(b); }
+  b.querySelector("b").textContent = t("tr_back"); b.setAttribute("aria-label", t("tr_back")); b.className = "b-" + (st.k || "l"); b.hidden = false;
+  document.body.classList.add("has-treeback");
+}
+let trRestore = null;
+document.addEventListener("click", (e) => {
+  if (!e.target.closest) return;
+  const lf = e.target.closest(".tr2-leaf");
+  if (lf) { const st = document.getElementById("tr2-stage"); try { sessionStorage.setItem(TB_KEY, JSON.stringify({ k: lf.dataset.tk, y: window.scrollY, x: st ? st.scrollLeft : 0, zoom: TR.zoom })); } catch (err) {} return; }
+  if (e.target.closest("#treeback")) { const st = tbGet(); trRestore = st; if (st) { TR.zoom = !!st.zoom; trSave(); } location.hash = ""; return; }
+  const hd = e.target.closest('[data-act="tr-br"]');
+  if (hd) { const k = hd.dataset.k, i = TR.closed.indexOf(k); if (i >= 0) TR.closed.splice(i, 1); else TR.closed.push(k); trSave(); render(); return; }
+  if (e.target.closest('[data-act="tr-open"]')) { TR.closed = []; trSave(); render(); return; }
+  const stg = e.target.closest("#tr2-stage");
+  if (stg && stg.clientWidth < TR_W && !e.target.closest("a,button")) { TR.zoom = !TR.zoom; trSave(); render(); if (TR.zoom) stg.scrollLeft = 0; }
+});
+/* after every render: draw the tree, place the back button, restore the spot you left */
+const trHook = () => {
+  trAfter(); tbSync();
+  if (route() === "" && trRestore) { const st = trRestore; trRestore = null; requestAnimationFrame(() => { const s = document.getElementById("tr2-stage"); if (s) s.scrollLeft = st.x || 0; window.scrollTo(0, st.y || 0); }); }
+};
+
+/* ----- تحليلاتي ----- */
+function anCapture(auto) {
+  const sym = S.chart && S.chart.sym; if (!sym) return null;
+  const box = document.querySelector(".panel.reading");
+  const read = box ? [...box.querySelectorAll("dt,dd,p.small,h3")].map((x) => x.innerText.trim()).filter(Boolean).join("\n") : "";
+  const h = typeof chartData === "function" ? chartData(sym) : [], last = h.length ? h[h.length - 1] : null;
+  const now = new Date(), day = now.toISOString().slice(0, 10);
+  S.analyses = S.analyses || [];
+  let a = auto ? S.analyses.find((x) => x.sym === sym && x.auto && x.at.slice(0, 10) === day) : null;
+  if (!a) { a = { id: "an" + now.getTime().toString(36), sym, note: "" }; S.analyses.unshift(a); }
+  Object.assign(a, { name: (typeof symName === "function" && symName(sym)) || sym, at: now.toISOString(), auto: !!auto, read, date: last ? last.d : "", price: last ? last.c : null, draws: JSON.parse(JSON.stringify((S.drawings && S.drawings[sym]) || [])), chart: JSON.parse(JSON.stringify(S.chart || {})) });
+  S.analyses = S.analyses.slice(0, 200); save(); return a;
+}
+document.addEventListener("click", (e) => {
+  if (!e.target.closest) return;
+  const rd = e.target.closest('[data-act="ch-read"],[data-act="ch-analyze"]');
+  if (rd) setTimeout(() => { if (document.querySelector(".panel.reading")) anCapture(true); }, 900);
+  const sv = e.target.closest('[data-act="an-save"]'); if (sv) { if (anCapture(false)) toast(t("an_saved")); return; }
+  const el = e.target.closest('[data-act^="an-"]'); if (!el) return;
+  const a = (S.analyses || []).find((x) => x.id === el.dataset.id);
+  if (el.dataset.act === "an-open" && a) { S.chart = Object.assign({}, S.chart, a.chart || {}, { sym: a.sym }); S.drawings = S.drawings || {}; S.drawings[a.sym] = a.draws || []; save(); location.hash = "chart"; }
+  else if (el.dataset.act === "an-del" && a) { S.analyses = S.analyses.filter((x) => x.id !== a.id); save(); render(); }
+  else if (el.dataset.act === "an-tgl") { anOpen = anOpen === el.dataset.id ? null : el.dataset.id; render(); }
+});
+document.addEventListener("input", (e) => {
+  if (e.target.dataset && e.target.dataset.an === "note") { const a = (S.analyses || []).find((x) => x.id === e.target.dataset.id); if (a) { a.note = e.target.value; save(); } }
+  if (e.target.dataset && e.target.dataset.an === "q") { anQ = e.target.value; const box = document.getElementById("an-list"); if (box) { const tmp = document.createElement("div"); tmp.innerHTML = pageAnalyses(); const nb = tmp.querySelector("#an-list"); if (nb) box.innerHTML = nb.innerHTML; } }
+});
+let anOpen = null, anQ = "";
+const anWhen = (iso) => { const d = new Date(iso); if (isNaN(d)) return iso; const z = (n) => String(n).padStart(2, "0"); let h = d.getHours(); const ap = h < 12 ? (S.lang === "ar" ? "ص" : "AM") : (S.lang === "ar" ? "م" : "PM"); h = h % 12 || 12; return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate()) + " · " + h + ":" + z(d.getMinutes()) + " " + ap; };
+function pageAnalyses() {
+  const q = anQ.trim(), list = (S.analyses || []).filter((a) => !q || a.sym.includes(q) || String(a.name).includes(q));
+  const item = (a) => { const open = anOpen === a.id;
+    return '<li class="an-it' + (open ? " open" : "") + '"><button class="an-row" data-act="an-tgl" data-id="' + esc(a.id) + '" aria-expanded="' + open + '"><span class="an-sym num">' + esc(a.sym) + '</span><span class="an-mid"><b>' + esc(a.name) + '</b><small class="muted">' + esc(t("an_at").replace("{d}", anWhen(a.at))) + (a.auto ? ' · <span class="tag">' + esc(t("an_auto")) + "</span>" : "") + '</small></span><span aria-hidden="true">' + (open ? "▴" : "▾") + "</span></button>" +
+      (open ? '<div class="an-body stack" style="gap:10px">' + (a.date ? '<p class="small muted" style="margin:0">' + esc(t("an_candle").replace("{d}", a.date).replace("{p}", a.price != null ? fmt(a.price) : "–")) + (a.draws && a.draws.length ? " · " + esc(t("an_draws").replace("{n}", a.draws.length)) : "") + "</p>" : "") +
+        (a.read ? '<div class="an-read">' + esc(a.read) + "</div>" : "") + '<div class="field"><label for="an-n-' + esc(a.id) + '">' + esc(t("an_note")) + '</label><textarea id="an-n-' + esc(a.id) + '" rows="2" data-an="note" data-id="' + esc(a.id) + '" placeholder="' + esc(t("an_note_ph")) + '">' + esc(a.note || "") + '</textarea></div><div class="row"><button class="btn sm primary" data-act="an-open" data-id="' + esc(a.id) + '">' + esc(t("an_open")) + '</button><button class="btn sm ghost" data-act="an-del" data-id="' + esc(a.id) + '">' + esc(t("an_del")) + "</button></div></div>" : "") + "</li>"; };
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("an_h")) + "</h1><p>" + esc(t("an_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + ((S.analyses || []).length ? '<div class="row" style="justify-content:space-between"><input id="an-q" type="search" data-an="q" placeholder="' + esc(t("an_q")) + '" value="' + esc(anQ) + '" style="flex:1;min-width:200px;max-width:360px"><span class="small muted">' + esc(t("an_count").replace("{n}", (S.analyses || []).length)) + "</span></div>" : "") +
+    '<ul class="an-list" id="an-list">' + (list.length ? list.map(item).join("") : '<li class="notice">' + esc(t("an_none")) + "</li>") + "</ul></div></div>";
+}
 /* ===== مِراس: العقود (الأوبشن) داخل مكتبي =====
    دروس خاصة بالمالك من مفهوم العقد إلى البيع وجمع العلاوة، مع حاسبة ربح وخسارة عند الانتهاء.
    تعليم فقط: لا توصيات ولا تنبؤات. كل المبالغ بالدولار. */
