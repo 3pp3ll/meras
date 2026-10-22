@@ -665,3 +665,4 @@ p,li,dd{line-height:1.95}
   .dg-table td.dg-c1{grid-column:1/-1;padding-inline-end:44px;font-size:17px}
   .dg-table td.dg-cs{position:absolute;top:8px;inset-inline-end:8px}
 }
+@media (max-width:640px){.dg-none tr{grid-template-columns:1fr 1fr}}
