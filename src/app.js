@@ -113,6 +113,13 @@ function toast(msg) {
   clearTimeout(toast.t); toast.t = setTimeout(() => { el.hidden = true; }, 2600);
 }
 
+/* Excel export used across the platform: sheets = [[name, rows(array of arrays)], …] */
+function xlsxSave(filename, sheets) {
+  if (!window.XLSX) { toast(t("save_fail")); return; }
+  const wb = XLSX.utils.book_new(); if (S.lang === "ar") wb.Workbook = { Views: [{ RTL: true }] };
+  sheets.forEach(([name, rows]) => { const ws = XLSX.utils.aoa_to_sheet(rows); ws["!cols"] = (rows[0] || []).map((_, i) => ({ wch: Math.min(40, Math.max(8, ...rows.map((r) => String(r[i] == null ? "" : r[i]).length + 2))) })); XLSX.utils.book_append_sheet(wb, ws, String(name).slice(0, 31)); });
+  saveFile(filename, new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+}
 async function saveFile(filename, blob) {
   let dl = null;
   try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch (e) {}
@@ -382,7 +389,7 @@ function render() {
   if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
   if (typeof topBell === "function") topBell();
-  document.querySelectorAll(".subnav nav, #main .tabs").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
+  document.querySelectorAll(".subnav nav, #main .tabs, .dg-chips").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"],[aria-pressed="true"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
       window.scrollTo(0, y);

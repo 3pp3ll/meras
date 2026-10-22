@@ -61,7 +61,7 @@ function headerHtml(r) {
   if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }
   fab.hidden = !back; if (back) { fab.href = "#" + BACK.r; fab.innerHTML = '<span aria-hidden="true">↩</span> ' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")); fab.title = t(BACK.r === "desk" ? "back_desk" : "back_owner"); }
   const tools = back + '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
-    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm acct-btn' + (S.signedIn ? "" : " primary") + (typeof HOSTED !== "undefined" && HOSTED && CFG.token ? " acct-owner" : "") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a>";
+    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + "</button>";
   const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
   return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;
 }
@@ -133,6 +133,8 @@ const secIc = (k, sz) => '<svg viewBox="0 0 24 24" width="' + (sz || 20) + '" he
 Object.assign(UI, {
   map_root: ["مِراس", "Meras"], map_admin: ["الإدارة", "Admin"], map_admin_p: ["تظهر لك بس", "Only you see this"],
   map_h: ["هيكل المنصة", "How Meras is organised"], map_p: ["كل أقسام مِراس في مكان واحد. اضغط أي قسم وتدخله على طول.", "Every part of Meras in one place. Tap any section to open it."],
+  map_portal: ["بوابة الدخول", "Sign-in portal"], map_portal_s: ["سجّل دخولك أو أنشئ حسابك", "Sign in or create your account"], map_portal_o: ["حسابك، ولوحة المالك ومكتبي لك بس", "Your account; the owner dashboard and desk are yours only"],
+  map_acc_in: ["بياناتك وتقدّمك", "Your details and progress"], map_acc_out: ["دخول أو إنشاء حساب", "Sign in or create an account"],
   map_tree: ["الشجرة", "Tree"], map_cols: ["الأعمدة", "Columns"], map_cards: ["البطاقات", "Cards"],
   map_learn_s: ["المسارات والشروحات والممارسة", "Tracks, guides and practice"], map_svc_s: ["أدوات يومية: سجل، تحليل، توزيعات، فرز شرعي", "Daily tools: journal, analysis, payouts, screening"],
   map_plans_s: ["أول درجتين مجانية في كل مسار", "The first two steps are free"], map_admin_s: ["تظهر لك بس", "Only you see this"], map_plan_free: ["البداية المجانية", "Free start"], map_q: ["ابحث عن قسم…", "Find a section…"], map_n: ["{n} أقسام", "{n} sections"],
@@ -180,11 +182,17 @@ function mapSection() {
     card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
     card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) +
     (owner ? card("owner", t("map_admin"), t("map_admin_s"), 0, cl("owner", "ow_h") + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "cd-admin") : "") + "</div>";
-  const v = mapView();
-  const sw = [["tree", "map_tree"], ["cards", "map_cards"], ["cols", "map_cols"]].map(([k, l]) => '<button data-act="map-view" data-v="' + k + '" aria-pressed="' + (v === k) + '">' + esc(t(l)) + "</button>").join("");
-  const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><div class="map-sw" role="group" aria-label="' + esc(t("map_h")) + '">' + sw + '</div><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
-  const view = (k, inner, cls) => '<div class="map-v' + (cls ? " " + cls : "") + '" data-v="' + k + '"' + (v === k ? "" : " hidden") + ">" + inner + "</div>";
-  return '<section class="sec org">' + bar + view("tree", tree) + view("cards", cards) + view("cols", columns, "map-vcols") + "</section>";
+  const portal = '<div class="cd cd-portal"><div class="cd-h"><span class="cd-hi"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l4-4-4-4M14 12H4"/></g></svg></span><span class="cd-ht"><b>' + esc(t("map_portal")) + "</b><small>" + esc(t(owner ? "map_portal_o" : "map_portal_s")) + '</small></span></div><div class="pt-big">' +
+    '<a class="pt-tile" href="#account">' + secIc("owner", 26) + "<b>" + esc(t(S.signedIn ? "nav_account" : "sign_in")) + "</b><small>" + esc(t(S.signedIn ? "map_acc_in" : "map_acc_out")) + "</small></a>" +
+    (owner ? '<a class="pt-tile pt-owner" href="#owner"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg><b>' + esc(t("ow_h")) + "</b><small>" + esc(t("map_owner_p")) + "</small></a>" : "") + "</div>" +
+    (owner ? '<div class="cd-sub">🔒 ' + esc(t("dk_h")) + '</div><div class="cd-grid">' + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + "</div>" : "") + "</div>";
+  const cards2 = '<div class="cds">' +
+    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) + portal + "</div>";
+  const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
+  void tree; void cards; void columns;
+  return '<section class="sec org">' + bar + cards2 + "</section>";
 }
 const mapView = () => { try { const v = localStorage.getItem("meras.mapview"); return v === "cols" || v === "cards" ? v : "tree"; } catch (e) { return "tree"; } };
 document.addEventListener("click", (e) => {

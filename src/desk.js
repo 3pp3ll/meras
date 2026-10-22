@@ -184,7 +184,7 @@ function dkGridHtml(tabs) {
   return '<div class="dk-grid">' + tabs.map(([k, l]) => { const b = badge(k); return '<button class="dk-tile" data-act="dk-tab" data-tab="' + k + '"><span class="dk-ti">' + '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">' + (DK_IC[k] || "") + "</svg>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</span><b>" + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></button>"; }).join("") + "</div>";
 }
 function pageDesk() {
-  const head = '<div class="wrap"><div class="page-head"><div class="crumbs"><a href="#owner">' + esc(t("dk_back")) + "</a></div><h1>" + esc(t("dk_h")) + "</h1><p>" + esc(t("dk_p")) + "</p></div>";
+  const head = '<div class="wrap"><div class="page-head"><div class="crumbs"><a class="btn sm owner-go" href="#owner"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg> ' + esc(t("dk_back")) + "</a></div><h1>" + esc(t("dk_h")) + "</h1><p>" + esc(t("dk_p")) + "</p></div>";
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }

@@ -1127,6 +1127,23 @@ h1,h2,h3,.hero h1{font-weight:700}
 .sy-nm{flex:1;min-width:0;display:flex;flex-direction:column}
 .sy-nm b{font-size:15px}
 .sy-nm small{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* بوابة الدخول */
+.cd-portal{background:color-mix(in srgb,var(--sky-soft) 75%,transparent);border-color:color-mix(in srgb,var(--sky) 45%,transparent)}
+.cd-portal .cd-hi{background:var(--surface);color:var(--ind2);border-color:color-mix(in srgb,var(--sky) 50%,transparent)}
+.cd-portal .cd-h{border-color:color-mix(in srgb,var(--sky) 40%,transparent)}
+.cd-portal .cd-ii{color:var(--ind2)}
+.pt-big{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.pt-tile{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:16px;background:var(--surface);border:1px solid color-mix(in srgb,var(--sky) 45%,transparent);color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s,box-shadow .2s}
+.pt-tile svg{color:var(--ind2);margin-bottom:4px}
+.pt-tile b{font-size:16px}
+.pt-tile small{font-size:12px;color:var(--muted);line-height:1.4}
+.pt-tile:hover,.pt-tile:focus-visible{border-color:var(--amber);transform:translateY(-2px);box-shadow:0 10px 22px -14px rgba(20,26,40,.35)}
+.pt-owner{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 45%,transparent)}
+.pt-owner svg{color:var(--amber-ink)}
+.cd-sub{font-size:12.5px;font-weight:700;color:var(--muted)}
+/* زر لوحة المالك في مكتبي */
+.owner-go{display:inline-flex;align-items:center;gap:6px;border-color:var(--amber);color:var(--amber-ink);text-decoration:none}
+.org .cds{width:100%}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1911,6 +1928,13 @@ function toast(msg) {
   clearTimeout(toast.t); toast.t = setTimeout(() => { el.hidden = true; }, 2600);
 }
 
+/* Excel export used across the platform: sheets = [[name, rows(array of arrays)], …] */
+function xlsxSave(filename, sheets) {
+  if (!window.XLSX) { toast(t("save_fail")); return; }
+  const wb = XLSX.utils.book_new(); if (S.lang === "ar") wb.Workbook = { Views: [{ RTL: true }] };
+  sheets.forEach(([name, rows]) => { const ws = XLSX.utils.aoa_to_sheet(rows); ws["!cols"] = (rows[0] || []).map((_, i) => ({ wch: Math.min(40, Math.max(8, ...rows.map((r) => String(r[i] == null ? "" : r[i]).length + 2))) })); XLSX.utils.book_append_sheet(wb, ws, String(name).slice(0, 31)); });
+  saveFile(filename, new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+}
 async function saveFile(filename, blob) {
   let dl = null;
   try { dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null; } catch (e) {}
@@ -2180,7 +2204,7 @@ function render() {
   if (same && m) m.style.minHeight = m.offsetHeight + "px";
   try { renderNow(); } finally { rendering = false; }
   if (typeof topBell === "function") topBell();
-  document.querySelectorAll(".subnav nav, #main .tabs").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
+  document.querySelectorAll(".subnav nav, #main .tabs, .dg-chips").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"],[aria-pressed="true"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
       window.scrollTo(0, y);
@@ -3514,7 +3538,7 @@ function pageSymbols() {
       rows.slice().sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([c, n, f]) => { const has = typeof chartData === "function" && chartData(c).length > 1; return '<li><span class="sy-code num">' + esc(c) + '</span><span class="sy-nm"><b>' + esc(n) + "</b>" + (f && f !== n ? '<small class="muted">' + esc(f) + "</small>" : "") + "</span>" + (has ? '<button class="btn sm ghost" data-act="sy-chart" data-s="' + esc(c) + '">' + esc(t("sy_chart")) + "</button>" : "") + "</li>"; }).join("") + "</ul></details>";
   }).join("");
   const n = SA_SECTORS.reduce((a, [, l]) => a + l.length, 0);
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sy_h")) + "</h1><p>" + esc(t("sy_p")) + '</p></div><div class="stack" style="padding-block:18px 40px"><div class="sy-bar"><input id="sy-q" type="search" data-sy="q" autocomplete="off" placeholder="' + esc(t("sy_q")) + '" value="' + esc(syQ) + '"><button class="btn sm" data-act="sy-all">' + esc(t("sy_open")) + '</button><button class="btn sm ghost" data-act="sy-none">' + esc(t("sy_close")) + '</button></div><p class="small muted" style="margin:0">' + esc(t("sy_all").replace("{n}", n).replace("{s}", SA_SECTORS.length)) + '</p><div id="sy-out" class="stack" style="gap:10px">' + (groups || '<div class="notice">' + esc(t("sy_none")) + "</div>") + '</div><p class="small muted" style="margin:0">' + esc(t("sy_src")) + ' <a href="https://www.argaam.com/ar/company/companies-prices" target="_blank" rel="noopener">argaam.com</a></p></div></div>';
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sy_h")) + "</h1><p>" + esc(t("sy_p")) + '</p></div><div class="stack" style="padding-block:18px 40px"><div class="sy-bar"><input id="sy-q" type="search" data-sy="q" autocomplete="off" placeholder="' + esc(t("sy_q")) + '" value="' + esc(syQ) + '"><button class="btn sm" data-act="sy-all">' + esc(t("sy_open")) + '</button><button class="btn sm ghost" data-act="sy-none">' + esc(t("sy_close")) + '</button><button class="btn sm" data-act="sy-xlsx">⬇ Excel</button></div><p class="small muted" style="margin:0">' + esc(t("sy_all").replace("{n}", n).replace("{s}", SA_SECTORS.length)) + '</p><div id="sy-out" class="stack" style="gap:10px">' + (groups || '<div class="notice">' + esc(t("sy_none")) + "</div>") + '</div><p class="small muted" style="margin:0">' + esc(t("sy_src")) + ' <a href="https://www.argaam.com/ar/company/companies-prices" target="_blank" rel="noopener">argaam.com</a></p></div></div>';
 }
 document.addEventListener("input", (e) => {
   if (!e.target.dataset || e.target.dataset.sy !== "q") return;
@@ -3525,6 +3549,7 @@ document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="sy-"]'); if (!el) return;
   const a = el.dataset.act;
   if (a === "sy-all" || a === "sy-none") { syOpen = a === "sy-all" ? "all" : "none"; document.querySelectorAll(".sy-sec").forEach((d) => { d.open = syOpen === "all"; }); }
+  else if (a === "sy-xlsx") { const rows = [[t("sy_code"), t("sy_name"), t("sy_full"), S.lang === "ar" ? "القطاع" : "Sector"]]; SA_SECTORS.forEach(([sec, l]) => l.forEach(([c, n, f]) => rows.push([c, n, f || n, sec]))); xlsxSave("meras-saudi-symbols.xlsx", [[t("sy_h"), rows]]); }
   else if (a === "sy-chart") { S.chart.sym = el.dataset.s; save(); location.hash = "chart"; }
 });
 /* ===== مِراس: دليل المؤشرات ===== */
@@ -4635,7 +4660,7 @@ function headerHtml(r) {
   if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }
   fab.hidden = !back; if (back) { fab.href = "#" + BACK.r; fab.innerHTML = '<span aria-hidden="true">↩</span> ' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")); fab.title = t(BACK.r === "desk" ? "back_desk" : "back_owner"); }
   const tools = back + '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
-    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + '</button><a class="btn sm acct-btn' + (S.signedIn ? "" : " primary") + (typeof HOSTED !== "undefined" && HOSTED && CFG.token ? " acct-owner" : "") + '" href="#account">' + esc(S.signedIn && S.account ? S.account.name.split(" ")[0] : t("sign_in")) + "</a>";
+    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + "</button>";
   const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
   return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;
 }
@@ -4707,6 +4732,8 @@ const secIc = (k, sz) => '<svg viewBox="0 0 24 24" width="' + (sz || 20) + '" he
 Object.assign(UI, {
   map_root: ["مِراس", "Meras"], map_admin: ["الإدارة", "Admin"], map_admin_p: ["تظهر لك بس", "Only you see this"],
   map_h: ["هيكل المنصة", "How Meras is organised"], map_p: ["كل أقسام مِراس في مكان واحد. اضغط أي قسم وتدخله على طول.", "Every part of Meras in one place. Tap any section to open it."],
+  map_portal: ["بوابة الدخول", "Sign-in portal"], map_portal_s: ["سجّل دخولك أو أنشئ حسابك", "Sign in or create your account"], map_portal_o: ["حسابك، ولوحة المالك ومكتبي لك بس", "Your account; the owner dashboard and desk are yours only"],
+  map_acc_in: ["بياناتك وتقدّمك", "Your details and progress"], map_acc_out: ["دخول أو إنشاء حساب", "Sign in or create an account"],
   map_tree: ["الشجرة", "Tree"], map_cols: ["الأعمدة", "Columns"], map_cards: ["البطاقات", "Cards"],
   map_learn_s: ["المسارات والشروحات والممارسة", "Tracks, guides and practice"], map_svc_s: ["أدوات يومية: سجل، تحليل، توزيعات، فرز شرعي", "Daily tools: journal, analysis, payouts, screening"],
   map_plans_s: ["أول درجتين مجانية في كل مسار", "The first two steps are free"], map_admin_s: ["تظهر لك بس", "Only you see this"], map_plan_free: ["البداية المجانية", "Free start"], map_q: ["ابحث عن قسم…", "Find a section…"], map_n: ["{n} أقسام", "{n} sections"],
@@ -4754,11 +4781,17 @@ function mapSection() {
     card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
     card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) +
     (owner ? card("owner", t("map_admin"), t("map_admin_s"), 0, cl("owner", "ow_h") + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "cd-admin") : "") + "</div>";
-  const v = mapView();
-  const sw = [["tree", "map_tree"], ["cards", "map_cards"], ["cols", "map_cols"]].map(([k, l]) => '<button data-act="map-view" data-v="' + k + '" aria-pressed="' + (v === k) + '">' + esc(t(l)) + "</button>").join("");
-  const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><div class="map-sw" role="group" aria-label="' + esc(t("map_h")) + '">' + sw + '</div><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
-  const view = (k, inner, cls) => '<div class="map-v' + (cls ? " " + cls : "") + '" data-v="' + k + '"' + (v === k ? "" : " hidden") + ">" + inner + "</div>";
-  return '<section class="sec org">' + bar + view("tree", tree) + view("cards", cards) + view("cols", columns, "map-vcols") + "</section>";
+  const portal = '<div class="cd cd-portal"><div class="cd-h"><span class="cd-hi"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l4-4-4-4M14 12H4"/></g></svg></span><span class="cd-ht"><b>' + esc(t("map_portal")) + "</b><small>" + esc(t(owner ? "map_portal_o" : "map_portal_s")) + '</small></span></div><div class="pt-big">' +
+    '<a class="pt-tile" href="#account">' + secIc("owner", 26) + "<b>" + esc(t(S.signedIn ? "nav_account" : "sign_in")) + "</b><small>" + esc(t(S.signedIn ? "map_acc_in" : "map_acc_out")) + "</small></a>" +
+    (owner ? '<a class="pt-tile pt-owner" href="#owner"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg><b>' + esc(t("ow_h")) + "</b><small>" + esc(t("map_owner_p")) + "</small></a>" : "") + "</div>" +
+    (owner ? '<div class="cd-sub">🔒 ' + esc(t("dk_h")) + '</div><div class="cd-grid">' + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + "</div>" : "") + "</div>";
+  const cards2 = '<div class="cds">' +
+    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) + portal + "</div>";
+  const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
+  void tree; void cards; void columns;
+  return '<section class="sec org">' + bar + cards2 + "</section>";
 }
 const mapView = () => { try { const v = localStorage.getItem("meras.mapview"); return v === "cols" || v === "cards" ? v : "tree"; } catch (e) { return "tree"; } };
 document.addEventListener("click", (e) => {
@@ -5354,7 +5387,7 @@ function dkGridHtml(tabs) {
   return '<div class="dk-grid">' + tabs.map(([k, l]) => { const b = badge(k); return '<button class="dk-tile" data-act="dk-tab" data-tab="' + k + '"><span class="dk-ti">' + '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">' + (DK_IC[k] || "") + "</svg>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</span><b>" + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></button>"; }).join("") + "</div>";
 }
 function pageDesk() {
-  const head = '<div class="wrap"><div class="page-head"><div class="crumbs"><a href="#owner">' + esc(t("dk_back")) + "</a></div><h1>" + esc(t("dk_h")) + "</h1><p>" + esc(t("dk_p")) + "</p></div>";
+  const head = '<div class="wrap"><div class="page-head"><div class="crumbs"><a class="btn sm owner-go" href="#owner"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg> ' + esc(t("dk_back")) + "</a></div><h1>" + esc(t("dk_h")) + "</h1><p>" + esc(t("dk_p")) + "</p></div>";
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
@@ -5981,6 +6014,7 @@ Object.assign(UI, {
   dg_own_before: [". لازم تملك السهم قبل هالتاريخ عشان يجيك التوزيع.", ". Own the share before this date to receive the payout."], dg_est: ["الموعد تقديري من نمط التوزيعات السابقة، والرسمي تعلنه الشركة.", "The date is estimated from past payouts; the company announces the official one."],
   dg_how_much: ["كم يجيك منه؟", "How much would you get?"], dg_net_y: ["يوصلك بالسنة تقريباً", "You receive per year, about"], dg_gross: ["قبل الضريبة", "Before tax"], dg_each: ["كل توزيع ({f})", "Each payout ({f})"], dg_pur_of: ["منه تطهير", "Of which purification"], dg_enter_amt: ["اكتب المبلغ.", "Enter an amount."],
   dg_nodiv_long: ["هالشركة ما وزّعت آخر سنة. لو بدأت توزع، تنتقل لقائمة الموزّعة لحالها.", "This company paid nothing in the last year. If it starts paying, it moves to the paying list."],
+  dg_xlsx: ["تصدير الجدول Excel", "Export to Excel"],
   dg_hist: ["آخر التوزيعات", "Recent payouts"],
   dg_share_h: ["مشاركة القسم", "Share this section"],
   dg_share_p: ["حط كلمة سر وعطها للي تبيه يشوف القسم (مثل أخوك). يفتح الرابط ويكتبها ويشوف الجدول والحاسبة، بدون نجوم ولا شي من مكتبك. تقدر توقفها أو تغيّر كلمة السر متى ما بغيت.", "Set a password and give it to whoever should see this section. They open the link, enter it and see the table and calculator, nothing else from your desk. You can stop or change it any time."],
@@ -6090,7 +6124,7 @@ function dgTable(data, opt) {
   const stats = [["soon", paid.filter(dgSoon).length, "dg_st_soon"], ["avg", fmt(avg, 2) + "%", "dg_st_avg"]].concat(opt.watch ? [["watch", paid.filter((r) => opt.watch.includes(r.s)).length, "dg_st_watch"]] : []);
   const sum = '<div class="dg-sum" style="grid-template-columns:repeat(' + stats.length + ',minmax(0,1fr))">' + stats.map(([k, v, l]) => k === "avg" ? '<div class="dg-stat"><b class="num">' + v + "</b><span>" + esc(t(l)) + "</span></div>" : '<button class="dg-stat" data-act="dg-f" data-f="' + k + '" aria-pressed="' + (dgF === k) + '"><b class="num">' + v + "</b><span>" + esc(t(l)) + "</span></button>").join("") + "</div>";
   const grps = ["all", "big", "tech", "china", "hk"].filter((g) => g === "all" || data.stocks.some((r) => r.g === g));
-  const rail = '<div class="dg-rail"><div class="dg-chips" role="group" aria-label="' + esc(t("dg_h")) + '">' + grps.map((g) => '<button class="dg-chip" data-act="dg-grp" data-g="' + g + '" aria-pressed="' + (dgGrp === g) + '">' + esc(t("dg_g_" + g)) + "</button>").join("") + '</div><button class="dg-sortb" data-act="dg-sort" aria-label="' + esc(t("dg_sort")) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' + esc(t("dg_s_" + dgSort)) + "</button></div>";
+  const rail = '<div class="dg-rail"><div class="dg-chips" role="group" aria-label="' + esc(t("dg_h")) + '">' + grps.map((g) => '<button class="dg-chip" data-act="dg-grp" data-g="' + g + '" aria-pressed="' + (dgGrp === g) + '">' + esc(t("dg_g_" + g)) + "</button>").join("") + '</div><button class="dg-sortb" data-act="dg-xlsx" title="' + esc(t("dg_xlsx")) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Excel</button><button class="dg-sortb" data-act="dg-sort" aria-label="' + esc(t("dg_sort")) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' + esc(t("dg_s_" + dgSort)) + "</button></div>";
   const listH = '<div class="dg-lh"><h3>' + esc(t(dgF === "soon" ? "dg_lh_soon" : dgF === "watch" ? "dg_lh_watch" : "dg_lh_pay")) + '</h3><span class="small muted">' + esc(t("dg_n").replace("{n}", list.length)) + "</span></div>";
   const emptyTxt = t(dgF === "watch" ? "dg_e_watch" : dgF === "soon" ? "dg_e_soon" : "dg_nopay");
   const head = ["dg_c_sym", "dg_c_px", "dg_c_yld", "dg_c_ttm", "dg_c_freq", "dg_c_last", "dg_c_next", "dg_c_sh"].map((k) => "<th>" + esc(t(k)) + "</th>").join("") + (opt.watch ? "<th></th>" : "");
@@ -6237,6 +6271,9 @@ document.addEventListener("click", async (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="dg-"],[data-act^="sd-"]'); if (!el) return;
   const a = el.dataset.act;
   if (a === "dg-grp") { dgGrp = el.dataset.g; render(); }
+  else if (a === "dg-xlsx") { const { data, opt } = dgCtx(); if (!data || !data.stocks) return; const head = [t("dg_c_sym"), "", t("dg_g_all"), t("dg_c_px"), "", t("dg_c_yld") + " %", t("dg_c_ttm"), t("dg_c_freq"), t("dg_c_last"), "", t("dg_c_next"), t("dg_c_sh"), t("sh_purify") + " %"];
+    const rows = dgSorted(data.stocks).map((r) => { const sh = opt.sh(r.s); return [r.s, r.n || "", t("dg_g_" + r.g), r.price, r.cur, r.yld, r.ttm, r.ttm ? dgFreq(r.freq) : t("dg_f0"), r.last ? r.last[0] : "", r.last ? r.last[1] : "", r.next || "", sh ? t("sh_" + sh.st) : t("dg_sh_none"), sh && sh.p != null ? sh.p : ""]; });
+    xlsxSave("meras-global-dividends-" + today() + ".xlsx", [[t("dg_h"), [head].concat(rows)]]); }
   else if (a === "dg-f") { dgF = dgF === el.dataset.f ? null : el.dataset.f; render(); }
   else if (a === "dg-sort") { const o = ["yld", "next", "sym"]; dgSort = o[(o.indexOf(dgSort) + 1) % o.length]; render(); }
   else if (a === "dg-none") { dgNone = !dgNone; render(); }
