@@ -148,13 +148,17 @@ function siteMap() {
 }
 function mapSection() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
-  const card = (h, k, d, stat, extra) => '<a class="panel map-card" href="#' + h + '"' + (extra || "") + '><span class="map-ic">' + secIc(h.startsWith("desk") ? "desk" : h, 22) + '</span><span class="map-tx"><b>' + esc(t(k)) + '</b><span class="muted small">' + esc(t(d)) + "</span>" + (stat ? '<span class="tag amber">' + esc(stat) + "</span>" : "") + "</span></a>";
-  const group = (title, sub, cards, cls) => '<div class="map-grp' + (cls ? " " + cls : "") + '"><div class="map-gh"><h3>' + esc(title) + "</h3>" + (sub ? '<span class="muted small">' + esc(sub) + "</span>" : "") + '</div><div class="map-cards">' + cards + "</div></div>";
-  return '<section class="sec"><div class="sec-head"><h2>' + esc(t("map_h")) + '</h2></div><p class="muted" style="margin:-6px 0 16px">' + esc(t("map_p")) + "</p>" +
-    group(t("nav_learn"), t("learn_p"), NAV_GROUPS.learn.items.map(([h, k, d]) => card(h, k, d, hubStat(h))).join("")) +
-    group(t("nav_svc"), t("svc_hub_p"), NAV_GROUPS.services.items.map(([h, k, d]) => card(h, k, d, hubStat(h))).join("")) +
-    group(t("nav_plans"), "", card("plans", "nav_plans", "map_plans_p")) +
-    (owner ? group(t("map_admin"), t("map_admin_p"), card("owner", "ow_h", "map_owner_p") + MAP_DESK.map(([k, l]) => card("desk", l, "dk_g_" + k, "", ' data-dktab="' + k + '"')).join(""), "map-admin") : "") + "</section>";
+  const short = (h) => { const done = LESSONS.filter((l) => isDone(l.id)).length;
+    return { tracks: done + "/" + LESSONS.length, glossary: String(GLOSSARY.length), progress: Math.round((done / LESSONS.length) * 100) + "%", journal: String(S.journal.filter((j) => j.exit == null).length || ""), guides: String((typeof GUIDES !== "undefined" ? GUIDES.length : 0) + 1) }[h] || ""; };
+  const item = (h, k, stat, extra, ic) => '<li><a class="org-it" href="#' + h + '"' + (extra || "") + '><span class="org-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">' + ic + "</svg>" : secIc(h, 17)) + "</span><span>" + esc(t(k)) + "</span>" + (stat ? '<small class="num">' + esc(stat) + "</small>" : "") + "</a></li>";
+  const col = (ic, title, href, body, cls) => '<div class="org-col' + (cls ? " " + cls : "") + '"><a class="org-h" href="#' + href + '"><span class="org-hi">' + secIc(ic, 20) + "</span><b>" + esc(title) + "</b></a>" + body + "</div>";
+  const cols = [
+    col("tracks", t("nav_learn"), "learn", '<ul class="org-list">' + NAV_GROUPS.learn.items.map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
+    col("calc", t("nav_svc"), "services", '<ul class="org-list">' + NAV_GROUPS.services.items.map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
+    col("plans", t("nav_plans"), "plans", '<a class="org-plans" href="#plans">' + secIc("plans", 30) + "<span>" + esc(t("map_plans_p")) + "</span></a>"),
+  ];
+  if (owner) cols.push(col("owner", t("map_admin"), "owner", '<ul class="org-list">' + item("owner", "ow_h") + MAP_DESK.map(([k, l]) => item("desk", l, "", ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + '</ul><p class="org-note">🔒 ' + esc(t("map_admin_p")) + "</p>", "org-admin"));
+  return '<section class="sec org"><div class="org-root">' + LOGO + "<div><b>" + esc(t("map_root")) + "</b><span>" + esc(t("map_h")) + '</span></div></div><div class="org-stem" aria-hidden="true"></div><div class="org-cols" style="--n:' + cols.length + '">' + cols.join("") + "</div></section>";
 }
 document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("[data-dktab]"); if (a && typeof dkTab !== "undefined") { dkTab = a.dataset.dktab; dkGrid = false; } });
 
