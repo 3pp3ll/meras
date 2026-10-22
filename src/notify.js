@@ -92,7 +92,8 @@ function ntEls() {
   }
   return { sc, sh };
 }
-function ntH() { return window.innerHeight - 8; }   // the sheet's full height
+const ntTopY = () => { const h = document.querySelector(".top"); return h ? Math.round(h.getBoundingClientRect().bottom) + 6 : 8; };
+function ntH() { return ntTop() ? window.innerHeight - ntTopY() - 16 : window.innerHeight - 8; }   // the sheet's full height
 function ntPlace(px, anim) {   // px = how much of the sheet is hidden off-screen
   const { sc, sh } = ntEls(), top = ntTop();
   sh.style.transition = anim ? "" : "none"; sc.style.transition = anim ? "" : "none";
@@ -102,18 +103,25 @@ function ntPlace(px, anim) {   // px = how much of the sheet is hidden off-scree
 }
 function ntGo(s) {
   const { sc, sh } = ntEls(); ntState = s; ntOpen = s !== "closed";
-  sh.classList.toggle("top", ntTop()); sh.classList.toggle("full", s === "full"); sc.classList.toggle("on", ntOpen);
+  sh.classList.toggle("top", ntTop()); sh.classList.toggle("full", s === "full"); sc.classList.toggle("on", ntOpen); sc.classList.toggle("wide", ntTop()); ntAnchor(sh);
   sh.dir = S.lang === "ar" ? "rtl" : "ltr";
   if (ntOpen) document.body.classList.add("nt-lock"); else document.body.classList.remove("nt-lock");
   requestAnimationFrame(() => ntPlace(s === "closed" ? ntH() + 20 : s === "half" ? ntH() * 0.5 : 0, true));
   if (!ntOpen) { ntMark(ntItems().map((i) => i.id)); if (typeof topBell === "function") topBell(); const b = document.querySelector('#tabbar [data-act="nt-bell"]') || document.getElementById("topbell"); if (b && b.offsetParent) b.focus({ preventScroll: true }); }
+}
+function ntAnchor(sh) {   // on a wide screen: a narrow tall panel that drops from under the bell
+  if (!ntTop()) { sh.style.left = sh.style.right = sh.style.top = ""; return; }
+  const b = document.getElementById("topbell"), w = Math.min(400, window.innerWidth - 16);
+  let x = b ? b.getBoundingClientRect().left + b.getBoundingClientRect().width / 2 - w / 2 : window.innerWidth - w - 8;
+  x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+  sh.style.left = x + "px"; sh.style.right = "auto"; sh.style.top = ntTopY() + "px";
 }
 function ntToggle(open) {
   const want = open == null ? !ntOpen : open;
   if (!want) { if (ntOpen) ntGo("closed"); return; }
   const { sh } = ntEls();
   document.getElementById("nt-body").innerHTML = ntPanel();
-  if (!ntOpen) { sh.classList.toggle("top", ntTop()); ntPlace(ntH() + 20, false); ntGo("half"); setTimeout(() => { const x = sh.querySelector(".nt-x"); if (x) x.focus({ preventScroll: true }); }, 320); }
+  if (!ntOpen) { sh.classList.toggle("top", ntTop()); ntAnchor(sh); ntPlace(ntH() + 20, false); ntGo("half"); setTimeout(() => { const x = sh.querySelector(".nt-x"); if (x) x.focus({ preventScroll: true }); }, 320); }
 }
 function ntDrag(sh) {
   let y0 = null, start = 0, last = 0, lastT = 0, v = 0, moved = false, grab = false;

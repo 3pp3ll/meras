@@ -841,6 +841,26 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 body.nt-lock{overflow:hidden}
 @media (prefers-reduced-motion:reduce){#ntsheet,#ntscrim{transition:none}}
 #ntsheet.top{transition:transform .3s cubic-bezier(.2,.8,.2,1),height .3s cubic-bezier(.2,.8,.2,1),border-radius .3s;height:calc(100% - 8px)}
+/* الكمبيوتر: لوحة ضيقة طولية تنزل من تحت الجرس، ونص أقصر */
+#ntsheet.top{width:min(400px,calc(100vw - 16px));margin:0;border-radius:16px;box-shadow:0 16px 40px rgba(20,26,40,.22);border:1px solid var(--line);padding-top:0}
+#ntsheet.top.full{border-radius:16px}
+#ntsheet.top .nt-body{padding-inline:12px}
+#ntsheet.top .nt-shead{padding-block:12px 8px}
+#ntsheet.top .nt-shead h2{font-size:16px}
+#ntsheet.top .nt-filters{padding-block:8px;gap:6px}
+#ntsheet.top .dg-chip{padding:4px 10px;font-size:12.5px}
+#ntsheet.top .nt-day{padding:8px 0 4px;font-size:12px}
+#ntsheet.top .nt-it{padding:8px 9px;gap:9px;border-radius:12px;margin-bottom:4px}
+#ntsheet.top .nt-ic{width:30px;height:30px;border-radius:9px}
+#ntsheet.top .nt-ic svg{width:16px;height:16px}
+#ntsheet.top .nt-tx b{font-size:13.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#ntsheet.top .nt-tx p{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ntsheet.top .nt-acts{gap:6px;margin-top:2px}
+#ntsheet.top .nt-acts .btn{padding:2px 9px;font-size:12px;min-height:0}
+#ntsheet.top .nt-acts .small{font-size:11.5px}
+#ntsheet.top .nt-it.unread::after{top:14px;inset-inline-end:9px;width:7px;height:7px}
+#ntsheet.top .nt-grab{padding:4px 0 8px}
+#ntscrim.wide{background:rgba(20,26,40,.12)}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5866,7 +5886,8 @@ function ntEls() {
   }
   return { sc, sh };
 }
-function ntH() { return window.innerHeight - 8; }   // the sheet's full height
+const ntTopY = () => { const h = document.querySelector(".top"); return h ? Math.round(h.getBoundingClientRect().bottom) + 6 : 8; };
+function ntH() { return ntTop() ? window.innerHeight - ntTopY() - 16 : window.innerHeight - 8; }   // the sheet's full height
 function ntPlace(px, anim) {   // px = how much of the sheet is hidden off-screen
   const { sc, sh } = ntEls(), top = ntTop();
   sh.style.transition = anim ? "" : "none"; sc.style.transition = anim ? "" : "none";
@@ -5876,18 +5897,25 @@ function ntPlace(px, anim) {   // px = how much of the sheet is hidden off-scree
 }
 function ntGo(s) {
   const { sc, sh } = ntEls(); ntState = s; ntOpen = s !== "closed";
-  sh.classList.toggle("top", ntTop()); sh.classList.toggle("full", s === "full"); sc.classList.toggle("on", ntOpen);
+  sh.classList.toggle("top", ntTop()); sh.classList.toggle("full", s === "full"); sc.classList.toggle("on", ntOpen); sc.classList.toggle("wide", ntTop()); ntAnchor(sh);
   sh.dir = S.lang === "ar" ? "rtl" : "ltr";
   if (ntOpen) document.body.classList.add("nt-lock"); else document.body.classList.remove("nt-lock");
   requestAnimationFrame(() => ntPlace(s === "closed" ? ntH() + 20 : s === "half" ? ntH() * 0.5 : 0, true));
   if (!ntOpen) { ntMark(ntItems().map((i) => i.id)); if (typeof topBell === "function") topBell(); const b = document.querySelector('#tabbar [data-act="nt-bell"]') || document.getElementById("topbell"); if (b && b.offsetParent) b.focus({ preventScroll: true }); }
+}
+function ntAnchor(sh) {   // on a wide screen: a narrow tall panel that drops from under the bell
+  if (!ntTop()) { sh.style.left = sh.style.right = sh.style.top = ""; return; }
+  const b = document.getElementById("topbell"), w = Math.min(400, window.innerWidth - 16);
+  let x = b ? b.getBoundingClientRect().left + b.getBoundingClientRect().width / 2 - w / 2 : window.innerWidth - w - 8;
+  x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+  sh.style.left = x + "px"; sh.style.right = "auto"; sh.style.top = ntTopY() + "px";
 }
 function ntToggle(open) {
   const want = open == null ? !ntOpen : open;
   if (!want) { if (ntOpen) ntGo("closed"); return; }
   const { sh } = ntEls();
   document.getElementById("nt-body").innerHTML = ntPanel();
-  if (!ntOpen) { sh.classList.toggle("top", ntTop()); ntPlace(ntH() + 20, false); ntGo("half"); setTimeout(() => { const x = sh.querySelector(".nt-x"); if (x) x.focus({ preventScroll: true }); }, 320); }
+  if (!ntOpen) { sh.classList.toggle("top", ntTop()); ntAnchor(sh); ntPlace(ntH() + 20, false); ntGo("half"); setTimeout(() => { const x = sh.querySelector(".nt-x"); if (x) x.focus({ preventScroll: true }); }, 320); }
 }
 function ntDrag(sh) {
   let y0 = null, start = 0, last = 0, lastT = 0, v = 0, moved = false, grab = false;
