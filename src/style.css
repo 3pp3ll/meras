@@ -785,3 +785,4 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .page-head p{margin-top:2px;font-size:14.5px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
   .page-head p.open{display:block}
 }
+@media (max-width:640px){.acct-owner{display:none}}
