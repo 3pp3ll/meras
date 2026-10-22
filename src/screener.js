@@ -94,11 +94,12 @@ function scResults() {
     '<div class="result"><div><span>' + esc(t("sc_entry")) + "</span><b>" + cur(o.x, o.c) + "</b></div><div><span>" + esc(t("sc_stop")) + "</span><b>" + cur(o.x, o.stop) + "</b></div><div><span>" + esc(t("sc_target")) + "</span><b>" + cur(o.x, o.target) + "</b></div><div><span>" + esc(t("sc_qty")) + "</span><b>" + (o.qty % 1 ? fmt(o.qty, 4) : int(o.qty)) + "</b></div><div><span>" + esc(t("sc_risk")) + "</span><b>" + cur(o.x, o.risk) + "</b></div></div>" +
     '<p class="small muted" style="margin:0">RSI ' + (o.rsi != null ? fmt(o.rsi, 1) : "–") + " · " + esc(t("ch_rvol")) + " " + (o.rvol != null ? fmt(o.rvol, 2) + "×" : "–") + " · ATR " + (o.atrp != null ? fmt(o.atrp, 1) + "%" : "–") + " · " + esc(t("sc_plan")) + "</p>" +
     '<div class="row"><button class="btn sm" data-act="dk-chart" data-s="' + esc(o.x.s) + '">' + esc(t("dk_open_ch")) + '</button><button class="btn sm primary" data-act="sc-save" data-k="' + k + '">' + esc(t("sc_save")) + "</button></div></div>";
-  SC_LAST = r.res;
+  SC_LAST = r.res; SC_CARD = card;
   return scFeeNote() + '<p class="small muted" style="margin:0">' + esc(t("sc_found").replace("{n}", r.res.length).replace("{m}", r.total)) + (why ? " · " + esc(t("sc_out").replace("{n}", Object.values(r.out).reduce((a, b) => a + b, 0)).replace("{why}", why)) : "") + "</p>" +
-    (r.res.length ? '<div class="stack">' + r.res.map(card).join("") + "</div>" : '<div class="notice">' + esc(t("sc_none")) + "</div>");
+    (r.res.length ? '<div class="stack dg-desk">' + r.res.map(card).join("") + "</div>" + '<ul class="dgm-list dg-mob">' + r.res.map((o, k) => mRow({ act: "sc-open", k: String(k), s: o.x.s, name: dkName(o.x.s), cls: o.x.m === "SA" ? "dg-big" : "dg-tech", meta: esc(t("sc_entry")) + " " + cur(o.x, o.c) + " · " + esc(t("sc_stop")) + " " + cur(o.x, o.stop), end: '<b class="num" style="color:var(' + (o.score >= 5 ? "--up" : o.score >= 3 ? "--amber-ink" : "--muted") + ')">' + o.score + "/6</b>", endSub: esc(t("sc_target")) + " " + cur(o.x, o.target) })).join("") + "</ul>" : '<div class="notice">' + esc(t("sc_none")) + "</div>");
 }
-let SC_LAST = [];
+let SC_LAST = [], SC_CARD = null;
+document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="sc-open"]'); if (!el) return; const k = Number(el.dataset.k); mSheet("sc:" + k, () => (SC_LAST[k] && SC_CARD ? SC_CARD(SC_LAST[k], k) : ""), el); });
 document.addEventListener("input", (e) => {
   const k = e.target.dataset && e.target.dataset.sc; if (!k) return;
   SC[k] = e.target.type === "checkbox" ? e.target.checked : e.target.tagName === "SELECT" ? (k === "boards" ? Number(e.target.value) : e.target.value) : Math.max(0, parseFloat(e.target.value) || 0);

@@ -49,17 +49,31 @@ function usRow(s, name, rows, chartable, dec) {
   const d = dec || (last && last.c < 5 ? 4 : 2);
   return '<tr><td><b class="num">' + esc(s) + '</b> <span class="small muted">' + esc(name || "") + '</span></td><td class="num">' + (last ? (curOf(s) === "USD" && !/^[A-Z]{6}$/.test(s) ? "$" : "") + fmt(last.c, d) : "–") + "</td><td>" + pc(usPct(rows, 1)) + "</td><td>" + pc(usPct(rows, 5)) + "</td><td>" + pc(usPct(rows, 21)) + '</td><td class="num small">' + (lo != null ? fmt(lo, d) + " – " + fmt(hi, d) : "–") + "</td><td>" + usSpark(rows) + "</td><td>" + (chartable ? '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button>" : "") + "</td></tr>";
 }
+let US_MOB = {};
+function usSheet(s) {
+  const o = US_MOB[s]; if (!o) return "";
+  const rows = o.rows, last = rows.length ? rows[rows.length - 1] : null, m = rows.slice(-30), d = o.dec || (last && last.c < 5 ? 4 : 2), lo = m.length ? Math.min(...m.map((x) => x.l)) : null, hi = m.length ? Math.max(...m.map((x) => x.h)) : null;
+  const pc = (v) => (v == null ? "–" : dkSign(v, 2, "%")), px = (v) => (curOf(s) === "USD" && !/^[A-Z]{6}$/.test(s) ? "$" : "") + fmt(v, d);
+  return '<div class="dgs-top"><span class="dgm-av dg-tech">' + esc(dgShort(s)) + '</span><div style="min-width:0"><h3 id="dgs-name">' + esc(o.name || s) + '</h3><p><span class="num">' + esc(s) + "</span>" + (last ? " · " + esc(last.d) : "") + "</p></div></div>" +
+    '<div class="dgs-kv"><div><span>' + esc(t("us_last")) + '</span><b class="num">' + (last ? px(last.c) : "–") + "</b></div><div><span>" + esc(t("us_1d")) + "</span><b>" + pc(usPct(rows, 1)) + "</b></div><div><span>" + esc(t("us_5d")) + "</span><b>" + pc(usPct(rows, 5)) + "</b></div><div><span>" + esc(t("us_1m")) + "</span><b>" + pc(usPct(rows, 21)) + "</b></div></div>" +
+    (lo != null ? '<div><h4 class="dgs-h">' + esc(t("us_range")) + '</h4><p class="num" style="margin:0" dir="ltr">' + px(lo) + " – " + px(hi) + '</p></div><div class="us-bigspark">' + usSpark(rows) + "</div>" : "") +
+    (o.chartable ? '<button class="btn primary" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button>" : "");
+}
+document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="us-open"]'); if (!el) return; const k = el.dataset.k; mSheet("us:" + k, () => usSheet(k), el); });
 function dkUS() {
   if (!US || !US.symbols || !Object.keys(US.symbols).length) return '<div class="notice">' + esc(t("us_none")) + "</div>";
   const head = "<thead><tr><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("us_last")) + "</th><th>" + esc(t("us_1d")) + "</th><th>" + esc(t("us_5d")) + "</th><th>" + esc(t("us_1m")) + "</th><th>" + esc(t("us_range")) + "</th><th></th><th></th></tr></thead>";
   const grp = (g) => Object.entries(US.symbols).filter(([, v]) => v.g === g);
-  const table = (g, extra) => { const rows = grp(g).map(([s, v]) => usRow(s, v.n, v.rows || [], true)).join("") + (extra || ""); return rows ? owPanel(t("us_g_" + g), '<div class="tablewrap"><table>' + head + "<tbody>" + rows + "</tbody></table></div>") : ""; };
-  let metals = "";
-  if (USM) [["gold", "us_gold", "XAU"], ["silver", "us_silver", "XAG"]].forEach(([k, lab, s]) => { const m = USM[k]; if (!m) return; const rows = LIVE.history[s] && LIVE.history[s].length > 1 ? LIVE.history[s] : Array.isArray(m.hist) ? m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })) : []; if (rows.length) metals += usRow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); });
+  US_MOB = {};
+  const mrow = (s, name, rows, chartable, dec) => { US_MOB[s] = { name, rows, chartable, dec }; const last = rows.length ? rows[rows.length - 1] : null, d = dec || (last && last.c < 5 ? 4 : 2), p1 = usPct(rows, 1), p21 = usPct(rows, 21);
+    return mRow({ act: "us-open", k: s, s, name, cls: /^[A-Z]{6}$/.test(s) ? "dg-china" : /^X/.test(s) ? "dg-big" : "dg-tech", meta: esc(t("us_1m")) + " " + (p21 == null ? "–" : dkSign(p21, 1, "%")), end: '<b class="num">' + (last ? (curOf(s) === "USD" && !/^[A-Z]{6}$/.test(s) ? "$" : "") + fmt(last.c, d) : "–") + "</b>", endSub: p1 == null ? "" : dkSign(p1, 2, "%") }); };
+  const table = (g, extra, mextra) => { const rows = grp(g).map(([s, v]) => usRow(s, v.n, v.rows || [], true)).join("") + (extra || ""); const mr = grp(g).map(([s, v]) => mrow(s, v.n, v.rows || [], true)).join("") + (mextra || ""); return rows ? '<div class="dg-desk">' + owPanel(t("us_g_" + g), '<div class="tablewrap"><table>' + head + "<tbody>" + rows + "</tbody></table></div>") + '</div><div class="dg-mob"><div class="dg-lh" style="margin-bottom:8px"><h3>' + esc(t("us_g_" + g)) + '</h3></div><ul class="dgm-list">' + mr + "</ul></div>" : ""; };
+  let metals = "", mmetals = "";
+  if (USM) [["gold", "us_gold", "XAU"], ["silver", "us_silver", "XAG"]].forEach(([k, lab, s]) => { const m = USM[k]; if (!m) return; const rows = LIVE.history[s] && LIVE.history[s].length > 1 ? LIVE.history[s] : Array.isArray(m.hist) ? m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })) : []; if (rows.length) { metals += usRow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); mmetals += mrow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); } });
   const errs = Object.entries(US.errors || {});
   return '<h3 style="font-size:19px;margin:0">' + esc(t("tab_sharia")) + "</h3>" + shFinder() + '<p class="small muted" style="margin:0">' + esc(t("us_meta").replace("{d}", whenText(US.fetched_at)).replace("{n}", US.requests != null ? US.requests : "–")) + " · " + esc(t("us_note")) + "</p>" +
     (errs.length ? '<div class="notice"><b>' + esc(t("us_err")) + ":</b> " + errs.map(([s, m]) => '<span class="num">' + esc(s) + "</span> <span class=\"small\">(" + esc(m) + ")</span>").join("، ") + "</div>" : "") +
-    table("movers") + table("ai") + table("fx") + table("cmd", metals);
+    table("movers") + table("ai") + table("fx") + table("cmd", metals, mmetals);
 }
 
 if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) loadUS();

@@ -70,6 +70,7 @@ function topWhy(sym) {
   if (cf[i] > 0) out.push(t("w_cmf").replace("{v}", fmt(cf[i], 2)));
   return out;
 }
+let TP_CARD = null, TP_ACT = [];
 function dkTop() {
   if (!TOP && !topLoading) loadTop();
   const head = '<p class="muted" style="margin:0">' + esc(t("tp_p")) + '</p><div class="row"><button class="btn sm' + (topSound ? " on" : "") + '" data-act="top-sound">🔔 ' + esc(t(topSound ? "tp_sound_on" : "tp_sound")) + '</button><button class="btn sm ghost" data-act="top-test">' + esc(t("tp_test")) + '</button></div><p class="small muted" style="margin:0">' + esc(t("tp_gh")) + "</p>";
@@ -87,13 +88,16 @@ function dkTop() {
   };
   const left = (TOP.log || []).filter((x) => x.out).slice(-6).reverse();
   setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); if (typeof ntMark === "function") ntMark((TOP.log || []).filter((x) => x.in).map((x) => "m:" + x.s + "|" + x.in)); topBell(); } catch (e) {} }, 1500);
-  return head + '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + " " + esc(whenText(TOP.updated)) + "</p>" + (act.length ? '<div class="stack">' + act.map(card).join("") + "</div>" : '<div class="notice">' + esc(t("tp_none")) + "</div>") +
+  TP_CARD = card; TP_ACT = act;
+  const mob = act.length ? '<ul class="dgm-list dg-mob">' + act.map(([s, v]) => mRow({ act: "tp-open", k: s, s, name: dkName(s) || v.n, cls: v.m === "SA" ? "dg-big" : "dg-tech", dot: v.sharia === "ok" ? "ok" : v.sharia === "no" ? "no" : "", meta: esc(t(v.m === "SA" ? "sh_sa" : "sh_us")) + " · " + esc(t("tp_days").replace("{n}", days(v))) + (v.sharia === "ok" && !seen.includes(topKey(s, v)) ? ' <span class="dg-soon">' + esc(t("tp_new")) + "</span>" : ""), end: '<b class="num">' + v.score + "/6</b>", endSub: v.rvol != null ? esc(t("ch_rvol")) + " " + fmt(v.rvol, 1) + "×" : "" })).join("") + "</ul>" : "";
+  return head + '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + " " + esc(whenText(TOP.updated)) + "</p>" + (act.length ? '<div class="stack dg-desk">' + act.map(card).join("") + "</div>" + mob : '<div class="notice">' + esc(t("tp_none")) + "</div>") +
     (left.length ? owPanel(t("tp_left"), '<ul class="tp-left">' + left.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc(dkName(x.s)) + ' <span class="small muted">' + esc(t("tp_out").replace("{d}", x.out).replace("{s}", x.score + "/6")) + "</span></li>").join("") + "</ul>") : "");
 }
 
 document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="top-"]'); if (!el) return;
   const a = el.dataset.act;
+  if (a === "tp-open") return;
   if (a === "top-open") { e.preventDefault(); if (typeof dkTab !== "undefined") dkTab = "top"; if (route() === "desk") render(); else location.hash = "desk"; }
   else if (a === "top-sound") { topSound = !topSound; try { localStorage.setItem("meras.topsound", topSound ? "1" : "0"); } catch (err) {} if (topSound) topBeep(); render(); }
   else if (a === "top-test") topBeep();
@@ -104,3 +108,5 @@ if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) {
   setInterval(() => { if (document.visibilityState === "visible") loadTop(true); }, 10 * 60 * 1000);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadTop(true); });
 }
+
+document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="tp-open"]'); if (!el) return; const k = el.dataset.k; mSheet("tp:" + k, () => { const it = TP_ACT.find(([s]) => s === k); return it && TP_CARD ? TP_CARD(it) : ""; }, el); });

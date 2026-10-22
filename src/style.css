@@ -841,3 +841,8 @@ body.nt-lock{overflow:hidden}
 #ntsheet.top .nt-it.unread::after{top:14px;inset-inline-end:9px;width:7px;height:7px}
 #ntsheet.top .nt-grab{padding:4px 0 8px}
 #ntscrim.wide{background:rgba(20,26,40,.12)}
+#dgsheet .panel{border:0;padding:0;box-shadow:none;background:transparent}
+#dgsheet .tp-card h3,#dgsheet .sc-card h3{font-size:18px}
+.us-bigspark svg{width:100%;height:auto;max-height:90px}
+.dgm-end .dk-sg{font-size:12.5px}
+.dgs-kv .dk-sg{font-size:17px;font-weight:700}

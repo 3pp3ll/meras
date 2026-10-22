@@ -157,7 +157,7 @@ function dgTable(data, opt) {
 }
 
 /* ----- bottom sheet (phone): details, payout bars, calculator, star ----- */
-let dgSheetS = null, dgSheetFocus = null;
+let dgSheetS = null, dgSheetFocus = null, dgSheetR = null;
 function dgCtx() { return route() === "shared" ? { data: DG.view, opt: { sh: (s) => { const r = DG.view && DG.view.stocks.find((x) => x.s === s); return r && r.sh; }, watch: null } } : { data: DG.data, opt: { sh: dgSharia, watch: DG.watch || [] } }; }
 function dgSheetHtml() {
   const { data, opt } = dgCtx(), r = data && data.stocks.find((x) => x.s === dgSheetS); if (!r) return "";
@@ -193,10 +193,16 @@ function dgSheet(open) {
     sh.addEventListener("touchmove", (e) => { if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); sh.style.transform = "translateY(" + dy + "px)"; }, { passive: true });
     sh.addEventListener("touchend", () => { if (y0 == null) return; sh.style.transition = ""; if (dy > 90) dgSheet(false); else sh.style.transform = ""; y0 = null; });
   }
-  sh.querySelector("#dgs-body").innerHTML = dgSheetHtml();
+  sh.querySelector("#dgs-body").innerHTML = (dgSheetR || dgSheetHtml)();
   requestAnimationFrame(() => { sc.classList.add("on"); sh.classList.add("on"); document.body.classList.add("dg-lock"); });
 }
-function dgSheetRefresh() { const b = document.getElementById("dgs-body"); if (b && dgSheetS) b.innerHTML = dgSheetHtml(); }
+function dgSheetRefresh() { const b = document.getElementById("dgs-body"); if (b && dgSheetS) b.innerHTML = (dgSheetR || dgSheetHtml)(); }
+/* the same sheet for other pages in مكتبي: mSheet(key, render) opens it with any content */
+function mSheet(key, fn, from) { dgSheetFocus = from || document.activeElement; dgSheetS = key; dgSheetR = fn; dgSheet(true); }
+/* one compact row: avatar, name + ticker, a meta line, and a value on the end side */
+function mRow(o) {
+  return '<li><button class="dgm-row" data-act="' + o.act + '" data-k="' + esc(o.k) + '"><span class="dgm-av ' + (o.cls || "dg-tech") + '">' + esc(dgShort(o.s)) + '</span><span class="dgm-mid"><span class="dgm-nm"><span class="dgm-n">' + esc(o.name || o.s) + '</span><small class="num">' + esc(o.s) + '</small></span><span class="dgm-meta">' + (o.dot != null ? '<i class="dgm-dot ' + esc(o.dot) + '"></i>' : "") + o.meta + '</span></span><span class="dgm-end">' + o.end + (o.endSub ? "<small>" + o.endSub + "</small>" : "") + "</span></button></li>";
+}
 
 /* ----- owner tab inside مكتبي ----- */
 function dkDivGlobal() {
@@ -282,7 +288,7 @@ document.addEventListener("click", async (e) => {
   else if (a === "dg-f") { dgF = dgF === el.dataset.f ? null : el.dataset.f; render(); }
   else if (a === "dg-sort") { const o = ["yld", "next", "sym"]; dgSort = o[(o.indexOf(dgSort) + 1) % o.length]; render(); }
   else if (a === "dg-none") { dgNone = !dgNone; render(); }
-  else if (a === "dg-open") { dgSheetFocus = el; dgSheetS = el.dataset.s; dgWht = null; dgSheet(true); }
+  else if (a === "dg-open") { dgSheetFocus = el; dgSheetS = el.dataset.s; dgSheetR = null; dgWht = null; dgSheet(true); }
   else if (a === "dg-close") { dgSheet(false); }
   else if (a === "dg-pick") { dgPick = dgPick === el.dataset.s ? null : el.dataset.s; dgWht = null; render(); const c = document.getElementById("dg-amt"); if (dgPick && c) c.scrollIntoView({ behavior: "smooth", block: "center" }); }
   else if (a === "dg-star") { const s = el.dataset.s, w = DG.watch || (DG.watch = []), i = w.indexOf(s); if (i >= 0) w.splice(i, 1); else { w.push(s); toast(t("dg_starred")); } render(); dgSheetRefresh(); await dgSaveWatch(); if (typeof topBell === "function") topBell(); }
@@ -310,5 +316,6 @@ document.addEventListener("submit", async (e) => {
   dgBusy = false; render();
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && dgSheetS) dgSheet(false); });
+document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest('#dgsheet [data-act="sc-save"],#dgsheet [data-act="dk-chart"],#dgsheet [data-act="top-ai"],#dgsheet a[href]'); if (b && dgSheetS) setTimeout(() => dgSheet(false), 0); }, true);
 window.addEventListener("hashchange", () => { if (dgSheetS) dgSheet(false); });
 if (dgOwner()) setTimeout(() => loadDG(), 1500);

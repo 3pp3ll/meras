@@ -861,6 +861,11 @@ body.nt-lock{overflow:hidden}
 #ntsheet.top .nt-it.unread::after{top:14px;inset-inline-end:9px;width:7px;height:7px}
 #ntsheet.top .nt-grab{padding:4px 0 8px}
 #ntscrim.wide{background:rgba(20,26,40,.12)}
+#dgsheet .panel{border:0;padding:0;box-shadow:none;background:transparent}
+#dgsheet .tp-card h3,#dgsheet .sc-card h3{font-size:18px}
+.us-bigspark svg{width:100%;height:auto;max-height:90px}
+.dgm-end .dk-sg{font-size:12.5px}
+.dgs-kv .dk-sg{font-size:17px;font-weight:700}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5030,17 +5035,31 @@ function usRow(s, name, rows, chartable, dec) {
   const d = dec || (last && last.c < 5 ? 4 : 2);
   return '<tr><td><b class="num">' + esc(s) + '</b> <span class="small muted">' + esc(name || "") + '</span></td><td class="num">' + (last ? (curOf(s) === "USD" && !/^[A-Z]{6}$/.test(s) ? "$" : "") + fmt(last.c, d) : "–") + "</td><td>" + pc(usPct(rows, 1)) + "</td><td>" + pc(usPct(rows, 5)) + "</td><td>" + pc(usPct(rows, 21)) + '</td><td class="num small">' + (lo != null ? fmt(lo, d) + " – " + fmt(hi, d) : "–") + "</td><td>" + usSpark(rows) + "</td><td>" + (chartable ? '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button>" : "") + "</td></tr>";
 }
+let US_MOB = {};
+function usSheet(s) {
+  const o = US_MOB[s]; if (!o) return "";
+  const rows = o.rows, last = rows.length ? rows[rows.length - 1] : null, m = rows.slice(-30), d = o.dec || (last && last.c < 5 ? 4 : 2), lo = m.length ? Math.min(...m.map((x) => x.l)) : null, hi = m.length ? Math.max(...m.map((x) => x.h)) : null;
+  const pc = (v) => (v == null ? "–" : dkSign(v, 2, "%")), px = (v) => (curOf(s) === "USD" && !/^[A-Z]{6}$/.test(s) ? "$" : "") + fmt(v, d);
+  return '<div class="dgs-top"><span class="dgm-av dg-tech">' + esc(dgShort(s)) + '</span><div style="min-width:0"><h3 id="dgs-name">' + esc(o.name || s) + '</h3><p><span class="num">' + esc(s) + "</span>" + (last ? " · " + esc(last.d) : "") + "</p></div></div>" +
+    '<div class="dgs-kv"><div><span>' + esc(t("us_last")) + '</span><b class="num">' + (last ? px(last.c) : "–") + "</b></div><div><span>" + esc(t("us_1d")) + "</span><b>" + pc(usPct(rows, 1)) + "</b></div><div><span>" + esc(t("us_5d")) + "</span><b>" + pc(usPct(rows, 5)) + "</b></div><div><span>" + esc(t("us_1m")) + "</span><b>" + pc(usPct(rows, 21)) + "</b></div></div>" +
+    (lo != null ? '<div><h4 class="dgs-h">' + esc(t("us_range")) + '</h4><p class="num" style="margin:0" dir="ltr">' + px(lo) + " – " + px(hi) + '</p></div><div class="us-bigspark">' + usSpark(rows) + "</div>" : "") +
+    (o.chartable ? '<button class="btn primary" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button>" : "");
+}
+document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="us-open"]'); if (!el) return; const k = el.dataset.k; mSheet("us:" + k, () => usSheet(k), el); });
 function dkUS() {
   if (!US || !US.symbols || !Object.keys(US.symbols).length) return '<div class="notice">' + esc(t("us_none")) + "</div>";
   const head = "<thead><tr><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("us_last")) + "</th><th>" + esc(t("us_1d")) + "</th><th>" + esc(t("us_5d")) + "</th><th>" + esc(t("us_1m")) + "</th><th>" + esc(t("us_range")) + "</th><th></th><th></th></tr></thead>";
   const grp = (g) => Object.entries(US.symbols).filter(([, v]) => v.g === g);
-  const table = (g, extra) => { const rows = grp(g).map(([s, v]) => usRow(s, v.n, v.rows || [], true)).join("") + (extra || ""); return rows ? owPanel(t("us_g_" + g), '<div class="tablewrap"><table>' + head + "<tbody>" + rows + "</tbody></table></div>") : ""; };
-  let metals = "";
-  if (USM) [["gold", "us_gold", "XAU"], ["silver", "us_silver", "XAG"]].forEach(([k, lab, s]) => { const m = USM[k]; if (!m) return; const rows = LIVE.history[s] && LIVE.history[s].length > 1 ? LIVE.history[s] : Array.isArray(m.hist) ? m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })) : []; if (rows.length) metals += usRow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); });
+  US_MOB = {};
+  const mrow = (s, name, rows, chartable, dec) => { US_MOB[s] = { name, rows, chartable, dec }; const last = rows.length ? rows[rows.length - 1] : null, d = dec || (last && last.c < 5 ? 4 : 2), p1 = usPct(rows, 1), p21 = usPct(rows, 21);
+    return mRow({ act: "us-open", k: s, s, name, cls: /^[A-Z]{6}$/.test(s) ? "dg-china" : /^X/.test(s) ? "dg-big" : "dg-tech", meta: esc(t("us_1m")) + " " + (p21 == null ? "–" : dkSign(p21, 1, "%")), end: '<b class="num">' + (last ? (curOf(s) === "USD" && !/^[A-Z]{6}$/.test(s) ? "$" : "") + fmt(last.c, d) : "–") + "</b>", endSub: p1 == null ? "" : dkSign(p1, 2, "%") }); };
+  const table = (g, extra, mextra) => { const rows = grp(g).map(([s, v]) => usRow(s, v.n, v.rows || [], true)).join("") + (extra || ""); const mr = grp(g).map(([s, v]) => mrow(s, v.n, v.rows || [], true)).join("") + (mextra || ""); return rows ? '<div class="dg-desk">' + owPanel(t("us_g_" + g), '<div class="tablewrap"><table>' + head + "<tbody>" + rows + "</tbody></table></div>") + '</div><div class="dg-mob"><div class="dg-lh" style="margin-bottom:8px"><h3>' + esc(t("us_g_" + g)) + '</h3></div><ul class="dgm-list">' + mr + "</ul></div>" : ""; };
+  let metals = "", mmetals = "";
+  if (USM) [["gold", "us_gold", "XAU"], ["silver", "us_silver", "XAG"]].forEach(([k, lab, s]) => { const m = USM[k]; if (!m) return; const rows = LIVE.history[s] && LIVE.history[s].length > 1 ? LIVE.history[s] : Array.isArray(m.hist) ? m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })) : []; if (rows.length) { metals += usRow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); mmetals += mrow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); } });
   const errs = Object.entries(US.errors || {});
   return '<h3 style="font-size:19px;margin:0">' + esc(t("tab_sharia")) + "</h3>" + shFinder() + '<p class="small muted" style="margin:0">' + esc(t("us_meta").replace("{d}", whenText(US.fetched_at)).replace("{n}", US.requests != null ? US.requests : "–")) + " · " + esc(t("us_note")) + "</p>" +
     (errs.length ? '<div class="notice"><b>' + esc(t("us_err")) + ":</b> " + errs.map(([s, m]) => '<span class="num">' + esc(s) + "</span> <span class=\"small\">(" + esc(m) + ")</span>").join("، ") + "</div>" : "") +
-    table("movers") + table("ai") + table("fx") + table("cmd", metals);
+    table("movers") + table("ai") + table("fx") + table("cmd", metals, mmetals);
 }
 
 if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) loadUS();
@@ -5355,11 +5374,12 @@ function scResults() {
     '<div class="result"><div><span>' + esc(t("sc_entry")) + "</span><b>" + cur(o.x, o.c) + "</b></div><div><span>" + esc(t("sc_stop")) + "</span><b>" + cur(o.x, o.stop) + "</b></div><div><span>" + esc(t("sc_target")) + "</span><b>" + cur(o.x, o.target) + "</b></div><div><span>" + esc(t("sc_qty")) + "</span><b>" + (o.qty % 1 ? fmt(o.qty, 4) : int(o.qty)) + "</b></div><div><span>" + esc(t("sc_risk")) + "</span><b>" + cur(o.x, o.risk) + "</b></div></div>" +
     '<p class="small muted" style="margin:0">RSI ' + (o.rsi != null ? fmt(o.rsi, 1) : "–") + " · " + esc(t("ch_rvol")) + " " + (o.rvol != null ? fmt(o.rvol, 2) + "×" : "–") + " · ATR " + (o.atrp != null ? fmt(o.atrp, 1) + "%" : "–") + " · " + esc(t("sc_plan")) + "</p>" +
     '<div class="row"><button class="btn sm" data-act="dk-chart" data-s="' + esc(o.x.s) + '">' + esc(t("dk_open_ch")) + '</button><button class="btn sm primary" data-act="sc-save" data-k="' + k + '">' + esc(t("sc_save")) + "</button></div></div>";
-  SC_LAST = r.res;
+  SC_LAST = r.res; SC_CARD = card;
   return scFeeNote() + '<p class="small muted" style="margin:0">' + esc(t("sc_found").replace("{n}", r.res.length).replace("{m}", r.total)) + (why ? " · " + esc(t("sc_out").replace("{n}", Object.values(r.out).reduce((a, b) => a + b, 0)).replace("{why}", why)) : "") + "</p>" +
-    (r.res.length ? '<div class="stack">' + r.res.map(card).join("") + "</div>" : '<div class="notice">' + esc(t("sc_none")) + "</div>");
+    (r.res.length ? '<div class="stack dg-desk">' + r.res.map(card).join("") + "</div>" + '<ul class="dgm-list dg-mob">' + r.res.map((o, k) => mRow({ act: "sc-open", k: String(k), s: o.x.s, name: dkName(o.x.s), cls: o.x.m === "SA" ? "dg-big" : "dg-tech", meta: esc(t("sc_entry")) + " " + cur(o.x, o.c) + " · " + esc(t("sc_stop")) + " " + cur(o.x, o.stop), end: '<b class="num" style="color:var(' + (o.score >= 5 ? "--up" : o.score >= 3 ? "--amber-ink" : "--muted") + ')">' + o.score + "/6</b>", endSub: esc(t("sc_target")) + " " + cur(o.x, o.target) })).join("") + "</ul>" : '<div class="notice">' + esc(t("sc_none")) + "</div>");
 }
-let SC_LAST = [];
+let SC_LAST = [], SC_CARD = null;
+document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="sc-open"]'); if (!el) return; const k = Number(el.dataset.k); mSheet("sc:" + k, () => (SC_LAST[k] && SC_CARD ? SC_CARD(SC_LAST[k], k) : ""), el); });
 document.addEventListener("input", (e) => {
   const k = e.target.dataset && e.target.dataset.sc; if (!k) return;
   SC[k] = e.target.type === "checkbox" ? e.target.checked : e.target.tagName === "SELECT" ? (k === "boards" ? Number(e.target.value) : e.target.value) : Math.max(0, parseFloat(e.target.value) || 0);
@@ -5444,6 +5464,7 @@ function topWhy(sym) {
   if (cf[i] > 0) out.push(t("w_cmf").replace("{v}", fmt(cf[i], 2)));
   return out;
 }
+let TP_CARD = null, TP_ACT = [];
 function dkTop() {
   if (!TOP && !topLoading) loadTop();
   const head = '<p class="muted" style="margin:0">' + esc(t("tp_p")) + '</p><div class="row"><button class="btn sm' + (topSound ? " on" : "") + '" data-act="top-sound">🔔 ' + esc(t(topSound ? "tp_sound_on" : "tp_sound")) + '</button><button class="btn sm ghost" data-act="top-test">' + esc(t("tp_test")) + '</button></div><p class="small muted" style="margin:0">' + esc(t("tp_gh")) + "</p>";
@@ -5461,13 +5482,16 @@ function dkTop() {
   };
   const left = (TOP.log || []).filter((x) => x.out).slice(-6).reverse();
   setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); if (typeof ntMark === "function") ntMark((TOP.log || []).filter((x) => x.in).map((x) => "m:" + x.s + "|" + x.in)); topBell(); } catch (e) {} }, 1500);
-  return head + '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + " " + esc(whenText(TOP.updated)) + "</p>" + (act.length ? '<div class="stack">' + act.map(card).join("") + "</div>" : '<div class="notice">' + esc(t("tp_none")) + "</div>") +
+  TP_CARD = card; TP_ACT = act;
+  const mob = act.length ? '<ul class="dgm-list dg-mob">' + act.map(([s, v]) => mRow({ act: "tp-open", k: s, s, name: dkName(s) || v.n, cls: v.m === "SA" ? "dg-big" : "dg-tech", dot: v.sharia === "ok" ? "ok" : v.sharia === "no" ? "no" : "", meta: esc(t(v.m === "SA" ? "sh_sa" : "sh_us")) + " · " + esc(t("tp_days").replace("{n}", days(v))) + (v.sharia === "ok" && !seen.includes(topKey(s, v)) ? ' <span class="dg-soon">' + esc(t("tp_new")) + "</span>" : ""), end: '<b class="num">' + v.score + "/6</b>", endSub: v.rvol != null ? esc(t("ch_rvol")) + " " + fmt(v.rvol, 1) + "×" : "" })).join("") + "</ul>" : "";
+  return head + '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + " " + esc(whenText(TOP.updated)) + "</p>" + (act.length ? '<div class="stack dg-desk">' + act.map(card).join("") + "</div>" + mob : '<div class="notice">' + esc(t("tp_none")) + "</div>") +
     (left.length ? owPanel(t("tp_left"), '<ul class="tp-left">' + left.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc(dkName(x.s)) + ' <span class="small muted">' + esc(t("tp_out").replace("{d}", x.out).replace("{s}", x.score + "/6")) + "</span></li>").join("") + "</ul>") : "");
 }
 
 document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="top-"]'); if (!el) return;
   const a = el.dataset.act;
+  if (a === "tp-open") return;
   if (a === "top-open") { e.preventDefault(); if (typeof dkTab !== "undefined") dkTab = "top"; if (route() === "desk") render(); else location.hash = "desk"; }
   else if (a === "top-sound") { topSound = !topSound; try { localStorage.setItem("meras.topsound", topSound ? "1" : "0"); } catch (err) {} if (topSound) topBeep(); render(); }
   else if (a === "top-test") topBeep();
@@ -5478,6 +5502,8 @@ if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) {
   setInterval(() => { if (document.visibilityState === "visible") loadTop(true); }, 10 * 60 * 1000);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadTop(true); });
 }
+
+document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="tp-open"]'); if (!el) return; const k = el.dataset.k; mSheet("tp:" + k, () => { const it = TP_ACT.find(([s]) => s === k); return it && TP_CARD ? TP_CARD(it) : ""; }, el); });
 /* ===== مِراس: التوزيعات العالمية (مكتبي) =====
    أربع قوائم: الكبار في التوزيع، التقنية والذكاء الاصطناعي الأمريكية، الصينية المدرجة في أمريكا، والصينية في هونغ كونغ.
    البيانات من divglobal.json (يجمعها fetch_global_divs.py من Yahoo يومياً) وهي للمالك فقط.
@@ -5637,7 +5663,7 @@ function dgTable(data, opt) {
 }
 
 /* ----- bottom sheet (phone): details, payout bars, calculator, star ----- */
-let dgSheetS = null, dgSheetFocus = null;
+let dgSheetS = null, dgSheetFocus = null, dgSheetR = null;
 function dgCtx() { return route() === "shared" ? { data: DG.view, opt: { sh: (s) => { const r = DG.view && DG.view.stocks.find((x) => x.s === s); return r && r.sh; }, watch: null } } : { data: DG.data, opt: { sh: dgSharia, watch: DG.watch || [] } }; }
 function dgSheetHtml() {
   const { data, opt } = dgCtx(), r = data && data.stocks.find((x) => x.s === dgSheetS); if (!r) return "";
@@ -5673,10 +5699,16 @@ function dgSheet(open) {
     sh.addEventListener("touchmove", (e) => { if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); sh.style.transform = "translateY(" + dy + "px)"; }, { passive: true });
     sh.addEventListener("touchend", () => { if (y0 == null) return; sh.style.transition = ""; if (dy > 90) dgSheet(false); else sh.style.transform = ""; y0 = null; });
   }
-  sh.querySelector("#dgs-body").innerHTML = dgSheetHtml();
+  sh.querySelector("#dgs-body").innerHTML = (dgSheetR || dgSheetHtml)();
   requestAnimationFrame(() => { sc.classList.add("on"); sh.classList.add("on"); document.body.classList.add("dg-lock"); });
 }
-function dgSheetRefresh() { const b = document.getElementById("dgs-body"); if (b && dgSheetS) b.innerHTML = dgSheetHtml(); }
+function dgSheetRefresh() { const b = document.getElementById("dgs-body"); if (b && dgSheetS) b.innerHTML = (dgSheetR || dgSheetHtml)(); }
+/* the same sheet for other pages in مكتبي: mSheet(key, render) opens it with any content */
+function mSheet(key, fn, from) { dgSheetFocus = from || document.activeElement; dgSheetS = key; dgSheetR = fn; dgSheet(true); }
+/* one compact row: avatar, name + ticker, a meta line, and a value on the end side */
+function mRow(o) {
+  return '<li><button class="dgm-row" data-act="' + o.act + '" data-k="' + esc(o.k) + '"><span class="dgm-av ' + (o.cls || "dg-tech") + '">' + esc(dgShort(o.s)) + '</span><span class="dgm-mid"><span class="dgm-nm"><span class="dgm-n">' + esc(o.name || o.s) + '</span><small class="num">' + esc(o.s) + '</small></span><span class="dgm-meta">' + (o.dot != null ? '<i class="dgm-dot ' + esc(o.dot) + '"></i>' : "") + o.meta + '</span></span><span class="dgm-end">' + o.end + (o.endSub ? "<small>" + o.endSub + "</small>" : "") + "</span></button></li>";
+}
 
 /* ----- owner tab inside مكتبي ----- */
 function dkDivGlobal() {
@@ -5762,7 +5794,7 @@ document.addEventListener("click", async (e) => {
   else if (a === "dg-f") { dgF = dgF === el.dataset.f ? null : el.dataset.f; render(); }
   else if (a === "dg-sort") { const o = ["yld", "next", "sym"]; dgSort = o[(o.indexOf(dgSort) + 1) % o.length]; render(); }
   else if (a === "dg-none") { dgNone = !dgNone; render(); }
-  else if (a === "dg-open") { dgSheetFocus = el; dgSheetS = el.dataset.s; dgWht = null; dgSheet(true); }
+  else if (a === "dg-open") { dgSheetFocus = el; dgSheetS = el.dataset.s; dgSheetR = null; dgWht = null; dgSheet(true); }
   else if (a === "dg-close") { dgSheet(false); }
   else if (a === "dg-pick") { dgPick = dgPick === el.dataset.s ? null : el.dataset.s; dgWht = null; render(); const c = document.getElementById("dg-amt"); if (dgPick && c) c.scrollIntoView({ behavior: "smooth", block: "center" }); }
   else if (a === "dg-star") { const s = el.dataset.s, w = DG.watch || (DG.watch = []), i = w.indexOf(s); if (i >= 0) w.splice(i, 1); else { w.push(s); toast(t("dg_starred")); } render(); dgSheetRefresh(); await dgSaveWatch(); if (typeof topBell === "function") topBell(); }
@@ -5790,6 +5822,7 @@ document.addEventListener("submit", async (e) => {
   dgBusy = false; render();
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && dgSheetS) dgSheet(false); });
+document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest('#dgsheet [data-act="sc-save"],#dgsheet [data-act="dk-chart"],#dgsheet [data-act="top-ai"],#dgsheet a[href]'); if (b && dgSheetS) setTimeout(() => dgSheet(false), 0); }, true);
 window.addEventListener("hashchange", () => { if (dgSheetS) dgSheet(false); });
 if (dgOwner()) setTimeout(() => loadDG(), 1500);
 /* ===== مِراس: قائمة التنبيهات =====
