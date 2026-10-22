@@ -160,8 +160,8 @@ document.addEventListener("click", (e) => {
   if (a === "nt-go") { ntToggle(false); return; }
   if (a === "nt-copy") { navigator.clipboard && navigator.clipboard.writeText(el.dataset.c).then(() => toast(t("nt_copied"))).catch(() => {}); }
   else if (a === "nt-readall") { ntMark(ntItems().map((i) => i.id)); document.getElementById("nt-body").innerHTML = ntPanel(); topBell(); }
-  else if (a === "nt-div") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") dkTab = "dg"; if (route() === "desk") render(); else location.hash = "desk"; }
-  else if (a === "nt-mover") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") dkTab = "top"; if (route() === "desk") render(); else location.hash = "desk"; }
+  else if (a === "nt-div") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") { dkTab = "dg"; dkGrid = false; } if (route() === "desk") render(); else location.hash = "desk"; }
+  else if (a === "nt-mover") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") { dkTab = "top"; dkGrid = false; } if (route() === "desk") render(); else location.hash = "desk"; }
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && ntOpen) ntToggle(false); });
 window.addEventListener("hashchange", () => { if (ntOpen) ntToggle(false); });

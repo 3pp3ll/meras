@@ -159,13 +159,39 @@ function dkCharts() {
     (list.length ? '<div class="dk-grid">' + list.map(card).join("") + "</div>" : '<div class="notice">' + esc(t("dk_none_an")) + "</div>");
 }
 
+let dkGrid = true;
+const dkPhone = () => window.matchMedia && matchMedia("(max-width:640px)").matches;
+const DK_IC = {
+  pf: '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z M4 7l11-3v3 M16 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  ch: '<path d="M4 20V4M4 20h16M8 15l3-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  sc: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></g>',
+  top: '<path d="M4 17l6-6 4 4 6-7M15 8h5v5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+  tech: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v4M7 15v6M17 2v4M17 14v8"/><rect x="5" y="7" width="4" height="8" rx="1"/><rect x="15" y="6" width="4" height="8" rx="1"/></g>',
+  dg: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15.5" r="2.5"/></g>',
+  us: '<g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></g>',
+  op: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></g>'
+};
+Object.assign(UI, {
+  dk_g_pf: ["فلوسك وصفقاتك", "Your money and trades"], dk_g_ch: ["تحليلاتك وخططك", "Your analyses and plans"], dk_g_sc: ["أسهم تطابق شروطك", "Stocks that match your rules"], dk_g_top: ["المرشحة 5 و6 من 6", "Scoring 5 or 6 of 6"],
+  dk_g_tech: ["قراءات المؤشرات", "Indicator readings"], dk_g_dg: ["أمريكا والصين", "US and China"], dk_g_us: ["الأسهم والعملات والمعادن", "Stocks, FX and metals"], dk_g_op: ["دروس الخيارات", "Options lessons"]
+});
+function dkGridHtml(tabs) {
+  const badge = (k) => { try {
+    if (k === "top" && typeof topActive === "function" && TOP) { const n = topActive().length; return n ? String(n) : ""; }
+    if (k === "dg" && DG.data && DG.data.stocks) { const n = DG.data.stocks.filter(dgSoon).length; return n ? String(n) : ""; }
+  } catch (e) {} return ""; };
+  return '<div class="dk-grid">' + tabs.map(([k, l]) => { const b = badge(k); return '<button class="dk-tile" data-act="dk-tab" data-tab="' + k + '"><span class="dk-ti">' + '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">' + (DK_IC[k] || "") + "</svg>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</span><b>" + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></button>"; }).join("") + "</div>";
+}
 function pageDesk() {
   const head = '<div class="wrap"><div class="page-head"><div class="crumbs"><a href="#owner">' + esc(t("dk_back")) + "</a></div><h1>" + esc(t("dk_h")) + "</h1><p>" + esc(t("dk_p")) + "</p></div>";
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
   const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
-  return head + '<div class="tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
+  if (dkGrid && dkPhone()) return head + dkGridHtml(tabs) + "</div>";
+  const cur = tabs.find(([k]) => k === dkTab) || tabs[0];
+  const mbar = '<div class="dk-mbar"><button class="dk-mback" data-act="dk-grid"><span aria-hidden="true">›</span> ' + esc(t("dk_h")) + "</button><b>" + esc(t(cur[1])) + "</b></div>";
+  return head + mbar + '<div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div>";
 }
 
 function dkExport() {
@@ -180,7 +206,8 @@ function dkExport() {
 document.addEventListener("click", async (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="dk-"]'); if (!el) return;
   const a = el.dataset.act, id = el.dataset.id;
-  if (a === "dk-tab") { e.preventDefault(); dkTab = el.dataset.tab; dkTrade = dkAn = dkDel = null; render(); }
+  if (a === "dk-tab") { e.preventDefault(); dkTab = el.dataset.tab; dkGrid = false; dkTrade = dkAn = dkDel = null; render(); window.scrollTo(0, 0); }
+  else if (a === "dk-grid") { e.preventDefault(); dkGrid = true; render(); window.scrollTo(0, 0); }
   else if (a === "dk-tnew") { dkTrade = {}; render(); }
   else if (a === "dk-tcancel") { dkTrade = null; render(); }
   else if (a === "dk-tedit") { dkTrade = Object.assign({}, DK.data.trades.find((x) => x.id === id)); render(); window.scrollTo(0, 0); }

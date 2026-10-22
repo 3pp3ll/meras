@@ -125,6 +125,7 @@ const TB_ICONS = {
   plans: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></g>',
   bell: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></g>'
 };
+document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest('#tabbar a[href="#desk"]'); if (a && typeof dkGrid !== "undefined") { dkGrid = true; if (route() === "desk") { e.preventDefault(); render(); window.scrollTo(0, 0); } } });
 function tabbarSync(r) {
   let bar = document.getElementById("tabbar");
   if (r == null) { if (bar) bar.hidden = true; document.body.classList.remove("has-tabbar"); return; }

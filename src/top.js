@@ -98,7 +98,7 @@ document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="top-"]'); if (!el) return;
   const a = el.dataset.act;
   if (a === "tp-open") return;
-  if (a === "top-open") { e.preventDefault(); if (typeof dkTab !== "undefined") dkTab = "top"; if (route() === "desk") render(); else location.hash = "desk"; }
+  if (a === "top-open") { e.preventDefault(); if (typeof dkTab !== "undefined") { dkTab = "top"; dkGrid = false; } if (route() === "desk") render(); else location.hash = "desk"; }
   else if (a === "top-sound") { topSound = !topSound; try { localStorage.setItem("meras.topsound", topSound ? "1" : "0"); } catch (err) {} if (topSound) topBeep(); render(); }
   else if (a === "top-test") topBeep();
   else if (a === "top-ai") { S.chart.sym = el.dataset.s; save(); location.hash = "chart"; setTimeout(() => { const b = document.querySelector('[data-act="ch-analyze"]'); if (b) b.click(); }, 700); }

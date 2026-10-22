@@ -77,11 +77,16 @@ function scFeeNote() {
   const f = DK && DK.data && DK.data.cfg ? Number(DK.data.cfg.feeUS) || 0 : 0, b = SC.bus || 0; if (!f || !b || SC.mkt === "sa") return "";
   const p = (f / b) * 100; return '<p class="small notice" style="margin:0">' + esc(t("sc_fee").replace("{f}", fmt(f, 2)).replace("{b}", int(b)).replace("{p}", fmt(p, 1)).replace("{r}", fmt(p * 2, 1))) + "</p>";
 }
+let scOpen = false;
+Object.assign(UI, { sc_set: ["الإعدادات", "Settings"], sc_sum_sa: ["السعودي {n} ر", "Saudi {n} SAR"], sc_sum_us: ["الأمريكي ${n}", "US ${n}"], sc_sum_p: ["تطهير ≤ {n}%", "Purification ≤ {n}%"] });
+document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest('[data-act="sc-tog"]'); if (!b) return; scOpen = !scOpen; render(); });
 function dkScreener() {
   if (typeof shTried !== "undefined" && !shTried && typeof loadSharia === "function") loadSharia();
   const opt = (k, v, l) => '<option value="' + v + '"' + (String(SC[k]) === String(v) ? " selected" : "") + ">" + esc(t(l)) + "</option>";
   const num = (k, l, step) => '<div class="field"><label for="sc-' + k + '">' + esc(t(l)) + '</label><input id="sc-' + k + '" data-sc="' + k + '" type="number" min="0" step="' + step + '" inputmode="decimal" value="' + esc(SC[k]) + '"></div>';
-  const form = '<div class="panel stack"><p class="muted" style="margin:0">' + esc(t("sc_p")) + '</p><div class="form-grid"><div class="field"><label for="sc-mkt">' + esc(t("sc_mkt")) + '</label><select id="sc-mkt" data-sc="mkt">' + opt("mkt", "all", "sc_all") + opt("mkt", "sa", "sc_sa") + opt("mkt", "us", "sc_us") + "</select></div>" +
+  const sum = [SC.mkt === "us" ? null : t("sc_sum_sa").replace("{n}", int(SC.bsa)), SC.mkt === "sa" ? null : t("sc_sum_us").replace("{n}", int(SC.bus)), t("sc_sum_p").replace("{n}", SC.pmax)].filter(Boolean).join(" · ");
+  const tog = '<button class="sc-tog" data-act="sc-tog" aria-expanded="' + scOpen + '"><span><b>' + esc(t("sc_set")) + '</b><small>' + esc(sum) + '</small></span><span aria-hidden="true">' + (scOpen ? "▴" : "▾") + "</span></button>";
+  const form = tog + '<div class="panel stack sc-set' + (scOpen ? " open" : "") + '"><p class="muted" style="margin:0">' + esc(t("sc_p")) + '</p><div class="form-grid"><div class="field"><label for="sc-mkt">' + esc(t("sc_mkt")) + '</label><select id="sc-mkt" data-sc="mkt">' + opt("mkt", "all", "sc_all") + opt("mkt", "sa", "sc_sa") + opt("mkt", "us", "sc_us") + "</select></div>" +
     num("bsa", "sc_bsa", 25) + num("bus", "sc_bus", 10) + num("pmax", "sc_pmax", 0.1) + '<div class="field"><label for="sc-boards">' + esc(t("sc_boards")) + '</label><select id="sc-boards" data-sc="boards">' + opt("boards", 3, "sc_b3") + opt("boards", 2, "sc_b2") + opt("boards", 1, "sc_b1") + "</select></div></div>" +
     '<label class="row small" style="gap:6px"><input type="checkbox" data-sc="frac"' + (SC.frac ? " checked" : "") + "> " + esc(t("sc_frac")) + '</label><label class="row small" style="gap:6px"><input type="checkbox" data-sc="unknown"' + (SC.unknown ? " checked" : "") + "> " + esc(t("sc_unknown")) + '</label><p class="small muted" style="margin:0">' + esc(t("sc_note")) + "</p></div>";
   return form + '<div id="sc-out">' + scResults() + "</div>";
