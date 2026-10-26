@@ -764,7 +764,7 @@ body.dg-lock{overflow:hidden}
 #tabbar{display:none}
 @media (max-width:640px){
   #tabbar:not([hidden]){display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-  .tb-in{display:grid;grid-template-columns:repeat(4,1fr);height:62px}
+  .tb-in{display:grid;grid-template-columns:repeat(5,1fr);height:62px}
   .tb{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
   .tb svg{width:23px;height:23px}
   .tb[aria-current="page"]{color:var(--amber-ink)}
@@ -1409,6 +1409,37 @@ details.pmenu{position:relative}details.pmenu>summary{list-style:none;cursor:poi
 .pm-pop a{padding:9px 12px;border-radius:8px;color:var(--ink);text-decoration:none}.pm-pop a:hover{background:var(--sunk)}
 .deskp .dg-intro{display:none}
 @media (max-width:640px){.dh-news li{flex-wrap:wrap}.dh-nt{flex-basis:100%;order:2}.dh-news a{order:3}}
+/* بطاقات الدورات */
+.crs{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.crs-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.crs-head h2{margin:0;font-size:22px}
+.crs-meta{display:flex;flex-direction:column;align-items:flex-end;flex:none}.crs-meta .num{font-size:22px;font-weight:700}
+.crs-lvs{display:grid;gap:8px}
+.crs-lv{border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.crs-lv>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer}.crs-lv>summary::-webkit-details-marker{display:none}
+.crs-lv[disabled]>summary{cursor:default;opacity:.7}
+.crs-k{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--amber-soft);color:var(--amber-ink);flex:none}
+.crs-lt{display:flex;flex-direction:column;flex:1;min-width:0}
+.crs-ls{list-style:none;margin:0;padding:0 12px 10px;display:grid;gap:2px}
+.crs-ls li{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px}.crs-ls li:hover{background:var(--sunk)}
+.crs-ls li a{flex:1;color:var(--ink);text-decoration:none;font-weight:500}.crs-ls li>span:not(.crs-n){flex:1;color:var(--muted)}
+.crs-n{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);font-size:12.5px;flex:none}.crs-ls li.done .crs-n{background:var(--up-soft);color:var(--up)}
+/* المساعد العائم */
+#asfab{position:fixed;inset-inline-start:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:45;display:inline-flex;align-items:center;gap:6px;border:0;border-radius:99px;padding:10px 16px;background:#3346A8;color:#fff;font:inherit;font-weight:700;box-shadow:0 8px 24px rgba(30,40,90,.3);cursor:pointer}
+body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+#aspanel{position:fixed;z-index:55;inset-inline-start:16px;bottom:16px;width:min(420px,calc(100vw - 32px));height:min(640px,calc(100vh - 120px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden}
+@media (max-width:640px){#aspanel{inset:auto 0 0 0;width:100%;height:85vh;border-radius:18px 18px 0 0}}
+.as-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}.as-head>div{display:flex;flex-direction:column;flex:1;min-width:0}
+.as-ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#EEF2FF;color:#3346A8;flex:none}
+.as-body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.as-m{max-width:88%;border-radius:14px;padding:8px 12px}.as-m p{margin:3px 0}.as-m.u{align-self:flex-start;background:#3346A8;color:#fff}.as-m.a{align-self:flex-end;background:var(--sunk)}
+[dir="ltr"] .as-m.u{align-self:flex-end}[dir="ltr"] .as-m.a{align-self:flex-start}
+.as-li{padding-inline-start:4px}.as-link{display:inline-block;margin:2px 0;padding:2px 10px;border-radius:99px;background:#EEF2FF;color:#3346A8;font-weight:600;text-decoration:none}
+.as-chips{display:flex;gap:6px;overflow-x:auto;padding:6px 12px}.as-chips button{flex:none;border:1px solid var(--line);background:var(--surface);color:inherit;font:inherit;font-size:13px;border-radius:99px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+.as-form{display:flex;gap:8px;padding:8px 12px;border-top:1px solid var(--line)}.as-form textarea{flex:1;min-width:0;resize:none;border:1px solid var(--line);border-radius:12px;padding:9px 12px;font:inherit;background:var(--bg);color:inherit}
+.as-foot{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:4px 12px 10px;flex-wrap:wrap}.as-foot input{width:56px;border:1px solid var(--line);border-radius:6px;padding:2px 4px;background:var(--bg);color:inherit}
+.as-lesson{display:flex;align-items:center;gap:10px;border:1px solid #CFE0FF;background:#F5F8FF;border-radius:14px;padding:12px 14px;margin-block:18px}.as-lesson>div{display:flex;flex-direction:column;flex:1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .as-lesson{background:#151C33;border-color:#2A3A66}:root:not([data-theme="light"]) .as-ic,:root:not([data-theme="light"]) .as-link{background:#1E2647;color:#AFC0FF}}
+:root[data-theme="dark"] .as-lesson{background:#151C33;border-color:#2A3A66}:root[data-theme="dark"] .as-ic,:root[data-theme="dark"] .as-link{background:#1E2647;color:#AFC0FF}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2333,9 +2364,22 @@ function levelBlock(tr, n) {
 }
 
 function pageTracks() {
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("tracks_h")) + "</h1><p>" + esc(t("tracks_p")) + "</p></div>" +
-    TRACKS.map((tr) => '<section class="track" id="t-' + tr.id + '"><div class="stack"><div><span class="tag amber">' + esc(L(tr.who)) + '</span></div><h2 style="font-size:26px">' + esc(L(tr.name)) + '</h2><p class="muted">' + esc(L(tr.blurb)) + "</p>" + stairs(tr.id) + '</div><div class="levels">' + [1, 2, 3, 4, 5].map((n) => levelBlock(tr, n)).join("") + "</div></section>").join("") +
-    (S.plan === "full" ? "" : '<section class="sec"><div class="panel row" style="justify-content:space-between"><div><h3>' + esc(t("level_locked_h")) + '</h3><p class="muted">' + esc(t("level_locked_p")) + '</p></div><a class="btn primary" href="#plans">' + esc(t("see_plans")) + "</a></div></section>") + "</div>";
+  /* بطاقات الدورات: كل مسار بطاقة، وكل درجة تنفتح وتنقفل وتعرض دروسها ومدة كل درس */
+  const cur = (typeof LAST !== "undefined" && LAST.lesson && LESSONS.find((x) => x.id === LAST.lesson)) || null;
+  const card = (tr) => {
+    const all = lessonsOf(tr.id), done = all.filter((l) => isDone(l.id)).length, nx = nextLesson(tr.id), mins = all.reduce((a, l) => a + (l.mins || 0), 0);
+    const openLv = (cur && cur.track === tr.id ? cur.level : nx ? nx.level : 1);
+    const lv = [1, 2, 3, 4, 5].map((n) => {
+      const ls = lessonsOf(tr.id, n), name = L(LEVELS[tr.id][n - 1]), lock = n > 2 && !unlocked(), dn = ls.filter((l) => isDone(l.id)).length, lm = ls.reduce((a, l) => a + (l.mins || 0), 0);
+      const tag = !ls.length ? t("soon") : levelDone(tr.id, n) ? t("done") : lock ? t("locked") : n > 2 ? t("paid") : t("free");
+      const rows = ls.map((l, i) => { const d = isDone(l.id), ok = canOpen(l); return "<li" + (d ? ' class="done"' : "") + '><span class="crs-n" aria-hidden="true">' + (d ? "✓" : ok ? i + 1 : "🔒") + "</span>" + (ok ? '<a href="#l-' + l.id + '">' + esc(L(l.title)) + "</a>" : "<span>" + esc(L(l.title)) + "</span>") + '<small class="muted num">' + l.mins + " " + esc(t("mins")) + "</small></li>"; }).join("");
+      return '<details class="crs-lv"' + (n === openLv && ls.length ? " open" : "") + (ls.length ? "" : " disabled") + '><summary><b class="crs-k">' + n + '</b><span class="crs-lt"><b>' + esc(name) + '</b><small class="muted">' + (ls.length ? ls.length + " " + esc(S.lang === "ar" ? "دروس" : "lessons") + " · " + lm + " " + esc(t("mins")) + " · " + dn + "/" + ls.length : esc(t("soon"))) + '</small></span><span class="tag' + (tag === t("free") || tag === t("done") ? " amber" : "") + '">' + esc(tag) + "</span></summary>" + (rows ? '<ol class="crs-ls">' + rows + "</ol>" : "") + "</details>";
+    }).join("");
+    return '<section class="crs" id="t-' + tr.id + '"><div class="crs-head"><div class="stack" style="gap:4px;min-width:0"><span class="tag amber" style="align-self:flex-start">' + esc(L(tr.who)) + '</span><h2>' + esc(L(tr.name)) + '</h2><p class="muted" style="margin:0">' + esc(L(tr.blurb)) + '</p></div><div class="crs-meta"><span class="num">' + done + "/" + all.length + '</span><small class="muted">' + mins + " " + esc(t("mins")) + '</small></div></div><div class="dh-bar"><i style="width:' + (all.length ? Math.round((done / all.length) * 100) : 0) + '%"></i></div>' +
+      (nx ? '<div><a class="btn sm primary" href="#l-' + nx.id + '">' + esc(t("dh_go")) + ": " + esc(L(nx.title)) + "</a></div>" : "") + '<div class="crs-lvs">' + lv + "</div></section>";
+  };
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("tracks_h")) + "</h1><p>" + esc(t("tracks_p")) + '</p></div><div class="stack" style="padding-block:16px 40px;gap:16px">' + TRACKS.map(card).join("") +
+    (S.plan === "full" ? "" : '<div class="panel row" style="justify-content:space-between"><div><h3>' + esc(t("level_locked_h")) + '</h3><p class="muted">' + esc(t("level_locked_p")) + '</p></div><a class="btn primary" href="#plans">' + esc(t("see_plans")) + "</a></div>") + "</div></div>";
 }
 
 let quizState = {};
@@ -2355,7 +2399,7 @@ function pageLesson(id) {
   const allRight = qs.checked && l.quiz.every((q, qi) => qs.picks[qi] === q.a);
   const verdict = qs.checked ? '<div class="row"><span class="tag ' + (allRight ? "up" : "down") + '">' + esc(allRight ? t("passed") : t("failed")) + "</span>" + (allRight ? "" : '<button class="btn sm" data-act="quiz-retry" data-id="' + id + '">' + esc(t("retry")) + "</button>") + "</div>" : '<div><button class="btn primary" data-act="quiz-check" data-id="' + id + '">' + esc(t("check")) + "</button></div>";
   return '<div class="wrap"><article class="lesson"><div class="crumbs"><a href="#tracks">' + esc(t("nav_tracks")) + "</a> / " + esc(L(tr.name)) + " / " + esc(t("step")) + " " + l.level + '</div><div class="stack" style="gap:8px"><h1>' + esc(L(l.title)) + '</h1><div class="row small muted"><span>' + l.mins + " " + esc(t("mins")) + "</span>" + (isDone(id) ? '<span class="tag amber">' + esc(t("done")) + "</span>" : "") + "</div></div>" +
-    '<div class="prose">' + l.body.map((b) => block(b, id)).join("") + '</div><section class="quiz"><h2 style="font-size:24px">' + esc(t("quiz_h")) + "</h2>" + quiz + verdict + "</section>" +
+    '<div class="prose">' + l.body.map((b) => block(b, id)).join("") + '</div>' + (typeof asLessonBox === "function" ? asLessonBox() : "") + '<section class="quiz"><h2 style="font-size:24px">' + esc(t("quiz_h")) + "</h2>" + quiz + verdict + "</section>" +
     '<nav class="lesson-nav">' + (prev ? '<a class="btn" href="#l-' + prev.id + '">' + esc(t("prev")) + "</a>" : '<a class="btn" href="#tracks">' + esc(t("back_tracks")) + "</a>") + (next ? '<a class="btn ' + (isDone(id) ? "primary" : "") + '" href="#l-' + next.id + '">' + esc(t("next")) + "</a>" : '<a class="btn" href="#progress">' + esc(t("nav_progress")) + "</a>") + "</nav></article></div>";
 }
 
@@ -2473,6 +2517,7 @@ function render() {
   if (typeof topBell === "function") topBell();
   if (typeof tickHook === "function") tickHook();
   if (typeof srHook === "function") srHook();
+  if (typeof asRender === "function") asRender();
   document.querySelectorAll(".subnav nav, #main .tabs, .dg-chips").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"],[aria-pressed="true"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
@@ -5134,6 +5179,148 @@ document.addEventListener("click", (e) => {
   if (x) { e.preventDefault(); try { localStorage.setItem(PIN_KEY, x.dataset.id); } catch (err) {} render(); return; }
   document.querySelectorAll("details.pmenu[open]").forEach((d) => { if (!d.contains(e.target) || (e.target.closest && e.target.closest(".pm-pop a"))) d.open = false; });
 });
+/* ===== مِراس: المساعد الذكي (زر عائم في كل الصفحات) =====
+   - أسئلة مقترحة حسب الصفحة اللي أنت فيها (الشارت، الدرس، المؤشرات، الأخبار…).
+   - يعرف وين أنت: بيانات الشارت ونتيجة المدارس، أو نص الدرس، أو المؤشرات.
+   - يدلك على صفحات مِراس بروابط تضغطها.
+   - عداد أسئلة يومي يحمي رصيد OpenRouter (الحد تغيّره من خانة المساعد).
+   نفس مفتاح OpenRouter اللي في الإعدادات. المحادثة تنحفظ على هذا الجهاز بس. */
+Object.assign(UI, {
+  as_btn: ["المساعد", "Assistant"], as_h: ["المساعد الذكي", "Smart assistant"], as_left: ["بقي لك {n} من {m} سؤال اليوم", "{n} of {m} questions left today"],
+  as_ph: ["اسأل عن أي شي في مِراس أو السوق…", "Ask anything about Meras or the market…"], as_send: ["أرسل", "Send"], as_clear: ["محادثة جديدة", "New chat"], as_close: ["إغلاق", "Close"],
+  as_busy: ["يكتب…", "Writing…"], as_limit: ["خلصت أسئلة اليوم. ترجع بكرة، أو ارفع الحد من الإعدادات تحت.", "Today's questions are used up. They reset tomorrow, or raise the limit below."],
+  as_setup: ["المساعد يحتاج مفتاح OpenRouter. اربطه من الإعدادات.", "The assistant needs an OpenRouter key. Connect it in settings."], as_set: ["الإعدادات", "Settings"],
+  as_lim_lbl: ["الحد اليومي", "Daily limit"], as_hello: ["هلا! أنا مساعد مِراس. أعرف الصفحة اللي أنت فيها، وأقدر أشرح، وأقارن، وأدلك على المكان المناسب في المنصة.", "Hi! I'm the Meras assistant. I know which page you're on, and I can explain, compare, and point you to the right place on the platform."],
+  as_warn: ["إجابات نموذج ذكاء اصطناعي وقد تخطئ. تعليمية، ومو توصية شراء أو بيع.", "AI answers may be wrong. Educational, not a buy or sell recommendation."],
+  as_lesson: ["عندك سؤال عن هذا الدرس؟", "A question about this lesson?"], as_lesson_p: ["المساعد يعرف نص الدرس ويشرحه لك بمثال.", "The assistant knows this lesson's text and explains it with an example."], as_ask: ["اسأل المساعد", "Ask the assistant"]
+});
+const AS_KEY = "meras.asst", AS_LIM_KEY = "meras.asst.lim", AS_USE_KEY = "meras.asst.use";
+const AS = { open: false, busy: false, err: "", msgs: [] };
+try { AS.msgs = JSON.parse(localStorage.getItem(AS_KEY) || "[]").slice(-20); } catch (e) {}
+const asLimit = () => { try { return Math.max(1, +localStorage.getItem(AS_LIM_KEY) || 30); } catch (e) { return 30; } };
+const asToday = () => new Date().toISOString().slice(0, 10);
+function asUsed() { try { const u = JSON.parse(localStorage.getItem(AS_USE_KEY) || "{}"); return u.d === asToday() ? u.n : 0; } catch (e) { return 0; } }
+function asBump() { try { localStorage.setItem(AS_USE_KEY, JSON.stringify({ d: asToday(), n: asUsed() + 1 })); } catch (e) {} }
+const asSave = () => { try { localStorage.setItem(AS_KEY, JSON.stringify(AS.msgs.slice(-20))); } catch (e) {} };
+
+/* أسئلة مقترحة حسب الصفحة */
+function asChips() {
+  const r = route(), A = (ar, en) => L([ar, en]);
+  if (r === "chart") return [A("وش يقول الشارت الحين بكلام بسيط؟", "What is the chart saying, in plain words?"), A("ليش المدارس مختلفة هنا؟", "Why do the schools disagree here?"), A("وين أحط الوقف لو دخلت؟", "Where would a stop go if I entered?"), A("وش أراقب الأسبوع الجاي؟", "What should I watch next week?")];
+  if (r.startsWith("l-")) return [A("اشرح لي الدرس بمثال من السوق السعودي", "Explain this lesson with a Saudi market example"), A("لخّص الدرس في 3 نقاط", "Summarise the lesson in 3 points"), A("اسألني سؤال أختبر فيه فهمي", "Quiz me on it")];
+  if (r.startsWith("sch-") || r === "schools") return [A("أي مدرسة تناسب مبتدئ؟", "Which school suits a beginner?"), A("كيف أدمج مدرستين مع بعض؟", "How do I combine two schools?"), A("وش الفرق بين داو ووايكوف؟", "Dow versus Wyckoff?")];
+  if (r === "indices" || r === "market") return [A("كيف وضع تاسي اليوم؟", "How is TASI doing today?"), A("وش العلاقة بين السوق الأمريكي والسعودي؟", "How do US and Saudi markets relate?"), A("وين ألقى الأسهم القوية؟", "Where do I find strong shares?")];
+  if (r === "news") return [A("لخّص لي أهم أخبار اليوم", "Summarise today's key news"), A("أي خبر يأثر على أسهمي؟", "Which news affects my shares?")];
+  if (["gdiv", "dividends"].includes(r)) return [A("وش يعني تاريخ الاستحقاق؟", "What does the ex-date mean?"), A("كيف أحسب عائد التوزيع؟", "How do I compute dividend yield?")];
+  if (["portfolio", "pf", "journal", "invest"].includes(r)) return [A("كيف أوزّع محفظتي؟", "How should I spread my portfolio?"), A("وش يعني الربح غير المحقق؟", "What is unrealised profit?")];
+  return [A("من وين أبدأ؟", "Where do I start?"), A("وين ألقى تحليل سهم بالمدارس؟", "Where do I analyse a share with the schools?"), A("اشرح لي إدارة المخاطرة", "Explain risk management"), A("وش الجديد في السوق اليوم؟", "What's new in the market today?")];
+}
+/* خريطة الصفحات اللي يقدر يدلك عليها */
+function asCatalog() {
+  const out = [["", t("nav_home")], ["news", t("nav_news")], ["schools", t("nav_schools")], ["sch-tsla", t("ex_h")]];
+  Object.keys(NAV_GROUPS).forEach((g) => navItems(g).forEach(([h, k]) => out.push([h, t(k)])));
+  (typeof SCHOOLS !== "undefined" ? SCHOOLS : []).forEach((s) => out.push(["sch-" + s.id, L(s.name)]));
+  LESSONS.forEach((l) => out.push(["l-" + l.id, L(l.title)]));
+  return out.map(([h, n]) => "#" + h + " = " + n).join("\n");
+}
+function asContext() {
+  const r = route(), ctx = { page: r || "home", page_title: (document.querySelector("#main h1") || {}).textContent || "" };
+  try {
+    if (r === "chart" && typeof qaContext === "function" && typeof CH !== "undefined" && CH) ctx.chart = qaContext();
+    if (r.startsWith("l-")) { const l = LESSONS.find((x) => "l-" + x.id === r); if (l) ctx.lesson = { title: L(l.title), text: l.body.map((b) => b.p ? L(b.p) : b.h ? "## " + L(b.h) : b.ul ? b.ul.map((x) => "- " + L(x)).join("\n") : "").filter(Boolean).join("\n").slice(0, 6000) }; }
+    if (r.startsWith("sch-")) { const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === r); if (s) ctx.school = { name: L(s.name), idea: L(s.idea), tools: s.tools.map(L), pros: s.pro.map(L), cons: s.con.map(L) }; }
+    if (typeof tkItems === "function") ctx.indices = tkItems().map((x) => ({ index: L(x.it.n), close: x.st.c, today: +(100 * (x.st.d || 0)).toFixed(2) + "%", month: x.st.m != null ? +(100 * x.st.m).toFixed(2) + "%" : null, schools_result: x.R ? x.R.fb : null, date: x.st.date }));
+    if (["news", "", "home"].includes(r) && typeof NW !== "undefined" && NW.data) ctx.news = (NW.data.items || []).slice(0, 15).map((x) => ({ t: x.t, sym: x.sym, src: x.src, at: x.at }));
+    if (typeof NW !== "undefined" && NW.brief && NW.brief.items) ctx.daily_brief = NW.brief.items.map((x) => x.h);
+    if (typeof DK !== "undefined" && DK.loaded && ["portfolio", "pf", "", "home"].includes(r)) { const H = dkHoldings(); ctx.portfolio = H.open.map((h) => ({ sym: h.sym, qty: h.qty, avg: +h.avg.toFixed(2), value: +h.value.toFixed(2), pl: +h.pl.toFixed(2) })); }
+    if (typeof DG !== "undefined" && DG.data && typeof dhDivs === "function") ctx.upcoming_dividends = dhDivs().slice(0, 8);
+  } catch (e) {}
+  return ctx;
+}
+const AS_SYSTEM = (lang) => [
+  "You are the assistant inside Meras (مِراس), a personal learning and analysis platform for the Saudi stock market with a look at world markets. Its owner is an individual investor in Saudi Arabia.",
+  "Each request carries a JSON context about the page the user is on (chart data and the multi-school analysis, a lesson's text, index figures, news, portfolio or dividends when available) and a list of Meras pages.",
+  "Rules:",
+  "1. Use the numbers in the context; if something is not there, say so plainly and suggest where in Meras to find it.",
+  "2. Explain, compare and discuss conditional scenarios, levels and risk. Never give a direct instruction to buy or sell, never promise outcomes, never invent probabilities.",
+  "3. When pointing to a Meras page, write a link exactly as [[#route|label]] using routes from the page list only (e.g. [[#chart|الشارت]]). At most 3 links per answer.",
+  "4. Keep answers short (under 170 words) unless asked for detail. Plain text, short paragraphs or '-' lists, no markdown headings or bold, English digits (0-9).",
+  "Language and tone: " + (lang === "ar" ? "friendly Saudi Arabic, like an experienced friend." : "plain friendly English.")
+].join("\n");
+async function asAsk(q) {
+  q = (q || "").trim(); if (!q || AS.busy) return;
+  if (!AI.key) { AS.err = t("as_setup"); asRender(); return; }
+  if (!AI.model) { AS.err = t("ai_need_model"); asRender(); return; }
+  if (asUsed() >= asLimit()) { AS.err = t("as_limit"); asRender(); return; }
+  AS.msgs.push({ r: "u", t: q }); AS.busy = true; AS.err = ""; asRender();
+  const msgs = [{ role: "system", content: AS_SYSTEM(S.lang) }, { role: "user", content: "Meras pages:\n" + asCatalog() + "\n\nContext JSON:\n" + JSON.stringify(asContext()) }, { role: "assistant", content: S.lang === "ar" ? "تمام، وصلتني." : "Got it." }];
+  AS.msgs.slice(-9, -1).forEach((m) => msgs.push({ role: m.r === "u" ? "user" : "assistant", content: m.t }));
+  msgs.push({ role: "user", content: q });
+  let text = "", err = "";
+  try {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", { method: "POST", headers: { Authorization: "Bearer " + AI.key, "Content-Type": "application/json", "X-Title": "Meras" }, body: JSON.stringify({ model: AI.model, temperature: 0.4, max_tokens: 700, messages: msgs }) });
+    if (!res.ok) err = t({ 401: "ai_e_401", 402: "ai_e_402", 404: "ai_e_404", 400: "ai_e_404", 429: "ai_e_429" }[res.status] || "ai_e_net") + " (" + res.status + ")";
+    else { const j = await res.json(); text = ((j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "").replace(/\*\*|^#+\s*/gm, "").trim(); if (!text) err = t("ai_e_empty"); }
+  } catch (e) { err = t("ai_e_net"); }
+  AS.busy = false;
+  if (text) { AS.msgs.push({ r: "a", t: text }); asBump(); } else { AS.err = err; AS.msgs.pop(); }
+  asSave(); asRender();
+}
+function asFmt(txt) {
+  const routes = new Set([""].concat(Object.keys(NAV_GROUPS).flatMap((g) => navItems(g).map((x) => x[0])), ["news", "schools", "sch-tsla", "indices", "settings"], (typeof SCHOOLS !== "undefined" ? SCHOOLS : []).map((s) => "sch-" + s.id), LESSONS.map((l) => "l-" + l.id)));
+  return txt.split(/\n+/).filter((x) => x.trim()).map((line) => {
+    const li = /^\s*[-•]\s+/.test(line);
+    let h = esc(line.replace(/^\s*[-•]\s+/, ""));
+    h = h.replace(/\[\[#([\w\-]*)\|([^\]]{1,60})\]\]/g, (m, r, lab) => (routes.has(r) ? '<a class="as-link" href="#' + r + '" data-act="as-go">' + lab + " ←</a>" : lab));
+    return li ? '<p class="as-li">• ' + h + "</p>" : "<p>" + h + "</p>";
+  }).join("");
+}
+function asRender() {
+  let fab = document.getElementById("asfab");
+  if (!(typeof HOSTED !== "undefined" && HOSTED) || (typeof lnShow === "function" && lnShow())) { if (fab) fab.remove(); const p = document.getElementById("aspanel"); if (p) p.remove(); return; }
+  if (!fab) { fab = document.createElement("button"); fab.id = "asfab"; fab.type = "button"; fab.setAttribute("data-act", "as-toggle"); document.body.appendChild(fab); }
+  fab.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" fill="currentColor"/><circle cx="18" cy="17.5" r="1.6" fill="currentColor"/></svg><span>' + esc(t("as_btn")) + "</span>";
+  fab.setAttribute("aria-expanded", String(AS.open)); fab.hidden = AS.open;
+  let p = document.getElementById("aspanel");
+  if (!AS.open) { if (p) p.remove(); return; }
+  const fresh = !p;
+  if (!p) { p = document.createElement("div"); p.id = "aspanel"; p.setAttribute("role", "dialog"); p.setAttribute("aria-label", t("as_h")); document.body.appendChild(p); }
+  p.dir = S.lang === "ar" ? "rtl" : "ltr";
+  const left = Math.max(0, asLimit() - asUsed());
+  const msgs = AS.msgs.length ? AS.msgs.map((m) => '<div class="as-m ' + (m.r === "u" ? "u" : "a") + '">' + (m.r === "u" ? "<p>" + esc(m.t) + "</p>" : asFmt(m.t)) + "</div>").join("") : '<div class="as-m a"><p>' + esc(t("as_hello")) + "</p></div>";
+  const chips = '<div class="as-chips">' + asChips().map((q) => '<button type="button" data-act="as-chip" data-q="' + esc(q) + '"' + (AS.busy ? " disabled" : "") + ">" + esc(q) + "</button>").join("") + "</div>";
+  const keep = p.querySelector("#as-q"), val = keep ? keep.value : "";
+  p.innerHTML = '<div class="as-head"><span class="as-ic"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" fill="currentColor"/></svg></span><div><b>' + esc(t("as_h")) + '</b><small class="muted">' + esc(t("as_left").replace("{n}", left).replace("{m}", asLimit())) + '</small></div><button type="button" class="btn sm ghost" data-act="as-clear" title="' + esc(t("as_clear")) + '">' + esc(t("as_clear")) + '</button><button type="button" class="btn sm" data-act="as-toggle" aria-label="' + esc(t("as_close")) + '">✕</button></div>' +
+    '<div class="as-body">' + msgs + (AS.busy ? '<div class="as-m a"><p class="muted">' + esc(t("as_busy")) + "</p></div>" : "") + (AS.err ? '<p class="neg small">' + esc(AS.err) + (AS.err === t("as_setup") ? ' <a href="#settings" data-act="as-go">' + esc(t("as_set")) + "</a>" : "") + "</p>" : "") + "</div>" +
+    chips + '<form class="as-form" data-form="as" novalidate><textarea id="as-q" rows="1" maxlength="600" placeholder="' + esc(t("as_ph")) + '"' + (AS.busy ? " disabled" : "") + '></textarea><button class="btn primary" type="submit"' + (AS.busy ? " disabled" : "") + ">" + esc(t("as_send")) + "</button></form>" +
+    '<div class="as-foot small muted"><span>' + esc(t("as_warn")) + '</span><label>' + esc(t("as_lim_lbl")) + ' <input type="number" min="1" max="500" data-as="lim" value="' + asLimit() + '" class="num"></label></div>';
+  const q = p.querySelector("#as-q"); q.value = val;
+  const body = p.querySelector(".as-body"); body.scrollTop = body.scrollHeight;
+  if (fresh || !AS.busy) setTimeout(() => { if (!AS.busy) q.focus({ preventScroll: true }); }, 30);
+}
+function asOpen(q) { AS.open = true; asRender(); if (q) asAsk(q); }
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act^="as-"]'); if (!el) return;
+  const a = el.dataset.act;
+  if (a === "as-go") { AS.open = window.matchMedia("(min-width:900px)").matches; setTimeout(asRender, 50); return; }
+  e.preventDefault();
+  if (a === "as-toggle") { AS.open = !AS.open; asRender(); }
+  else if (a === "as-chip") asAsk(el.dataset.q);
+  else if (a === "as-clear") { AS.msgs = []; AS.err = ""; asSave(); asRender(); }
+  else if (a === "as-lesson") asOpen(el.dataset.q);
+});
+document.addEventListener("submit", (e) => { const f = e.target.closest && e.target.closest('[data-form="as"]'); if (!f) return; e.preventDefault(); const q = document.getElementById("as-q"); const v = q.value; q.value = ""; asAsk(v); });
+document.addEventListener("keydown", (e) => {
+  if (e.target && e.target.id === "as-q" && e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.target.closest("form").requestSubmit(); }
+  if (e.key === "Escape" && AS.open && !(typeof SR !== "undefined" && SR.open)) { AS.open = false; asRender(); }
+});
+document.addEventListener("change", (e) => { if (e.target.dataset && e.target.dataset.as === "lim") { try { localStorage.setItem(AS_LIM_KEY, String(Math.max(1, Math.min(500, parseInt(e.target.value, 10) || 30)))); } catch (err) {} asRender(); } });
+window.addEventListener("hashchange", () => setTimeout(asRender, 60));
+/* صندوق "عندك سؤال عن هذا الدرس؟" داخل صفحة الدرس */
+function asLessonBox() {
+  if (!(typeof HOSTED !== "undefined" && HOSTED)) return "";
+  return '<div class="as-lesson"><span class="as-ic"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" fill="currentColor"/></svg></span><div><b>' + esc(t("as_lesson")) + '</b><small class="muted">' + esc(t("as_lesson_p")) + '</small></div><button type="button" class="btn sm primary" data-act="as-lesson" data-q="' + esc(L(["اشرح لي هذا الدرس بمثال من السوق السعودي", "Explain this lesson with a Saudi market example"])) + '">' + esc(t("as_ask")) + "</button></div>";
+}
 /* ===== مِراس: دليل رموز السوق السعودي =====
    كل شركات السوق الرئيسية (تاسي) مقسّمة حسب القطاع، كما يصنّفها أرقام.
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].

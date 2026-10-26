@@ -253,9 +253,22 @@ function levelBlock(tr, n) {
 }
 
 function pageTracks() {
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("tracks_h")) + "</h1><p>" + esc(t("tracks_p")) + "</p></div>" +
-    TRACKS.map((tr) => '<section class="track" id="t-' + tr.id + '"><div class="stack"><div><span class="tag amber">' + esc(L(tr.who)) + '</span></div><h2 style="font-size:26px">' + esc(L(tr.name)) + '</h2><p class="muted">' + esc(L(tr.blurb)) + "</p>" + stairs(tr.id) + '</div><div class="levels">' + [1, 2, 3, 4, 5].map((n) => levelBlock(tr, n)).join("") + "</div></section>").join("") +
-    (S.plan === "full" ? "" : '<section class="sec"><div class="panel row" style="justify-content:space-between"><div><h3>' + esc(t("level_locked_h")) + '</h3><p class="muted">' + esc(t("level_locked_p")) + '</p></div><a class="btn primary" href="#plans">' + esc(t("see_plans")) + "</a></div></section>") + "</div>";
+  /* بطاقات الدورات: كل مسار بطاقة، وكل درجة تنفتح وتنقفل وتعرض دروسها ومدة كل درس */
+  const cur = (typeof LAST !== "undefined" && LAST.lesson && LESSONS.find((x) => x.id === LAST.lesson)) || null;
+  const card = (tr) => {
+    const all = lessonsOf(tr.id), done = all.filter((l) => isDone(l.id)).length, nx = nextLesson(tr.id), mins = all.reduce((a, l) => a + (l.mins || 0), 0);
+    const openLv = (cur && cur.track === tr.id ? cur.level : nx ? nx.level : 1);
+    const lv = [1, 2, 3, 4, 5].map((n) => {
+      const ls = lessonsOf(tr.id, n), name = L(LEVELS[tr.id][n - 1]), lock = n > 2 && !unlocked(), dn = ls.filter((l) => isDone(l.id)).length, lm = ls.reduce((a, l) => a + (l.mins || 0), 0);
+      const tag = !ls.length ? t("soon") : levelDone(tr.id, n) ? t("done") : lock ? t("locked") : n > 2 ? t("paid") : t("free");
+      const rows = ls.map((l, i) => { const d = isDone(l.id), ok = canOpen(l); return "<li" + (d ? ' class="done"' : "") + '><span class="crs-n" aria-hidden="true">' + (d ? "✓" : ok ? i + 1 : "🔒") + "</span>" + (ok ? '<a href="#l-' + l.id + '">' + esc(L(l.title)) + "</a>" : "<span>" + esc(L(l.title)) + "</span>") + '<small class="muted num">' + l.mins + " " + esc(t("mins")) + "</small></li>"; }).join("");
+      return '<details class="crs-lv"' + (n === openLv && ls.length ? " open" : "") + (ls.length ? "" : " disabled") + '><summary><b class="crs-k">' + n + '</b><span class="crs-lt"><b>' + esc(name) + '</b><small class="muted">' + (ls.length ? ls.length + " " + esc(S.lang === "ar" ? "دروس" : "lessons") + " · " + lm + " " + esc(t("mins")) + " · " + dn + "/" + ls.length : esc(t("soon"))) + '</small></span><span class="tag' + (tag === t("free") || tag === t("done") ? " amber" : "") + '">' + esc(tag) + "</span></summary>" + (rows ? '<ol class="crs-ls">' + rows + "</ol>" : "") + "</details>";
+    }).join("");
+    return '<section class="crs" id="t-' + tr.id + '"><div class="crs-head"><div class="stack" style="gap:4px;min-width:0"><span class="tag amber" style="align-self:flex-start">' + esc(L(tr.who)) + '</span><h2>' + esc(L(tr.name)) + '</h2><p class="muted" style="margin:0">' + esc(L(tr.blurb)) + '</p></div><div class="crs-meta"><span class="num">' + done + "/" + all.length + '</span><small class="muted">' + mins + " " + esc(t("mins")) + '</small></div></div><div class="dh-bar"><i style="width:' + (all.length ? Math.round((done / all.length) * 100) : 0) + '%"></i></div>' +
+      (nx ? '<div><a class="btn sm primary" href="#l-' + nx.id + '">' + esc(t("dh_go")) + ": " + esc(L(nx.title)) + "</a></div>" : "") + '<div class="crs-lvs">' + lv + "</div></section>";
+  };
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("tracks_h")) + "</h1><p>" + esc(t("tracks_p")) + '</p></div><div class="stack" style="padding-block:16px 40px;gap:16px">' + TRACKS.map(card).join("") +
+    (S.plan === "full" ? "" : '<div class="panel row" style="justify-content:space-between"><div><h3>' + esc(t("level_locked_h")) + '</h3><p class="muted">' + esc(t("level_locked_p")) + '</p></div><a class="btn primary" href="#plans">' + esc(t("see_plans")) + "</a></div>") + "</div></div>";
 }
 
 let quizState = {};
@@ -275,7 +288,7 @@ function pageLesson(id) {
   const allRight = qs.checked && l.quiz.every((q, qi) => qs.picks[qi] === q.a);
   const verdict = qs.checked ? '<div class="row"><span class="tag ' + (allRight ? "up" : "down") + '">' + esc(allRight ? t("passed") : t("failed")) + "</span>" + (allRight ? "" : '<button class="btn sm" data-act="quiz-retry" data-id="' + id + '">' + esc(t("retry")) + "</button>") + "</div>" : '<div><button class="btn primary" data-act="quiz-check" data-id="' + id + '">' + esc(t("check")) + "</button></div>";
   return '<div class="wrap"><article class="lesson"><div class="crumbs"><a href="#tracks">' + esc(t("nav_tracks")) + "</a> / " + esc(L(tr.name)) + " / " + esc(t("step")) + " " + l.level + '</div><div class="stack" style="gap:8px"><h1>' + esc(L(l.title)) + '</h1><div class="row small muted"><span>' + l.mins + " " + esc(t("mins")) + "</span>" + (isDone(id) ? '<span class="tag amber">' + esc(t("done")) + "</span>" : "") + "</div></div>" +
-    '<div class="prose">' + l.body.map((b) => block(b, id)).join("") + '</div><section class="quiz"><h2 style="font-size:24px">' + esc(t("quiz_h")) + "</h2>" + quiz + verdict + "</section>" +
+    '<div class="prose">' + l.body.map((b) => block(b, id)).join("") + '</div>' + (typeof asLessonBox === "function" ? asLessonBox() : "") + '<section class="quiz"><h2 style="font-size:24px">' + esc(t("quiz_h")) + "</h2>" + quiz + verdict + "</section>" +
     '<nav class="lesson-nav">' + (prev ? '<a class="btn" href="#l-' + prev.id + '">' + esc(t("prev")) + "</a>" : '<a class="btn" href="#tracks">' + esc(t("back_tracks")) + "</a>") + (next ? '<a class="btn ' + (isDone(id) ? "primary" : "") + '" href="#l-' + next.id + '">' + esc(t("next")) + "</a>" : '<a class="btn" href="#progress">' + esc(t("nav_progress")) + "</a>") + "</nav></article></div>";
 }
 
@@ -393,6 +406,7 @@ function render() {
   if (typeof topBell === "function") topBell();
   if (typeof tickHook === "function") tickHook();
   if (typeof srHook === "function") srHook();
+  if (typeof asRender === "function") asRender();
   document.querySelectorAll(".subnav nav, #main .tabs, .dg-chips").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"],[aria-pressed="true"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
