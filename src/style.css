@@ -1298,3 +1298,15 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 .sca-read summary{cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sca-read summary a{color:inherit}
 .sca-read ul{margin-top:8px}
 @media (max-width:640px){.sca-final{grid-template-columns:1fr 1fr}}
+/* المحفوظات والتصدير والأسئلة */
+.sv-bar{background:var(--sunk)}
+.sv-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.sv-it{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.sv-main{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sv-q{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit}
+.qa{border-color:color-mix(in srgb,#5B7BD5 40%,var(--line))}
+.qa-msgs{display:grid;gap:12px}.qa-m{display:grid;gap:6px}
+.qa-q,.qa-a,.qa-long{border-radius:12px;padding:8px 12px}.qa-q{background:var(--sunk);justify-self:start;max-width:92%}.qa-a,.qa-long{background:var(--surface);border:1px solid var(--line)}
+.qa-q p,.qa-a p,.qa-long p{margin:4px 0}.qa-a h4,.qa-long h4{margin:10px 0 2px;font-size:15.5px}
+.qa-form{display:grid;gap:8px}.qa-form textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;resize:vertical}
+.sv-bar .tag{white-space:normal}

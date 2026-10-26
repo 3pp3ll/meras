@@ -162,6 +162,7 @@ function dkCharts() {
 let dkGrid = true;
 const dkPhone = () => window.matchMedia && matchMedia("(max-width:640px)").matches;
 const DK_IC = {
+  sv: '<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   nw: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 5h11v14H6a1 1 0 0 1-1-1z"/><path d="M16 9h3v9a1 1 0 0 1-1 1h-2"/><path d="M8 9h5M8 12h5M8 15h3" stroke-linecap="round"/></g>',
   apps: '<g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><path d="M17 14v6M14 17h6" stroke-linecap="round"/></g>',
   pf: '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z M4 7l11-3v3 M16 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
@@ -190,12 +191,12 @@ function pageDesk() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
-  const tabs = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["nw", "nw_t"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
+  const tabs = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["nw", "nw_t"], ["sv", "sv_t"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
   if (dkGrid && dkPhone()) return head + dkGridHtml(tabs) + "</div>";
   const cur = tabs.find(([k]) => k === dkTab) || tabs[0];
   const mbar = '<div class="dk-mbar"><button class="dk-mback" data-act="dk-grid"><span aria-hidden="true">›</span> ' + esc(t("dk_h")) + "</button><b>" + esc(t(cur[1])) + "</b></div>";
   const side = '<aside class="dk-side"><nav aria-label="' + esc(t("dk_h")) + '">' + tabs.map(([k, l]) => { const b = dkBadge(k); return '<a href="#desk" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page"' : "") + '><span class="dk-si"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + (DK_IC[k] || "") + '</svg></span><span class="dk-sl"><b>' + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></span>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</a>"; }).join("") + "</nav></aside>";
-  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, apps: dkApps, nw: dkNews, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
+  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, apps: dkApps, nw: dkNews, sv: dkSaved, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
 }
 
 function dkExport() {

@@ -20,10 +20,11 @@ const curOf = (s) => (/^\d{4}$/.test(String(s)) ? "SAR" : "USD");
 const money = (n, cur, d = 2) => (cur === "USD" ? "$" : "") + fmt(n, d);
 
 function usMerge() {
-  if (!LIVE || (!(US && US.symbols) && !USM)) return;
+  if (!LIVE) return; if (!(US && US.symbols) && !USM) { if (typeof extraMerge === "function") extraMerge(); return; }
   LIVE.history = LIVE.history || {};
   if (US && US.symbols) Object.entries(US.symbols).forEach(([s, v]) => { if (Array.isArray(v.rows) && v.rows.length) LIVE.history[s] = v.rows; });
   if (USM) [["gold", "XAU"], ["silver", "XAG"]].forEach(([k, s]) => { const o = USM[k] && USM[k].ohlc; if (Array.isArray(o) && o.length > 1) LIVE.history[s] = o.map(([d, op, h, l, c]) => ({ d, o: op, h, l, c })); });
+  if (typeof extraMerge === "function") extraMerge();
 }
 const usNameOf = (s) => (s === "XAU" ? t("us_gold") : s === "XAG" ? t("us_silver") : US && US.symbols && US.symbols[s] ? US.symbols[s].n : null);
 async function loadUS() {

@@ -292,7 +292,7 @@ function scaRun(all, ids) {
 
 /* ----- العرض ----- */
 const scaTag = (b) => '<span class="tag ' + ({ up: "up", down: "ex-dn", flat: "", open: "" }[b] || "") + '">' + esc(t({ up: "ex_up", down: "ex_down", flat: "ex_flat", open: "ex_open_q" }[b] || "ex_flat")) + "</span>";
-function scaResultHtml(R) {
+function scaExplain(R) {
   const why = [], pro = R.res.filter((r) => !r.na && r.bias === R.fb && R.fb !== "flat"), con = R.res.filter((r) => !r.na && R.fb !== "flat" && (r.bias === "up" || r.bias === "down") && r.bias !== R.fb), neu = R.res.filter((r) => !r.na && (r.bias === "flat" || r.bias === "open"));
   const nm = (arr) => arr.map((r) => scaName(r.id)).join(L(["، ", ", "]));
   if (R.fb === "flat") why.push(F("مجموع الدرجات الموزونة {s}، وهذا قريب من الصفر: المدارس ما اتفقت على اتجاه.", "The weighted total is {s}, close to zero: the schools do not agree on a direction.", { s: R.tot.toFixed(2) }));
@@ -313,6 +313,10 @@ function scaResultHtml(R) {
   if (sup) scen.push(F("إغلاق تحت {p} (دعم اتفقت عليه {n} مدارس) يقوّي الهبوط.", "A close below {p} (support agreed by {n} schools) strengthens the downside.", { p: px(sup.p), n: sup.ids.length }));
   scen.push(F("الوقف المنطقي على الأقل 1.5 ضعف ATR ({a}) ورا المستوى، لأن هذا متوسط حركة السهم.", "A sensible stop sits at least 1.5× ATR ({a}) beyond the level, since that is the share's normal range.", { a: px(1.5 * R.atr) }));
   if (R.conf === 1) scen.push(F("الإشارة ضعيفة: الانتظار لين تتفق مدارس أكثر قرار بحد ذاته.", "The signal is weak: waiting until more schools agree is a decision in itself."));
+  return { why, scen };
+}
+function scaResultHtml(R) {
+  const { why, scen } = scaExplain(R);
   const final = '<div class="sca-final ' + R.fb + '"><div><span class="small muted">' + esc(t("sca_final")) + "</span><b>" + esc(t(R.fb === "up" ? "ex_up" : R.fb === "down" ? "ex_down" : "ex_flat")) + '</b></div><div><span class="small muted">' + esc(t("sca_conf")) + "</span><b>" + esc(t("sca_c" + R.conf)) + '</b></div><div><span class="small muted">' + esc(t("sca_score")) + '</span><b class="num" dir="ltr">' + (R.tot > 0 ? "+" : "") + R.tot.toFixed(2) + '</b></div><div class="small">' + esc(t("sca_agree").replace("{a}", R.agree).replace("{n}", R.nAct)) + "</div></div>";
   const reads = R.res.map((r) => '<details class="sca-read"' + (R.res.length <= 3 ? " open" : "") + '><summary><b><a href="#sch-' + r.id + '">' + esc(scaName(r.id)) + "</a></b>" + scaTag(r.bias) + '<span class="small muted num" dir="ltr">' + (r.na ? "-" : (r.score > 0 ? "+" : "") + r.score.toFixed(1)) + "</span></summary><ul>" + r.lines.map((l) => "<li>" + esc(l) + "</li>").join("") + "</ul></details>").join("");
   const cmp = '<div class="tablewrap"><table class="sch-tbl"><thead><tr><th>' + esc(t("sch_name")) + "</th><th>" + esc(t("ex_bias")) + "</th><th>" + esc(t("sca_score")) + "</th><th>" + esc(t("sca_w")) + "</th></tr></thead><tbody>" + R.res.map((r) => "<tr><td>" + esc(scaName(r.id)) + "</td><td>" + scaTag(r.bias) + '</td><td class="num" dir="ltr">' + (r.na ? "-" : (r.score > 0 ? "+" : "") + r.score.toFixed(1)) + '</td><td class="num">' + (r.na ? "-" : r.w) + "</td></tr>").join("") + "</tbody></table></div>";
@@ -326,6 +330,7 @@ function scaResultHtml(R) {
 function scaPanel() {
   if (!CH || !CH.data) return "";
   const cfg = chartCfg(), key = cfg.sym + "|" + CH.e;
+  if (SCA.keyPending) { SCA.key = key; SCA.keyPending = false; }
   const chips = SCA.sel.map((id) => '<span class="chip"><span>' + esc(scaName(id)) + '</span><button data-act="sca-del" data-id="' + id + '" aria-label="' + esc(t("ch_remove")) + '">×</button></span>').join("");
   const left = SCA_SCHOOLS.filter((id) => !SCA.sel.includes(id));
   const add = left.length ? '<select class="addsel" data-sca="add" aria-label="' + esc(t("sca_add")) + '"><option value="">' + esc(t("sca_add")) + "</option>" + left.map((id) => '<option value="' + id + '">' + esc(scaName(id)) + "</option>").join("") + "</select>" : "";
@@ -334,7 +339,7 @@ function scaPanel() {
     '<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">' + chips + add + (left.length ? '<button class="btn sm ghost" data-act="sca-all">' + esc(t("sca_all")) + "</button>" : "") + (SCA.sel.length ? '<button class="btn sm ghost" data-act="sca-clear">' + esc(t("sca_clear")) + "</button>" : "") + "</div>" +
     '<p class="small muted" style="margin:0">' + esc(t("sca_fund")) + "</p>" +
     '<div><button class="btn primary" data-act="sca-go"' + (SCA.sel.length ? "" : " disabled") + ">" + esc(t(stale ? "sca_again" : "sca_go")) + "</button></div>" +
-    (SCA.res && !stale ? scaResultHtml(SCA.res) : "") + "</div>";
+    (SCA.res && !stale ? scaResultHtml(SCA.res) + (typeof svBar === "function" ? svBar() : "") : "") + (typeof scaAiBox === "function" ? scaAiBox() : "") + "</div>";
 }
 document.addEventListener("change", (ev) => {
   if (!ev.target.dataset || ev.target.dataset.sca !== "add" || !ev.target.value) return;
