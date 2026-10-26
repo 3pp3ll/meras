@@ -16,7 +16,7 @@ const SR_ALIAS = { BABA: "علي بابا", "9988.HK": "علي بابا هونغ
   TSLA: "تسلا", NVDA: "انفيديا نفيديا", AMD: "اي ام دي", PLTR: "بالانتير", SMCI: "سوبر مايكرو", META: "ميتا فيسبوك", AMZN: "امازون", AAPL: "ابل آبل", MSFT: "مايكروسوفت", GOOGL: "جوجل قوقل الفابت", AVGO: "برودكوم", ORCL: "اوراكل", SNOW: "سنوفليك",
   "^GSPC": "اس اند بي", "^IXIC": "ناسداك", "^DJI": "داو جونز", "^N225": "نيكاي اليابان", "^HSI": "هانغ سنغ هونغ كونغ", "^GDAXI": "داكس المانيا", "^TASI.SR": "تاسي السوق السعودي المؤشر العام", XAU: "ذهب الذهب gold", XAG: "فضه الفضة silver" };
 const srNorm = (s) => String(s || "").toLowerCase().replace(/[ً-ْـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/ؤ/g, "و").replace(/ئ/g, "ي").replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660)).replace(/\s+/g, " ").trim();
-function srGoDesk(tab) { if (typeof dkTab !== "undefined") { dkTab = tab; if (typeof dkGrid !== "undefined") dkGrid = false; } if (location.hash !== "#desk") location.hash = "desk"; else render(); }
+function srGoDesk(tab) { const r = typeof DESK_ROUTE !== "undefined" && DESK_ROUTE[tab]; if (r) { location.hash = r; return; } if (typeof dkTab !== "undefined") { dkTab = tab; if (typeof dkGrid !== "undefined") dkGrid = false; } if (location.hash !== "#desk") location.hash = "desk"; else render(); }
 function srGoChart(sym, analyse) {
   const cfg = chartCfg(); cfg.sym = sym; chOffset = 0; chReplay = null; chPending = null; save();
   if (location.hash !== "#chart") location.hash = "chart"; else render();
@@ -27,8 +27,8 @@ function srIndex() {
   const go = (h) => () => { location.hash = h; };
   const owner = typeof HOSTED !== "undefined" && HOSTED && !!CFG.token;
   // الصفحات
-  add("page", t("learn_h"), "", "تعليم learn", go("learn"), 3); add("page", t("svc_hub_h"), "", "خدمات services", go("services"), 3);
-  Object.values(NAV_GROUPS).forEach((g) => g.items.forEach(([h, k, d]) => add("page", t(k), t(d), h, go(h), 4)));
+  add("page", t("learn_h"), "", "تعليم learn", go("learn"), 3); add("page", t("pf_h"), t("pf_p"), "محفظه portfolio خدمات", go("pf"), 3);
+  Object.keys(NAV_GROUPS).forEach((g) => navItems(g).forEach(([h, k, d]) => add("page", t(k), t(d), h, go(h), 4))); add("page", t("nav_news"), "", "news اخبار", go("news"), 4); add("page", t("mk_h"), t("mk_p"), "market سوق", go("market"), 3);
   [["settings", "set_h", "اعدادات ربط مفتاح token openrouter"], ["plans", "nav_plans", "باقات اشتراك"], ["account", "nav_account", "حساب"]].forEach(([h, k, kw]) => { try { add("page", t(k), "", kw, go(h), 2); } catch (e) {} });
   if (owner) {
     add("page", t("ow_h"), "", "owner مالك", go("owner"), 3);

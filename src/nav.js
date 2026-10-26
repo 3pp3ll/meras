@@ -25,12 +25,19 @@ Object.assign(UI, {
 });
 
 const NAV_GROUPS = {
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["schools", "nav_schools", "d_schools"], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] },
-  services: { label: "nav_svc", items: [["journal", "tab_journal", "d_journal"], ["invest", "tab_inv", "d_invest"], ["tech", "tab_tech", "d_tech"], ["dividends", "tab_div", "d_div"], ["metals", "tab_met", "d_met"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] }
+  market: { label: "nav_market", items: [["chart", "nav_chart", "d_chart"], ["indices", "nav_indices", "d_indices", 1], ["tech", "tab_tech", "d_tech"], ["metals", "tab_met", "d_met"], ["screener", "sc_t", "dk_g_sc", 1], ["movers", "tp_t", "dk_g_top", 1], ["usm", "us_t", "dk_g_us", 1]] },
+  pf: { label: "nav_pf", items: [["portfolio", "dk_t_pf", "dk_g_pf", 1], ["journal", "tab_journal", "d_journal"], ["saved", "sv_t", "dk_g_sv", 1], ["analyses", "nav_an", "d_an"], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["dividends", "tab_div", "d_div"], ["gdiv", "dg_t", "dk_g_dg", 1], ["invest", "tab_inv", "d_invest"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"], ["apps", "ap_t", "dk_g_apps", 1]] },
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] }
 };
+/* بنود المالك (العلامة 1) تختفي إذا ما فيه ربط GitHub */
+const navItems = (g) => (NAV_GROUPS[g] ? NAV_GROUPS[g].items.filter((x) => !x[3] || (typeof HOSTED !== "undefined" && HOSTED && CFG.token)) : []);
+const SECTIONS = [["", "nav_home"], ["market", "nav_market"], ["pf", "nav_pf"], ["news", "nav_news", 1], ["learn", "nav_learn"]];
 function groupOf(r) {
   if (r === "learn" || r.startsWith("l-") || r.startsWith("g-") || r.startsWith("sch-")) return "learn";
-  if (r === "services") return "services";
+  if (r === "services" || r === "pf") return "pf";
+  if (r === "market") return "market";
+  if (r === "news") return "news";
+  if (r === "" || r === "home") return "home";
   if (r === "checkout" || r === "plans") return "plans";
   for (const g in NAV_GROUPS) if (NAV_GROUPS[g].items.some((x) => x[0] === r)) return g;
   return "";
@@ -38,7 +45,8 @@ function groupOf(r) {
 function subOf(r) { if (r.startsWith("sch-")) return "schools"; if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
 
 const ICON_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 4v3M7 15v5M17 3v4M17 13v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4.5" y="7" width="5" height="8" rx="1" fill="currentColor"/><rect x="14.5" y="7" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
-const BACK_KEY = "meras.back", OWN_R = ["owner", "desk"];
+const BACK_KEY = "meras.back", OWN_R = []; /* زر "رجوع لمكتبي" ما عاد له داعي بعد الهيكلة الجديدة */
+try { sessionStorage.removeItem("meras.back"); } catch (e) {}
 let BACK = null; try { BACK = JSON.parse(sessionStorage.getItem(BACK_KEY) || "null"); } catch (e) {}
 function trackBack(r) {
   const prev = typeof lastPainted !== "undefined" ? lastPainted : null, was = BACK;
@@ -55,14 +63,15 @@ Object.assign(UI, { back_desk: ["رجوع لمكتبي", "Back to my desk"], bac
 function headerHtml(r) {
   trackBack(r);
   const g = groupOf(r), sub = subOf(r);
-  const top = [["learn", "nav_learn"], ["services", "nav_svc"], ["plans", "nav_plans"]].map(([h, k]) => '<a href="#' + h + '"' + (g === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("");
+  const own = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  const top = SECTIONS.filter((x) => !x[2] || own).map(([h, k]) => '<a href="#' + h + '"' + ((h === "" ? g === "home" : g === h) ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + (own ? "" : '<a href="#plans"' + (g === "plans" ? ' aria-current="page"' : "") + ">" + esc(t("nav_plans")) + "</a>");
   const back = BACK && typeof HOSTED !== "undefined" && HOSTED && CFG.token ? '<a class="btn sm back-btn" href="#' + BACK.r + '" data-act="nav-back" title="' + esc(t(BACK.r === "desk" ? "back_desk" : "back_owner")) + '"><span aria-hidden="true">↩</span> <span>' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")) + "</span></a>" : "";
   let fab = document.getElementById("backfab");
   if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }
   fab.hidden = !back; if (back) { fab.href = "#" + BACK.r; fab.innerHTML = '<span aria-hidden="true">↩</span> ' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")); fab.title = t(BACK.r === "desk" ? "back_desk" : "back_owner"); }
-  const tools = back + '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
-    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + "</button>";
-  const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
+  const tools = back + (typeof themeButton === "function" ? themeButton() : "") +
+    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + "</button>" + (typeof profileMenu === "function" ? profileMenu() : "");
+  const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + navItems(g).map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
   return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;
 }
 
@@ -108,7 +117,7 @@ function hubStat(k) {
   return "";
 }
 function hubCards(g) {
-  return '<div class="hub">' + NAV_GROUPS[g].items.map(([h, k, d]) => '<a class="panel hub-card" href="#' + h + '"><h3>' + esc(t(k)) + '</h3><p class="muted small">' + esc(t(d)) + '</p><span class="hub-foot"><span class="tag amber">' + esc(hubStat(h) || t("open")) + '</span><span class="go" aria-hidden="true">←</span></span></a>').join("") + "</div>";
+  return '<div class="hub">' + navItems(g).map(([h, k, d]) => '<a class="panel hub-card" href="#' + h + '"><h3>' + esc(t(k)) + '</h3><p class="muted small">' + esc(t(d)) + '</p><span class="hub-foot"><span class="tag amber">' + esc(hubStat(h) || t("open")) + '</span><span class="go" aria-hidden="true">←</span></span></a>').join("") + "</div>";
 }
 function pageLearn() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("learn_h")) + "</h1><p>" + esc(t("learn_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + continueHtml() + hubCards("learn") + "</div></div>"; }
 function pageServicesHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("svc_hub_h")) + "</h1><p>" + esc(t("svc_hub_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("services") + "</div></div>"; }
@@ -153,8 +162,8 @@ function siteMap() {
   const leaf = (h, k) => '<a class="smap-leaf" href="#' + h + '">' + secIc(h, 15) + "<span>" + esc(t(k)) + "</span></a>";
   const branch = (h, k, kids, cls) => '<li class="smap-br' + (cls ? " " + cls : "") + '"><a class="smap-node" href="#' + h + '">' + esc(t(k)) + "</a>" + (kids ? '<div class="smap-kids">' + kids + "</div>" : "") + "</li>";
   return '<div class="smap" aria-label="' + esc(t("map_h")) + '"><div class="smap-root">' + LOGO + "<b>" + esc(t("map_root")) + '</b></div><ul class="smap-tree">' +
-    branch("learn", "nav_learn", NAV_GROUPS.learn.items.map(([h, k]) => leaf(h, k)).join("")) +
-    branch("services", "nav_svc", NAV_GROUPS.services.items.map(([h, k]) => leaf(h, k)).join("")) +
+    branch("learn", "nav_learn", navItems("learn").map(([h, k]) => leaf(h, k)).join("")) +
+    branch("pf", "nav_pf", navItems("pf").map(([h, k]) => leaf(h, k)).join("")) +
     branch("plans", "nav_plans", "") +
     (owner ? branch("owner", "map_admin", leaf("owner", "ow_h") + leaf("desk", "dk_h"), "smap-admin") : "") + "</ul></div>";
 }
@@ -165,8 +174,8 @@ function mapSection() {
   const item = (h, k, stat, extra, ic) => '<li><a class="org-it" href="#' + h + '"' + (extra || "") + '><span class="org-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">' + ic + "</svg>" : secIc(h, 17)) + "</span><span>" + esc(t(k)) + "</span>" + (stat ? '<small class="num">' + esc(stat) + "</small>" : "") + "</a></li>";
   const col = (ic, title, href, body, cls) => '<div class="org-col' + (cls ? " " + cls : "") + '"><a class="org-h" href="#' + href + '"><span class="org-hi">' + secIc(ic, 20) + "</span><b>" + esc(title) + "</b></a>" + body + "</div>";
   const cols = [
-    col("tracks", t("nav_learn"), "learn", '<ul class="org-list">' + NAV_GROUPS.learn.items.map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
-    col("calc", t("nav_svc"), "services", '<ul class="org-list">' + NAV_GROUPS.services.items.map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
+    col("tracks", t("nav_learn"), "learn", '<ul class="org-list">' + navItems("learn").map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
+    col("calc", t("nav_pf"), "pf", '<ul class="org-list">' + navItems("pf").map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
     col("plans", t("nav_plans"), "plans", '<a class="org-plans" href="#plans">' + secIc("plans", 30) + "<span>" + esc(t("map_plans_p")) + "</span></a>"),
   ];
   if (owner) cols.push(col("owner", t("map_admin"), "owner", '<ul class="org-list">' + item("owner", "ow_h") + MAP_DESK.map(([k, l]) => item("desk", l, "", ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + '</ul><p class="org-note">🔒 ' + esc(t("map_admin_p")) + "</p>", "org-admin"));
@@ -175,16 +184,16 @@ function mapSection() {
   const pill = (h, k, extra, ic) => '<a class="tr-pill" href="#' + h + '"' + (extra || "") + '><span class="tr-pi">' + (ic ? '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' + ic + "</svg>" : secIc(h, 15)) + "</span><span>" + esc(t(k)) + "</span></a>";
   const grp = (ic, title, n, pills, cls) => '<div class="tr-grp' + (cls ? " " + cls : "") + '"><div class="tr-head">' + (cls ? "🔒" : secIc(ic, 17)) + "<b>" + esc(title) + "</b>" + (n ? '<small>' + esc(t("map_n").replace("{n}", n)) + "</small>" : "") + '</div><div class="tr-pills">' + pills + "</div></div>";
   const tree = '<div class="tr"><span class="tr-trunk" aria-hidden="true"></span>' +
-    grp("tracks", t("nav_learn"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => pill(h, k)).join("")) +
-    grp("calc", t("nav_svc"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => pill(h, k)).join("")) +
+    grp("tracks", t("nav_learn"), navItems("learn").length, navItems("learn").map(([h, k]) => pill(h, k)).join("")) +
+    grp("calc", t("nav_pf"), navItems("pf").length, navItems("pf").map(([h, k]) => pill(h, k)).join("")) +
     grp("plans", t("nav_plans"), 0, pill("plans", "map_plans_go")) +
     (owner ? grp("owner", t("map_admin"), 0, pill("owner", "ow_h") + MAP_DESK.map(([k, l]) => pill("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "tr-admin") : "") + "</div>";
   /* cards view: a card per group, its sections in a two-column grid */
   const cl = (h, k, extra, ic) => '<a class="cd-it" href="#' + h + '"' + (extra || "") + '><span class="cd-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' + ic + "</svg>" : secIc(h, 15)) + "</span><span>" + esc(t(k)) + "</span></a>";
   const card = (ic, title, sub, n, items, cls) => '<div class="cd' + (cls ? " " + cls : "") + '"><div class="cd-h"><span class="cd-hi">' + (cls ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg>' : secIc(ic, 20)) + '</span><span class="cd-ht"><b>' + esc(title) + "</b><small>" + esc(sub) + "</small></span>" + (n ? '<span class="cd-n">' + esc(t("map_n").replace("{n}", n)) + "</span>" : "") + '</div><div class="cd-grid">' + items + "</div></div>";
   const cards = '<div class="cds">' +
-    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
-    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("tracks", t("nav_learn"), t("map_learn_s"), navItems("learn").length, navItems("learn").map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_pf"), t("map_svc_s"), navItems("pf").length, navItems("pf").map(([h, k]) => cl(h, k)).join("")) +
     card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) +
     (owner ? card("owner", t("map_admin"), t("map_admin_s"), 0, cl("owner", "ow_h") + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "cd-admin") : "") + "</div>";
   const portal = '<div class="cd cd-portal"><div class="cd-h"><span class="cd-hi"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l4-4-4-4M14 12H4"/></g></svg></span><span class="cd-ht"><b>' + esc(t("map_portal")) + "</b><small>" + esc(t(owner ? "map_portal_o" : "map_portal_s")) + '</small></span></div><div class="pt-big">' +
@@ -192,8 +201,8 @@ function mapSection() {
     (owner ? '<a class="pt-tile pt-owner" href="#owner"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg><b>' + esc(t("ow_h")) + "</b><small>" + esc(t("map_owner_p")) + "</small></a>" : "") + "</div>" +
     (owner ? '<div class="cd-sub">🔒 ' + esc(t("dk_h")) + '</div><div class="cd-grid">' + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + "</div>" : "") + "</div>";
   const cards2 = '<div class="cds">' +
-    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
-    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("tracks", t("nav_learn"), t("map_learn_s"), navItems("learn").length, navItems("learn").map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_pf"), t("map_svc_s"), navItems("pf").length, navItems("pf").map(([h, k]) => cl(h, k)).join("")) +
     card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) + portal + "</div>";
   const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
   void tree; void cards; void columns;
@@ -225,19 +234,23 @@ const GATE_TAIL = () => '<section class="sec"><div class="notice">' + esc(t(type
 const SIDE_MINI = ["chart", "lab"];
 function sideW() {
   const vw = document.documentElement.clientWidth || 0, g = groupOf(route());
-  if (vw < 1000 || (g !== "learn" && g !== "services")) return 0;
+  if (vw < 1000 || !["learn", "market", "pf"].includes(g)) return 0;
   return SIDE_MINI.includes(route()) ? 92 : 258;
 }
 function sideShell(g, r, html) {
   const sub = subOf(r), mini = SIDE_MINI.includes(r);
-  const hub = '<a class="side-hub" href="#' + g + '"' + (r === g ? ' aria-current="page"' : "") + ' title="' + esc(t(g === "learn" ? "learn_h" : "svc_hub_h")) + '"><span class="dk-si">' + secIc(g === "learn" ? "tracks" : "calc", 18).replace("tracks", "") + '</span><span class="dk-sl"><b>' + esc(t(g === "learn" ? "nav_learn" : "nav_svc")) + "</b></span></a>";
-  const items = NAV_GROUPS[g].items.map(([h, k, d]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ' title="' + esc(t(k)) + '"><span class="dk-si">' + secIc(h, 20) + '</span><span class="dk-sl"><b>' + esc(t(k)) + "</b><small>" + esc(t(d)) + "</small></span></a>").join("");
+  const hub = '<a class="side-hub" href="#' + g + '"' + (r === g ? ' aria-current="page"' : "") + ' title="' + esc(t(NAV_GROUPS[g].label)) + '"><span class="dk-si">' + secIc(g === "learn" ? "tracks" : g === "market" ? "tech" : "invest", 18) + '</span><span class="dk-sl"><b>' + esc(t(NAV_GROUPS[g].label)) + "</b></span></a>";
+  const items = navItems(g).map(([h, k, d]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ' title="' + esc(t(k)) + '"><span class="dk-si">' + (SEC_IC[h] ? secIc(h, 20) : typeof DK_IC !== "undefined" && typeof ROUTE_DESK !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : h === "indices" ? secIc("tech", 20) : h === "analyses" ? secIc("journal", 20) : secIc("chart", 20)) + '</span><span class="dk-sl"><b>' + esc(t(k)) + "</b><small>" + esc(t(d)) + "</small></span></a>").join("");
   return '<div class="wrap side-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + hub + items + '</nav></aside><div class="side-main">' + html + "</div></div>";
 }
 
 /* ----- phone tab bar: التعليم، الخدمات، مكتبي (أو الباقات)، الإشعارات ----- */
 const TB_ICONS = {
-  learn: '<path d="M4 19h4v-4h4v-4h4V7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  home: '<path d="M4 11l8-7 8 7v9H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  market: '<path d="M4 18l4-6 4 3 6-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  pf: '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z M4 7l11-3v3 M16 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  news: '<path d="M5 5h11v14H6a1 1 0 0 1-1-1z M16 9h3v9a1 1 0 0 1-1 1h-2 M8 9h5M8 12h5M8 15h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  learn: '<path d="M3 9l9-5 9 5-9 5z M7 11.5V16c0 1.5 2.5 3 5 3s5-1.5 5-3v-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   services: '<g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></g>',
   desk: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 9V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></g>',
   plans: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></g>',
@@ -249,11 +262,10 @@ function tabbarSync(r) {
   if (r == null) { if (bar) bar.hidden = true; document.body.classList.remove("has-tabbar"); return; }
   if (!bar) { bar = document.createElement("nav"); bar.id = "tabbar"; document.body.appendChild(bar); }
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token, g = groupOf(r);
-  const items = [["learn", "nav_learn", g === "learn"], ["services", "nav_svc", g === "services"], owner ? ["desk", "dk_h", r === "desk" || r === "owner"] : ["plans", "nav_plans", g === "plans"]];
+  const items = [["", "nav_home", g === "home", "home"], ["market", "nav_market", g === "market", "market"], ["pf", "nav_pf", g === "pf", "pf"], owner ? ["news", "nav_news", g === "news", "news"] : ["plans", "nav_plans", g === "plans", "plans"], ["learn", "nav_learn", g === "learn", "learn"]];
   const n = typeof ntUnread === "function" ? ntUnread() : 0;
   bar.setAttribute("aria-label", S.lang === "ar" ? "التنقل" : "Navigation");
-  bar.innerHTML = '<div class="tb-in">' + items.map(([h, k, on]) => '<a class="tb" href="#' + h + '"' + (on ? ' aria-current="page"' : "") + '><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS[h] + "</svg>" + esc(t(k)) + "</a>").join("") +
-    '<button class="tb" type="button" data-act="nt-bell" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS.bell + "</svg>" + esc(t("nt_h")) + (n ? '<span class="bell-n">' + n + "</span>" : "") + "</button></div>";
+  bar.innerHTML = '<div class="tb-in">' + items.map(([h, k, on, ic]) => '<a class="tb" href="#' + h + '"' + (on ? ' aria-current="page"' : "") + '><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS[ic] + "</svg>" + esc(t(k)) + "</a>").join("") + "</div>";
   bar.hidden = false; document.body.classList.add("has-tabbar");
 }
 

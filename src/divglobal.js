@@ -65,7 +65,7 @@ async function loadDG(force) {
   DG.loading = false; DG.loaded = true;
   if (typeof topBell === "function") topBell();
   dgAutoPublish();
-  if (route() === "desk") render();
+  if (deskOn("dg")) render();
 }
 
 /* ----- shared helpers: the table works for the owner (live) and for the shared view (snapshot) ----- */

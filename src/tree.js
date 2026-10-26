@@ -15,7 +15,7 @@ Object.assign(UI, {
   an_at: ["أُنشئ {d}", "Created {d}"], an_candle: ["آخر شمعة {d} · السعر {p}", "Last candle {d} · price {p}"], an_draws: ["{n} رسمة", "{n} drawings"], an_q: ["ابحث باسم السهم أو رمزه…", "Search by share name or code…"],
   an_count: ["{n} تحليل", "{n} analyses"], an_auto: ["تلقائي", "Auto"]
 });
-NAV_GROUPS.learn.items.splice(2, 0, ["analyses", "nav_an", "d_an"]);
+/* "تحليلاتي" صارت تحت محفظتي في الهيكلة الجديدة */
 SEC_IC.analyses = '<path d="M4 20V4M4 20h16M8 15l3-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="7" r="2" fill="currentColor"/>';
 
 /* ----- the tree ----- */
@@ -26,8 +26,8 @@ function trGroups() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const ic = (h) => SEC_IC[h] || "";
   const g = [
-    { k: "l", name: t("nav_learn"), items: NAV_GROUPS.learn.items.map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: h === "analyses" && (S.analyses || []).length ? String((S.analyses || []).length) : "" })) },
-    { k: "s", name: t("nav_svc"), items: NAV_GROUPS.services.items.map(([h, k]) => ({ h, label: t(k), ic: ic(h) })) },
+    { k: "l", name: t("nav_learn"), items: navItems("learn").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: h === "analyses" && (S.analyses || []).length ? String((S.analyses || []).length) : "" })) },
+    { k: "s", name: t("nav_pf"), items: navItems("pf").map(([h, k]) => ({ h, label: t(k), ic: ic(h) })) },
     { k: "p", name: t("nav_plans"), items: [{ h: "plans", label: t("map_plan_free"), ic: ic("plans") }, { h: "plans", label: t("plan_full"), ic: ic("plans") }, { h: "account", label: t(S.signedIn ? "tr_account" : "tr_login"), ic: ic("owner") }] }
   ];
   if (owner) g.push({ k: "a", name: t("map_admin"), lock: true, items: [{ h: "owner", label: t("ow_h"), ic: ic("owner") }].concat(MAP_DESK.map(([k, l]) => ({ h: "desk", tab: k, label: t(l), ic: typeof DK_IC !== "undefined" ? DK_IC[k] : "", badge: typeof dkBadge === "function" ? dkBadge(k) : "" }))) });

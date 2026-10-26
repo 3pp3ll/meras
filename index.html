@@ -1374,6 +1374,41 @@ body.tk-lock{overflow:hidden}
 .sca-row{gap:6px;flex-wrap:wrap;align-items:center}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sr-k.desk,:root:not([data-theme="light"]) .sr-k.saved{background:#3A2414;color:#FFC08F}:root:not([data-theme="light"]) .sr-k.school,:root:not([data-theme="light"]) .sr-k.lesson,:root:not([data-theme="light"]) .sr-k.guide{background:#1E2647;color:#AFC0FF}}
 :root[data-theme="dark"] .sr-k.desk,:root[data-theme="dark"] .sr-k.saved{background:#3A2414;color:#FFC08F}:root[data-theme="dark"] .sr-k.school,:root[data-theme="dark"] .sr-k.lesson,:root[data-theme="dark"] .sr-k.guide{background:#1E2647;color:#AFC0FF}
+/* ===== الهيكلة الجديدة ===== */
+.dh-hero{background:var(--hero-bg)}
+.dh-hero .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-block:16px}
+.dh-hero-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dh-eyebrow{margin:0;font-size:12.5px;font-weight:600;color:var(--amber-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dh-hero h1{margin:0;font-size:clamp(20px,2.6vw,30px);line-height:1.35;color:var(--navy-fg)}.dh-hero h1 em{font-style:normal;color:var(--amber-ink)}
+.dh-lead{margin:0;font-size:13.5px;color:var(--navy-muted)}
+.dh-hero .btn.ghost{color:var(--navy-fg);border-color:var(--navy-line)}
+.gate-hero .wrap{padding-block:20px 0}.gate-hero h1{font-size:clamp(22px,3vw,32px)}.gate-hero .eyebrow{font-size:12.5px;margin-bottom:4px}.gate-hero p.lead{font-size:14.5px;margin-block:6px 12px}.gate-hero .copy{padding-bottom:20px}
+.dh-pin{display:flex;align-items:center;gap:10px;border-radius:12px;padding:10px 12px;border:1px solid var(--line);background:var(--surface)}
+.dh-pin.amber{background:var(--amber-soft);border-color:color-mix(in srgb,var(--amber) 45%,var(--line))}.dh-pin.up{background:var(--up-soft)}.dh-pin.down{background:var(--down-soft)}
+.dh-pin-t{flex:1;min-width:0;border:0;background:none;font:inherit;color:inherit;text-align:start;cursor:pointer;font-weight:600}
+.dh-pin-x{border:0;background:none;font-size:20px;line-height:1;cursor:pointer;color:var(--muted);width:32px;height:32px;border-radius:8px}
+.dh-sc{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.dh-sc a{display:flex;flex-direction:column;gap:8px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink);text-decoration:none;font-size:14.5px}
+.dh-sc a:hover{border-color:var(--amber)}.dh-sci{color:var(--amber-ink)}
+@media (max-width:820px){.dh-sc{grid-template-columns:repeat(3,minmax(0,1fr))}.dh-sc a{align-items:center;text-align:center;padding:10px 6px;font-size:13px}}
+.dh-cols{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}.dh-main{flex:999 1 560px;min-width:0}.dh-side{flex:1 1 300px;min-width:0}
+.dh-card h2{margin:0;font-size:18px}
+.dh-idx{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.dh-idx{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.dh-ic{position:relative;background:var(--sunk);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.dh-ic.big{background:var(--surface);border:1px solid var(--line)}.dh-ic .dh-v{font-size:19px}.dh-ic .up{color:var(--up);font-weight:600}.dh-ic .dn{color:var(--down);font-weight:600}
+.dh-hit{position:absolute;inset:0;border:0;background:none;cursor:pointer;border-radius:12px}.dh-hit:focus-visible{outline:2px solid var(--amber)}
+.dh-brief{background:var(--sky-soft);border-radius:10px;padding:10px 12px}
+.dh-news,.dh-div{list-style:none;margin:0;padding:0;display:grid}
+.dh-news li{display:flex;gap:8px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line)}.dh-news li:last-child{border-bottom:0}
+.dh-nt{flex:1;min-width:0}.dh-news a{white-space:nowrap}
+.dh-div li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.dh-div li:last-child{border-bottom:0}
+.dh-big{font-size:24px}.dh-bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}.dh-bar i{display:block;height:100%;background:var(--amber);border-radius:99px}
+details.pmenu{position:relative}details.pmenu>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center}details.pmenu>summary::-webkit-details-marker{display:none}
+.pm-pop{position:absolute;inset-inline-end:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.15);padding:6px;min-width:190px;z-index:40;display:grid}
+.pm-pop a{padding:9px 12px;border-radius:8px;color:var(--ink);text-decoration:none}.pm-pop a:hover{background:var(--sunk)}
+.deskp .dg-intro{display:none}
+@media (max-width:640px){.dh-news li{flex-wrap:wrap}.dh-nt{flex-basis:100%;order:2}.dh-news a{order:3}}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2450,7 +2485,9 @@ function render() {
   lastPainted = r;
 }
 function renderNow() {
-  const r = route();
+  let r = route();
+  /* رابط مكتبي القديم: يحوّل لصفحة القسم الجديدة */
+  if (r === "desk" && typeof DESK_ROUTE !== "undefined" && typeof isOwner === "function" && isOwner()) { const to = typeof dkGrid !== "undefined" && dkGrid ? "" : DESK_ROUTE[typeof dkTab !== "undefined" ? dkTab : ""] || ""; history.replaceState(null, "", "#" + to); r = to; }
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
   const lnOn = typeof lnShow === "function" && lnShow();
   $("#top").innerHTML = lnOn ? lnHeader() : headerHtml(r);
@@ -2459,9 +2496,10 @@ function renderNow() {
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
   else if (r.startsWith("sch-")) html = pageSchool(r.slice(4));
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
-  { const g = typeof groupOf === "function" ? groupOf(r) : ""; if ((g === "learn" || g === "services") && typeof sideShell === "function") html = sideShell(g, r, html); }
-  { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "services" ? "s" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
+  else if (typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[r] && r !== "tech") html = deskPage(r);
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), home: () => (typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), market: pageMarketHub, pf: pagePfHub, indices: pageIndices, welcome: pageLanding, learn: pageLearn, services: pagePfHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
+  { const g = typeof groupOf === "function" ? groupOf(r) : ""; if (["learn", "market", "pf"].includes(g) && typeof sideShell === "function") html = sideShell(g, r, html); }
+  { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "pf" || g === "market" ? "s" : r === "" || r === "home" ? "a" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();
@@ -4465,7 +4503,7 @@ const svId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,
 async function svLoad(force) {
   if (!svOk() || SV.loading || (SV.list && !force)) return; SV.loading = true;
   try { const f = await readJson("saved/index.json"); SV.list = (f && Array.isArray(f.data)) ? f.data : []; SV.sha = f ? f.sha : undefined; } catch (e) { SV.list = SV.list || []; toast(errText(e)); }
-  SV.loading = false; if (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "sv") render();
+  SV.loading = false; if (deskOn("sv")) render();
 }
 function svDefaultTitle() { const cfg = chartCfg(), d = CH && CH.data[CH.e - 1]; return cfg.sym + " " + symName(cfg.sym) + (d && d.d ? " · " + d.d : ""); }
 function svSnapshot() {
@@ -4529,7 +4567,7 @@ function svBar() {
   const cur = SV.cur ? '<p class="small" style="margin:0"><span class="tag amber">' + esc(t("sv_cur").replace("{t}", SV.cur.title || "")) + '</span> <button class="btn sm ghost" data-act="sv-close">' + esc(t("sv_close")) + "</button></p>" : "";
   const saveBtns = svOk() ? (SV.cur ? '<button class="btn primary" data-act="sv-save"' + (SV.busy ? " disabled" : "") + ">💾 " + esc(t(SV.busy ? "sv_busy" : "sv_update")) + '</button><button class="btn" data-act="sv-copy"' + (SV.busy ? " disabled" : "") + ">" + esc(t("sv_copy")) + "</button>" : '<button class="btn primary" data-act="sv-save"' + (SV.busy ? " disabled" : "") + ">💾 " + esc(t(SV.busy ? "sv_busy" : "sv_save")) + "</button>") : "";
   return '<div class="panel stack sv-bar">' + cur + '<div class="form-grid"><div class="field"><label for="sv-title">' + esc(t("sv_title")) + '</label><input id="sv-title" data-svm="title" maxlength="120" value="' + esc(SCA.meta.title || svDefaultTitle()) + '"></div></div><div class="field"><label for="sv-note">' + esc(t("sv_note")) + '</label><textarea id="sv-note" data-svm="note" rows="2" placeholder="' + esc(t("sv_note_ph")) + '">' + esc(SCA.meta.note || "") + "</textarea></div>" +
-    '<div class="row" style="gap:8px;flex-wrap:wrap">' + saveBtns + '<button class="btn" data-act="xp-pdf">⬇ ' + esc(t("xp_pdf")) + '</button><button class="btn" data-act="xp-word">⬇ ' + esc(t("xp_word")) + "</button>" + (svOk() ? '<a class="btn ghost" href="#desk" data-dktab="sv">' + esc(t("sv_h")) + " ↗</a>" : "") + "</div></div>";
+    '<div class="row" style="gap:8px;flex-wrap:wrap">' + saveBtns + '<button class="btn" data-act="xp-pdf">⬇ ' + esc(t("xp_pdf")) + '</button><button class="btn" data-act="xp-word">⬇ ' + esc(t("xp_word")) + "</button>" + (svOk() ? '<a class="btn ghost" href="#saved">' + esc(t("sv_h")) + " ↗</a>" : "") + "</div></div>";
 }
 
 /* صفحة المحفوظات في مكتبي */
@@ -4880,7 +4918,7 @@ const SR_ALIAS = { BABA: "علي بابا", "9988.HK": "علي بابا هونغ
   TSLA: "تسلا", NVDA: "انفيديا نفيديا", AMD: "اي ام دي", PLTR: "بالانتير", SMCI: "سوبر مايكرو", META: "ميتا فيسبوك", AMZN: "امازون", AAPL: "ابل آبل", MSFT: "مايكروسوفت", GOOGL: "جوجل قوقل الفابت", AVGO: "برودكوم", ORCL: "اوراكل", SNOW: "سنوفليك",
   "^GSPC": "اس اند بي", "^IXIC": "ناسداك", "^DJI": "داو جونز", "^N225": "نيكاي اليابان", "^HSI": "هانغ سنغ هونغ كونغ", "^GDAXI": "داكس المانيا", "^TASI.SR": "تاسي السوق السعودي المؤشر العام", XAU: "ذهب الذهب gold", XAG: "فضه الفضة silver" };
 const srNorm = (s) => String(s || "").toLowerCase().replace(/[ً-ْـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/ؤ/g, "و").replace(/ئ/g, "ي").replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660)).replace(/\s+/g, " ").trim();
-function srGoDesk(tab) { if (typeof dkTab !== "undefined") { dkTab = tab; if (typeof dkGrid !== "undefined") dkGrid = false; } if (location.hash !== "#desk") location.hash = "desk"; else render(); }
+function srGoDesk(tab) { const r = typeof DESK_ROUTE !== "undefined" && DESK_ROUTE[tab]; if (r) { location.hash = r; return; } if (typeof dkTab !== "undefined") { dkTab = tab; if (typeof dkGrid !== "undefined") dkGrid = false; } if (location.hash !== "#desk") location.hash = "desk"; else render(); }
 function srGoChart(sym, analyse) {
   const cfg = chartCfg(); cfg.sym = sym; chOffset = 0; chReplay = null; chPending = null; save();
   if (location.hash !== "#chart") location.hash = "chart"; else render();
@@ -4891,8 +4929,8 @@ function srIndex() {
   const go = (h) => () => { location.hash = h; };
   const owner = typeof HOSTED !== "undefined" && HOSTED && !!CFG.token;
   // الصفحات
-  add("page", t("learn_h"), "", "تعليم learn", go("learn"), 3); add("page", t("svc_hub_h"), "", "خدمات services", go("services"), 3);
-  Object.values(NAV_GROUPS).forEach((g) => g.items.forEach(([h, k, d]) => add("page", t(k), t(d), h, go(h), 4)));
+  add("page", t("learn_h"), "", "تعليم learn", go("learn"), 3); add("page", t("pf_h"), t("pf_p"), "محفظه portfolio خدمات", go("pf"), 3);
+  Object.keys(NAV_GROUPS).forEach((g) => navItems(g).forEach(([h, k, d]) => add("page", t(k), t(d), h, go(h), 4))); add("page", t("nav_news"), "", "news اخبار", go("news"), 4); add("page", t("mk_h"), t("mk_p"), "market سوق", go("market"), 3);
   [["settings", "set_h", "اعدادات ربط مفتاح token openrouter"], ["plans", "nav_plans", "باقات اشتراك"], ["account", "nav_account", "حساب"]].forEach(([h, k, kw]) => { try { add("page", t(k), "", kw, go(h), 2); } catch (e) {} });
   if (owner) {
     add("page", t("ow_h"), "", "owner مالك", go("owner"), 3);
@@ -4981,6 +5019,121 @@ function srHook() {
   const clock = document.getElementById("topclock");
   if (clock && clock.parentNode === tools) clock.after(b); else tools.insertBefore(b, tools.firstChild);
 }
+/* ===== مِراس: الهيكلة الجديدة (5 أقسام) =====
+   الرئيسية · السوق · محفظتي · الأخبار · التعليم.
+   صفحات "مكتبي" القديمة صارت صفحات مستقلة داخل أقسامها (#portfolio، #saved، #movers…)،
+   ورابط #desk القديم يحوّل تلقائياً للصفحة الجديدة، فكل الأزرار القديمة تشتغل. */
+Object.assign(UI, {
+  nav_home: ["الرئيسية", "Home"], nav_market: ["السوق", "Market"], nav_pf: ["محفظتي", "Portfolio"], nav_news: ["الأخبار", "News"],
+  nav_indices: ["المؤشرات", "Indices"], d_indices: ["تاسي والأمريكي مع تحليل المدارس", "TASI and US indices with the schools analysis"],
+  mk_h: ["السوق", "Market"], mk_p: ["كل أدوات التحليل: الشارت والمدارس، المؤشرات، الباحث، أفضل حركة، الأمريكي، والمعادن.", "All analysis tools: the chart and schools, indices, screener, best movers, US market and metals."],
+  pf_h: ["محفظتي", "My portfolio"], pf_p: ["فلوسك وقراراتك: المحفظة، السجل، المحفوظات، التوزيعات، الخطة الشهرية، والحاسبات.", "Your money and decisions: portfolio, journal, saved analyses, dividends, monthly plan and calculators."],
+  pm_menu: ["القائمة", "Menu"], pm_owner: ["لوحة المالك", "Owner dashboard"], pm_map: ["هيكل المنصة", "Platform map"],
+  dh_hi: ["مساء الخير", "Good evening"], dh_hi_m: ["صباح الخير", "Good morning"],
+  dh_short: ["اختصارات", "Shortcuts"], dh_idx: ["المؤشرات اليوم", "Indices today"], dh_idx_open: ["التفاصيل", "Details"],
+  dh_news: ["أهم أخبار اليوم", "Today's top news"], dh_news_all: ["كل الأخبار", "All news"], dh_pf: ["محفظتي", "My portfolio"], dh_pf_open: ["افتح المحفظة", "Open portfolio"],
+  dh_pf_none: ["ما سجلت صفقات للحين.", "No trades recorded yet."], dh_pf_n: ["{n} أسهم مفتوحة", "{n} open holdings"],
+  dh_div: ["توزيعات قريبة", "Upcoming dividends"], dh_div_all: ["كل التوزيعات", "All dividends"], dh_div_none: ["ما فيه توزيعات خلال 30 يوم في قائمتك.", "No dividends in the next 30 days on your list."],
+  dh_decl: ["معلن", "Declared"], dh_est: ["متوقع", "Expected"], dh_days: ["بعد {n} يوم", "in {n} days"], dh_today: ["اليوم", "today"],
+  dh_learn: ["كمّل التعلم", "Keep learning"], dh_lessons: ["{d} من {n} درس", "{d} of {n} lessons"], dh_go: ["كمّل", "Continue"],
+  dh_pin_x: ["إخفاء", "Dismiss"], dh_pin_div: ["توزيع {k} لـ {s} بعد {n} يوم ({d}). آخر يوم شراء {b}.", "{k} dividend for {s} in {n} days ({d}). Last buy day {b}."],
+  dh_pin_idx: ["{s} {w} {p} اليوم.", "{s} {w} {p} today."], dh_up: ["ارتفع", "rose"], dh_down: ["نزل", "fell"],
+  dh_loading: ["جاري التحميل…", "Loading…"]
+});
+
+/* صفحات مكتبي → مساراتها الجديدة */
+const DESK_ROUTE = { pf: "portfolio", ch: "mycharts", sc: "screener", top: "movers", us: "usm", nw: "news", sv: "saved", dg: "gdiv", apps: "apps", op: "options", tech: "tech" };
+const ROUTE_DESK = Object.fromEntries(Object.entries(DESK_ROUTE).map(([k, v]) => [v, k]));
+const isOwner = () => typeof HOSTED !== "undefined" && HOSTED && !!CFG.token;
+const deskOn = (k) => route() === DESK_ROUTE[k] || (route() === "desk" && typeof dkTab !== "undefined" && dkTab === k) || (route() === "" && isOwner());
+function deskPage(r) {
+  const k = ROUTE_DESK[r], lab = (typeof MAP_DESK !== "undefined" && MAP_DESK.find((x) => x[0] === k) || [k, "dk_h"])[1];
+  const head = '<div class="page-head"><h1>' + esc(t(lab)) + "</h1>" + (UI["dk_g_" + k] ? "<p>" + esc(t("dk_g_" + k)) + "</p>" : "") + "</div>";
+  if (!isOwner()) return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t(HOSTED ? "ow_need" : "ow_preview")) + "</div></div>";
+  if (["pf", "ch"].includes(k) && !DK.loaded) { loadDesk(); return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
+  if (typeof dkTab !== "undefined") dkTab = k;
+  const fn = { pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, us: dkUS, nw: dkNews, sv: dkSaved, dg: dkDivGlobal, apps: dkApps, op: dkOptions }[k];
+  let inner = ""; try { inner = fn(); } catch (e) { console.error(e); inner = '<div class="notice">' + esc(String(e && e.message || e)) + "</div>"; }
+  return '<div class="wrap deskp">' + head + '<div class="stack" style="padding-block:14px 40px">' + inner + "</div></div>";
+}
+
+/* ----- صفحة المؤشرات ----- */
+function pageIndices() {
+  const head = '<div class="page-head"><h1>' + esc(t("nav_indices")) + "</h1><p>" + esc(t("d_indices")) + "</p></div>";
+  const items = typeof tkItems === "function" ? tkItems() : [];
+  if (!items.length) { if (isOwner() && typeof loadExtra === "function") loadExtra(); return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t(isOwner() ? "dh_loading" : "ow_need")) + "</div></div>"; }
+  return '<div class="wrap">' + head + '<div class="dh-idx" style="padding-block:14px 40px">' + items.map((x) => dhIdxCard(x, true)).join("") + "</div></div>";
+}
+function dhIdxCard(x, big) {
+  const d = x.st.d || 0;
+  return '<div class="dh-ic' + (big ? " big" : "") + '"><div class="row" style="justify-content:space-between;align-items:center"><b>' + esc(L(x.it.n)) + "</b>" + (x.R ? '<span class="tk-b ' + x.R.fb + '">' + esc(biasWord(x.R.fb)) + "</span>" : "") + '</div><b class="num dh-v" dir="ltr">' + tkFmt(x.st.c) + '</b><span class="num ' + (d >= 0 ? "up" : "dn") + '" dir="ltr">' + tkPct(d) + "</span>" +
+    (big ? '<small class="muted">' + esc(L(x.it.full)) + '</small><div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-act="tk-open" data-s="' + esc(x.it.s) + '">' + esc(t("dh_idx_open")) + '</button><button class="btn sm primary" data-act="tk-chart" data-s="' + esc(x.it.s) + '">' + esc(t("tk_open")) + "</button></div>" : '<button class="dh-hit" data-act="tk-open" data-s="' + esc(x.it.s) + '" aria-label="' + esc(L(x.it.n) + " " + t("dh_idx_open")) + '"></button>') + "</div>";
+}
+
+/* ----- محاور الأقسام ----- */
+function pageMarketHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("mk_h")) + "</h1><p>" + esc(t("mk_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("market") + "</div></div>"; }
+function pagePfHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("pf_h")) + "</h1><p>" + esc(t("pf_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("pf") + "</div></div>"; }
+
+/* ----- الرئيسية (لوحة المالك اليومية) ----- */
+function dhDivs() {
+  const out = [], today = new Date(); today.setHours(0, 0, 0, 0);
+  if (typeof DG !== "undefined" && DG.data && DG.data.stocks) DG.data.stocks.forEach((s) => {
+    if (!s.next) return; const d = new Date(s.next + "T00:00:00"), n = Math.round((d - today) / 864e5);
+    if (n >= 0 && n <= 30) out.push({ s: s.s, name: s.n, n, date: s.next, decl: !!s.decl, amt: s.decl ? s.decl.amt : s.last ? s.last[1] : null, cur: s.cur, chg: s.decl ? s.decl.chg : null });
+  });
+  return out.sort((a, b) => a.n - b.n);
+}
+const PIN_KEY = "meras.pin";
+function dhPin() {
+  let off = ""; try { off = localStorage.getItem(PIN_KEY) || ""; } catch (e) {}
+  const items = [];
+  dhDivs().filter((x) => x.decl && x.n <= 7).forEach((x) => { const lb = typeof dgLastBuy === "function" ? dgLastBuy(x.date) : x.date; items.push({ id: "div|" + x.s + "|" + x.date, tone: "amber", go: "gdiv", text: t("dh_pin_div").replace("{k}", t("dh_decl")).replace("{s}", x.s).replace("{n}", x.n).replace("{d}", "\u2066" + x.date + "\u2069").replace("{b}", "\u2066" + lb + "\u2069") }); });
+  (typeof tkItems === "function" ? tkItems() : []).forEach((x) => { const d = x.st.d || 0; if (Math.abs(d) >= 0.02) items.push({ id: "idx|" + x.it.s + "|" + x.st.date, tone: d > 0 ? "up" : "down", tk: x.it.s, text: t("dh_pin_idx").replace("{s}", L(x.it.n)).replace("{w}", t(d > 0 ? "dh_up" : "dh_down")).replace("{p}", "⁦" + tkPct(Math.abs(d)).replace("+", "") + "⁩") }); });
+  const p = items.find((x) => x.id !== off); if (!p) return "";
+  return '<div class="dh-pin ' + p.tone + '" role="status"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>' +
+    (p.tk ? '<button class="dh-pin-t" data-act="tk-open" data-s="' + esc(p.tk) + '">' + esc(p.text) + "</button>" : '<a class="dh-pin-t" href="#' + p.go + '">' + esc(p.text) + "</a>") + '<button class="dh-pin-x" data-act="pin-x" data-id="' + esc(p.id) + '" aria-label="' + esc(t("dh_pin_x")) + '">×</button></div>';
+}
+function dhCard(title, link, linkLabel, body, cls) {
+  return '<section class="panel stack dh-card' + (cls ? " " + cls : "") + '"><div class="row" style="justify-content:space-between;align-items:center"><h2>' + esc(title) + "</h2>" + (link ? '<a class="small" href="' + link + '">' + esc(linkLabel) + "</a>" : "") + "</div>" + body + "</section>";
+}
+function pageDash() {
+  if (typeof DG !== "undefined" && !DG.loaded && typeof loadDG === "function") loadDG();
+  if (typeof NW !== "undefined" && !NW.loaded && typeof loadNews === "function") loadNews();
+  if (typeof DK !== "undefined" && !DK.loaded && typeof loadDesk === "function") loadDesk();
+  if (typeof EXTRA !== "undefined" && !EXTRA && typeof loadExtra === "function") loadExtra();
+  const first = nextLesson("inv") || LESSONS[0], done = LESSONS.filter((l) => isDone(l.id)).length;
+  const hero = '<section class="dh-hero"><div class="wrap"><div class="dh-hero-t"><p class="dh-eyebrow">' + esc(t("hero_eyebrow")) + "</p><h1>" + t("hero_h") + '</h1><p class="dh-lead">' + esc(t("hero_p_short")) + '</p></div><div class="row" style="gap:8px"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("dh_go")) + ": " + esc(L(first.title)) + '</a><a class="btn ghost" href="#learn">' + esc(t("nav_learn")) + "</a></div></div></section>";
+  const sc = [["chart", "nav_chart", "chart"], ["portfolio", "dk_t_pf", "invest"], ["screener", "sc_t", "tech"], ["gdiv", "dividends", "dividends"], ["saved", "sv_t", "journal"], ["movers", "tp_t", "tech"]];
+  const shortcuts = '<div class="dh-sc">' + sc.map(([h, k, ic]) => '<a href="#' + h + '"><span class="dh-sci">' + (typeof DK_IC !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : secIc(ic, 22)) + "</span><b>" + esc(t(k === "dividends" ? "dh_div" : k)) + "</b></a>").join("") + "</div>";
+  const idx = (typeof tkItems === "function" ? tkItems() : []);
+  const idxCard = dhCard(t("dh_idx"), "#indices", t("nav_indices"), idx.length ? '<div class="dh-idx">' + idx.map((x) => dhIdxCard(x, false)).join("") + "</div>" : '<p class="muted small">' + esc(t("dh_loading")) + "</p>");
+  const nwI = (typeof NW !== "undefined" && NW.data && NW.data.items) || [], br = typeof NW !== "undefined" && NW.brief && NW.brief.items && NW.brief.items[0];
+  const nwList = nwI.filter((x) => x.imp >= 2).slice(0, 4).map((x) => '<li><span class="tag ' + (x.sym ? "nw-sym" : "") + '"' + (x.sym ? ' dir="ltr"' : "") + ">" + esc(x.sym || x.topic || "") + '</span><span class="dh-nt" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + '</span><a class="small" href="' + esc(nwLink(x.url)) + '" target="_blank" rel="noopener noreferrer">' + esc(t("nw_more")) + " ↗</a></li>").join("");
+  const newsCard = dhCard(t("dh_news"), "#news", t("dh_news_all"), (br ? '<div class="dh-brief"><b>✦ ' + esc(br.h) + "</b>" + (br.s ? '<p class="small" style="margin:4px 0 0">' + esc(br.s) + "</p>" : "") + "</div>" : "") + (nwList ? '<ul class="dh-news">' + nwList + "</ul>" : '<p class="muted small">' + esc(t("dh_loading")) + "</p>"));
+  let pfBody = '<p class="muted small">' + esc(t("dh_loading")) + "</p>";
+  if (typeof DK !== "undefined" && DK.loaded) { try { const H = dkHoldings("SAR"), U = dkHoldings("USD"); pfBody = H.open.length || U.open.length ? (H.open.length ? '<b class="dh-big num">' + money(H.value, "SAR") + ' <small class="muted">SAR</small></b><span>' + dkSign(H.unreal) + (H.cost ? ' <span class="small">' + dkSign((H.unreal / H.cost) * 100, 1, "%") + "</span>" : "") + "</span>" : "") + (U.open.length ? '<b class="num">' + money(U.value, "USD") + "</b>" : "") + '<span class="small muted">' + esc(t("dh_pf_n").replace("{n}", H.open.length + U.open.length)) + "</span>" : '<p class="muted small">' + esc(t("dh_pf_none")) + "</p>"; } catch (e) { pfBody = ""; } }
+  const pfCard = dhCard(t("dh_pf"), "#portfolio", t("dh_pf_open"), '<div class="stack" style="gap:4px">' + pfBody + "</div>");
+  const dv = dhDivs().slice(0, 4);
+  const divCard = dhCard(t("dh_div"), "#gdiv", t("dh_div_all"), dv.length ? '<ul class="dh-div">' + dv.map((x) => '<li><span><b class="num">' + esc(x.s) + '</b> <span class="tag ' + (x.decl ? "dg-off" : "") + '">' + esc(t(x.decl ? "dh_decl" : "dh_est")) + "</span>" + (x.amt != null ? ' <span class="num" dir="ltr">' + x.amt + (x.cur === "USD" ? "$" : " " + (x.cur || "")) + "</span>" : "") + '</span><small class="muted">' + esc(x.n ? t("dh_days").replace("{n}", x.n) : t("dh_today")) + "</small></li>").join("") + "</ul>" : '<p class="muted small">' + esc(t(typeof DG !== "undefined" && DG.loaded ? "dh_div_none" : "dh_loading")) + "</p>");
+  const learnCard = dhCard(t("dh_learn"), "#tracks", t("nav_tracks"), '<span>' + esc(L(first.title)) + '</span><div class="dh-bar"><i style="width:' + Math.round((done / LESSONS.length) * 100) + '%"></i></div><small class="muted">' + esc(t("dh_lessons").replace("{d}", done).replace("{n}", LESSONS.length)) + '</small><div><a class="btn sm primary" href="#l-' + first.id + '">' + esc(t("dh_go")) + "</a></div>");
+  return hero + '<div class="wrap dh"><div class="stack" style="padding-block:16px 40px;gap:16px">' + dhPin() + shortcuts +
+    '<div class="dh-cols"><div class="dh-main stack" style="gap:16px">' + idxCard + newsCard + '</div><aside class="dh-side stack" style="gap:16px">' + pfCard + divCard + learnCard + "</aside></div>" +
+    "</div></div>";
+}
+Object.assign(UI, { hero_p_short: ["ثلاثة مسارات: المستثمر والمتداول والمبرمج. شرح، مثال على سهم من تاسي، تمرين في سجلك.", "Three tracks: investor, trader, developer. A lesson, a TASI example, practice in your journal."] });
+
+/* ----- قائمة الحساب (الإعدادات، الحساب، الباقات، لوحة المالك، هيكل المنصة) ----- */
+function profileMenu() {
+  const owner = isOwner();
+  const links = [["settings", "set_h"], ["account", "nav_account"], ["plans", "nav_plans"]].concat(owner ? [["owner", "pm_owner"]] : []);
+  return '<details class="pmenu"><summary class="btn sm" aria-label="' + esc(t("pm_menu")) + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></g></svg></summary><div class="pm-pop">' +
+    links.map(([h, k]) => '<a href="#' + h + '">' + esc(t(k)) + "</a>").join("") + "</div></details>";
+}
+document.addEventListener("click", (e) => {
+  const x = e.target.closest && e.target.closest('[data-act="pin-x"]');
+  if (x) { e.preventDefault(); try { localStorage.setItem(PIN_KEY, x.dataset.id); } catch (err) {} render(); return; }
+  document.querySelectorAll("details.pmenu[open]").forEach((d) => { if (!d.contains(e.target) || (e.target.closest && e.target.closest(".pm-pop a"))) d.open = false; });
+});
 /* ===== مِراس: دليل رموز السوق السعودي =====
    كل شركات السوق الرئيسية (تاسي) مقسّمة حسب القطاع، كما يصنّفها أرقام.
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
@@ -6098,12 +6251,19 @@ Object.assign(UI, {
 });
 
 const NAV_GROUPS = {
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["schools", "nav_schools", "d_schools"], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] },
-  services: { label: "nav_svc", items: [["journal", "tab_journal", "d_journal"], ["invest", "tab_inv", "d_invest"], ["tech", "tab_tech", "d_tech"], ["dividends", "tab_div", "d_div"], ["metals", "tab_met", "d_met"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] }
+  market: { label: "nav_market", items: [["chart", "nav_chart", "d_chart"], ["indices", "nav_indices", "d_indices", 1], ["tech", "tab_tech", "d_tech"], ["metals", "tab_met", "d_met"], ["screener", "sc_t", "dk_g_sc", 1], ["movers", "tp_t", "dk_g_top", 1], ["usm", "us_t", "dk_g_us", 1]] },
+  pf: { label: "nav_pf", items: [["portfolio", "dk_t_pf", "dk_g_pf", 1], ["journal", "tab_journal", "d_journal"], ["saved", "sv_t", "dk_g_sv", 1], ["analyses", "nav_an", "d_an"], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["dividends", "tab_div", "d_div"], ["gdiv", "dg_t", "dk_g_dg", 1], ["invest", "tab_inv", "d_invest"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"], ["apps", "ap_t", "dk_g_apps", 1]] },
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] }
 };
+/* بنود المالك (العلامة 1) تختفي إذا ما فيه ربط GitHub */
+const navItems = (g) => (NAV_GROUPS[g] ? NAV_GROUPS[g].items.filter((x) => !x[3] || (typeof HOSTED !== "undefined" && HOSTED && CFG.token)) : []);
+const SECTIONS = [["", "nav_home"], ["market", "nav_market"], ["pf", "nav_pf"], ["news", "nav_news", 1], ["learn", "nav_learn"]];
 function groupOf(r) {
   if (r === "learn" || r.startsWith("l-") || r.startsWith("g-") || r.startsWith("sch-")) return "learn";
-  if (r === "services") return "services";
+  if (r === "services" || r === "pf") return "pf";
+  if (r === "market") return "market";
+  if (r === "news") return "news";
+  if (r === "" || r === "home") return "home";
   if (r === "checkout" || r === "plans") return "plans";
   for (const g in NAV_GROUPS) if (NAV_GROUPS[g].items.some((x) => x[0] === r)) return g;
   return "";
@@ -6111,7 +6271,8 @@ function groupOf(r) {
 function subOf(r) { if (r.startsWith("sch-")) return "schools"; if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
 
 const ICON_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 4v3M7 15v5M17 3v4M17 13v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4.5" y="7" width="5" height="8" rx="1" fill="currentColor"/><rect x="14.5" y="7" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
-const BACK_KEY = "meras.back", OWN_R = ["owner", "desk"];
+const BACK_KEY = "meras.back", OWN_R = []; /* زر "رجوع لمكتبي" ما عاد له داعي بعد الهيكلة الجديدة */
+try { sessionStorage.removeItem("meras.back"); } catch (e) {}
 let BACK = null; try { BACK = JSON.parse(sessionStorage.getItem(BACK_KEY) || "null"); } catch (e) {}
 function trackBack(r) {
   const prev = typeof lastPainted !== "undefined" ? lastPainted : null, was = BACK;
@@ -6128,14 +6289,15 @@ Object.assign(UI, { back_desk: ["رجوع لمكتبي", "Back to my desk"], bac
 function headerHtml(r) {
   trackBack(r);
   const g = groupOf(r), sub = subOf(r);
-  const top = [["learn", "nav_learn"], ["services", "nav_svc"], ["plans", "nav_plans"]].map(([h, k]) => '<a href="#' + h + '"' + (g === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("");
+  const own = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  const top = SECTIONS.filter((x) => !x[2] || own).map(([h, k]) => '<a href="#' + h + '"' + ((h === "" ? g === "home" : g === h) ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + (own ? "" : '<a href="#plans"' + (g === "plans" ? ' aria-current="page"' : "") + ">" + esc(t("nav_plans")) + "</a>");
   const back = BACK && typeof HOSTED !== "undefined" && HOSTED && CFG.token ? '<a class="btn sm back-btn" href="#' + BACK.r + '" data-act="nav-back" title="' + esc(t(BACK.r === "desk" ? "back_desk" : "back_owner")) + '"><span aria-hidden="true">↩</span> <span>' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")) + "</span></a>" : "";
   let fab = document.getElementById("backfab");
   if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }
   fab.hidden = !back; if (back) { fab.href = "#" + BACK.r; fab.innerHTML = '<span aria-hidden="true">↩</span> ' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")); fab.title = t(BACK.r === "desk" ? "back_desk" : "back_owner"); }
-  const tools = back + '<a class="btn sm th-btn" href="#chart" title="' + esc(t("nav_chart")) + '" aria-label="' + esc(t("nav_chart")) + '"' + (r === "chart" ? ' aria-current="page"' : "") + ">" + ICON_CHART + "</a>" + (typeof themeButton === "function" ? themeButton() : "") +
-    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + "</button>";
-  const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + NAV_GROUPS[g].items.map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
+  const tools = back + (typeof themeButton === "function" ? themeButton() : "") +
+    '<button class="btn sm" data-act="lang" aria-label="language">' + (S.lang === "ar" ? "EN" : "ع") + "</button>" + (typeof profileMenu === "function" ? profileMenu() : "");
+  const subnav = NAV_GROUPS[g] ? '<div class="subnav"><div class="wrap"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + navItems(g).map(([h, k]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav></div></div>" : "";
   return '<div class="wrap"><a class="brand" href="#">' + LOGO + "<span>" + esc(t("brand")) + '</span></a><nav class="nav top3" aria-label="main">' + top + '</nav><div class="tools">' + tools + "</div></div>" + subnav;
 }
 
@@ -6181,7 +6343,7 @@ function hubStat(k) {
   return "";
 }
 function hubCards(g) {
-  return '<div class="hub">' + NAV_GROUPS[g].items.map(([h, k, d]) => '<a class="panel hub-card" href="#' + h + '"><h3>' + esc(t(k)) + '</h3><p class="muted small">' + esc(t(d)) + '</p><span class="hub-foot"><span class="tag amber">' + esc(hubStat(h) || t("open")) + '</span><span class="go" aria-hidden="true">←</span></span></a>').join("") + "</div>";
+  return '<div class="hub">' + navItems(g).map(([h, k, d]) => '<a class="panel hub-card" href="#' + h + '"><h3>' + esc(t(k)) + '</h3><p class="muted small">' + esc(t(d)) + '</p><span class="hub-foot"><span class="tag amber">' + esc(hubStat(h) || t("open")) + '</span><span class="go" aria-hidden="true">←</span></span></a>').join("") + "</div>";
 }
 function pageLearn() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("learn_h")) + "</h1><p>" + esc(t("learn_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + continueHtml() + hubCards("learn") + "</div></div>"; }
 function pageServicesHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("svc_hub_h")) + "</h1><p>" + esc(t("svc_hub_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("services") + "</div></div>"; }
@@ -6226,8 +6388,8 @@ function siteMap() {
   const leaf = (h, k) => '<a class="smap-leaf" href="#' + h + '">' + secIc(h, 15) + "<span>" + esc(t(k)) + "</span></a>";
   const branch = (h, k, kids, cls) => '<li class="smap-br' + (cls ? " " + cls : "") + '"><a class="smap-node" href="#' + h + '">' + esc(t(k)) + "</a>" + (kids ? '<div class="smap-kids">' + kids + "</div>" : "") + "</li>";
   return '<div class="smap" aria-label="' + esc(t("map_h")) + '"><div class="smap-root">' + LOGO + "<b>" + esc(t("map_root")) + '</b></div><ul class="smap-tree">' +
-    branch("learn", "nav_learn", NAV_GROUPS.learn.items.map(([h, k]) => leaf(h, k)).join("")) +
-    branch("services", "nav_svc", NAV_GROUPS.services.items.map(([h, k]) => leaf(h, k)).join("")) +
+    branch("learn", "nav_learn", navItems("learn").map(([h, k]) => leaf(h, k)).join("")) +
+    branch("pf", "nav_pf", navItems("pf").map(([h, k]) => leaf(h, k)).join("")) +
     branch("plans", "nav_plans", "") +
     (owner ? branch("owner", "map_admin", leaf("owner", "ow_h") + leaf("desk", "dk_h"), "smap-admin") : "") + "</ul></div>";
 }
@@ -6238,8 +6400,8 @@ function mapSection() {
   const item = (h, k, stat, extra, ic) => '<li><a class="org-it" href="#' + h + '"' + (extra || "") + '><span class="org-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">' + ic + "</svg>" : secIc(h, 17)) + "</span><span>" + esc(t(k)) + "</span>" + (stat ? '<small class="num">' + esc(stat) + "</small>" : "") + "</a></li>";
   const col = (ic, title, href, body, cls) => '<div class="org-col' + (cls ? " " + cls : "") + '"><a class="org-h" href="#' + href + '"><span class="org-hi">' + secIc(ic, 20) + "</span><b>" + esc(title) + "</b></a>" + body + "</div>";
   const cols = [
-    col("tracks", t("nav_learn"), "learn", '<ul class="org-list">' + NAV_GROUPS.learn.items.map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
-    col("calc", t("nav_svc"), "services", '<ul class="org-list">' + NAV_GROUPS.services.items.map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
+    col("tracks", t("nav_learn"), "learn", '<ul class="org-list">' + navItems("learn").map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
+    col("calc", t("nav_pf"), "pf", '<ul class="org-list">' + navItems("pf").map(([h, k]) => item(h, k, short(h))).join("") + "</ul>"),
     col("plans", t("nav_plans"), "plans", '<a class="org-plans" href="#plans">' + secIc("plans", 30) + "<span>" + esc(t("map_plans_p")) + "</span></a>"),
   ];
   if (owner) cols.push(col("owner", t("map_admin"), "owner", '<ul class="org-list">' + item("owner", "ow_h") + MAP_DESK.map(([k, l]) => item("desk", l, "", ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + '</ul><p class="org-note">🔒 ' + esc(t("map_admin_p")) + "</p>", "org-admin"));
@@ -6248,16 +6410,16 @@ function mapSection() {
   const pill = (h, k, extra, ic) => '<a class="tr-pill" href="#' + h + '"' + (extra || "") + '><span class="tr-pi">' + (ic ? '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' + ic + "</svg>" : secIc(h, 15)) + "</span><span>" + esc(t(k)) + "</span></a>";
   const grp = (ic, title, n, pills, cls) => '<div class="tr-grp' + (cls ? " " + cls : "") + '"><div class="tr-head">' + (cls ? "🔒" : secIc(ic, 17)) + "<b>" + esc(title) + "</b>" + (n ? '<small>' + esc(t("map_n").replace("{n}", n)) + "</small>" : "") + '</div><div class="tr-pills">' + pills + "</div></div>";
   const tree = '<div class="tr"><span class="tr-trunk" aria-hidden="true"></span>' +
-    grp("tracks", t("nav_learn"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => pill(h, k)).join("")) +
-    grp("calc", t("nav_svc"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => pill(h, k)).join("")) +
+    grp("tracks", t("nav_learn"), navItems("learn").length, navItems("learn").map(([h, k]) => pill(h, k)).join("")) +
+    grp("calc", t("nav_pf"), navItems("pf").length, navItems("pf").map(([h, k]) => pill(h, k)).join("")) +
     grp("plans", t("nav_plans"), 0, pill("plans", "map_plans_go")) +
     (owner ? grp("owner", t("map_admin"), 0, pill("owner", "ow_h") + MAP_DESK.map(([k, l]) => pill("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "tr-admin") : "") + "</div>";
   /* cards view: a card per group, its sections in a two-column grid */
   const cl = (h, k, extra, ic) => '<a class="cd-it" href="#' + h + '"' + (extra || "") + '><span class="cd-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">' + ic + "</svg>" : secIc(h, 15)) + "</span><span>" + esc(t(k)) + "</span></a>";
   const card = (ic, title, sub, n, items, cls) => '<div class="cd' + (cls ? " " + cls : "") + '"><div class="cd-h"><span class="cd-hi">' + (cls ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg>' : secIc(ic, 20)) + '</span><span class="cd-ht"><b>' + esc(title) + "</b><small>" + esc(sub) + "</small></span>" + (n ? '<span class="cd-n">' + esc(t("map_n").replace("{n}", n)) + "</span>" : "") + '</div><div class="cd-grid">' + items + "</div></div>";
   const cards = '<div class="cds">' +
-    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
-    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("tracks", t("nav_learn"), t("map_learn_s"), navItems("learn").length, navItems("learn").map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_pf"), t("map_svc_s"), navItems("pf").length, navItems("pf").map(([h, k]) => cl(h, k)).join("")) +
     card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) +
     (owner ? card("owner", t("map_admin"), t("map_admin_s"), 0, cl("owner", "ow_h") + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join(""), "cd-admin") : "") + "</div>";
   const portal = '<div class="cd cd-portal"><div class="cd-h"><span class="cd-hi"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l4-4-4-4M14 12H4"/></g></svg></span><span class="cd-ht"><b>' + esc(t("map_portal")) + "</b><small>" + esc(t(owner ? "map_portal_o" : "map_portal_s")) + '</small></span></div><div class="pt-big">' +
@@ -6265,8 +6427,8 @@ function mapSection() {
     (owner ? '<a class="pt-tile pt-owner" href="#owner"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></g></svg><b>' + esc(t("ow_h")) + "</b><small>" + esc(t("map_owner_p")) + "</small></a>" : "") + "</div>" +
     (owner ? '<div class="cd-sub">🔒 ' + esc(t("dk_h")) + '</div><div class="cd-grid">' + MAP_DESK.map(([k, l]) => cl("desk", l, ' data-dktab="' + k + '"', typeof DK_IC !== "undefined" ? DK_IC[k] : "")).join("") + "</div>" : "") + "</div>";
   const cards2 = '<div class="cds">' +
-    card("tracks", t("nav_learn"), t("map_learn_s"), NAV_GROUPS.learn.items.length, NAV_GROUPS.learn.items.map(([h, k]) => cl(h, k)).join("")) +
-    card("calc", t("nav_svc"), t("map_svc_s"), NAV_GROUPS.services.items.length, NAV_GROUPS.services.items.map(([h, k]) => cl(h, k)).join("")) +
+    card("tracks", t("nav_learn"), t("map_learn_s"), navItems("learn").length, navItems("learn").map(([h, k]) => cl(h, k)).join("")) +
+    card("calc", t("nav_pf"), t("map_svc_s"), navItems("pf").length, navItems("pf").map(([h, k]) => cl(h, k)).join("")) +
     card("plans", t("nav_plans"), t("map_plans_s"), 0, cl("plans", "map_plan_free") + cl("plans", "plan_full")) + portal + "</div>";
   const bar = '<div class="map-bar"><div class="map-brand">' + LOGO + "<span><b>" + esc(t("map_root")) + "</b><small>" + esc(t("map_h")) + '</small></span></div><div class="map-tools"><input class="map-q" id="map-q" type="search" placeholder="' + esc(t("map_q")) + '" aria-label="' + esc(t("map_q")) + '" autocomplete="off"></div></div>';
   void tree; void cards; void columns;
@@ -6298,19 +6460,23 @@ const GATE_TAIL = () => '<section class="sec"><div class="notice">' + esc(t(type
 const SIDE_MINI = ["chart", "lab"];
 function sideW() {
   const vw = document.documentElement.clientWidth || 0, g = groupOf(route());
-  if (vw < 1000 || (g !== "learn" && g !== "services")) return 0;
+  if (vw < 1000 || !["learn", "market", "pf"].includes(g)) return 0;
   return SIDE_MINI.includes(route()) ? 92 : 258;
 }
 function sideShell(g, r, html) {
   const sub = subOf(r), mini = SIDE_MINI.includes(r);
-  const hub = '<a class="side-hub" href="#' + g + '"' + (r === g ? ' aria-current="page"' : "") + ' title="' + esc(t(g === "learn" ? "learn_h" : "svc_hub_h")) + '"><span class="dk-si">' + secIc(g === "learn" ? "tracks" : "calc", 18).replace("tracks", "") + '</span><span class="dk-sl"><b>' + esc(t(g === "learn" ? "nav_learn" : "nav_svc")) + "</b></span></a>";
-  const items = NAV_GROUPS[g].items.map(([h, k, d]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ' title="' + esc(t(k)) + '"><span class="dk-si">' + secIc(h, 20) + '</span><span class="dk-sl"><b>' + esc(t(k)) + "</b><small>" + esc(t(d)) + "</small></span></a>").join("");
+  const hub = '<a class="side-hub" href="#' + g + '"' + (r === g ? ' aria-current="page"' : "") + ' title="' + esc(t(NAV_GROUPS[g].label)) + '"><span class="dk-si">' + secIc(g === "learn" ? "tracks" : g === "market" ? "tech" : "invest", 18) + '</span><span class="dk-sl"><b>' + esc(t(NAV_GROUPS[g].label)) + "</b></span></a>";
+  const items = navItems(g).map(([h, k, d]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ' title="' + esc(t(k)) + '"><span class="dk-si">' + (SEC_IC[h] ? secIc(h, 20) : typeof DK_IC !== "undefined" && typeof ROUTE_DESK !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : h === "indices" ? secIc("tech", 20) : h === "analyses" ? secIc("journal", 20) : secIc("chart", 20)) + '</span><span class="dk-sl"><b>' + esc(t(k)) + "</b><small>" + esc(t(d)) + "</small></span></a>").join("");
   return '<div class="wrap side-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + hub + items + '</nav></aside><div class="side-main">' + html + "</div></div>";
 }
 
 /* ----- phone tab bar: التعليم، الخدمات، مكتبي (أو الباقات)، الإشعارات ----- */
 const TB_ICONS = {
-  learn: '<path d="M4 19h4v-4h4v-4h4V7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  home: '<path d="M4 11l8-7 8 7v9H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  market: '<path d="M4 18l4-6 4 3 6-9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+  pf: '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z M4 7l11-3v3 M16 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  news: '<path d="M5 5h11v14H6a1 1 0 0 1-1-1z M16 9h3v9a1 1 0 0 1-1 1h-2 M8 9h5M8 12h5M8 15h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  learn: '<path d="M3 9l9-5 9 5-9 5z M7 11.5V16c0 1.5 2.5 3 5 3s5-1.5 5-3v-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   services: '<g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></g>',
   desk: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M9 9V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></g>',
   plans: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></g>',
@@ -6322,11 +6488,10 @@ function tabbarSync(r) {
   if (r == null) { if (bar) bar.hidden = true; document.body.classList.remove("has-tabbar"); return; }
   if (!bar) { bar = document.createElement("nav"); bar.id = "tabbar"; document.body.appendChild(bar); }
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token, g = groupOf(r);
-  const items = [["learn", "nav_learn", g === "learn"], ["services", "nav_svc", g === "services"], owner ? ["desk", "dk_h", r === "desk" || r === "owner"] : ["plans", "nav_plans", g === "plans"]];
+  const items = [["", "nav_home", g === "home", "home"], ["market", "nav_market", g === "market", "market"], ["pf", "nav_pf", g === "pf", "pf"], owner ? ["news", "nav_news", g === "news", "news"] : ["plans", "nav_plans", g === "plans", "plans"], ["learn", "nav_learn", g === "learn", "learn"]];
   const n = typeof ntUnread === "function" ? ntUnread() : 0;
   bar.setAttribute("aria-label", S.lang === "ar" ? "التنقل" : "Navigation");
-  bar.innerHTML = '<div class="tb-in">' + items.map(([h, k, on]) => '<a class="tb" href="#' + h + '"' + (on ? ' aria-current="page"' : "") + '><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS[h] + "</svg>" + esc(t(k)) + "</a>").join("") +
-    '<button class="tb" type="button" data-act="nt-bell" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS.bell + "</svg>" + esc(t("nt_h")) + (n ? '<span class="bell-n">' + n + "</span>" : "") + "</button></div>";
+  bar.innerHTML = '<div class="tb-in">' + items.map(([h, k, on, ic]) => '<a class="tb" href="#' + h + '"' + (on ? ' aria-current="page"' : "") + '><svg viewBox="0 0 24 24" aria-hidden="true">' + TB_ICONS[ic] + "</svg>" + esc(t(k)) + "</a>").join("") + "</div>";
   bar.hidden = false; document.body.classList.add("has-tabbar");
 }
 
@@ -6719,7 +6884,7 @@ async function loadDesk(force) {
   await loadUS();
   try { const f = await readJson("desk.json"); DK.data = (f && f.data) || dkBlank(); DK.sha = f ? f.sha : undefined; } catch (e) { DK.data = DK.data || dkBlank(); toast(errText(e)); }
   ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 2.25 }, DK.data.cfg); if (DK.data.cfg.v !== 2 && DK.data.cfg.v !== 3) Object.assign(DK.data.cfg, { v: 2, feePct: 0.155, feeMin: 0, feeVat: 15 }); if (DK.data.cfg.v === 2) Object.assign(DK.data.cfg, { v: 3, feeUS: 0 });
-  DK.loading = false; DK.loaded = true; if (route() === "desk") render();
+  DK.loading = false; DK.loaded = true; if (["desk", "portfolio", "mycharts", ""].includes(route())) render();
 }
 async function saveDesk() {
   DK.data.updatedAt = new Date().toISOString();
@@ -7506,7 +7671,7 @@ const topKey = (s, v) => s + "|" + v.since;
 async function loadTop(quiet) {
   if (!HOSTED || !CFG.token || topLoading) return; topLoading = true;
   try { const f = await readJson("top.json"); const prev = topNewCount(); TOP = (f && f.data) || { items: {}, log: [] }; const now = topNewCount(); if (now > prev && prev >= 0 && topSound && quiet) topBeep(); } catch (e) {}
-  topLoading = false; topBell(); if (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "top") render();
+  topLoading = false; topBell(); if (deskOn("top")) render();
 }
 function topActive() { return TOP ? Object.entries(TOP.items || {}).filter(([, v]) => v.active) : []; }
 function topNewCount() { if (!TOP) return -1; const seen = topSeen(); return topActive().filter(([s, v]) => v.sharia === "ok" && !seen.includes(topKey(s, v))).length; }
@@ -7660,7 +7825,7 @@ async function loadDG(force) {
   DG.loading = false; DG.loaded = true;
   if (typeof topBell === "function") topBell();
   dgAutoPublish();
-  if (route() === "desk") render();
+  if (deskOn("dg")) render();
 }
 
 /* ----- shared helpers: the table works for the owner (live) and for the shared view (snapshot) ----- */
@@ -7962,7 +8127,7 @@ async function loadNews(force) {
     NW.data = (a && a.data) || { items: [] }; NW.brief = (b && b.data) || null;
   } catch (e) { NW.data = NW.data || { items: [] }; toast(errText(e)); }
   NW.loaded = true; NW.loading = false;
-  if (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "nw") render();
+  if (deskOn("nw")) render();
 }
 function nwAgo(iso) {
   const m = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
@@ -8279,7 +8444,7 @@ Object.assign(UI, {
   an_at: ["أُنشئ {d}", "Created {d}"], an_candle: ["آخر شمعة {d} · السعر {p}", "Last candle {d} · price {p}"], an_draws: ["{n} رسمة", "{n} drawings"], an_q: ["ابحث باسم السهم أو رمزه…", "Search by share name or code…"],
   an_count: ["{n} تحليل", "{n} analyses"], an_auto: ["تلقائي", "Auto"]
 });
-NAV_GROUPS.learn.items.splice(2, 0, ["analyses", "nav_an", "d_an"]);
+/* "تحليلاتي" صارت تحت محفظتي في الهيكلة الجديدة */
 SEC_IC.analyses = '<path d="M4 20V4M4 20h16M8 15l3-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="7" r="2" fill="currentColor"/>';
 
 /* ----- the tree ----- */
@@ -8290,8 +8455,8 @@ function trGroups() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const ic = (h) => SEC_IC[h] || "";
   const g = [
-    { k: "l", name: t("nav_learn"), items: NAV_GROUPS.learn.items.map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: h === "analyses" && (S.analyses || []).length ? String((S.analyses || []).length) : "" })) },
-    { k: "s", name: t("nav_svc"), items: NAV_GROUPS.services.items.map(([h, k]) => ({ h, label: t(k), ic: ic(h) })) },
+    { k: "l", name: t("nav_learn"), items: navItems("learn").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: h === "analyses" && (S.analyses || []).length ? String((S.analyses || []).length) : "" })) },
+    { k: "s", name: t("nav_pf"), items: navItems("pf").map(([h, k]) => ({ h, label: t(k), ic: ic(h) })) },
     { k: "p", name: t("nav_plans"), items: [{ h: "plans", label: t("map_plan_free"), ic: ic("plans") }, { h: "plans", label: t("plan_full"), ic: ic("plans") }, { h: "account", label: t(S.signedIn ? "tr_account" : "tr_login"), ic: ic("owner") }] }
   ];
   if (owner) g.push({ k: "a", name: t("map_admin"), lock: true, items: [{ h: "owner", label: t("ow_h"), ic: ic("owner") }].concat(MAP_DESK.map(([k, l]) => ({ h: "desk", tab: k, label: t(l), ic: typeof DK_IC !== "undefined" ? DK_IC[k] : "", badge: typeof dkBadge === "function" ? dkBadge(k) : "" }))) });

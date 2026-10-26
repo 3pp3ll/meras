@@ -405,7 +405,9 @@ function render() {
   lastPainted = r;
 }
 function renderNow() {
-  const r = route();
+  let r = route();
+  /* رابط مكتبي القديم: يحوّل لصفحة القسم الجديدة */
+  if (r === "desk" && typeof DESK_ROUTE !== "undefined" && typeof isOwner === "function" && isOwner()) { const to = typeof dkGrid !== "undefined" && dkGrid ? "" : DESK_ROUTE[typeof dkTab !== "undefined" ? dkTab : ""] || ""; history.replaceState(null, "", "#" + to); r = to; }
   document.documentElement.lang = S.lang; document.documentElement.dir = S.lang === "ar" ? "rtl" : "ltr";
   const lnOn = typeof lnShow === "function" && lnShow();
   $("#top").innerHTML = lnOn ? lnHeader() : headerHtml(r);
@@ -414,9 +416,10 @@ function renderNow() {
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
   else if (r.startsWith("sch-")) html = pageSchool(r.slice(4));
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
-  { const g = typeof groupOf === "function" ? groupOf(r) : ""; if ((g === "learn" || g === "services") && typeof sideShell === "function") html = sideShell(g, r, html); }
-  { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "services" ? "s" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
+  else if (typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[r] && r !== "tech") html = deskPage(r);
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), home: () => (typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), market: pageMarketHub, pf: pagePfHub, indices: pageIndices, welcome: pageLanding, learn: pageLearn, services: pagePfHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
+  { const g = typeof groupOf === "function" ? groupOf(r) : ""; if (["learn", "market", "pf"].includes(g) && typeof sideShell === "function") html = sideShell(g, r, html); }
+  { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "pf" || g === "market" ? "s" : r === "" || r === "home" ? "a" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;
   $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + "</span></div>";
   if (r === "calc") runCalc();

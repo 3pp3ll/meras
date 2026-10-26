@@ -20,7 +20,7 @@ async function loadNews(force) {
     NW.data = (a && a.data) || { items: [] }; NW.brief = (b && b.data) || null;
   } catch (e) { NW.data = NW.data || { items: [] }; toast(errText(e)); }
   NW.loaded = true; NW.loading = false;
-  if (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "nw") render();
+  if (deskOn("nw")) render();
 }
 function nwAgo(iso) {
   const m = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));

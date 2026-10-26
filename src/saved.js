@@ -36,7 +36,7 @@ const svId = () => Date.now().toString(36) + Math.random().toString(36).slice(2,
 async function svLoad(force) {
   if (!svOk() || SV.loading || (SV.list && !force)) return; SV.loading = true;
   try { const f = await readJson("saved/index.json"); SV.list = (f && Array.isArray(f.data)) ? f.data : []; SV.sha = f ? f.sha : undefined; } catch (e) { SV.list = SV.list || []; toast(errText(e)); }
-  SV.loading = false; if (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "sv") render();
+  SV.loading = false; if (deskOn("sv")) render();
 }
 function svDefaultTitle() { const cfg = chartCfg(), d = CH && CH.data[CH.e - 1]; return cfg.sym + " " + symName(cfg.sym) + (d && d.d ? " · " + d.d : ""); }
 function svSnapshot() {
@@ -100,7 +100,7 @@ function svBar() {
   const cur = SV.cur ? '<p class="small" style="margin:0"><span class="tag amber">' + esc(t("sv_cur").replace("{t}", SV.cur.title || "")) + '</span> <button class="btn sm ghost" data-act="sv-close">' + esc(t("sv_close")) + "</button></p>" : "";
   const saveBtns = svOk() ? (SV.cur ? '<button class="btn primary" data-act="sv-save"' + (SV.busy ? " disabled" : "") + ">💾 " + esc(t(SV.busy ? "sv_busy" : "sv_update")) + '</button><button class="btn" data-act="sv-copy"' + (SV.busy ? " disabled" : "") + ">" + esc(t("sv_copy")) + "</button>" : '<button class="btn primary" data-act="sv-save"' + (SV.busy ? " disabled" : "") + ">💾 " + esc(t(SV.busy ? "sv_busy" : "sv_save")) + "</button>") : "";
   return '<div class="panel stack sv-bar">' + cur + '<div class="form-grid"><div class="field"><label for="sv-title">' + esc(t("sv_title")) + '</label><input id="sv-title" data-svm="title" maxlength="120" value="' + esc(SCA.meta.title || svDefaultTitle()) + '"></div></div><div class="field"><label for="sv-note">' + esc(t("sv_note")) + '</label><textarea id="sv-note" data-svm="note" rows="2" placeholder="' + esc(t("sv_note_ph")) + '">' + esc(SCA.meta.note || "") + "</textarea></div>" +
-    '<div class="row" style="gap:8px;flex-wrap:wrap">' + saveBtns + '<button class="btn" data-act="xp-pdf">⬇ ' + esc(t("xp_pdf")) + '</button><button class="btn" data-act="xp-word">⬇ ' + esc(t("xp_word")) + "</button>" + (svOk() ? '<a class="btn ghost" href="#desk" data-dktab="sv">' + esc(t("sv_h")) + " ↗</a>" : "") + "</div></div>";
+    '<div class="row" style="gap:8px;flex-wrap:wrap">' + saveBtns + '<button class="btn" data-act="xp-pdf">⬇ ' + esc(t("xp_pdf")) + '</button><button class="btn" data-act="xp-word">⬇ ' + esc(t("xp_word")) + "</button>" + (svOk() ? '<a class="btn ghost" href="#saved">' + esc(t("sv_h")) + " ↗</a>" : "") + "</div></div>";
 }
 
 /* صفحة المحفوظات في مكتبي */

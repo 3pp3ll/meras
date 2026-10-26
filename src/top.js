@@ -23,7 +23,7 @@ const topKey = (s, v) => s + "|" + v.since;
 async function loadTop(quiet) {
   if (!HOSTED || !CFG.token || topLoading) return; topLoading = true;
   try { const f = await readJson("top.json"); const prev = topNewCount(); TOP = (f && f.data) || { items: {}, log: [] }; const now = topNewCount(); if (now > prev && prev >= 0 && topSound && quiet) topBeep(); } catch (e) {}
-  topLoading = false; topBell(); if (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "top") render();
+  topLoading = false; topBell(); if (deskOn("top")) render();
 }
 function topActive() { return TOP ? Object.entries(TOP.items || {}).filter(([, v]) => v.active) : []; }
 function topNewCount() { if (!TOP) return -1; const seen = topSeen(); return topActive().filter(([s, v]) => v.sharia === "ok" && !seen.includes(topKey(s, v))).length; }
