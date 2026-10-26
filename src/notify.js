@@ -97,7 +97,7 @@ function ntH() { return ntTop() ? window.innerHeight - ntTopY() - 16 : window.in
 function ntPlace(px, anim) {   // px = how much of the sheet is hidden off-screen
   const { sc, sh } = ntEls(), top = ntTop();
   sh.style.transition = anim ? "" : "none"; sc.style.transition = anim ? "" : "none";
-  if (top) { sh.style.transform = px >= ntH() ? "translateY(-110%)" : "none"; sh.style.height = Math.max(0, ntH() - px) + "px"; }   // from the top it grows, so the header stays in view
+  if (top) { const shut = px >= ntH(); sh.style.transform = shut ? "translateY(-130vh)" : "none"; sh.style.visibility = shut ? "hidden" : ""; sh.style.height = Math.max(0, ntH() - px) + "px"; }   // مقفلة: تطلع كاملة برا الشاشة (الشريط العلوي صار أطول)   // from the top it grows, so the header stays in view
   else { sh.style.height = ""; sh.style.transform = "translateY(" + px + "px)"; }
   sc.style.opacity = Math.max(0, Math.min(1, (1 - px / ntH()) / 0.5));
 }
