@@ -1263,3 +1263,15 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 @media (max-width:640px){.nw-list{grid-template-columns:1fr}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.nw-sym{background:#1E2647;color:#AFC0FF}:root:not([data-theme="light"]) .tag.nw-hot{background:#3A2414;color:#FFC08F}:root:not([data-theme="light"]) .nw-brief{border-color:#2A3A66;background:linear-gradient(180deg,#151C33,transparent)}}
 :root[data-theme="dark"] .tag.nw-sym{background:#1E2647;color:#AFC0FF}:root[data-theme="dark"] .tag.nw-hot{background:#3A2414;color:#FFC08F}:root[data-theme="dark"] .nw-brief{border-color:#2A3A66;background:linear-gradient(180deg,#151C33,transparent)}
+/* مدارس التحليل */
+.sch-facts{gap:6px;flex-wrap:wrap;margin-top:10px}
+.sch-pc{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sch-pc .sch-pro{border-color:color-mix(in srgb,var(--up) 35%,var(--line))}
+.sch-pc .sch-con{border-color:color-mix(in srgb,var(--down) 35%,var(--line))}
+.sch-pro h2{color:var(--up)} .sch-con h2{color:var(--down)}
+.panel ul,.panel .sch-steps{margin:0;padding-inline-start:22px;display:grid;gap:6px}
+.sch-m{display:inline-flex;gap:3px;vertical-align:middle}
+.sch-m i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.sch-m i.on{background:var(--amber)}
+.sch-tbl td,.sch-tbl th{white-space:nowrap}
+@media (max-width:640px){.sch-pc{grid-template-columns:1fr}}

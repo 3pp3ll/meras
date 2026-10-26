@@ -411,7 +411,8 @@ function renderNow() {
   let html;
   if (r.startsWith("l-")) html = pageLesson(r.slice(2));
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, lab: pageLab }[r] || pageHome)();
+  else if (r.startsWith("sch-")) html = pageSchool(r.slice(4));
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : pageGate()), welcome: pageLanding, learn: pageLearn, services: pageServicesHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; if ((g === "learn" || g === "services") && typeof sideShell === "function") html = sideShell(g, r, html); }
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "services" ? "s" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;

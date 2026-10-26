@@ -25,17 +25,17 @@ Object.assign(UI, {
 });
 
 const NAV_GROUPS = {
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] },
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["chart", "nav_chart", "d_chart"], ["lab", "nav_lab", "d_lab"], ["guides", "nav_guides", "d_guides"], ["schools", "nav_schools", "d_schools"], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] },
   services: { label: "nav_svc", items: [["journal", "tab_journal", "d_journal"], ["invest", "tab_inv", "d_invest"], ["tech", "tab_tech", "d_tech"], ["dividends", "tab_div", "d_div"], ["metals", "tab_met", "d_met"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] }
 };
 function groupOf(r) {
-  if (r === "learn" || r.startsWith("l-") || r.startsWith("g-")) return "learn";
+  if (r === "learn" || r.startsWith("l-") || r.startsWith("g-") || r.startsWith("sch-")) return "learn";
   if (r === "services") return "services";
   if (r === "checkout" || r === "plans") return "plans";
   for (const g in NAV_GROUPS) if (NAV_GROUPS[g].items.some((x) => x[0] === r)) return g;
   return "";
 }
-function subOf(r) { if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
+function subOf(r) { if (r.startsWith("sch-")) return "schools"; if (r.startsWith("l-")) return "tracks"; if (r.startsWith("g-")) return "guides"; return r; }
 
 const ICON_CHART = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><path d="M7 4v3M7 15v5M17 3v4M17 13v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4.5" y="7" width="5" height="8" rx="1" fill="currentColor"/><rect x="14.5" y="7" width="5" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
 const BACK_KEY = "meras.back", OWN_R = ["owner", "desk"];
@@ -77,6 +77,7 @@ function noteVisit(r) {
 }
 function pageLabel(p) {
   if (!p) return "";
+  if (p.r.startsWith("sch-")) { const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === p.r); return s ? L(s.name) : t("nav_schools"); }
   if (p.r.startsWith("g-")) { const g = typeof GUIDES !== "undefined" && GUIDES.find((x) => "g-" + x.id === p.r); return g ? L(g.title) : t("nav_guides"); }
   for (const g in NAV_GROUPS) { const it = NAV_GROUPS[g].items.find((x) => x[0] === p.r); if (it) return t(it[1]) + (p.sym && typeof symName === "function" ? ": " + symName(p.sym) : ""); }
   const extra = { desk: "dk_h", owner: "ow_h", plans: "nav_plans", account: "nav_account", learn: "nav_learn", services: "nav_svc", tracks: "nav_tracks", settings: "set_h", shared: "dg_h", symbols: "nav_symbols" }[p.r];
@@ -100,6 +101,7 @@ function hubStat(k) {
   if (k === "chart") return f("s_shares", { n: Object.keys(LIVE.history || {}).filter((x) => (LIVE.history[x] || []).length > 1).length });
   if (k === "guides") return f("s_guides", { n: (typeof GUIDES !== "undefined" ? GUIDES.length : 0) + 1 });
   if (k === "glossary") return f("s_terms", { n: GLOSSARY.length });
+  if (k === "schools") return f("s_schools", { n: typeof SCHOOLS !== "undefined" ? SCHOOLS.length : 0 });
   if (k === "progress") return Math.round((LESSONS.filter((l) => isDone(l.id)).length / LESSONS.length) * 100) + "%";
   if (k === "journal") return f("s_open", { n: S.journal.filter((j) => j.exit == null).length });
   if (k === "calc") return t("s_calcs");
@@ -113,6 +115,7 @@ function pageServicesHub() { return '<div class="wrap"><div class="page-head"><h
 
 /* ----- icons for every section (used by the side menu and the platform map) ----- */
 const SEC_IC = {
+  schools: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.5 2.5 3 5 3s5-1.5 5-3v-4.5M21 9v6"/></g>',
   tracks: '<path d="M4 19h4v-4h4v-4h4V7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   chart: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v4M7 15v6M17 2v4M17 14v8"/><rect x="5" y="7" width="4" height="8" rx="1"/><rect x="15" y="6" width="4" height="8" rx="1"/></g>',
   lab: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 15h9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
@@ -158,7 +161,7 @@ function siteMap() {
 function mapSection() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const short = (h) => { const done = LESSONS.filter((l) => isDone(l.id)).length;
-    return { tracks: done + "/" + LESSONS.length, glossary: String(GLOSSARY.length), progress: Math.round((done / LESSONS.length) * 100) + "%", journal: String(S.journal.filter((j) => j.exit == null).length || ""), guides: String((typeof GUIDES !== "undefined" ? GUIDES.length : 0) + 1) }[h] || ""; };
+    return { tracks: done + "/" + LESSONS.length, glossary: String(GLOSSARY.length), progress: Math.round((done / LESSONS.length) * 100) + "%", journal: String(S.journal.filter((j) => j.exit == null).length || ""), guides: String((typeof GUIDES !== "undefined" ? GUIDES.length : 0) + 1), schools: String(typeof SCHOOLS !== "undefined" ? SCHOOLS.length : 0) }[h] || ""; };
   const item = (h, k, stat, extra, ic) => '<li><a class="org-it" href="#' + h + '"' + (extra || "") + '><span class="org-ii">' + (ic ? '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">' + ic + "</svg>" : secIc(h, 17)) + "</span><span>" + esc(t(k)) + "</span>" + (stat ? '<small class="num">' + esc(stat) + "</small>" : "") + "</a></li>";
   const col = (ic, title, href, body, cls) => '<div class="org-col' + (cls ? " " + cls : "") + '"><a class="org-h" href="#' + href + '"><span class="org-hi">' + secIc(ic, 20) + "</span><b>" + esc(title) + "</b></a>" + body + "</div>";
   const cols = [
