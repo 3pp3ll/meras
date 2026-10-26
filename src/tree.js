@@ -24,13 +24,15 @@ let TR = (() => { try { return Object.assign({ closed: [], zoom: false }, JSON.p
 const trSave = () => { try { localStorage.setItem(TR_KEY, JSON.stringify({ closed: TR.closed, zoom: TR.zoom })); } catch (e) {} };
 function trGroups() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
-  const ic = (h) => SEC_IC[h] || "";
+  const ic = (h) => SEC_IC[h] || (typeof DK_IC !== "undefined" && typeof ROUTE_DESK !== "undefined" && DK_IC[ROUTE_DESK[h]]) || (h === "indices" ? SEC_IC.tech : h === "analyses" ? SEC_IC.journal : "");
+  const bdg = (h) => (typeof dkBadge === "function" && typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[h] ? dkBadge(ROUTE_DESK[h]) : "");
   const g = [
+    { k: "m", name: t("nav_market"), items: navItems("market").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: bdg(h) })).concat(owner ? [{ h: "news", label: t("nav_news"), ic: typeof DK_IC !== "undefined" ? DK_IC.nw : "" }] : []) },
+    { k: "s", name: t("nav_pf"), items: navItems("pf").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: bdg(h) })) },
     { k: "l", name: t("nav_learn"), items: navItems("learn").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: h === "analyses" && (S.analyses || []).length ? String((S.analyses || []).length) : "" })) },
-    { k: "s", name: t("nav_pf"), items: navItems("pf").map(([h, k]) => ({ h, label: t(k), ic: ic(h) })) },
     { k: "p", name: t("nav_plans"), items: [{ h: "plans", label: t("map_plan_free"), ic: ic("plans") }, { h: "plans", label: t("plan_full"), ic: ic("plans") }, { h: "account", label: t(S.signedIn ? "tr_account" : "tr_login"), ic: ic("owner") }] }
   ];
-  if (owner) g.push({ k: "a", name: t("map_admin"), lock: true, items: [{ h: "owner", label: t("ow_h"), ic: ic("owner") }].concat(MAP_DESK.map(([k, l]) => ({ h: "desk", tab: k, label: t(l), ic: typeof DK_IC !== "undefined" ? DK_IC[k] : "", badge: typeof dkBadge === "function" ? dkBadge(k) : "" }))) });
+  if (owner) g.push({ k: "a", name: t("map_admin"), lock: true, items: [{ h: "owner", label: t("ow_h"), ic: ic("owner") }, { h: "settings", label: t("set_h"), ic: ic("owner") }] });
   return g;
 }
 function treeHtml() {
@@ -89,7 +91,7 @@ const TB_KEY = "meras.treeback";
 const tbGet = () => { try { return JSON.parse(sessionStorage.getItem(TB_KEY) || "null"); } catch (e) { return null; } };
 function tbSync() {
   let b = document.getElementById("treeback");
-  const st = tbGet(), show = st && route() !== "" && !(typeof lnShow === "function" && lnShow());
+  const st = tbGet(), show = st && route() !== "" && route() !== "map" && !(typeof lnShow === "function" && lnShow());
   if (!show) { if (b) b.hidden = true; document.body.classList.remove("has-treeback"); return; }
   if (!b) { b = document.createElement("button"); b.id = "treeback"; b.type = "button"; b.innerHTML = '<span class="tb-spark"><svg viewBox="0 0 34 22" aria-hidden="true"><path d="M2 18 L9 12 L14 15 L21 7 L26 10 L32 3"/><circle cx="32" cy="3" r="2.6"/></svg></span><b></b>'; document.body.appendChild(b); }
   b.querySelector("b").textContent = t("tr_back"); b.setAttribute("aria-label", t("tr_back")); b.className = "b-" + (st.k || "l"); b.hidden = false;
@@ -100,7 +102,7 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest) return;
   const lf = e.target.closest(".tr2-leaf");
   if (lf) { const st = document.getElementById("tr2-stage"); try { sessionStorage.setItem(TB_KEY, JSON.stringify({ k: lf.dataset.tk, y: window.scrollY, x: st ? st.scrollLeft : 0, zoom: TR.zoom })); } catch (err) {} return; }
-  if (e.target.closest("#treeback")) { const st = tbGet(); trRestore = st; if (st) { TR.zoom = !!st.zoom; trSave(); } location.hash = ""; return; }
+  if (e.target.closest("#treeback")) { const st = tbGet(); trRestore = st; if (st) { TR.zoom = !!st.zoom; trSave(); } location.hash = typeof isOwner === "function" && isOwner() ? "map" : ""; return; }
   const hd = e.target.closest('[data-act="tr-br"]');
   if (hd) { const k = hd.dataset.k, i = TR.closed.indexOf(k); if (i >= 0) TR.closed.splice(i, 1); else TR.closed.push(k); trSave(); render(); return; }
   if (e.target.closest('[data-act="tr-open"]')) { TR.closed = []; trSave(); render(); return; }

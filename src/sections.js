@@ -49,6 +49,9 @@ function dhIdxCard(x, big) {
     (big ? '<small class="muted">' + esc(L(x.it.full)) + '</small><div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-act="tk-open" data-s="' + esc(x.it.s) + '">' + esc(t("dh_idx_open")) + '</button><button class="btn sm primary" data-act="tk-chart" data-s="' + esc(x.it.s) + '">' + esc(t("tk_open")) + "</button></div>" : '<button class="dh-hit" data-act="tk-open" data-s="' + esc(x.it.s) + '" aria-label="' + esc(L(x.it.n) + " " + t("dh_idx_open")) + '"></button>') + "</div>";
 }
 
+/* ----- هيكل المنصة (الشجرة) كصفحة مستقلة ----- */
+function pageMap() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("pm_map")) + "</h1><p>" + esc(t("map_p")) + "</p></div>" + (typeof treeHtml === "function" ? treeHtml() : mapSection()) + "</div>"; }
+
 /* ----- محاور الأقسام ----- */
 function pageMarketHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("mk_h")) + "</h1><p>" + esc(t("mk_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("market") + "</div></div>"; }
 function pagePfHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("pf_h")) + "</h1><p>" + esc(t("pf_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("pf") + "</div></div>"; }
@@ -89,8 +92,8 @@ function pageDash() {
   if (typeof EXTRA !== "undefined" && !EXTRA && typeof loadExtra === "function") loadExtra();
   const first = nextLesson("inv") || LESSONS[0], done = LESSONS.filter((l) => isDone(l.id)).length;
   const hero = '<section class="dh-hero"><div class="wrap"><div class="dh-hero-t"><p class="dh-eyebrow">' + esc(t("hero_eyebrow")) + "</p><h1>" + t("hero_h") + '</h1><p class="dh-lead">' + esc(t("hero_p_short")) + '</p></div><div class="row" style="gap:8px"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("dh_go")) + ": " + esc(L(first.title)) + '</a><a class="btn ghost" href="#learn">' + esc(t("nav_learn")) + "</a></div></div></section>";
-  const sc = [["chart", "nav_chart", "chart"], ["portfolio", "dk_t_pf", "invest"], ["screener", "sc_t", "tech"], ["dividends", "dividends", "dividends"], ["saved", "sv_t", "journal"], ["movers", "tp_t", "tech"]];
-  const shortcuts = '<div class="dh-sc">' + sc.map(([h, k, ic]) => '<a href="#' + h + '"><span class="dh-sci">' + (typeof DK_IC !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : secIc(ic, 22)) + "</span><b>" + esc(t(k === "dividends" ? "dh_div" : k)) + "</b></a>").join("") + "</div>";
+  const sc = [["chart", "nav_chart", "chart"], ["portfolio", "dk_t_pf", "invest"], ["apps", "ap_t", "calc"], ["dividends", "dividends", "dividends"], ["screener", "sc_t", "tech"], ["movers", "tp_t", "tech"], ["saved", "sv_t", "journal"], ["indices", "nav_indices", "tech"]];
+  const shortcuts = '<div class="dh-sc">' + sc.map(([h, k, ic]) => '<a href="#' + h + '"><span class="dh-sci">' + (typeof DK_IC !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : secIc(ic, 22)) + "</span><b>" + esc(t(k === "dividends" ? "dh_div" : k)) + "</b>" + (typeof dkBadge === "function" && ROUTE_DESK[h] && dkBadge(ROUTE_DESK[h]) ? '<span class="bell-n">' + dkBadge(ROUTE_DESK[h]) + "</span>" : "") + "</a>").join("") + "</div>";
   const idx = (typeof tkItems === "function" ? tkItems() : []);
   const idxCard = dhCard(t("dh_idx"), "#indices", t("nav_indices"), idx.length ? '<div class="dh-idx">' + idx.map((x) => dhIdxCard(x, false)).join("") + "</div>" : '<p class="muted small">' + esc(t("dh_loading")) + "</p>");
   const nwI = (typeof NW !== "undefined" && NW.data && NW.data.items) || [], br = typeof NW !== "undefined" && NW.brief && NW.brief.items && NW.brief.items[0];
@@ -111,9 +114,9 @@ Object.assign(UI, { hero_p_short: ["ثلاثة مسارات: المستثمر و
 /* ----- قائمة الحساب (الإعدادات، الحساب، الباقات، لوحة المالك، هيكل المنصة) ----- */
 function profileMenu() {
   const owner = isOwner();
-  const links = [["settings", "set_h"], ["account", "nav_account"], ["plans", "nav_plans"]].concat(owner ? [["owner", "pm_owner"]] : []);
+  const links = [["map", "pm_map"], ["settings", "set_h"], ["account", "nav_account"], ["plans", "nav_plans"]].concat(owner ? [["owner", "pm_owner"]] : []);
   return '<details class="pmenu"><summary class="btn sm" aria-label="' + esc(t("pm_menu")) + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></g></svg></summary><div class="pm-pop">' +
-    links.map(([h, k]) => '<a href="#' + h + '">' + esc(t(k)) + "</a>").join("") + "</div></details>";
+    links.map(([h, k]) => '<a href="#' + h + '">' + esc(t(k)) + "</a>").join("") + '<button type="button" class="pm-m" data-act="lang">' + (S.lang === "ar" ? "English" : "عربي") + "</button></div></details>";
 }
 document.addEventListener("click", (e) => {
   const x = e.target.closest && e.target.closest('[data-act="pin-x"]');

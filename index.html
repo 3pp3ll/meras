@@ -773,7 +773,7 @@ body.dg-lock{overflow:hidden}
   body.has-tabbar{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
   body.has-tabbar #totop{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   body.has-tabbar #backfab:not([hidden]){bottom:calc(78px + env(safe-area-inset-bottom,0px))}
-  body.has-tabbar .top .nav.top3,body.has-tabbar #topbell,body.has-tabbar .top .th-btn[href="#chart"]{display:none}
+  body.has-tabbar .top .nav.top3,body.has-tabbar .top .th-btn[href="#chart"]{display:none}
   body.has-tabbar .top .wrap{flex-wrap:nowrap;gap:8px;padding-block:8px}
   body.has-tabbar .top .tools{margin-inline-start:auto;gap:6px;flex-wrap:nowrap;min-width:0}
   body.has-tabbar #ntpanel{top:auto!important;bottom:calc(72px + env(safe-area-inset-bottom,0px))}
@@ -1449,6 +1449,12 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .sn-list{list-style:none;margin:10px 0 0;padding:0;display:grid}
 .sn-list li{padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}.sn-list li:last-child{border-bottom:0}
 .sn-t{margin:0;font-weight:600;line-height:1.55}.sn-t[dir="ltr"]{text-align:left}
+.b-m{--c:var(--ta);--c2:var(--ta2);--cs:var(--ta-soft);--ci:var(--ta-ink)}
+.dh-sc{grid-template-columns:repeat(8,minmax(0,1fr))}.dh-sc a{position:relative}.dh-sc .bell-n{position:absolute;top:8px;inset-inline-end:8px}
+@media (max-width:1100px){.dh-sc{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.dk-side nav a{position:relative}.dk-side nav a .bell-n{position:absolute;top:6px;inset-inline-end:6px}
+.pm-pop .pm-m{display:none;border:0;background:none;font:inherit;color:var(--ink);text-align:start;padding:9px 12px;border-radius:8px;cursor:pointer}.pm-pop .pm-m:hover{background:var(--sunk)}
+@media (max-width:480px){.top .tools > [data-act="lang"],#topclock{display:none!important}.pm-pop .pm-m{display:block}}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2551,7 +2557,7 @@ function renderNow() {
   else if (r.startsWith("g-")) html = pageGuide(r.slice(2));
   else if (r.startsWith("sch-")) html = pageSchool(r.slice(4));
   else if (typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[r] && r !== "tech") html = deskPage(r);
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), home: () => (typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), market: pageMarketHub, pf: pagePfHub, indices: pageIndices, welcome: pageLanding, learn: pageLearn, services: pagePfHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), home: () => (typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), market: pageMarketHub, pf: pagePfHub, map: pageMap, indices: pageIndices, welcome: pageLanding, learn: pageLearn, services: pagePfHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; if (["learn", "market", "pf"].includes(g) && typeof sideShell === "function") html = sideShell(g, r, html); }
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "pf" || g === "market" ? "s" : r === "" || r === "home" ? "a" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;
@@ -5124,6 +5130,9 @@ function dhIdxCard(x, big) {
     (big ? '<small class="muted">' + esc(L(x.it.full)) + '</small><div class="row" style="gap:6px;margin-top:6px"><button class="btn sm" data-act="tk-open" data-s="' + esc(x.it.s) + '">' + esc(t("dh_idx_open")) + '</button><button class="btn sm primary" data-act="tk-chart" data-s="' + esc(x.it.s) + '">' + esc(t("tk_open")) + "</button></div>" : '<button class="dh-hit" data-act="tk-open" data-s="' + esc(x.it.s) + '" aria-label="' + esc(L(x.it.n) + " " + t("dh_idx_open")) + '"></button>') + "</div>";
 }
 
+/* ----- هيكل المنصة (الشجرة) كصفحة مستقلة ----- */
+function pageMap() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("pm_map")) + "</h1><p>" + esc(t("map_p")) + "</p></div>" + (typeof treeHtml === "function" ? treeHtml() : mapSection()) + "</div>"; }
+
 /* ----- محاور الأقسام ----- */
 function pageMarketHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("mk_h")) + "</h1><p>" + esc(t("mk_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("market") + "</div></div>"; }
 function pagePfHub() { return '<div class="wrap"><div class="page-head"><h1>' + esc(t("pf_h")) + "</h1><p>" + esc(t("pf_p")) + '</p></div><div class="stack" style="padding-block:18px 40px">' + hubCards("pf") + "</div></div>"; }
@@ -5164,8 +5173,8 @@ function pageDash() {
   if (typeof EXTRA !== "undefined" && !EXTRA && typeof loadExtra === "function") loadExtra();
   const first = nextLesson("inv") || LESSONS[0], done = LESSONS.filter((l) => isDone(l.id)).length;
   const hero = '<section class="dh-hero"><div class="wrap"><div class="dh-hero-t"><p class="dh-eyebrow">' + esc(t("hero_eyebrow")) + "</p><h1>" + t("hero_h") + '</h1><p class="dh-lead">' + esc(t("hero_p_short")) + '</p></div><div class="row" style="gap:8px"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("dh_go")) + ": " + esc(L(first.title)) + '</a><a class="btn ghost" href="#learn">' + esc(t("nav_learn")) + "</a></div></div></section>";
-  const sc = [["chart", "nav_chart", "chart"], ["portfolio", "dk_t_pf", "invest"], ["screener", "sc_t", "tech"], ["dividends", "dividends", "dividends"], ["saved", "sv_t", "journal"], ["movers", "tp_t", "tech"]];
-  const shortcuts = '<div class="dh-sc">' + sc.map(([h, k, ic]) => '<a href="#' + h + '"><span class="dh-sci">' + (typeof DK_IC !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : secIc(ic, 22)) + "</span><b>" + esc(t(k === "dividends" ? "dh_div" : k)) + "</b></a>").join("") + "</div>";
+  const sc = [["chart", "nav_chart", "chart"], ["portfolio", "dk_t_pf", "invest"], ["apps", "ap_t", "calc"], ["dividends", "dividends", "dividends"], ["screener", "sc_t", "tech"], ["movers", "tp_t", "tech"], ["saved", "sv_t", "journal"], ["indices", "nav_indices", "tech"]];
+  const shortcuts = '<div class="dh-sc">' + sc.map(([h, k, ic]) => '<a href="#' + h + '"><span class="dh-sci">' + (typeof DK_IC !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : secIc(ic, 22)) + "</span><b>" + esc(t(k === "dividends" ? "dh_div" : k)) + "</b>" + (typeof dkBadge === "function" && ROUTE_DESK[h] && dkBadge(ROUTE_DESK[h]) ? '<span class="bell-n">' + dkBadge(ROUTE_DESK[h]) + "</span>" : "") + "</a>").join("") + "</div>";
   const idx = (typeof tkItems === "function" ? tkItems() : []);
   const idxCard = dhCard(t("dh_idx"), "#indices", t("nav_indices"), idx.length ? '<div class="dh-idx">' + idx.map((x) => dhIdxCard(x, false)).join("") + "</div>" : '<p class="muted small">' + esc(t("dh_loading")) + "</p>");
   const nwI = (typeof NW !== "undefined" && NW.data && NW.data.items) || [], br = typeof NW !== "undefined" && NW.brief && NW.brief.items && NW.brief.items[0];
@@ -5186,9 +5195,9 @@ Object.assign(UI, { hero_p_short: ["ثلاثة مسارات: المستثمر و
 /* ----- قائمة الحساب (الإعدادات، الحساب، الباقات، لوحة المالك، هيكل المنصة) ----- */
 function profileMenu() {
   const owner = isOwner();
-  const links = [["settings", "set_h"], ["account", "nav_account"], ["plans", "nav_plans"]].concat(owner ? [["owner", "pm_owner"]] : []);
+  const links = [["map", "pm_map"], ["settings", "set_h"], ["account", "nav_account"], ["plans", "nav_plans"]].concat(owner ? [["owner", "pm_owner"]] : []);
   return '<details class="pmenu"><summary class="btn sm" aria-label="' + esc(t("pm_menu")) + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></g></svg></summary><div class="pm-pop">' +
-    links.map(([h, k]) => '<a href="#' + h + '">' + esc(t(k)) + "</a>").join("") + "</div></details>";
+    links.map(([h, k]) => '<a href="#' + h + '">' + esc(t(k)) + "</a>").join("") + '<button type="button" class="pm-m" data-act="lang">' + (S.lang === "ar" ? "English" : "عربي") + "</button></div></details>";
 }
 document.addEventListener("click", (e) => {
   const x = e.target.closest && e.target.closest('[data-act="pin-x"]');
@@ -6514,7 +6523,7 @@ Object.assign(UI, {
 
 const NAV_GROUPS = {
   market: { label: "nav_market", items: [["chart", "nav_chart", "d_chart"], ["indices", "nav_indices", "d_indices", 1], ["tech", "tab_tech", "d_tech"], ["metals", "tab_met", "d_met"], ["screener", "sc_t", "dk_g_sc", 1], ["movers", "tp_t", "dk_g_top", 1], ["usm", "us_t", "dk_g_us", 1]] },
-  pf: { label: "nav_pf", items: [["portfolio", "dk_t_pf", "dk_g_pf", 1], ["journal", "tab_journal", "d_journal"], ["saved", "sv_t", "dk_g_sv", 1], ["analyses", "nav_an", "d_an"], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["dividends", "tab_div", "d_div"], ["gdiv", "dg_t", "dk_g_dg", 1], ["invest", "tab_inv", "d_invest"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"], ["apps", "ap_t", "dk_g_apps", 1]] },
+  pf: { label: "nav_pf", items: [["apps", "ap_t", "dk_g_apps", 1], ["portfolio", "dk_t_pf", "dk_g_pf", 1], ["journal", "tab_journal", "d_journal"], ["saved", "sv_t", "dk_g_sv", 1], ["analyses", "nav_an", "d_an"], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["dividends", "tab_div", "d_div"], ["gdiv", "dg_t", "dk_g_dg", 1], ["invest", "tab_inv", "d_invest"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] },
   learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] }
 };
 /* بنود المالك (العلامة 1) تختفي إذا ما فيه ربط GitHub */
@@ -6728,7 +6737,7 @@ function sideW() {
 function sideShell(g, r, html) {
   const sub = subOf(r), mini = SIDE_MINI.includes(r);
   const hub = '<a class="side-hub" href="#' + g + '"' + (r === g ? ' aria-current="page"' : "") + ' title="' + esc(t(NAV_GROUPS[g].label)) + '"><span class="dk-si">' + secIc(g === "learn" ? "tracks" : g === "market" ? "tech" : "invest", 18) + '</span><span class="dk-sl"><b>' + esc(t(NAV_GROUPS[g].label)) + "</b></span></a>";
-  const items = navItems(g).map(([h, k, d]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ' title="' + esc(t(k)) + '"><span class="dk-si">' + (SEC_IC[h] ? secIc(h, 20) : typeof DK_IC !== "undefined" && typeof ROUTE_DESK !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : h === "indices" ? secIc("tech", 20) : h === "analyses" ? secIc("journal", 20) : secIc("chart", 20)) + '</span><span class="dk-sl"><b>' + esc(t(k)) + "</b><small>" + esc(t(d)) + "</small></span></a>").join("");
+  const items = navItems(g).map(([h, k, d]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ' title="' + esc(t(k)) + '"><span class="dk-si">' + (SEC_IC[h] ? secIc(h, 20) : typeof DK_IC !== "undefined" && typeof ROUTE_DESK !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : h === "indices" ? secIc("tech", 20) : h === "analyses" ? secIc("journal", 20) : secIc("chart", 20)) + '</span><span class="dk-sl"><b>' + esc(t(k)) + "</b><small>" + esc(t(d)) + "</small></span>" + (typeof dkBadge === "function" && typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[h] && dkBadge(ROUTE_DESK[h]) ? '<span class="bell-n">' + dkBadge(ROUTE_DESK[h]) + "</span>" : "") + "</a>").join("");
   return '<div class="wrap side-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + esc(t(NAV_GROUPS[g].label)) + '">' + hub + items + '</nav></aside><div class="side-main">' + html + "</div></div>";
 }
 
@@ -8715,13 +8724,15 @@ let TR = (() => { try { return Object.assign({ closed: [], zoom: false }, JSON.p
 const trSave = () => { try { localStorage.setItem(TR_KEY, JSON.stringify({ closed: TR.closed, zoom: TR.zoom })); } catch (e) {} };
 function trGroups() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
-  const ic = (h) => SEC_IC[h] || "";
+  const ic = (h) => SEC_IC[h] || (typeof DK_IC !== "undefined" && typeof ROUTE_DESK !== "undefined" && DK_IC[ROUTE_DESK[h]]) || (h === "indices" ? SEC_IC.tech : h === "analyses" ? SEC_IC.journal : "");
+  const bdg = (h) => (typeof dkBadge === "function" && typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[h] ? dkBadge(ROUTE_DESK[h]) : "");
   const g = [
+    { k: "m", name: t("nav_market"), items: navItems("market").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: bdg(h) })).concat(owner ? [{ h: "news", label: t("nav_news"), ic: typeof DK_IC !== "undefined" ? DK_IC.nw : "" }] : []) },
+    { k: "s", name: t("nav_pf"), items: navItems("pf").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: bdg(h) })) },
     { k: "l", name: t("nav_learn"), items: navItems("learn").map(([h, k]) => ({ h, label: t(k), ic: ic(h), badge: h === "analyses" && (S.analyses || []).length ? String((S.analyses || []).length) : "" })) },
-    { k: "s", name: t("nav_pf"), items: navItems("pf").map(([h, k]) => ({ h, label: t(k), ic: ic(h) })) },
     { k: "p", name: t("nav_plans"), items: [{ h: "plans", label: t("map_plan_free"), ic: ic("plans") }, { h: "plans", label: t("plan_full"), ic: ic("plans") }, { h: "account", label: t(S.signedIn ? "tr_account" : "tr_login"), ic: ic("owner") }] }
   ];
-  if (owner) g.push({ k: "a", name: t("map_admin"), lock: true, items: [{ h: "owner", label: t("ow_h"), ic: ic("owner") }].concat(MAP_DESK.map(([k, l]) => ({ h: "desk", tab: k, label: t(l), ic: typeof DK_IC !== "undefined" ? DK_IC[k] : "", badge: typeof dkBadge === "function" ? dkBadge(k) : "" }))) });
+  if (owner) g.push({ k: "a", name: t("map_admin"), lock: true, items: [{ h: "owner", label: t("ow_h"), ic: ic("owner") }, { h: "settings", label: t("set_h"), ic: ic("owner") }] });
   return g;
 }
 function treeHtml() {
@@ -8780,7 +8791,7 @@ const TB_KEY = "meras.treeback";
 const tbGet = () => { try { return JSON.parse(sessionStorage.getItem(TB_KEY) || "null"); } catch (e) { return null; } };
 function tbSync() {
   let b = document.getElementById("treeback");
-  const st = tbGet(), show = st && route() !== "" && !(typeof lnShow === "function" && lnShow());
+  const st = tbGet(), show = st && route() !== "" && route() !== "map" && !(typeof lnShow === "function" && lnShow());
   if (!show) { if (b) b.hidden = true; document.body.classList.remove("has-treeback"); return; }
   if (!b) { b = document.createElement("button"); b.id = "treeback"; b.type = "button"; b.innerHTML = '<span class="tb-spark"><svg viewBox="0 0 34 22" aria-hidden="true"><path d="M2 18 L9 12 L14 15 L21 7 L26 10 L32 3"/><circle cx="32" cy="3" r="2.6"/></svg></span><b></b>'; document.body.appendChild(b); }
   b.querySelector("b").textContent = t("tr_back"); b.setAttribute("aria-label", t("tr_back")); b.className = "b-" + (st.k || "l"); b.hidden = false;
@@ -8791,7 +8802,7 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest) return;
   const lf = e.target.closest(".tr2-leaf");
   if (lf) { const st = document.getElementById("tr2-stage"); try { sessionStorage.setItem(TB_KEY, JSON.stringify({ k: lf.dataset.tk, y: window.scrollY, x: st ? st.scrollLeft : 0, zoom: TR.zoom })); } catch (err) {} return; }
-  if (e.target.closest("#treeback")) { const st = tbGet(); trRestore = st; if (st) { TR.zoom = !!st.zoom; trSave(); } location.hash = ""; return; }
+  if (e.target.closest("#treeback")) { const st = tbGet(); trRestore = st; if (st) { TR.zoom = !!st.zoom; trSave(); } location.hash = typeof isOwner === "function" && isOwner() ? "map" : ""; return; }
   const hd = e.target.closest('[data-act="tr-br"]');
   if (hd) { const k = hd.dataset.k, i = TR.closed.indexOf(k); if (i >= 0) TR.closed.splice(i, 1); else TR.closed.push(k); trSave(); render(); return; }
   if (e.target.closest('[data-act="tr-open"]')) { TR.closed = []; trSave(); render(); return; }
