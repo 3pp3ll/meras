@@ -14,11 +14,13 @@ Object.assign(UI, {
 const AP_COLORS = ["#E9A03B", "#E8765A", "#C76BA4", "#3D6E97", "#2E9C73", "#7DC3E6", "#B4532E", "#6E7A8E"];
 const AP_SUGG = [["الراجحي كابيتال", "https://www.alrajhi-capital.sa"], ["دراية", "https://www.derayah.com"], ["Exness", "https://www.exness.com"], ["TradingView", "https://www.tradingview.com"], ["تداول السعودية", "https://www.saudiexchange.sa"], ["أرقام", "https://www.argaam.com"], ["يقين", "https://yaaqen.com"]];
 let apEdit = false, apForm = null;
-const apList = () => { if (!DK.data) return []; if (!Array.isArray(DK.data.apps)) DK.data.apps = [{ id: "a1", name: "منطاد", url: "" }, { id: "a2", name: "دربي", url: "" }, { id: "a3", name: "عقود", url: "" }]; return DK.data.apps; };
+const apList = () => { if (!DK.data) return []; if (!Array.isArray(DK.data.apps)) DK.data.apps = [{ id: "a1", name: "منطاد", url: "https://3pp3ll.github.io/ad-studio/" }, { id: "a2", name: "دربي", url: "https://3pp3ll.github.io/darbi-E/" }, { id: "a3", name: "عقود", url: "https://3pp3ll.github.io/oqood/Contracts.html" }]; return DK.data.apps; };
+const AP_MINE = { "منطاد": "https://3pp3ll.github.io/ad-studio/", "دربي": "https://3pp3ll.github.io/darbi-E/", "عقود": "https://3pp3ll.github.io/oqood/Contracts.html" };
+const apFill = () => { (DK.data && DK.data.apps || []).forEach((a) => { if (!a.url && AP_MINE[a.name]) a.url = AP_MINE[a.name]; }); };
 const apInit = (n) => { const w = String(n || "?").replace(/^(ال)/, "").trim(); return w.slice(0, /^[A-Za-z]/.test(w) ? 2 : 1).toUpperCase(); };
 const apHost = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
 function dkApps() {
-  const list = apList();
+  const list = apList(); apFill();
   const tile = (a, i) => { const col = a.color || AP_COLORS[i % AP_COLORS.length], ok = /^https:\/\//.test(a.url || "");
     const inner = '<span class="ap-ic" style="--ac:' + col + '">' + esc(apInit(a.name)) + '</span><b>' + esc(a.name) + '</b><small class="muted">' + esc(ok ? apHost(a.url) : t("ap_nolink")) + "</small>";
     if (apEdit) return '<div class="ap-tile edit">' + inner + '<div class="row" style="gap:4px;justify-content:center"><button class="btn sm" data-act="ap-edit1" data-id="' + esc(a.id) + '">' + esc(t("ap_edit")) + "</button>" + (i ? '<button class="btn sm ghost" data-act="ap-up" data-id="' + esc(a.id) + '" aria-label="' + esc(t("ap_up")) + '">↑</button>' : "") + '<button class="btn sm ghost" data-act="ap-del" data-id="' + esc(a.id) + '" aria-label="' + esc(t("ap_del")) + '">✕</button></div></div>';
