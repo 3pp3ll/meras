@@ -1269,6 +1269,20 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.dg-off{background:#163B25;color:#9BE0B4;border-color:#245C3A}:root:not([data-theme="light"]) .dg-offp{color:#9BE0B4;background:#12301F;border-color:#245C3A}}
 :root[data-theme="dark"] .tag.dg-off{background:#163B25;color:#9BE0B4;border-color:#245C3A}
 :root[data-theme="dark"] .dg-offp{color:#9BE0B4;background:#12301F;border-color:#245C3A}
+/* الأخبار */
+.nw-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.nw-card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.nw-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.nw-title{margin:0;font-size:16.5px;line-height:1.55;font-weight:600}
+.nw-title[dir="ltr"]{text-align:left;font-family:Carlito,"IBM Plex Sans Arabic",sans-serif}
+.nw-more{align-self:flex-start;margin-top:auto}
+.tag.nw-sym{font-family:"IBM Plex Mono",monospace;background:#EEF2FF;color:#3346A8}
+.tag.nw-hot{background:#FFF1E6;color:#B4501A}
+.nw-brief{border-color:#CFE0FF;background:linear-gradient(180deg,#F5F8FF,transparent)}
+.nw-bl{margin:0;padding-inline-start:20px;display:grid;gap:10px}
+@media (max-width:640px){.nw-list{grid-template-columns:1fr}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.nw-sym{background:#1E2647;color:#AFC0FF}:root:not([data-theme="light"]) .tag.nw-hot{background:#3A2414;color:#FFC08F}:root:not([data-theme="light"]) .nw-brief{border-color:#2A3A66;background:linear-gradient(180deg,#151C33,transparent)}}
+:root[data-theme="dark"] .tag.nw-sym{background:#1E2647;color:#AFC0FF}:root[data-theme="dark"] .tag.nw-hot{background:#3A2414;color:#FFC08F}:root[data-theme="dark"] .nw-brief{border-color:#2A3A66;background:linear-gradient(180deg,#151C33,transparent)}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -4871,7 +4885,7 @@ Object.assign(UI, {
   map_plans_p: ["أول درجتين في كل مسار مجانية، والباقي بالاشتراك.", "The first two steps of every track are free; the rest comes with a plan."],
   map_owner_p: ["لوحة المالك والمستخدمين والبيانات.", "Owner dashboard, users and data."], map_desk_p: ["محفظتك وأدواتك الخاصة.", "Your portfolio and private tools."]
 });
-const MAP_DESK = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
+const MAP_DESK = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["nw", "nw_t"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
 function siteMap() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const leaf = (h, k) => '<a class="smap-leaf" href="#' + h + '">' + secIc(h, 15) + "<span>" + esc(t(k)) + "</span></a>";
@@ -5495,6 +5509,7 @@ function dkCharts() {
 let dkGrid = true;
 const dkPhone = () => window.matchMedia && matchMedia("(max-width:640px)").matches;
 const DK_IC = {
+  nw: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 5h11v14H6a1 1 0 0 1-1-1z"/><path d="M16 9h3v9a1 1 0 0 1-1 1h-2"/><path d="M8 9h5M8 12h5M8 15h3" stroke-linecap="round"/></g>',
   apps: '<g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><path d="M17 14v6M14 17h6" stroke-linecap="round"/></g>',
   pf: '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z M4 7l11-3v3 M16 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   ch: '<path d="M4 20V4M4 20h16M8 15l3-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -5522,12 +5537,12 @@ function pageDesk() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
-  const tabs = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
+  const tabs = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["nw", "nw_t"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
   if (dkGrid && dkPhone()) return head + dkGridHtml(tabs) + "</div>";
   const cur = tabs.find(([k]) => k === dkTab) || tabs[0];
   const mbar = '<div class="dk-mbar"><button class="dk-mback" data-act="dk-grid"><span aria-hidden="true">›</span> ' + esc(t("dk_h")) + "</button><b>" + esc(t(cur[1])) + "</b></div>";
   const side = '<aside class="dk-side"><nav aria-label="' + esc(t("dk_h")) + '">' + tabs.map(([k, l]) => { const b = dkBadge(k); return '<a href="#desk" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page"' : "") + '><span class="dk-si"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + (DK_IC[k] || "") + '</svg></span><span class="dk-sl"><b>' + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></span>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</a>"; }).join("") + "</nav></aside>";
-  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, apps: dkApps, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
+  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, apps: dkApps, nw: dkNews, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
 }
 
 function dkExport() {
@@ -6515,6 +6530,68 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && dgSheetS
 document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest('#dgsheet [data-act="sc-save"],#dgsheet [data-act="dk-chart"],#dgsheet [data-act="top-ai"],#dgsheet a[href]'); if (b && dgSheetS) setTimeout(() => dgSheet(false), 0); }, true);
 window.addEventListener("hashchange", () => { if (dgSheetS) dgSheet(false); });
 if (dgOwner()) setTimeout(() => loadDG(), 1500);
+/* ===== مِراس: الأخبار اليومية (للمالك) =====
+   news.json يكتبه GitHub Actions 4 مرات يومياً من Google News: أخبار أسهمك المتابعة أولاً، بعدها السوق والاقتصاد.
+   news_brief.json يكتبه كلاود كل صباح: أهم الأخبار مختصرة بالعربي.
+   كل خبر معه زر "المزيد" يفتح الموقع الأصلي. */
+Object.assign(UI, {
+  nw_t: ["الأخبار", "News"], dk_g_nw: ["أهم أخبار اليوم", "Today's top news"],
+  nw_h: ["أخبار اليوم", "Today's news"], nw_p: ["أخبار أسهمك المتابعة أولاً، بعدها السوق السعودي والأمريكي والاقتصاد. آخر 48 ساعة، تتحدث 4 مرات في اليوم.", "Your followed stocks first, then the Saudi and US markets and the economy. Last 48 hours, refreshed 4 times a day."],
+  nw_loading: ["جاري تحميل الأخبار…", "Loading news…"], nw_none: ["ما فيه أخبار للحين. أول تحديث ينزل خلال ساعات.", "No news yet. The first update lands within hours."],
+  nw_more: ["المزيد", "More"], nw_f_all: ["الكل", "All"], nw_f_mine: ["أسهمي", "My stocks"], nw_f_sa: ["السعودي", "Saudi"], nw_f_us: ["الأمريكي", "US"], nw_f_macro: ["الاقتصاد", "Economy"],
+  nw_brief: ["ملخص كلاود اليوم", "Claude's daily brief"], nw_upd: ["آخر تحديث {d}", "Updated {d}"], nw_hot: ["مهم", "Key"],
+  nw_ago_m: ["قبل {n} د", "{n}m ago"], nw_ago_h: ["قبل {n} س", "{n}h ago"], nw_ago_d: ["قبل {n} يوم", "{n}d ago"],
+  nw_reload: ["تحديث", "Refresh"], nw_note: ["الأخبار للاطلاع فقط ومو توصية شراء أو بيع. تأكد من المصدر قبل أي قرار.", "News for information only, not a buy or sell recommendation. Check the source before any decision."]
+});
+
+const NW = { data: null, brief: null, loaded: false, loading: false, f: "all" };
+async function loadNews(force) {
+  if (!HOSTED || !CFG.token || NW.loading || (NW.loaded && !force)) return; NW.loading = true;
+  try {
+    const [a, b] = await Promise.all([readJson("news.json"), readJson("news_brief.json").catch(() => null)]);
+    NW.data = (a && a.data) || { items: [] }; NW.brief = (b && b.data) || null;
+  } catch (e) { NW.data = NW.data || { items: [] }; toast(errText(e)); }
+  NW.loaded = true; NW.loading = false;
+  if (route() === "desk" && typeof dkTab !== "undefined" && dkTab === "nw") render();
+}
+function nwAgo(iso) {
+  const m = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (m < 60) return t("nw_ago_m").replace("{n}", m);
+  const h = Math.round(m / 60); if (h < 24) return t("nw_ago_h").replace("{n}", h);
+  return t("nw_ago_d").replace("{n}", Math.round(h / 24));
+}
+function nwLink(url) { return /^https:\/\//.test(url || "") ? url : "#"; }
+function nwMore(url) { return '<a class="btn sm nw-more" href="' + esc(nwLink(url)) + '" target="_blank" rel="noopener noreferrer">' + esc(t("nw_more")) + " ↗</a>"; }
+function nwItem(x) {
+  const tag = x.sym ? '<span class="tag nw-sym" dir="ltr">' + esc(x.sym) + "</span>" + (x.nm && x.nm !== x.sym ? '<span class="small muted">' + esc(x.nm) + "</span>" : "") : x.topic ? '<span class="tag">' + esc(x.topic) + "</span>" : "";
+  const hot = x.imp >= 3 ? '<span class="tag nw-hot">' + esc(t("nw_hot")) + "</span>" : "";
+  return '<article class="nw-card"><div class="nw-meta">' + hot + tag + '<span class="small muted">' + esc(x.src || "") + " · " + esc(nwAgo(x.at)) + '</span></div><h3 class="nw-title" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</h3>" + nwMore(x.url) + "</article>";
+}
+function nwBrief() {
+  const b = NW.brief; if (!b || !Array.isArray(b.items) || !b.items.length) return "";
+  return '<section class="panel stack nw-brief"><div class="row" style="justify-content:space-between"><h3>✦ ' + esc(t("nw_brief")) + '</h3><span class="small muted">' + esc(t("nw_upd").replace("{d}", whenText(b.at))) + "</span></div>" +
+    (b.intro ? '<p style="margin:0">' + esc(b.intro) + "</p>" : "") +
+    '<ol class="nw-bl">' + b.items.map((x) => "<li><b>" + esc(x.h || "") + "</b>" + (x.sym ? ' <span class="tag nw-sym" dir="ltr">' + esc(x.sym) + "</span>" : "") + (x.s ? '<p class="small" style="margin:4px 0 6px">' + esc(x.s) + "</p>" : "") + (x.url ? nwMore(x.url) : "") + "</li>").join("") + "</ol></section>";
+}
+function dkNews() {
+  if (!NW.loaded) { loadNews(); return '<div class="notice">' + esc(t("nw_loading")) + "</div>"; }
+  const all = (NW.data && NW.data.items) || [];
+  const pick = { all: () => true, mine: (x) => !!x.sym, sa: (x) => x.mk === "sa", us: (x) => x.mk === "us", macro: (x) => x.mk === "macro" }[NW.f] || (() => true);
+  const list = all.filter(pick);
+  const mine = list.filter((x) => x.sym), rest = list.filter((x) => !x.sym);
+  const ordered = NW.f === "all" ? mine.filter((x) => x.imp >= 2).concat(rest.filter((x) => x.imp >= 2), mine.filter((x) => x.imp < 2), rest.filter((x) => x.imp < 2)) : list;
+  const fl = ["all", "mine", "sa", "us", "macro"].map((k) => '<button type="button" class="btn sm' + (NW.f === k ? " primary" : "") + '" data-act="nw-f" data-f="' + k + '" aria-pressed="' + (NW.f === k) + '">' + esc(t("nw_f_" + k)) + ' <span class="num">' + all.filter({ all: () => true, mine: (x) => !!x.sym, sa: (x) => x.mk === "sa", us: (x) => x.mk === "us", macro: (x) => x.mk === "macro" }[k]).length + "</span></button>").join("");
+  return '<div class="stack"><div class="dg-intro"><h2 style="margin:0">' + esc(t("nw_h")) + '</h2><p class="muted" style="margin:4px 0 0">' + esc(t("nw_p")) + "</p></div>" + nwBrief() +
+    '<div class="row nw-filters" style="gap:6px;flex-wrap:wrap;align-items:center">' + fl + '<span style="flex:1"></span><span class="small muted">' + esc(t("nw_upd").replace("{d}", whenText(NW.data && NW.data.fetched_at))) + '</span><button type="button" class="btn sm ghost" data-act="nw-reload">' + esc(t("nw_reload")) + "</button></div>" +
+    (ordered.length ? '<div class="nw-list">' + ordered.map(nwItem).join("") + "</div>" : '<div class="notice">' + esc(t("nw_none")) + "</div>") +
+    '<p class="small muted" style="margin:0">' + esc(t("nw_note")) + "</p></div>";
+}
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act="nw-f"],[data-act="nw-reload"]'); if (!el) return;
+  e.preventDefault();
+  if (el.dataset.act === "nw-f") { NW.f = el.dataset.f; render(); }
+  else { NW.loaded = false; render(); loadNews(true); }
+});
 /* ===== مِراس: قائمة التنبيهات =====
    الجرس فوق يفتح قائمة فيها:
    - إعلانات المنصة (notices.json في الموقع): المالك يضيفها من لوحة المالك، مثل كود خصم أو تحديث، وتظهر لكل الزوار.
