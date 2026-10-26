@@ -5602,7 +5602,7 @@ const apList = () => { if (!DK.data) return []; if (!Array.isArray(DK.data.apps)
 const AP_MINE = { "منطاد": "https://3pp3ll.github.io/ad-studio/", "دربي": "https://3pp3ll.github.io/darbi-E/", "عقود": "https://3pp3ll.github.io/oqood/Contracts.html" };
 const apFill = () => { (DK.data && DK.data.apps || []).forEach((a) => { if (!a.url && AP_MINE[a.name]) a.url = AP_MINE[a.name]; }); };
 const apInit = (n) => { const w = String(n || "?").replace(/^(ال)/, "").trim(); return w.slice(0, /^[A-Za-z]/.test(w) ? 2 : 1).toUpperCase(); };
-const apHost = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
+const apHost = (u) => { try { const x = new URL(u), h = x.hostname.replace(/^www\./, ""); return /github\.io$/.test(h) ? (x.pathname.split("/")[1] || h) : h; } catch (e) { return ""; } };
 function dkApps() {
   const list = apList(); apFill();
   const tile = (a, i) => { const col = a.color || AP_COLORS[i % AP_COLORS.length], ok = /^https:\/\//.test(a.url || "");
