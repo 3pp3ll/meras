@@ -33,6 +33,7 @@ async function loadExtra() {
   } catch (e) {}
   exLoading = false;
   if (typeof route === "function" && ["chart", "lab"].includes(route())) render();
+  if (typeof tickHook === "function") tickHook();
 }
 async function extraSaveList(next, msg) {
   try {

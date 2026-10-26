@@ -391,6 +391,7 @@ function render() {
   try { renderNow(); } finally { rendering = false; }
   if (typeof trHook === "function") trHook();
   if (typeof topBell === "function") topBell();
+  if (typeof tickHook === "function") tickHook();
   document.querySelectorAll(".subnav nav, #main .tabs, .dg-chips").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"],[aria-pressed="true"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
