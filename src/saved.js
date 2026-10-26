@@ -173,7 +173,13 @@ function reportHtml(d) {
     (d.chat.length ? '<div class="rp-sec"><h2>' + esc(t("rp_chat")) + "</h2>" + d.chat.map((c) => '<div class="rp-qa"><p class="rp-q">' + esc(c.q) + "</p>" + paras(c.a || "") + "</div>").join("") + "</div>" : "") +
     '<p class="rp-foot">' + esc(d.foot) + "<br>" + esc(d.made) + "</p></div>";
 }
-const fileBase = (d) => ("Meras-" + d.sym + "-" + (SCA.res.date || new Date().toISOString().slice(0, 10))).replace(/[^\w.\-^]+/g, "_").replace(/\^/g, "");
+const fileBase = (d) => {
+  // مثال: تحليل شارت - 2222 أرامكو السعودية - 2026-10-23  |  تحليل شارت - XAU الذهب - 2026-10-23
+  const sym = String(d.sym).replace(/^\^/, ""), name = String(d.name || "").trim();
+  const who = name && name !== d.sym ? sym + " " + name : sym;
+  return (L(["تحليل شارت", "Chart analysis"]) + " - " + who + " - " + (SCA.res.date || new Date().toISOString().slice(0, 10)))
+    .replace(/[\\/:*?"<>|#%]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
+};
 
 const RP_CSS = '@page{size:A4;margin:12mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;background:#fff}' +
   '.rp{font-family:"IBM Plex Sans Arabic",Carlito,Tahoma,sans-serif;color:#111827;background:#fff;font-size:12.5pt;line-height:1.7;max-width:800px;margin:0 auto;padding:12px}' +
