@@ -1286,3 +1286,15 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 .tag.ex-dn{background:var(--down-soft);color:var(--down)}
 .ex-sum h3{margin:6px 0 0}
 @media (max-width:640px){.ex-teaser{grid-template-columns:1fr}.ex-snap{grid-template-columns:1fr 1fr}.ex-chart{overflow-x:auto}.ex-chart svg{min-width:660px}}
+/* تحليل الشارت بالمدارس */
+.sca{border-color:color-mix(in srgb,var(--amber) 40%,var(--line))}
+.sca-out h3{margin:8px 0 0;font-size:17px}
+.sca-out ul{margin:0;padding-inline-start:22px;display:grid;gap:6px}
+.sca-final{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.4fr);gap:10px;align-items:center;border-radius:12px;padding:12px 14px;background:var(--sunk);border:1px solid var(--line)}
+.sca-final>div{display:flex;flex-direction:column;gap:2px}.sca-final b{font-size:20px}
+.sca-final.up{background:var(--up-soft);border-color:color-mix(in srgb,var(--up) 40%,var(--line))}.sca-final.up>div:first-child b{color:var(--up)}
+.sca-final.down{background:var(--down-soft);border-color:color-mix(in srgb,var(--down) 40%,var(--line))}.sca-final.down>div:first-child b{color:var(--down)}
+.sca-read{border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--surface)}
+.sca-read summary{cursor:pointer;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sca-read summary a{color:inherit}
+.sca-read ul{margin-top:8px}
+@media (max-width:640px){.sca-final{grid-template-columns:1fr 1fr}}
