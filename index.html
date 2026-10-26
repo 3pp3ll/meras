@@ -1295,6 +1295,17 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 .sch-m i.on{background:var(--amber)}
 .sch-tbl td,.sch-tbl th{white-space:nowrap}
 @media (max-width:640px){.sch-pc{grid-template-columns:1fr}}
+/* مثال تسلا */
+.ex-teaser{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:18px;align-items:center;text-decoration:none;color:inherit;border-color:color-mix(in srgb,var(--amber) 45%,var(--line))}
+.ex-tz-fig{background:var(--sunk);border-radius:8px;padding:8px}.ex-tz-fig svg,.ex-chart svg{display:block;width:100%;height:auto;direction:ltr}
+.ex-snap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ex-kv{background:var(--sunk);border-radius:10px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}.ex-kv b{font-size:18px}
+.ex-chart{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px}
+.ex-lg{display:flex;flex-wrap:wrap;gap:14px}.ex-lg i{display:inline-block;width:14px;height:8px;border-radius:2px;margin-inline-end:6px;vertical-align:middle}
+.ex-read{display:flex;flex-direction:column;gap:8px}.ex-read h3{margin:0;display:flex;align-items:center;gap:8px}.ex-read h3 a{color:inherit}
+.tag.ex-dn{background:var(--down-soft);color:var(--down)}
+.ex-sum h3{margin:6px 0 0}
+@media (max-width:640px){.ex-teaser{grid-template-columns:1fr}.ex-snap{grid-template-columns:1fr 1fr}.ex-chart{overflow-x:auto}.ex-chart svg{min-width:660px}}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -3853,9 +3864,10 @@ function pageSchools() {
   const table = '<div class="panel stack"><h2 style="margin:0">' + esc(t("sch_cmp")) + '</h2><div class="tablewrap"><table class="sch-tbl"><thead><tr><th>' + esc(t("sch_name")) + "</th><th>" + esc(t("sch_lvl")) + "</th><th>" + esc(t("sch_obj")) + "</th><th>" + esc(t("sch_tf")) + "</th></tr></thead><tbody>" +
     SCHOOLS.map((s) => '<tr><td><a href="#sch-' + s.id + '">' + esc(L(s.name)) + "</a></td><td>" + schMeter(s.lvl) + " " + esc(t("sch_l" + s.lvl)) + "</td><td>" + schMeter(s.obj) + " " + esc(t("sch_o" + s.obj)) + "</td><td>" + esc(L(s.tf)) + "</td></tr>").join("") + "</tbody></table></div></div>";
   const tip = '<div class="notice"><b>' + esc(t("sch_tip_h")) + ":</b> " + esc(t("sch_tip")) + "</div>";
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sch_h")) + "</h1><p>" + esc(t("sch_p")) + '</p></div><div class="stack" style="padding-block:20px 40px">' + tip + '<div class="grid3">' + cards + "</div>" + table + '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p></div></div>";
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sch_h")) + "</h1><p>" + esc(t("sch_p")) + '</p></div><div class="stack" style="padding-block:20px 40px">' + tip + (typeof exTeaser === "function" ? exTeaser() : "") + '<div class="grid3">' + cards + "</div>" + table + '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p></div></div>";
 }
 function pageSchool(id) {
+  if (id === "tsla" && typeof pageTslaExample === "function") return pageTslaExample();
   const i = SCHOOLS.findIndex((x) => x.id === id); if (i < 0) return pageSchools();
   const s = SCHOOLS[i], nx = SCHOOLS[(i + 1) % SCHOOLS.length];
   const list = (arr) => "<ul>" + arr.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul>";
@@ -3868,6 +3880,105 @@ function pageSchool(id) {
     '<div class="sch-pc">' + sec("sch_pro", list(s.pro), "sch-pro") + sec("sch_con", list(s.con), "sch-con") + "</div>" +
     sec("sch_fit", "<p>" + esc(L(s.fit)) + "</p>") + '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p></div>" +
     '<div class="row" style="justify-content:space-between;padding-block:8px 40px"><a class="btn" href="#schools">' + esc(t("sch_all")) + '</a><a class="btn" href="#chart">' + esc(t("sch_try")) + '</a><a class="btn primary" href="#sch-' + nx.id + '">' + esc(t("sch_next")) + ": " + esc(L(nx.name)) + "</a></div></div>";
+}
+/* ===== مِراس: مثال تطبيقي — تسلا بعيون عدة مدارس =====
+   بيانات يومية حقيقية من 28 مايو إلى 23 أكتوبر 2026 (Alpha Vantage عبر us.json). التاريخ: يوم الشهر بدون السنة، والحجم بوحدة 100 ألف سهم.
+   الأرقام محسوبة مرة وحدة وقت كتابة المثال، والمثال ثابت للتعليم. */
+const TSLA_EX = "0528,437.6,444.0,436.3,442.1,324;0529,439.8,441.1,428.1,435.8,451;0601,427.5,429.6,415.4,415.9,449;0602,418.2,424.4,413.6,423.7,375;0603,418.7,433.6,416.0,423.7,445;0604,419.8,426.3,417.2,418.4,353;0605,420.5,424.7,388.6,391.0,634;0608,396.3,412.9,394.7,408.9,503;0609,411.0,418.5,384.2,396.7,599;0610,391.5,397.1,380.1,381.6,496;0611,388.3,399.5,380.7,399.1,453;0612,399.5,406.7,386.8,406.4,636;0615,412.4,416.0,407.1,411.1,456;0616,404.1,412.4,400.5,404.7,402;0617,401.5,405.9,393.8,396.4,435;0618,398.1,402.5,384.7,400.5,583;0622,394.9,414.8,394.4,405.1,478;0623,392.6,392.9,379.1,381.6,504;0624,380.1,384.6,373.1,375.5,370;0625,375.3,379.1,371.2,375.1,302;0626,370.1,387.8,368.6,379.7,534;0629,381.8,413.3,379.3,411.8,576;0630,406.0,424.5,406.0,420.6,433;0701,421.5,432.9,418.1,425.3,401;0702,428.0,432.4,389.3,393.4,739;0706,397.5,420.0,390.5,419.8,547;0707,417.0,419.6,401.9,402.9,381;0708,399.4,399.6,390.5,394.1,338;0709,394.0,407.9,390.9,406.6,378;0710,410.5,413.2,402.8,407.8,334;0713,404.6,405.6,391.4,394.8,328;0714,399.1,402.2,394.8,396.2,233;0715,399.4,406.6,390.7,394.5,315;0716,392.4,395.3,385.3,391.1,292;0717,381.8,385.7,377.2,380.8,313;0720,386.0,386.6,369.4,369.6,339;0721,371.2,384.1,370.0,378.9,327;0722,375.5,380.2,372.9,374.0,306;0723,341.0,342.1,315.7,319.7,1156;0724,320.7,323.0,306.5,313.0,627;0727,313.2,317.0,304.3,309.2,449;0728,305.9,311.2,300.7,307.4,398;0729,307.1,309.1,297.4,298.3,394;0730,302.7,310.9,301.3,308.9,380;0731,309.7,315.5,302.0,311.2,366;0803,311.0,324.6,310.4,322.1,382;0804,324.0,329.6,320.8,327.4,333;0805,323.4,327.1,320.3,321.6,278;0806,317.1,323.0,315.5,319.5,260;0807,322.3,333.7,321.3,328.6,394;0810,326.6,332.1,326.1,330.9,250;0811,332.8,336.2,329.5,332.8,233;0812,335.0,335.5,323.6,327.5,286;0813,327.2,341.6,325.2,340.0,347;0814,342.3,351.3,335.3,342.3,454;0817,340.7,345.4,337.5,339.3,260;0818,333.2,340.5,331.1,336.9,279;0819,338.9,351.6,335.7,351.1,367;0820,346.2,347.5,339.0,345.1,307;0821,349.9,366.5,346.9,362.9,592;0824,361.4,363.2,348.3,348.9,391;0825,349.6,357.0,349.2,350.2,298;0826,345.3,351.9,342.5,345.8,285;0827,346.2,355.7,345.4,354.8,301;0828,357.1,358.8,345.2,348.8,329;0831,347.2,368.9,347.1,367.9,617;0901,360.9,362.7,353.0,356.1,361;0902,360.4,360.6,349.9,357.0,339;0903,365.8,384.0,365.8,376.4,636;0904,362.1,364.7,351.3,354.1,650;0908,357.1,370.0,355.8,368.2,510;0909,368.2,375.4,366.0,367.8,325;0910,360.6,369.2,357.7,363.6,296;0911,364.2,368.7,361.6,365.4,301;0914,359.8,367.7,357.0,359.0,324;0915,358.8,362.4,354.1,356.6,303;0916,357.9,365.1,354.9,358.1,321;0917,367.5,374.1,363.2,366.2,389;0918,369.0,370.9,360.8,364.3,519;0921,371.6,378.4,371.1,375.3,365;0922,379.1,380.4,372.9,378.9,282;0923,380.1,386.7,377.6,380.1,335;0924,377.4,383.3,375.7,377.9,261;0925,384.6,386.8,367.7,372.1,459;0928,368.1,369.4,356.8,357.4,394;0929,358.4,358.7,351.7,352.8,324;0930,352.1,355.2,345.9,354.8,392;1001,356.8,359.8,353.8,354.1,310;1002,360.1,374.6,359.4,370.6,553;1005,369.0,381.6,364.9,378.7,422;1006,382.0,383.3,378.5,380.7,277;1007,378.4,382.3,374.4,377.8,255;1008,374.1,376.0,368.0,375.0,283;1009,382.4,388.6,379.7,382.7,389;1012,382.6,382.7,377.6,378.0,202;1013,372.3,377.1,371.3,375.2,183;1014,371.2,371.4,363.8,367.2,310;1015,360.6,363.8,355.2,362.4,267;1016,369.1,370.5,349.3,354.7,620;1019,357.5,369.6,354.5,368.1,388;1020,370.3,377.6,363.6,373.7,321;1021,381.4,388.8,380.5,386.5,488;1022,374.3,388.9,373.7,374.6,516;1023,373.2,377.3,365.3,372.2,347";
+Object.assign(UI, {
+  ex_card: ["مثال تطبيقي: سهم تسلا بعيون 10 مدارس", "Worked example: Tesla through 10 schools"],
+  ex_card_p: ["نفس الشارت، كل مدرسة تقراه بطريقتها، وبعدها نجمعها في خلاصة واحدة: وين تتفق ووين تختلف.", "The same chart, read by each school in its own way, then combined into one conclusion: where they agree and where they differ."],
+  ex_open: ["افتح المثال", "Open the example"],
+  ex_h: ["مثال تطبيقي: تسلا (TSLA)", "Worked example: Tesla (TSLA)"],
+  ex_p: ["شموع يومية حقيقية من 28 مايو إلى 23 أكتوبر 2026. نقرأ نفس الشارت بعشر مدارس، وبعدها نجمع القراءات. الهدف تتعلم كيف تدمج المدارس، مو توصية على السهم.", "Real daily candles from 28 May to 23 October 2026. We read the same chart with ten schools, then combine the readings. The goal is learning how to combine schools, not a call on the stock."],
+  ex_snap: ["لقطة 23 أكتوبر 2026", "Snapshot 23 Oct 2026"], ex_close: ["الإغلاق", "Close"], ex_chg: ["من قمة مايو", "From May high"], ex_from_low: ["من قاع يوليو", "From July low"], ex_atr: ["التذبذب اليومي ATR", "Daily range ATR"],
+  ex_lg_range: ["النطاق 346 إلى 389", "Range 346 to 389"], ex_lg_fib: ["فيبوناتشي", "Fibonacci"], ex_lg_sma: ["متوسط 50", "50-day average"], ex_lg_poc: ["أعلى حجم POC", "Highest volume (POC)"],
+  ex_reads: ["قراءة كل مدرسة", "Each school's reading"], ex_bias: ["الميل", "Bias"],
+  ex_up: ["صاعد", "Bullish"], ex_down: ["هابط", "Bearish"], ex_flat: ["محايد", "Neutral"], ex_mixed: ["مختلط", "Mixed"], ex_open_q: ["غير محسوم", "Undecided"],
+  ex_sum: ["الخلاصة: لما نجمع المدارس", "Conclusion: combining the schools"],
+  ex_agree: ["وين اتفقت المدارس", "Where the schools agree"], ex_scen: ["السيناريوهات", "Scenarios"], ex_lesson: ["الدروس من المثال", "Lessons from the example"],
+  ex_note: ["مثال تعليمي بأسعار 23 أكتوبر 2026، ومو توصية شراء أو بيع. السعر يتغير، وطبّق نفس الطريقة على بيانات اليوم.", "Educational example using 23 October 2026 prices, not a buy or sell recommendation. Prices change; apply the same method to today's data."],
+  ex_src: ["المصادر: نتائج تسلا للربع الثالث 2026 (21 أكتوبر)، وإعلان التسليمات (2 أكتوبر).", "Sources: Tesla Q3 2026 results (21 Oct) and the delivery report (2 Oct)."]
+});
+
+const EX_ROWS = TSLA_EX.split(";").map((r) => { const a = r.split(","); return { d: a[0], o: +a[1], h: +a[2], l: +a[3], c: +a[4], v: +a[5] / 10 }; });
+
+function exChart() {
+  const R = EX_ROWS, n = R.length, X0 = 14, X1 = 600, W = 720, H = 340, top = 18, bot = 300, lo = 290, hi = 450;
+  const Y = (p) => (bot - ((p - lo) / (hi - lo)) * (bot - top)).toFixed(1), step = (X1 - X0) / n, X = (i) => (X0 + step * (i + 0.5)).toFixed(1);
+  const hl = (p, cls, lab, dy) => '<line class="' + cls + '" x1="' + X0 + '" x2="' + X1 + '" y1="' + Y(p) + '" y2="' + Y(p) + '"/><text class="c-text" x="' + (X1 + 6) + '" y="' + (+Y(p) + 4 + (dy || 0)) + '">' + lab + "</text>";
+  let s = '<rect x="' + X0 + '" y="' + Y(389) + '" width="' + (X1 - X0) + '" height="' + (Y(346) - Y(389)) + '" fill="var(--up-soft)" opacity=".55"/>';
+  s += '<rect x="' + X0 + '" y="' + Y(383) + '" width="' + (X1 - X0) + '" height="' + (Y(377) - Y(383)) + '" fill="var(--amber)" opacity=".16"/>';
+  s += hl(388.0, "c-res", "61.8% 388.0", -6) + hl(370.7, "c-grid", "50% 370.7") + hl(353.4, "c-sup", "38.2% 353.4", 6);
+  // متوسط 50
+  const c = R.map((r) => r.c), pts = [];
+  for (let i = 49; i < n; i++) { let m = 0; for (let k = i - 49; k <= i; k++) m += c[k]; pts.push(X(i) + "," + Y(m / 50)); }
+  s += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="#5B7BD5" stroke-width="1.8"/>';
+  // الشموع
+  const bw = Math.max(2, step * 0.62);
+  s += R.map((r, i) => { const cl = r.c >= r.o ? "c-up" : "c-down", t1 = Y(Math.max(r.o, r.c)), b1 = Y(Math.min(r.o, r.c)); return '<line class="' + cl + '" x1="' + X(i) + '" x2="' + X(i) + '" y1="' + Y(r.h) + '" y2="' + Y(r.l) + '" stroke-width="1"/><rect class="' + cl + '" x="' + (X(i) - bw / 2).toFixed(1) + '" y="' + t1 + '" width="' + bw.toFixed(1) + '" height="' + Math.max(1, b1 - t1).toFixed(1) + '"/>'; }).join("");
+  // علامات
+  const mk = (i, p, lab, up) => '<circle cx="' + X(i) + '" cy="' + Y(p) + '" r="5" fill="none" stroke="var(--amber)" stroke-width="2"/><text class="c-text" x="' + X(i) + '" y="' + (+Y(p) + (up ? -10 : 18)) + '" text-anchor="middle" font-weight="600">' + lab + "</text>";
+  const at = (d) => R.findIndex((r) => r.d === d);
+  s += mk(0, 443.96, "443.96", true) + mk(at("0729"), 297.38, "297.38", false) + mk(at("1022"), 388.86, "22 Oct", true) + mk(at("1016"), 349.33, "16 Oct", false);
+  // محور الأشهر
+  const months = { "06": "Jun", "07": "Jul", "08": "Aug", "09": "Sep", "10": "Oct" }; let lastM = "";
+  R.forEach((r, i) => { const m = r.d.slice(0, 2); if (m !== lastM && months[m]) { s += '<line class="c-grid" x1="' + X(i) + '" x2="' + X(i) + '" y1="' + bot + '" y2="' + (bot + 5) + '"/><text class="c-text" x="' + X(i) + '" y="' + (bot + 20) + '" text-anchor="middle">' + months[m] + "</text>"; } lastM = m; });
+  s += [300, 450].map((p) => '<text class="c-text" x="' + (X1 + 6) + '" y="' + (+Y(p) + 4) + '" opacity=".6">' + p + "</text>").join("");
+  return '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="TSLA daily chart">' + s + "</svg>";
+}
+
+/* القراءات: [id المدرسة، الميل، النص] */
+const EX_READS = [
+  ["dow", "flat", ["الاتجاه الرئيسي من قمة 443.96 (28 مايو) كان هابط لين قاع 297.38 (29 يوليو)، يعني نزل 33%. بعدها ارتد، ومن سبتمبر القمم تقريباً متساوية (384.0 ثم 386.8 ثم 388.6 ثم 388.9) والقيعان متذبذبة (354.1 ثم 345.9 ثم 349.3). ما فيه قمم وقيعان أعلى واضحة، فحسب داو: ما فيه اتجاه، السهم عرضي.", "The primary trend from the 443.96 high (28 May) was down to the 297.38 low (29 Jul), a 33% fall. It then rebounded, and since September the highs are almost equal (384.0, 386.8, 388.6, 388.9) while the lows swing (354.1, 345.9, 349.3). No clear higher highs and higher lows, so by Dow: no trend, the share is sideways."]],
+  ["classic", "flat", ["مستطيل واضح بين 346 و 389 لمس سقفه 4 مرات. القاعدة الكلاسيكية: لا تتوقع الاتجاه قبل الكسر. ارتفاع المستطيل 43 دولار: إغلاق فوق 389 هدفه حوالي 432 (وهي نفس قمة يوليو 432.9)، وإغلاق تحت 346 هدفه حوالي 303 (قريب من قاع يوليو).", "A clear rectangle between 346 and 389, with four touches of the top. The classical rule: do not assume direction before the break. The rectangle is 43 dollars tall: a close above 389 targets about 432 (the July high was 432.9), a close below 346 targets about 303 (near the July low)."]],
+  ["harmonic", "flat", ["نقيس الهبوط من 443.96 إلى 297.38. تصحيح 61.8% يطلع 388.0، وهذا بالضبط السقف اللي ارتد منه السعر 4 مرات. و 38.2% عند 353.4 قريب من قاع النطاق، و 50% عند 370.7 وهو السعر الحالي تقريباً. فيبوناتشي هنا يشرح النطاق كامل.", "We measure the fall from 443.96 to 297.38. The 61.8% retracement is 388.0, exactly the ceiling price rejected four times. 38.2% sits at 353.4 near the range floor, and 50% at 370.7 is roughly the current price. Fibonacci explains the whole range here."]],
+  ["candles", "down", ["يوم 22 أكتوبر (بعد النتائج) صعد السعر لـ 388.86 ورجع أغلق عند 374.58: ظل علوي طويل يشبه الشهاب، عند السقف، وبحجم 51.6 مليون سهم مقابل متوسط 36.8 مليون. هذي شمعة رفض واضحة. بالمقابل يوم 16 أكتوبر نزل لـ 349.33 بحجم 62 مليون، وبعدها بيوم رجع لـ 368: المشترين دافعوا عن القاع.", "On 22 October (after earnings) price rose to 388.86 and closed back at 374.58: a long upper wick like a shooting star, at the ceiling, on 51.6 million shares against a 36.8 million average. A clear rejection candle. On the other side, 16 October dipped to 349.33 on 62 million shares and the next day returned to 368: buyers defended the floor."]],
+  ["indicators", "flat", ["الإغلاق 372.22 فوق متوسط 50 يوم (363.77) وعند متوسط 20 (369.87). RSI عند 51.5 يعني لا تشبع شراء ولا بيع. MACD عند 2.63 تحت خط الإشارة 2.75 بشوي: الزخم يهدأ. البولينجر بين 349 و 391 والسعر في النص. ATR عند 12.6 دولار (3.4% يومياً): تحرك يومي كبير، فالوقف لازم يكون واسع.", "The 372.22 close is above the 50-day average (363.77) and at the 20-day (369.87). RSI at 51.5: neither overbought nor oversold. MACD at 2.63 sits just under its 2.75 signal: momentum is fading. Bollinger Bands span 349 to 391 with price in the middle. ATR is 12.6 dollars (3.4% a day): big daily swings, so stops must be wide."]],
+  ["volume", "flat", ["أكثر سعر انتداول عنده في الـ 5 شهور (POC) بين 377 و 383، يعني فوق السعر الحالي بشوي: مغناطيس ومقاومة قريبة. و 70% من الحجم (منطقة القيمة) بين 346 و 420. السعر داخل منطقة القيمة، فالمتوقع يتذبذب داخلها لين يطلع منها بحجم كبير.", "The price with the most volume over five months (POC) is 377 to 383, just above the current price: a magnet and nearby resistance. 70% of volume (the value area) traded between 346 and 420. Price is inside the value area, so swings inside it are expected until it leaves on heavy volume."]],
+  ["wyckoff", "open", ["نطاق عرضي بعد هبوط كبير وارتداد. فيه قراءتين: تجميع جديد، لأن نزول 16 أكتوبر لـ 349 بحجم عالي ورجوعه السريع يشبه الـ Spring. أو توزيع، لأن صعود 22 أكتوبر فوق السقف ورجوعه بحجم عالي يشبه الـ Upthrust. وايكوف نفسه يقول: الكسر هو اللي يحسم.", "A sideways range after a big fall and a rebound. Two readings: re-accumulation, since the 16 October drop to 349 on heavy volume with a fast return looks like a Spring; or distribution, since the 22 October push above the ceiling with a heavy-volume reversal looks like an Upthrust. Wyckoff himself says the break decides."]],
+  ["elliott", "open", ["عدّين ممكنين: الأول إن الهبوط من 444 لـ 297 موجة A، والصعود لـ 389 موجة B، فالجاي موجة C هابطة. الثاني إن 297 نهاية التصحيح، و 297 إلى 384 موجة 1، والنطاق موجة 2، فالجاي موجة 3 صاعدة قوية. هذا بالضبط عيب إليوت: نفس الشارت يعطيك سيناريوهين متعاكسين.", "Two valid counts: first, the 444 to 297 fall is wave A, the rise to 389 is wave B, so a falling wave C comes next. Second, 297 ended the correction, 297 to 384 is wave 1, the range is wave 2, so a strong rising wave 3 comes next. That is Elliott's weakness exactly: the same chart gives two opposite scenarios."]],
+  ["smc", "down", ["فوق القمم المتساوية 386.8 إلى 388.9 فيه سيولة (أوامر وقف البائعين). يوم 22 أكتوبر السعر كسحها (388.86) ورجع تحت: كسح سيولة شرائية. لكن ما صار كسر هيكل هابط للحين، لأن قاع 20 أكتوبر (363.64) ما انكسر. فالإشارة ناقصة. وتذكر إن اختباراتنا على 4 سنوات ما لقت لهذا النموذج أفضلية.", "Above the equal highs of 386.8 to 388.9 sits liquidity (sellers' stop orders). On 22 October price swept it (388.86) and fell back: a buy-side liquidity sweep. But no bearish structure break yet, because the 20 October low (363.64) has not broken. The signal is incomplete. And remember our 4-year tests found no edge for this setup."]],
+  ["fund", "mixed", ["نتائج الربع الثالث (21 أكتوبر): الإيرادات 28.05 مليار ثابتة مقارنة بالسنة الماضية، وربح السهم المعدّل 0.48 فوق التوقع 0.45، والهامش الإجمالي تحسن لـ 19.6%. لكن الهامش التشغيلي 2.6% فقط، وصافي الربح نزل 43%. والتسليمات 486,532 سيارة فوق التوقعات. وفي السوق حديث عن دمج محتمل مع SpaceX. الصورة مختلطة، والتقييم عالي جداً مقارنة بالأرباح.", "Q3 results (21 Oct): revenue of 28.05 billion was flat year on year, adjusted EPS of 0.48 beat the 0.45 estimate, and gross margin improved to 19.6%. But operating margin was only 2.6% and net income fell 43%. Deliveries of 486,532 cars beat estimates. The market also talks of a possible SpaceX merger. A mixed picture, and the valuation is very high relative to earnings."]]
+];
+
+function pageTslaExample() {
+  const last = EX_ROWS[EX_ROWS.length - 1];
+  const name = (id) => { const s = SCHOOLS.find((x) => x.id === id); return s ? L(s.name) : id; };
+  const tag = (b) => '<span class="tag ' + ({ up: "up", down: "ex-dn", flat: "", mixed: "amber", open: "" }[b] || "") + '">' + esc(t({ up: "ex_up", down: "ex_down", flat: "ex_flat", mixed: "ex_mixed", open: "ex_open_q" }[b])) + "</span>";
+  const kv = (k, v) => '<div class="ex-kv"><span class="small muted">' + esc(t(k)) + '</span><b class="num" dir="ltr">' + v + "</b></div>";
+  const snap = '<div class="ex-snap">' + kv("ex_close", "372.22") + kv("ex_chg", "-16.2%") + kv("ex_from_low", "+25.2%") + kv("ex_atr", "12.6 (3.4%)") + "</div>";
+  const legend = '<div class="ex-lg small"><span><i style="background:var(--up-soft)"></i>' + esc(t("ex_lg_range")) + '</span><span><i style="background:var(--down)"></i>' + esc(t("ex_lg_fib")) + '</span><span><i style="background:#5B7BD5"></i>' + esc(t("ex_lg_sma")) + '</span><span><i style="background:var(--amber);opacity:.5"></i>' + esc(t("ex_lg_poc")) + "</span></div>";
+  const reads = EX_READS.map(([id, b, tx], i) => '<section class="panel ex-read"><div class="row" style="justify-content:space-between;align-items:center"><h3><span class="gs-n num">' + (i + 1) + '</span> <a href="#sch-' + id + '">' + esc(name(id)) + "</a></h3>" + tag(b) + '</div><p style="margin:0">' + esc(L(tx)) + "</p></section>").join("");
+  const tbl = '<div class="tablewrap"><table class="sch-tbl"><thead><tr><th>' + esc(t("sch_name")) + "</th><th>" + esc(t("ex_bias")) + "</th></tr></thead><tbody>" + EX_READS.map(([id, b]) => "<tr><td>" + esc(name(id)) + "</td><td>" + tag(b) + "</td></tr>").join("") + "</tbody></table></div>";
+  const li = (arr) => "<ul>" + arr.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul>";
+  const agree = li([
+    ["المقاومة 388 تقريباً: اتفقت عليها 5 مدارس. الكلاسيكية تشوفها سقف المستطيل، وفيبوناتشي 61.8% عندها، والشموع رفضتها، وSMC تشوف فوقها سيولة، والحجم يقول POC قريب منها.", "Resistance near 388: five schools agree. Classical sees it as the rectangle top, Fibonacci 61.8% sits there, candles rejected it, SMC sees liquidity above it, and volume puts the POC close by."],
+    ["الدعم 346 إلى 353: قاع المستطيل، و38.2% فيبوناتشي عند 353.4، والبولينجر السفلي 349، والمشترين دافعوا عنه يوم 16 أكتوبر.", "Support 346 to 353: the rectangle floor, Fibonacci 38.2% at 353.4, the lower Bollinger Band at 349, and buyers defended it on 16 October."],
+    ["الاتجاه: أغلب المدارس محايدة. ما فيه مدرسة تعطي إشارة صعود مكتملة، واثنتين بس تميل للهبوط على المدى القصير (الشموع وSMC).", "Direction: most schools are neutral. None gives a complete bullish signal, and only two lean bearish short term (candles and SMC)."]
+  ]);
+  const scen = li([
+    ["إغلاق يومي فوق 389 بحجم أعلى من المتوسط: الكلاسيكية وداو ووايكوف وإليوت (العدّ الثاني) يتفقون صعود. هدف المستطيل حوالي 432، وهي قمة يوليو.", "A daily close above 389 on above-average volume: classical, Dow, Wyckoff and Elliott (second count) all turn bullish. The rectangle target is about 432, the July high."],
+    ["إغلاق يومي تحت 346: يتأكد التوزيع والعدّ الأول لإليوت. الهدف حوالي 303 قرب قاع يوليو.", "A daily close below 346: distribution and Elliott's first count are confirmed. The target is about 303, near the July low."],
+    ["بين 346 و 389: الأفضل الانتظار. اللي يتداول النطاق يشتري قرب القاع ويبيع قرب السقف، والوقف لازم يكون على الأقل 1 إلى 1.5 ضعف ATR (13 إلى 19 دولار) لأن السهم متذبذب.", "Between 346 and 389: waiting is best. Range traders buy near the floor and sell near the ceiling, with a stop of at least 1 to 1.5 times ATR (13 to 19 dollars) because the share is volatile."]
+  ]);
+  const lessons = li([
+    ["قوة الدمج مو في كثرة المدارس، في المستويات اللي تتفق عليها مدارس مختلفة الطريقة.", "The strength of combining is not the number of schools but the levels that schools with different methods agree on."],
+    ["إذا المدارس اختلفت، هذي بحد ذاتها معلومة: السوق ما حسم، والأفضل تنتظر.", "When schools disagree, that is information in itself: the market has not decided, and waiting is best."],
+    ["المدارس اللي فيها اجتهاد كبير (إليوت ووايكوف) تعطيك سيناريوهات، والمدارس الواضحة (المستويات والمؤشرات) تعطيك نقاط الدخول والوقف.", "Highly subjective schools (Elliott, Wyckoff) give scenarios; rule-clear ones (levels, indicators) give entries and stops."],
+    ["التحليل الكمي آخر خطوة: قبل ما تعتمد على أي قاعدة من هذي، اختبرها على سنين من البيانات في المختبر.", "Quantitative analysis is the last step: before relying on any rule here, test it on years of data in the lab."]
+  ]);
+  return '<div class="wrap"><div class="guide-head"><div class="crumbs"><a href="#schools">' + esc(t("sch_h")) + "</a> / TSLA</div><h1>" + esc(t("ex_h")) + "</h1><p>" + esc(t("ex_p")) + "</p></div>" +
+    '<div class="stack" style="padding-block:16px 8px"><div class="panel stack"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="margin:0">' + esc(t("ex_snap")) + "</h2></div>" + snap + '<div class="ex-chart">' + exChart() + "</div>" + legend + "</div>" +
+    "<h2>" + esc(t("ex_reads")) + "</h2>" + reads +
+    '<section class="panel stack ex-sum"><h2>' + esc(t("ex_sum")) + "</h2>" + tbl + "<h3>" + esc(t("ex_agree")) + "</h3>" + agree + "<h3>" + esc(t("ex_scen")) + "</h3>" + scen + "<h3>" + esc(t("ex_lesson")) + "</h3>" + lessons + "</section>" +
+    '<p class="small muted" style="margin:0">' + esc(t("ex_note")) + " " + esc(t("ex_src")) + "</p></div>" +
+    '<div class="row" style="justify-content:space-between;padding-block:8px 40px"><a class="btn" href="#schools">' + esc(t("sch_all")) + '</a><a class="btn primary" href="#lab">' + esc(t("nav_lab")) + "</a></div></div>";
+}
+function exTeaser() {
+  const R = EX_ROWS.slice(-60), lo = 315, hi = 395, Y = (p) => (110 - ((p - lo) / (hi - lo)) * 100).toFixed(1);
+  const pts = R.map((r, i) => (10 + i * (620 / 59)).toFixed(1) + "," + Y(r.c)).join(" ");
+  return '<a class="panel ex-teaser" href="#sch-tsla"><div class="ex-tz-fig"><svg viewBox="0 0 640 120" role="img"><rect x="10" y="' + Y(389) + '" width="620" height="' + (Y(346) - Y(389)) + '" fill="var(--up-soft)"/><polyline points="' + pts + '" fill="none" stroke="var(--amber)" stroke-width="2.2"/></svg></div><div class="stack" style="gap:6px"><span class="tag amber" style="align-self:flex-start">TSLA</span><h3 style="margin:0">' + esc(t("ex_card")) + '</h3><p class="muted" style="margin:0">' + esc(t("ex_card_p")) + '</p><span class="btn sm primary" style="align-self:flex-start">' + esc(t("ex_open")) + "</span></div></a>";
 }
 /* ===== مِراس: دليل رموز السوق السعودي =====
    كل شركات السوق الرئيسية (تاسي) مقسّمة حسب القطاع، كما يصنّفها أرقام.
@@ -5038,7 +5149,7 @@ function noteVisit(r) {
 }
 function pageLabel(p) {
   if (!p) return "";
-  if (p.r.startsWith("sch-")) { const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === p.r); return s ? L(s.name) : t("nav_schools"); }
+  if (p.r.startsWith("sch-")) { if (p.r === "sch-tsla") return "TSLA"; const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === p.r); return s ? L(s.name) : t("nav_schools"); }
   if (p.r.startsWith("g-")) { const g = typeof GUIDES !== "undefined" && GUIDES.find((x) => "g-" + x.id === p.r); return g ? L(g.title) : t("nav_guides"); }
   for (const g in NAV_GROUPS) { const it = NAV_GROUPS[g].items.find((x) => x[0] === p.r); if (it) return t(it[1]) + (p.sym && typeof symName === "function" ? ": " + symName(p.sym) : ""); }
   const extra = { desk: "dk_h", owner: "ow_h", plans: "nav_plans", account: "nav_account", learn: "nav_learn", services: "nav_svc", tracks: "nav_tracks", settings: "set_h", shared: "dg_h", symbols: "nav_symbols" }[p.r];

@@ -189,9 +189,10 @@ function pageSchools() {
   const table = '<div class="panel stack"><h2 style="margin:0">' + esc(t("sch_cmp")) + '</h2><div class="tablewrap"><table class="sch-tbl"><thead><tr><th>' + esc(t("sch_name")) + "</th><th>" + esc(t("sch_lvl")) + "</th><th>" + esc(t("sch_obj")) + "</th><th>" + esc(t("sch_tf")) + "</th></tr></thead><tbody>" +
     SCHOOLS.map((s) => '<tr><td><a href="#sch-' + s.id + '">' + esc(L(s.name)) + "</a></td><td>" + schMeter(s.lvl) + " " + esc(t("sch_l" + s.lvl)) + "</td><td>" + schMeter(s.obj) + " " + esc(t("sch_o" + s.obj)) + "</td><td>" + esc(L(s.tf)) + "</td></tr>").join("") + "</tbody></table></div></div>";
   const tip = '<div class="notice"><b>' + esc(t("sch_tip_h")) + ":</b> " + esc(t("sch_tip")) + "</div>";
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sch_h")) + "</h1><p>" + esc(t("sch_p")) + '</p></div><div class="stack" style="padding-block:20px 40px">' + tip + '<div class="grid3">' + cards + "</div>" + table + '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p></div></div>";
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sch_h")) + "</h1><p>" + esc(t("sch_p")) + '</p></div><div class="stack" style="padding-block:20px 40px">' + tip + (typeof exTeaser === "function" ? exTeaser() : "") + '<div class="grid3">' + cards + "</div>" + table + '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p></div></div>";
 }
 function pageSchool(id) {
+  if (id === "tsla" && typeof pageTslaExample === "function") return pageTslaExample();
   const i = SCHOOLS.findIndex((x) => x.id === id); if (i < 0) return pageSchools();
   const s = SCHOOLS[i], nx = SCHOOLS[(i + 1) % SCHOOLS.length];
   const list = (arr) => "<ul>" + arr.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul>";

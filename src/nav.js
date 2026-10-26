@@ -77,7 +77,7 @@ function noteVisit(r) {
 }
 function pageLabel(p) {
   if (!p) return "";
-  if (p.r.startsWith("sch-")) { const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === p.r); return s ? L(s.name) : t("nav_schools"); }
+  if (p.r.startsWith("sch-")) { if (p.r === "sch-tsla") return "TSLA"; const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === p.r); return s ? L(s.name) : t("nav_schools"); }
   if (p.r.startsWith("g-")) { const g = typeof GUIDES !== "undefined" && GUIDES.find((x) => "g-" + x.id === p.r); return g ? L(g.title) : t("nav_guides"); }
   for (const g in NAV_GROUPS) { const it = NAV_GROUPS[g].items.find((x) => x[0] === p.r); if (it) return t(it[1]) + (p.sym && typeof symName === "function" ? ": " + symName(p.sym) : ""); }
   const extra = { desk: "dk_h", owner: "ow_h", plans: "nav_plans", account: "nav_account", learn: "nav_learn", services: "nav_svc", tracks: "nav_tracks", settings: "set_h", shared: "dg_h", symbols: "nav_symbols" }[p.r];
