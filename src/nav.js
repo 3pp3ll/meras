@@ -144,7 +144,7 @@ Object.assign(UI, {
   map_plans_p: ["أول درجتين في كل مسار مجانية، والباقي بالاشتراك.", "The first two steps of every track are free; the rest comes with a plan."],
   map_owner_p: ["لوحة المالك والمستخدمين والبيانات.", "Owner dashboard, users and data."], map_desk_p: ["محفظتك وأدواتك الخاصة.", "Your portfolio and private tools."]
 });
-const MAP_DESK = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
+const MAP_DESK = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
 function siteMap() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const leaf = (h, k) => '<a class="smap-leaf" href="#' + h + '">' + secIc(h, 15) + "<span>" + esc(t(k)) + "</span></a>";

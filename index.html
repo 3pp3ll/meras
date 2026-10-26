@@ -1252,6 +1252,16 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 #treeback{inset-inline-start:auto;inset-inline-end:max(18px,env(safe-area-inset-right,0px));bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 [dir="rtl"] #treeback{inset-inline-end:max(18px,env(safe-area-inset-left,0px))}
 @media (max-width:640px){body.has-tabbar #treeback{bottom:calc(130px + env(safe-area-inset-bottom,0px))}}
+/* منصاتي */
+.ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.ap-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none;text-align:center;font:inherit;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;min-width:0}
+.ap-tile:hover,.ap-tile:focus-visible{transform:translateY(-3px);border-color:var(--c,var(--amber));box-shadow:0 12px 24px -14px rgba(20,26,40,.4)}
+.ap-tile.off{opacity:.7;border-style:dashed}
+.ap-tile.edit{cursor:default}.ap-tile.edit:hover{transform:none}
+.ap-ic{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;font-size:24px;font-weight:700;color:#fff;background:linear-gradient(160deg,color-mix(in srgb,var(--ac) 70%,#fff),var(--ac));box-shadow:0 8px 18px -8px var(--ac),inset 0 1px 0 rgba(255,255,255,.4)}
+.ap-tile b{font-size:15px;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ap-tile small{font-size:11.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr}
+@media (max-width:560px){.ap-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.ap-ic{width:52px;height:52px;font-size:21px}}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -4854,7 +4864,7 @@ Object.assign(UI, {
   map_plans_p: ["أول درجتين في كل مسار مجانية، والباقي بالاشتراك.", "The first two steps of every track are free; the rest comes with a plan."],
   map_owner_p: ["لوحة المالك والمستخدمين والبيانات.", "Owner dashboard, users and data."], map_desk_p: ["محفظتك وأدواتك الخاصة.", "Your portfolio and private tools."]
 });
-const MAP_DESK = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
+const MAP_DESK = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
 function siteMap() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   const leaf = (h, k) => '<a class="smap-leaf" href="#' + h + '">' + secIc(h, 15) + "<span>" + esc(t(k)) + "</span></a>";
@@ -5478,6 +5488,7 @@ function dkCharts() {
 let dkGrid = true;
 const dkPhone = () => window.matchMedia && matchMedia("(max-width:640px)").matches;
 const DK_IC = {
+  apps: '<g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><path d="M17 14v6M14 17h6" stroke-linecap="round"/></g>',
   pf: '<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z M4 7l11-3v3 M16 13h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
   ch: '<path d="M4 20V4M4 20h16M8 15l3-4 3 2 5-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   sc: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></g>',
@@ -5504,12 +5515,12 @@ function pageDesk() {
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";
   if (!CFG.token) return head + '<div class="stack" style="padding-block:18px"><div class="notice">' + esc(t("ow_need")) + "</div></div></div>";
   if (!DK.loaded) { loadDesk(); return head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
-  const tabs = [["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
+  const tabs = [["apps", "ap_t"], ["pf", "dk_t_pf"], ["ch", "dk_t_ch"], ["sc", "sc_t"], ["top", "tp_t"], ["tech", "tab_tech"], ["dg", "dg_t"], ["us", "us_t"], ["op", "op_t"]];
   if (dkGrid && dkPhone()) return head + dkGridHtml(tabs) + "</div>";
   const cur = tabs.find(([k]) => k === dkTab) || tabs[0];
   const mbar = '<div class="dk-mbar"><button class="dk-mback" data-act="dk-grid"><span aria-hidden="true">›</span> ' + esc(t("dk_h")) + "</button><b>" + esc(t(cur[1])) + "</b></div>";
   const side = '<aside class="dk-side"><nav aria-label="' + esc(t("dk_h")) + '">' + tabs.map(([k, l]) => { const b = dkBadge(k); return '<a href="#desk" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page"' : "") + '><span class="dk-si"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">' + (DK_IC[k] || "") + '</svg></span><span class="dk-sl"><b>' + esc(t(l)) + "</b><small>" + esc(t("dk_g_" + k)) + "</small></span>" + (b ? '<span class="bell-n">' + b + "</span>" : "") + "</a>"; }).join("") + "</nav></aside>";
-  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
+  return head + mbar + '<div class="dk-layout">' + side + '<div class="dk-main"><div class="tabs dk-tabs" role="tablist">' + tabs.map(([k, l]) => '<a href="#desk" role="tab" data-act="dk-tab" data-tab="' + k + '"' + (dkTab === k ? ' aria-current="page" aria-selected="true"' : "") + ">" + esc(t(l)) + "</a>").join("") + '</div><div class="stack" style="padding-block:18px 40px">' + ({ pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, tech: () => { svcBare = true; try { return pageTech(); } finally { svcBare = false; } }, apps: dkApps, dg: dkDivGlobal, us: dkUS, op: dkOptions }[dkTab] || dkPortfolio)() + "</div></div></div></div>";
 }
 
 function dkExport() {
@@ -5570,6 +5581,58 @@ document.addEventListener("submit", async (e) => {
     else DK.data.charts.push(Object.assign({ id: "a" + Date.now().toString(36), at: Date.now(), sym, date: h.length ? h[h.length - 1].d : today(), price: h.length ? h[h.length - 1].c : null, draws: dkCopyDraws(sym), ind: S.chart ? JSON.parse(JSON.stringify(S.chart)) : null }, rec));
     dkAn = null; render(); await saveDesk(); render();
   }
+});
+/* ===== مِراس: منصاتي (مكتبي) =====
+   أيقونات للمنصات اللي تستخدمها (منطاد، دربي، عقود، الراجحي كابيتال…). تضغط الأيقونة وتفتح المنصة.
+   على الجوال: إذا التطبيق مثبّت والمنصة تدعم فتح روابطها في التطبيق، النظام يفتح التطبيق مباشرة.
+   القائمة محفوظة في desk.json مع باقي مكتبي. */
+Object.assign(UI, {
+  ap_t: ["منصاتي", "My platforms"], dk_g_apps: ["افتح منصاتك بضغطة", "Open your platforms in one tap"],
+  ap_p: ["اضغط أي أيقونة وتفتح المنصة. على الجوال يفتح التطبيق نفسه إذا كان مثبّت والمنصة تدعم ذلك.", "Tap an icon to open the platform. On a phone its app opens if it is installed and the platform supports it."],
+  ap_edit: ["تعديل", "Edit"], ap_done: ["تم", "Done"], ap_add: ["أضف منصة", "Add a platform"], ap_name: ["الاسم", "Name"], ap_url: ["الرابط", "Link"],
+  ap_url_ph: ["انسخ رابط المنصة من المتصفح، مثل https://…", "Paste the platform link, e.g. https://…"], ap_save: ["احفظ", "Save"], ap_del: ["احذف", "Delete"], ap_up: ["قدّم", "Move up"],
+  ap_nolink: ["أضف الرابط", "Add the link"], ap_bad: ["اكتب اسم ورابط يبدأ بـ https://", "Enter a name and a link starting with https://"],
+  ap_sugg: ["إضافة سريعة", "Quick add"], ap_empty: ["ما فيه منصات للحين. اضغط «تعديل» وأضف منصاتك.", "No platforms yet. Tap Edit and add yours."],
+  ap_tip: ["للتطبيق: افتح المنصة في متصفح الجوال مرة، وإذا طلع لك «فتح في التطبيق» اختره، وبعدها الأيقونة تفتح التطبيق على طول.", "Tip: open the platform once in your phone browser and choose “Open in app” if offered; the icon will then open the app."]
+});
+const AP_COLORS = ["#E9A03B", "#E8765A", "#C76BA4", "#3D6E97", "#2E9C73", "#7DC3E6", "#B4532E", "#6E7A8E"];
+const AP_SUGG = [["الراجحي كابيتال", "https://www.alrajhi-capital.sa"], ["دراية", "https://www.derayah.com"], ["Exness", "https://www.exness.com"], ["TradingView", "https://www.tradingview.com"], ["تداول السعودية", "https://www.saudiexchange.sa"], ["أرقام", "https://www.argaam.com"], ["يقين", "https://yaaqen.com"]];
+let apEdit = false, apForm = null;
+const apList = () => { if (!DK.data) return []; if (!Array.isArray(DK.data.apps)) DK.data.apps = [{ id: "a1", name: "منطاد", url: "" }, { id: "a2", name: "دربي", url: "" }, { id: "a3", name: "عقود", url: "" }]; return DK.data.apps; };
+const apInit = (n) => { const w = String(n || "?").replace(/^(ال)/, "").trim(); return w.slice(0, /^[A-Za-z]/.test(w) ? 2 : 1).toUpperCase(); };
+const apHost = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
+function dkApps() {
+  const list = apList();
+  const tile = (a, i) => { const col = a.color || AP_COLORS[i % AP_COLORS.length], ok = /^https:\/\//.test(a.url || "");
+    const inner = '<span class="ap-ic" style="--ac:' + col + '">' + esc(apInit(a.name)) + '</span><b>' + esc(a.name) + '</b><small class="muted">' + esc(ok ? apHost(a.url) : t("ap_nolink")) + "</small>";
+    if (apEdit) return '<div class="ap-tile edit">' + inner + '<div class="row" style="gap:4px;justify-content:center"><button class="btn sm" data-act="ap-edit1" data-id="' + esc(a.id) + '">' + esc(t("ap_edit")) + "</button>" + (i ? '<button class="btn sm ghost" data-act="ap-up" data-id="' + esc(a.id) + '" aria-label="' + esc(t("ap_up")) + '">↑</button>' : "") + '<button class="btn sm ghost" data-act="ap-del" data-id="' + esc(a.id) + '" aria-label="' + esc(t("ap_del")) + '">✕</button></div></div>';
+    return ok ? '<a class="ap-tile" href="' + esc(a.url) + '" target="_blank" rel="noopener">' + inner + "</a>" : '<button class="ap-tile off" data-act="ap-edit1" data-id="' + esc(a.id) + '">' + inner + "</button>"; };
+  const f = apForm;
+  const form = f ? '<form class="panel stack" data-form="ap" novalidate><div class="form-grid"><div class="field"><label for="ap-n">' + esc(t("ap_name")) + '</label><input id="ap-n" value="' + esc(f.name || "") + '" autocomplete="off"></div><div class="field"><label for="ap-u">' + esc(t("ap_url")) + '</label><input id="ap-u" dir="ltr" inputmode="url" value="' + esc(f.url || "") + '" placeholder="' + esc(t("ap_url_ph")) + '"></div></div><div class="row"><button class="btn primary" type="submit">' + esc(t("ap_save")) + '</button><button class="btn ghost" type="button" data-act="ap-cancel">' + esc(t("ap_done")) + "</button></div></form>" : "";
+  const have = new Set(list.map((a) => a.url));
+  const sugg = apEdit ? '<div class="stack" style="gap:6px"><span class="small muted">' + esc(t("ap_sugg")) + '</span><div class="row" style="gap:6px">' + AP_SUGG.filter(([, u]) => !have.has(u)).map(([n, u]) => '<button class="btn sm" data-act="ap-sugg" data-n="' + esc(n) + '" data-u="' + esc(u) + '">+ ' + esc(n) + "</button>").join("") + "</div></div>" : "";
+  return '<div class="stack"><div class="row" style="justify-content:space-between;align-items:flex-start"><p class="muted" style="margin:0;max-width:60ch">' + esc(t("ap_p")) + '</p><div class="row" style="gap:6px">' + (apEdit ? '<button class="btn sm" data-act="ap-new">+ ' + esc(t("ap_add")) + "</button>" : "") + '<button class="btn sm ' + (apEdit ? "primary" : "") + '" data-act="ap-mode">' + esc(t(apEdit ? "ap_done" : "ap_edit")) + "</button></div></div>" + form +
+    (list.length ? '<div class="ap-grid">' + list.map(tile).join("") + "</div>" : '<div class="notice">' + esc(t("ap_empty")) + "</div>") + sugg + '<p class="small muted" style="margin:0">' + esc(t("ap_tip")) + "</p></div>";
+}
+document.addEventListener("click", async (e) => {
+  const el = e.target.closest && e.target.closest('[data-act^="ap-"]'); if (!el) return;
+  const a = el.dataset.act, list = apList(), it = list.find((x) => x.id === el.dataset.id);
+  if (a === "ap-mode") { apEdit = !apEdit; apForm = null; render(); return; }
+  if (a === "ap-new") { apForm = { id: "", name: "", url: "https://" }; render(); return; }
+  if (a === "ap-edit1" && it) { apEdit = true; apForm = Object.assign({}, it); render(); setTimeout(() => { const u = document.getElementById("ap-u"); if (u) u.focus(); }, 50); return; }
+  if (a === "ap-cancel") { apForm = null; render(); return; }
+  if (a === "ap-del" && it) { DK.data.apps = list.filter((x) => x.id !== it.id); render(); await saveDesk(); return; }
+  if (a === "ap-up" && it) { const i = list.indexOf(it); if (i > 0) { list.splice(i, 1); list.splice(i - 1, 0, it); } render(); await saveDesk(); return; }
+  if (a === "ap-sugg") { list.push({ id: "a" + Date.now().toString(36), name: el.dataset.n, url: el.dataset.u }); render(); await saveDesk(); }
+});
+document.addEventListener("submit", async (e) => {
+  const f = e.target.closest && e.target.closest('[data-form="ap"]'); if (!f) return; e.preventDefault();
+  const name = document.getElementById("ap-n").value.trim(); let url = document.getElementById("ap-u").value.trim();
+  if (url && !/^https?:\/\//.test(url)) url = "https://" + url;
+  if (!name || !/^https:\/\/[^\s.]+\.[^\s]+/.test(url)) { toast(t("ap_bad")); return; }
+  const list = apList(), cur = apForm && apForm.id && list.find((x) => x.id === apForm.id);
+  if (cur) Object.assign(cur, { name, url }); else list.push({ id: "a" + Date.now().toString(36), name, url });
+  apForm = null; render(); await saveDesk();
 });
 /* ===== مِراس: السوق الأمريكي داخل مكتبي =====
    الأسهم الأمريكية والفوركس والنفط من us.json (Alpha Vantage عبر GitHub Actions)، والذهب والفضة من metals.json.
