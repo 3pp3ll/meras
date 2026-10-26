@@ -1242,3 +1242,10 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 .ap-tile b{font-size:15px;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ap-tile small{font-size:11.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr}
 @media (max-width:560px){.ap-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.ap-ic{width:52px;height:52px;font-size:21px}}
+
+/* official (declared) dividend */
+.tag.dg-off{background:#E7F6EC;color:#1D6B3A;border-color:#BFE3CB}
+.dg-offp{color:#1D6B3A;background:#F1FAF4;border:1px solid #CFEBD8;border-radius:10px;padding:8px 10px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.dg-off{background:#163B25;color:#9BE0B4;border-color:#245C3A}:root:not([data-theme="light"]) .dg-offp{color:#9BE0B4;background:#12301F;border-color:#245C3A}}
+:root[data-theme="dark"] .tag.dg-off{background:#163B25;color:#9BE0B4;border-color:#245C3A}
+:root[data-theme="dark"] .dg-offp{color:#9BE0B4;background:#12301F;border-color:#245C3A}

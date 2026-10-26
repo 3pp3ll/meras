@@ -1262,6 +1262,13 @@ body[data-br] .subnav a[aria-current="page"],body[data-br] .tabs a[aria-current=
 .ap-tile b{font-size:15px;line-height:1.3;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ap-tile small{font-size:11.5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr}
 @media (max-width:560px){.ap-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.ap-ic{width:52px;height:52px;font-size:21px}}
+
+/* official (declared) dividend */
+.tag.dg-off{background:#E7F6EC;color:#1D6B3A;border-color:#BFE3CB}
+.dg-offp{color:#1D6B3A;background:#F1FAF4;border:1px solid #CFEBD8;border-radius:10px;padding:8px 10px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tag.dg-off{background:#163B25;color:#9BE0B4;border-color:#245C3A}:root:not([data-theme="light"]) .dg-offp{color:#9BE0B4;background:#12301F;border-color:#245C3A}}
+:root[data-theme="dark"] .tag.dg-off{background:#163B25;color:#9BE0B4;border-color:#245C3A}
+:root[data-theme="dark"] .dg-offp{color:#9BE0B4;background:#12301F;border-color:#245C3A}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -6193,6 +6200,11 @@ Object.assign(UI, {
   dg_how_much: ["كم يجيك منه؟", "How much would you get?"], dg_net_y: ["يوصلك بالسنة تقريباً", "You receive per year, about"], dg_gross: ["قبل الضريبة", "Before tax"], dg_each: ["كل توزيع ({f})", "Each payout ({f})"], dg_pur_of: ["منه تطهير", "Of which purification"], dg_enter_amt: ["اكتب المبلغ.", "Enter an amount."],
   dg_nodiv_long: ["هالشركة ما وزّعت آخر سنة. لو بدأت توزع، تنتقل لقائمة الموزّعة لحالها.", "This company paid nothing in the last year. If it starts paying, it moves to the paying list."],
   dg_xlsx: ["تصدير الجدول Excel", "Export to Excel"],
+  dg_off: ["✓ معلن رسمياً", "✓ Officially declared"], dg_off_s: ["معلن", "Declared"],
+  dg_d_amt: ["التوزيع المعلن", "Declared payout"], dg_d_ex: ["تاريخ الاستحقاق (Ex)", "Ex-date"], dg_d_buy: ["آخر يوم شراء", "Last day to buy"],
+  dg_d_pay: ["تاريخ الصرف", "Pay date"], dg_d_yld: ["العائد بالتوزيع الجديد", "Yield at the new payout"], dg_d_chg: ["التغيير عن السابق", "Change from previous"],
+  dg_d_note: ["الشركة أعلنت التوزيع رسمياً في {d}. اشترِ السهم قبل نهاية تداول {b} (بتوقيت نيويورك) عشان يجيك التوزيع.", "The company declared this payout on {d}. Buy before the close on {b} (New York time) to receive it."],
+  dg_d_note2: ["التوزيع معلن رسمياً. اشترِ السهم قبل نهاية تداول {b} (بتوقيت نيويورك) عشان يجيك التوزيع.", "This payout is officially declared. Buy before the close on {b} (New York time) to receive it."],
   dg_hist: ["آخر التوزيعات", "Recent payouts"],
   dg_share_h: ["مشاركة القسم", "Share this section"],
   dg_share_p: ["حط كلمة سر وعطها للي تبيه يشوف القسم (مثل أخوك). يفتح الرابط ويكتبها ويشوف الجدول والحاسبة، بدون نجوم ولا شي من مكتبك. تقدر توقفها أو تغيّر كلمة السر متى ما بغيت.", "Set a password and give it to whoever should see this section. They open the link, enter it and see the table and calculator, nothing else from your desk. You can stop or change it any time."],
@@ -6238,8 +6250,18 @@ const dgDays = (d) => { if (!d) return null; return Math.round((new Date(d + "T0
 const dgFreq = (f) => t({ 12: "dg_f12", 4: "dg_f4", 2: "dg_f2", 1: "dg_f1", 0: "dg_f0" }[f] || "dg_firr");
 const dgMoney = (n, cur) => (cur === "USD" ? "$" : "") + fmt(n, n < 1 ? 3 : 2) + (cur && cur !== "USD" ? " " + cur : "");
 const dgCurName = (cur) => (cur === "HKD" ? "HK$" : cur === "USD" ? "$" : cur || "");
+/* the trading day before the ex-date (weekends skipped; US holidays not covered) */
+function dgLastBuy(ex) {
+  const d = new Date(ex + "T00:00:00Z");
+  do { d.setUTCDate(d.getUTCDate() - 1); } while (d.getUTCDay() === 0 || d.getUTCDay() === 6);
+  return d.toISOString().slice(0, 10);
+}
 function dgNextCell(r) {
   if (!r.next) return '<span class="muted">–</span>';
+  if (r.decl) {
+    const n = dgDays(r.next), txt = n == null ? "" : n <= 0 ? t("dg_today") : t("dg_days").replace("{n}", n);
+    return '<span class="num">' + esc(r.next) + '</span> <span class="tag dg-off">' + esc(t("dg_off_s")) + '</span><br><span class="small ' + (n != null && n >= 0 && n <= 14 ? "dg-soon" : "muted") + '">' + esc(txt) + "</span>";
+  }
   const n = dgDays(r.next), txt = n == null ? "" : n < -3 ? t("dg_past") : n <= 0 ? t("dg_today") : t("dg_days").replace("{n}", n);
   return '<span class="num">' + esc(r.next) + '</span><br><span class="small ' + (n != null && n >= 0 && n <= 14 ? "dg-soon" : "muted") + '">' + esc(txt) + "</span>";
 }
@@ -6327,12 +6349,19 @@ function dgSheetHtml() {
   const { data, opt } = dgCtx(), r = data && data.stocks.find((x) => x.s === dgSheetS); if (!r) return "";
   const sh = opt.sh(r.s), st = sh && sh.st, on = opt.watch && opt.watch.includes(r.s), paid = r.ttm > 0;
   const kv = [[t("dg_c_px"), dgMoney(r.price, r.cur)]];
-  if (paid) { kv.push([t("dg_c_yld"), fmt(r.yld, 2) + "%"], [t("dg_c_ttm"), dgMoney(r.ttm, r.cur)], [t("dg_c_freq"), dgFreq(r.freq), 1]); if (r.last) kv.push([t("dg_c_last"), r.last[0]]); if (r.next) kv.push([t("dg_c_next"), r.next]); }
+  const dc = r.decl;
+  if (paid && dc) {
+    kv.push([t("dg_d_amt"), dgMoney(dc.amt, r.cur) + (dc.chg ? " (" + (dc.chg > 0 ? "+" : "") + fmt(dc.chg, 1) + "%)" : "")], [t("dg_d_yld"), fmt(r.yld_fwd != null ? r.yld_fwd : r.yld, 2) + "%"],
+      [t("dg_d_ex"), dc.ex], [t("dg_d_buy"), dgLastBuy(dc.ex)]);
+    if (dc.pay) kv.push([t("dg_d_pay"), dc.pay]);
+    kv.push([t("dg_c_ttm"), dgMoney(r.ttm, r.cur)], [t("dg_c_freq"), dgFreq(r.freq), 1]);
+  } else if (paid) { kv.push([t("dg_c_yld"), fmt(r.yld, 2) + "%"], [t("dg_c_ttm"), dgMoney(r.ttm, r.cur)], [t("dg_c_freq"), dgFreq(r.freq), 1]); if (r.last) kv.push([t("dg_c_last"), r.last[0]]); if (r.next) kv.push([t("dg_c_next"), r.next]); }
   let h = '<div class="dgs-top"><span class="dgm-av dg-' + r.g + '">' + esc(dgShort(r.s)) + '</span><div style="min-width:0"><h3 id="dgs-name">' + esc(r.n || r.s) + '</h3><p><span class="num">' + esc(r.s) + "</span> · " + esc(t("dg_g_" + r.g)) + "</p></div>" +
     (opt.watch ? '<button class="dgs-star" data-act="dg-star" data-s="' + esc(r.s) + '" aria-pressed="' + !!on + '">' + (on ? "★ " + esc(t("dg_watching")) : "☆ " + esc(t("dg_follow"))) + "</button>" : "") + "</div>";
-  h += '<div class="row" style="gap:6px">' + (st ? shTag(st) : '<span class="tag">' + esc(t("dg_sh_none")) + "</span>") + (sh && sh.p != null ? '<span class="tag">' + esc(t("sh_purify")) + " " + fmt(sh.p, 2) + "%</span>" : "") + (!st && opt.watch && r.g !== "hk" && typeof SHQ !== "undefined" ? (SHQ && SHQ.includes(r.s) ? '<span class="small muted">' + esc(t("dg_sh_q")) + "</span>" : '<button class="btn sm ghost" data-act="sh-queue" data-s="' + esc(r.s) + '">' + esc(t("dg_sh_calc")) + "</button>") : "") + "</div>";
+  h += '<div class="row" style="gap:6px">' + (dc ? '<span class="tag dg-off">' + esc(t("dg_off")) + "</span>" : "") + (st ? shTag(st) : '<span class="tag">' + esc(t("dg_sh_none")) + "</span>") + (sh && sh.p != null ? '<span class="tag">' + esc(t("sh_purify")) + " " + fmt(sh.p, 2) + "%</span>" : "") + (!st && opt.watch && r.g !== "hk" && typeof SHQ !== "undefined" ? (SHQ && SHQ.includes(r.s) ? '<span class="small muted">' + esc(t("dg_sh_q")) + "</span>" : '<button class="btn sm ghost" data-act="sh-queue" data-s="' + esc(r.s) + '">' + esc(t("dg_sh_calc")) + "</button>") : "") + "</div>";
   h += '<div class="dgs-kv">' + kv.map(([k, v, ar]) => "<div><span>" + esc(k) + '</span><b class="' + (ar ? "" : "num") + '">' + esc(v) + "</b></div>").join("") + "</div>";
-  if (paid && r.next) { const n = dgDays(r.next); h += '<p class="small muted" style="margin:0">' + esc(dgNextTxt(r) + (n != null && n >= 0 ? t("dg_own_before") : ".") + " " + t("dg_est")) + "</p>"; }
+  if (paid && dc) h += '<p class="small dg-offp" style="margin:0">' + esc((dc.on ? t("dg_d_note").replace("{d}", "\u2066" + dc.on + "\u2069") : t("dg_d_note2")).replace("{b}", "\u2066" + dgLastBuy(dc.ex) + "\u2069")) + "</p>";
+  else if (paid && r.next) { const n = dgDays(r.next); h += '<p class="small muted" style="margin:0">' + esc(dgNextTxt(r) + (n != null && n >= 0 ? t("dg_own_before") : ".") + " " + t("dg_est")) + "</p>"; }
   if (r.hist && r.hist.length) { const hs = r.hist.slice(-8), mx = Math.max.apply(null, hs.map((x) => x[1])); h += '<div><h4 class="dgs-h">' + esc(t("dg_hist")) + '</h4><div class="dgs-bars">' + hs.map((x) => '<div title="' + esc(x[0] + " · " + dgMoney(x[1], r.cur)) + '"><small class="num">' + fmt(x[1], 2) + '</small><i style="height:' + Math.max(6, Math.round((x[1] / mx) * 52)) + 'px"></i><small class="num">' + esc(x[0].slice(2, 7).replace("-", "/")) + "</small></div>").join("") + "</div></div>"; }
   if (paid) { const w = dgWht == null ? (DG_WHT[r.g] == null ? 30 : DG_WHT[r.g]) : dgWht; h += '<div><h4 class="dgs-h">' + esc(t("dg_how_much")) + '</h4><div class="dgs-calc"><div class="field"><label for="dgs-amt">' + esc(t("dg_calc_amt")) + " (" + esc(dgCurName(r.cur)) + ')</label><input id="dgs-amt" data-dg="samt" type="number" min="0" step="any" inputmode="decimal" value="' + esc(dgAmt) + '"></div><div class="field"><label for="dgs-wht">' + esc(t("dg_calc_wht")) + '</label><input id="dgs-wht" data-dg="swht" type="number" min="0" max="100" step="any" inputmode="decimal" value="' + esc(w) + '"></div></div></div><div class="dgs-res" id="dgs-res">' + dgSheetRes(r, opt) + '</div><p class="small muted" style="margin:0">' + esc(t("dg_wht_note")) + "</p>"; }
   else h += '<p class="small muted" style="margin:0">' + esc(t("dg_nodiv_long")) + "</p>";
@@ -6341,7 +6370,7 @@ function dgSheetHtml() {
 function dgSheetRes(r, opt) {
   const a = parseFloat(dgAmt), w = parseFloat(dgWht == null ? (DG_WHT[r.g] == null ? 30 : DG_WHT[r.g]) : dgWht) || 0;
   if (!(a > 0)) return '<span class="small muted">' + esc(t("dg_enter_amt")) + "</span>";
-  const sh = opt.sh(r.s), g = a * r.yld / 100, net = g * (1 - w / 100), pur = sh && sh.p ? g * sh.p / 100 : 0, c = dgCurName(r.cur);
+  const sh = opt.sh(r.s), g = a * (r.decl && r.yld_fwd != null ? r.yld_fwd : r.yld) / 100, net = g * (1 - w / 100), pur = sh && sh.p ? g * sh.p / 100 : 0, c = dgCurName(r.cur);
   const ln = (k, v) => '<div class="dgs-ln"><span>' + esc(k) + '</span><b class="num">' + v + "</b></div>";
   return '<div class="dgs-big"><span>' + esc(t("dg_net_y")) + '</span><b class="num">' + c + fmt(net, 2) + "</b></div>" + ln(t("dg_gross"), c + fmt(g, 2)) + ln(t("dg_calc_wht").replace(" %", "") + " " + fmt(w, 0) + "%", "−" + c + fmt(g - net, 2)) + (r.freq ? ln(t("dg_each").replace("{f}", dgFreq(r.freq)), c + fmt(net / r.freq, 2)) : "") + (pur ? ln(t("dg_pur_of"), c + fmt(pur, 2)) : "");
 }
