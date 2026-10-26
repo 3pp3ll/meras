@@ -1353,6 +1353,27 @@ body.tk-lock{overflow:hidden}
 @media (max-width:640px){.tk-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .tk-chart{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:6px}.tk-chart svg{display:block;width:100%;height:auto;direction:ltr}
 .tk-lv{display:flex;gap:6px;flex-wrap:wrap}
+/* البحث السريع */
+.sr-btn{display:inline-flex;align-items:center;gap:6px;min-width:150px;justify-content:flex-start;color:var(--muted)}
+.sr-btn kbd{margin-inline-start:auto;font:600 11px var(--mono,monospace);border:1px solid var(--line);border-radius:5px;padding:0 5px;color:var(--muted)}
+@media (max-width:760px){.sr-btn{min-width:0}.sr-btn .sr-btn-t,.sr-btn kbd{display:none}}
+#srch{position:fixed;inset:0;z-index:70;display:flex;justify-content:center;align-items:flex-start;padding:max(10vh,calc(env(safe-area-inset-top,0px) + 12px)) 12px 12px}
+.sr-back{position:absolute;inset:0;background:rgba(15,20,30,.45)}
+.sr-box{position:relative;width:min(640px,100%);background:var(--surface);color:var(--ink);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden;display:flex;flex-direction:column;max-height:75vh}
+.sr-in{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.sr-in input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:17px;color:inherit;outline:none}
+.sr-list{overflow:auto;padding:6px}
+.sr-sec{padding:6px 10px 2px}
+.sr-it{display:flex;align-items:center;gap:10px;width:100%;text-align:start;border:0;background:none;color:inherit;font:inherit;padding:9px 10px;border-radius:10px;cursor:pointer}
+.sr-it.on,.sr-it:hover{background:var(--sunk)}
+.sr-t{display:flex;flex-direction:column;min-width:0}.sr-t b{font-weight:600}.sr-t small{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-k{flex:none;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--sunk);color:var(--muted);min-width:52px;text-align:center}
+.sr-k.stock,.sr-k.idx,.sr-k.metal{background:var(--up-soft);color:var(--up)}.sr-k.desk,.sr-k.saved{background:#FFF1E6;color:#B4501A}.sr-k.school,.sr-k.lesson,.sr-k.guide{background:#EEF2FF;color:#3346A8}
+.sr-hint{margin:0;padding:8px 14px;border-top:1px solid var(--line)}
+@media (max-width:640px){.sr-hint{display:none}#srch{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}.sr-box{max-height:85vh}}
+.sca-row{gap:6px;flex-wrap:wrap;align-items:center}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sr-k.desk,:root:not([data-theme="light"]) .sr-k.saved{background:#3A2414;color:#FFC08F}:root:not([data-theme="light"]) .sr-k.school,:root:not([data-theme="light"]) .sr-k.lesson,:root:not([data-theme="light"]) .sr-k.guide{background:#1E2647;color:#AFC0FF}}
+:root[data-theme="dark"] .sr-k.desk,:root[data-theme="dark"] .sr-k.saved{background:#3A2414;color:#FFC08F}:root[data-theme="dark"] .sr-k.school,:root[data-theme="dark"] .sr-k.lesson,:root[data-theme="dark"] .sr-k.guide{background:#1E2647;color:#AFC0FF}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2416,6 +2437,7 @@ function render() {
   if (typeof trHook === "function") trHook();
   if (typeof topBell === "function") topBell();
   if (typeof tickHook === "function") tickHook();
+  if (typeof srHook === "function") srHook();
   document.querySelectorAll(".subnav nav, #main .tabs, .dg-chips").forEach((sn) => { const cur = sn.querySelector('[aria-current="page"],[aria-pressed="true"]'); if (!cur) return; const nb = sn.getBoundingClientRect(), cb = cur.getBoundingClientRect(); if (cb.left < nb.left || cb.right > nb.right) sn.scrollLeft += cb.left - nb.left - (nb.width - cb.width) / 2; });
   if (same) {
     const hold = () => {
@@ -3115,7 +3137,7 @@ function pageChart() {
 
   return '<div class="wrap' + (chSide() ? " ch-page" : "") + '"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
     '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
-    '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p>" + (["vwap", "rvol", "obv", "cmf", "mfi"].some((k) => indOn(cfg, k)) && !hasVol(full) ? '<p class="small notice" style="margin:0">' + esc(t("ch_novol")) + "</p>" : "") + "</div>" +
+    (typeof scaRow === "function" ? scaRow() : "") + '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p>" + (["vwap", "rvol", "obv", "cmf", "mfi"].some((k) => indOn(cfg, k)) && !hasVol(full) ? '<p class="small notice" style="margin:0">' + esc(t("ch_novol")) + "</p>" : "") + "</div>" +
     '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + '<div class="ch-body' + (chSide() ? " side" : "") + '">' + svg + chInfoBox() + "</div></div>" +
     (chReading ? readingHtml() : "") +
     (typeof scaPanel === "function" ? scaPanel() : "") +
@@ -4035,7 +4057,7 @@ function exTeaser() {
    مقارنة، ومستويات اتفقت عليها أكثر من مدرسة، ونتيجة نهائية مع سبب واضح.
    في وضع الإعادة (Replay) يحلل الشموع الظاهرة بس، فما يشوف المستقبل. */
 Object.assign(UI, {
-  sca_h: ["حلّل بمدارس التحليل", "Analyse with the schools"],
+  sca_h: ["نتيجة التحليل بالمدارس", "Schools analysis result"], sca_row: ["المدارس", "Schools"], sca_guide: ["دليل المدارس", "Schools guide"],
   sca_p: ["اختر مدرسة أو أكثر، واضغط حلّل الشارت. كل مدرسة تقرأ نفس الشموع بقواعدها، وبعدها نقارن ونطلع بنتيجة وحدة ونشرح ليش.", "Pick one or more schools and press Analyse. Each school reads the same candles by its own rules, then we compare and reach one conclusion, with the reasons."],
   sca_add: ["+ أضف مدرسة", "+ Add a school"], sca_all: ["كل المدارس", "All schools"], sca_clear: ["مسح", "Clear"],
   sca_go: ["حلّل الشارت", "Analyse the chart"], sca_again: ["الشارت تغيّر، حلّل من جديد", "The chart changed, analyse again"],
@@ -4358,23 +4380,31 @@ function scaResultHtml(R) {
     "<h3>" + esc(t("sca_cmp")) + "</h3>" + cmp + "<h3>" + esc(t("sca_each")) + "</h3>" + reads +
     '<p class="small muted" style="margin:0">' + esc(t("sca_how")) + " " + esc(t("sca_note")) + "</p></div>";
 }
+/* صف المدارس داخل لوحة التحكم الأساسية في الشارت (مع السهم والمؤشرات والرسم) */
+function scaRow() {
+  if (!CH || !CH.data) return "";
+  const key = chartCfg().sym + "|" + CH.e, stale = SCA.res && SCA.key !== key, all = SCA.sel.length === SCA_SCHOOLS.length;
+  const chips = all ? '<span class="indchip"><span>' + esc(t("sca_all")) + ' <span class="num muted">' + SCA_SCHOOLS.length + '</span></span><button data-act="sca-clear" aria-label="' + esc(t("sca_clear")) + '">×</button></span>'
+    : SCA.sel.map((id) => '<span class="indchip"><span>' + esc(scaName(id)) + '</span><button data-act="sca-del" data-id="' + id + '" aria-label="' + esc(t("ch_remove")) + '">×</button></span>').join("");
+  const left = SCA_SCHOOLS.filter((id) => !SCA.sel.includes(id));
+  const add = left.length ? '<select class="addsel" data-sca="add" aria-label="' + esc(t("sca_add")) + '"><option value="">' + esc(t("sca_add")) + "</option>" + (left.length > 1 ? '<option value="*">' + esc(t("sca_all")) + "</option>" : "") + left.map((id) => '<option value="' + id + '">' + esc(scaName(id)) + "</option>").join("") + "</select>" : "";
+  return '<div class="row sca-row"><b class="small">' + esc(t("sca_row")) + "</b>" + chips + add + (SCA.sel.length && !all ? '<button class="btn sm ghost" data-act="sca-clear">' + esc(t("sca_clear")) + "</button>" : "") +
+    '<button class="btn sm primary" data-act="sca-go"' + (SCA.sel.length ? "" : " disabled") + ">" + (typeof ICON_READ !== "undefined" ? ICON_READ + " " : "") + esc(t(stale ? "sca_again" : "sca_go")) + '</button><a class="small" href="#schools">' + esc(t("sca_guide")) + "</a></div>";
+}
+/* تحت الشارت: النتيجة + الحفظ والتصدير + اسأل */
 function scaPanel() {
   if (!CH || !CH.data) return "";
   const cfg = chartCfg(), key = cfg.sym + "|" + CH.e;
   if (SCA.keyPending) { SCA.key = key; SCA.keyPending = false; }
-  const chips = SCA.sel.map((id) => '<span class="chip"><span>' + esc(scaName(id)) + '</span><button data-act="sca-del" data-id="' + id + '" aria-label="' + esc(t("ch_remove")) + '">×</button></span>').join("");
-  const left = SCA_SCHOOLS.filter((id) => !SCA.sel.includes(id));
-  const add = left.length ? '<select class="addsel" data-sca="add" aria-label="' + esc(t("sca_add")) + '"><option value="">' + esc(t("sca_add")) + "</option>" + left.map((id) => '<option value="' + id + '">' + esc(scaName(id)) + "</option>").join("") + "</select>" : "";
-  const stale = SCA.res && SCA.key !== key;
-  return '<div class="panel stack sca"><div class="row" style="justify-content:space-between;align-items:center"><h3 style="font-size:18px;margin:0">' + esc(t("sca_h")) + '</h3><a class="small" href="#schools">' + esc(t("sch_h")) + ' ↗</a></div><p class="small muted" style="margin:0">' + esc(t("sca_p")) + "</p>" +
-    '<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">' + chips + add + (left.length ? '<button class="btn sm ghost" data-act="sca-all">' + esc(t("sca_all")) + "</button>" : "") + (SCA.sel.length ? '<button class="btn sm ghost" data-act="sca-clear">' + esc(t("sca_clear")) + "</button>" : "") + "</div>" +
-    '<p class="small muted" style="margin:0">' + esc(t("sca_fund")) + "</p>" +
-    '<div><button class="btn primary" data-act="sca-go"' + (SCA.sel.length ? "" : " disabled") + ">" + esc(t(stale ? "sca_again" : "sca_go")) + "</button></div>" +
-    (SCA.res && !stale ? scaResultHtml(SCA.res) + (typeof svBar === "function" ? svBar() : "") : "") + (typeof scaAiBox === "function" ? scaAiBox() : "") + "</div>";
+  const stale = SCA.res && SCA.key !== key, has = SCA.res && !stale;
+  const ai = typeof scaAiBox === "function" ? scaAiBox() : "";
+  if (!has && !stale && !ai) return "";
+  return '<div class="panel stack sca">' + (has || stale ? '<div class="row" style="justify-content:space-between;align-items:center"><h3 style="font-size:18px;margin:0">' + esc(t("sca_h")) + "</h3>" + (stale ? '<button class="btn sm primary" data-act="sca-go">' + esc(t("sca_again")) + "</button>" : "") + "</div>" : "") +
+    (has ? scaResultHtml(SCA.res) + (typeof svBar === "function" ? svBar() : "") : "") + ai + "</div>";
 }
 document.addEventListener("change", (ev) => {
   if (!ev.target.dataset || ev.target.dataset.sca !== "add" || !ev.target.value) return;
-  SCA.sel.push(ev.target.value); scaSave(); render();
+  if (ev.target.value === "*") SCA.sel = SCA_SCHOOLS.slice(); else SCA.sel.push(ev.target.value); scaSave(); render();
 });
 document.addEventListener("click", (ev) => {
   const el = ev.target.closest && ev.target.closest('[data-act^="sca-"]'); if (!el) return;
@@ -4832,6 +4862,125 @@ document.addEventListener("click", (ev) => {
   }
 });
 document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && TK.open) { TK.open = null; tkSheetRender(); } });
+/* ===== مِراس: البحث السريع (في الشريط العلوي جنب الساعة) =====
+   تكتب اللي تبيه وينقلك له على طول: الصفحات، أقسام مكتبي، الأسهم والمؤشرات (تفتح في الشارت)،
+   الدروس، الشروحات، مدارس التحليل، مصطلحات القاموس، والتحليلات المحفوظة.
+   اختصار لوحة المفاتيح: / أو Ctrl+K. */
+Object.assign(UI, {
+  sr_btn: ["ابحث", "Search"], sr_ph: ["وش تبي؟ سهم، مؤشر، صفحة، درس، مصطلح…", "What do you need? A stock, index, page, lesson, term…"],
+  sr_none: ["ما لقيت شي بهذا الاسم.", "Nothing found."], sr_hint: ["↑↓ للتنقل · Enter للفتح · Esc للإغلاق", "↑↓ to move · Enter to open · Esc to close"],
+  sr_k_page: ["صفحة", "Page"], sr_k_desk: ["مكتبي", "My desk"], sr_k_stock: ["سهم", "Stock"], sr_k_idx: ["مؤشر", "Index"], sr_k_lesson: ["درس", "Lesson"], sr_k_guide: ["شرح", "Guide"],
+  sr_k_school: ["مدرسة", "School"], sr_k_term: ["مصطلح", "Term"], sr_k_saved: ["محفوظ", "Saved"], sr_k_metal: ["معدن", "Metal"], sr_k_act: ["إجراء", "Action"],
+  sr_open_chart: ["افتح {s} في الشارت", "Open {s} on the chart"], sr_analyse: ["حلّل {s} بكل المدارس", "Analyse {s} with all schools"],
+  sr_recent: ["الأكثر استخداماً", "Popular"], sr_add_chart: ["أضفه للشارت", "Add it to the chart"]
+});
+const SR = { open: false, q: "", i: 0, list: [] };
+/* أسماء عربية للبحث عن الأسهم العالمية */
+const SR_ALIAS = { BABA: "علي بابا", "9988.HK": "علي بابا هونغ كونغ", TSM: "تايوان للرقائق تي اس ام سي", ASML: "اي اس ام ال", "0700.HK": "تينسنت", "7203.T": "تويوتا", "SAP.DE": "ساب", NFLX: "نتفليكس", JPM: "جي بي مورغان", KO: "كوكاكولا كوكا كولا",
+  TSLA: "تسلا", NVDA: "انفيديا نفيديا", AMD: "اي ام دي", PLTR: "بالانتير", SMCI: "سوبر مايكرو", META: "ميتا فيسبوك", AMZN: "امازون", AAPL: "ابل آبل", MSFT: "مايكروسوفت", GOOGL: "جوجل قوقل الفابت", AVGO: "برودكوم", ORCL: "اوراكل", SNOW: "سنوفليك",
+  "^GSPC": "اس اند بي", "^IXIC": "ناسداك", "^DJI": "داو جونز", "^N225": "نيكاي اليابان", "^HSI": "هانغ سنغ هونغ كونغ", "^GDAXI": "داكس المانيا", "^TASI.SR": "تاسي السوق السعودي المؤشر العام", XAU: "ذهب الذهب gold", XAG: "فضه الفضة silver" };
+const srNorm = (s) => String(s || "").toLowerCase().replace(/[ً-ْـ]/g, "").replace(/[أإآٱ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/ؤ/g, "و").replace(/ئ/g, "ي").replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660)).replace(/\s+/g, " ").trim();
+function srGoDesk(tab) { if (typeof dkTab !== "undefined") { dkTab = tab; if (typeof dkGrid !== "undefined") dkGrid = false; } if (location.hash !== "#desk") location.hash = "desk"; else render(); }
+function srGoChart(sym, analyse) {
+  const cfg = chartCfg(); cfg.sym = sym; chOffset = 0; chReplay = null; chPending = null; save();
+  if (location.hash !== "#chart") location.hash = "chart"; else render();
+  if (analyse) setTimeout(() => { SCA.sel = SCA_SCHOOLS.slice(); scaSave(); const all = CH && CH.data ? CH.data.slice(0, CH.e) : []; if (all.length >= 40) { SCA.res = scaRun(all, SCA.sel); SCA.key = sym + "|" + CH.e; render(); setTimeout(() => { const o = document.querySelector(".sca-out"); if (o) o.scrollIntoView({ behavior: "smooth", block: "start" }); }, 100); } }, 300);
+}
+function srIndex() {
+  const out = [], add = (kind, label, sub, kw, go, w) => out.push({ kind, label, sub: sub || "", kw: srNorm(label + " " + (sub || "") + " " + (kw || "")), go, w: w || 0 });
+  const go = (h) => () => { location.hash = h; };
+  const owner = typeof HOSTED !== "undefined" && HOSTED && !!CFG.token;
+  // الصفحات
+  add("page", t("learn_h"), "", "تعليم learn", go("learn"), 3); add("page", t("svc_hub_h"), "", "خدمات services", go("services"), 3);
+  Object.values(NAV_GROUPS).forEach((g) => g.items.forEach(([h, k, d]) => add("page", t(k), t(d), h, go(h), 4)));
+  [["settings", "set_h", "اعدادات ربط مفتاح token openrouter"], ["plans", "nav_plans", "باقات اشتراك"], ["account", "nav_account", "حساب"]].forEach(([h, k, kw]) => { try { add("page", t(k), "", kw, go(h), 2); } catch (e) {} });
+  if (owner) {
+    add("page", t("ow_h"), "", "owner مالك", go("owner"), 3);
+    add("page", t("dk_h"), "", "desk مكتبي", () => srGoDesk(typeof dkTab !== "undefined" ? dkTab : "pf"), 3);
+    (typeof MAP_DESK !== "undefined" ? MAP_DESK : []).forEach(([k, l]) => add("desk", t(l), t("dk_g_" + k), k, () => srGoDesk(k), 5));
+  }
+  // الأسهم والمؤشرات والمعادن (كل اللي له شموع في الشارت)
+  const hist = (typeof LIVE !== "undefined" && LIVE.history) || {};
+  Object.keys(hist).filter((k) => (hist[k] || []).length > 1).forEach((k) => {
+    const nm = symName(k), kind = k[0] === "^" ? "idx" : k === "XAU" || k === "XAG" ? "metal" : "stock", tk = (typeof TK_LIST !== "undefined" && TK_LIST.find((x) => x.s === k));
+    const short = k.replace(/^\^/, "").replace(/\.SR$/, ""), label = tk ? L(tk.n) + " · " + L(tk.full) : short + " " + nm;
+    const en = typeof extraNameOf === "function" && EXTRA && EXTRA.symbols && EXTRA.symbols[k] ? EXTRA.symbols[k].n : "";
+    add(kind, label, t("sr_open_chart").replace("{s}", tk ? L(tk.n) : short), k + " " + en + " " + (SR_ALIAS[k] || "") + " " + (tk ? L([tk.n[1], tk.n[0]]) + " " + tk.full.join(" ") : "") + (k === "XAU" ? " gold ذهب" : k === "XAG" ? " silver فضه" : ""), () => srGoChart(k), kind === "idx" ? 6 : 5);
+    add("act", t("sr_analyse").replace("{s}", k.replace(/^\^/, "") + " " + nm), "", "تحليل حلل analyse " + k + " " + nm + " " + en + " " + (SR_ALIAS[k] || ""), () => srGoChart(k, true), 1);
+  });
+  // أسهم السوق السعودي اللي ما لها شموع في الشارت: تنضاف لقائمة الشارت بضغطة (للمالك)
+  if (owner && typeof SA_SECTORS !== "undefined" && typeof extraSaveList === "function") SA_SECTORS.forEach(([sec, list]) => list.forEach(([code, nm, full]) => {
+    if (hist[code] && hist[code].length > 1) return;
+    add("stock", code + " " + nm, t("sr_add_chart") + " · " + sec, full + " " + code, () => { const l = EXL || []; if (l.some(([x]) => x === code)) { toast(t("ex2_dup")); return; } if (l.length >= 40) { toast(t("ex2_max")); return; } extraSaveList(l.concat([[code, "SA"]]), "ex2_added"); }, 2);
+  }));
+  // التعليم
+  if (typeof LESSONS !== "undefined") LESSONS.forEach((l) => add("lesson", L(l.title), "", l.title.join(" "), go("l-" + l.id), 2));
+  if (typeof GUIDES !== "undefined") GUIDES.forEach((g) => add("guide", L(g.title), L(g.intro), g.title.join(" "), go("g-" + g.id), 2));
+  add("guide", t("il_title"), "", "indicators مؤشرات", go("g-indicators"), 2);
+  if (typeof SCHOOLS !== "undefined") { SCHOOLS.forEach((s) => add("school", L(s.name), L(s.idea).slice(0, 90), s.name.join(" ") + " " + s.id, go("sch-" + s.id), 3)); add("school", t("ex_h"), "", "tsla تسلا مثال example", go("sch-tsla"), 2); }
+  if (typeof GLOSSARY !== "undefined") GLOSSARY.forEach((g) => add("term", L(g[0]), L(g[2]), g[0].join(" ") + " " + g[1], go("glossary"), 1));
+  // المحفوظات
+  if (typeof SV !== "undefined" && SV.list) SV.list.forEach((x) => add("saved", x.title, x.sym + " · " + (x.date || ""), x.sym + " " + x.name, () => svOpen(x.id), 4));
+  const seen = new Set(); return out.filter((x) => { const key = x.kind + "|" + x.label; if (seen.has(key)) return false; seen.add(key); return true; });
+}
+function srSearch(q) {
+  const n = srNorm(q); if (!n) return [];
+  const words = n.split(" ");
+  return srIndex().map((it) => {
+    const lab = srNorm(it.label); let sc = 0;
+    if (!words.every((w) => it.kw.includes(w))) return null;
+    if (lab === n) sc += 100; else if (lab.startsWith(n)) sc += 60; else if (lab.includes(n)) sc += 35; else sc += 10;
+    if (words.some((w) => lab.split(" ").some((x) => x.startsWith(w)))) sc += 15;
+    sc += it.w * 10 - lab.length / 40;
+    return Object.assign({ sc }, it);
+  }).filter(Boolean).sort((a, b) => b.sc - a.sc).slice(0, 14);
+}
+function srPopular() {
+  const pick = (kinds) => srIndex().filter((x) => kinds.includes(x.kind));
+  const pages = pick(["desk", "page"]).sort((a, b) => b.w - a.w).slice(0, 6), idx = pick(["idx"]).slice(0, 4);
+  return idx.concat(pages);
+}
+function srRender() {
+  let el = document.getElementById("srch");
+  if (!SR.open) { if (el) el.remove(); document.body.classList.remove("tk-lock"); return; }
+  if (!el) {
+    el = document.createElement("div"); el.id = "srch"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true");
+    el.innerHTML = '<div class="sr-back" data-act="sr-close"></div><div class="sr-box"><div class="sr-in"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="sr-q" type="search" autocomplete="off" spellcheck="false" placeholder="' + esc(t("sr_ph")) + '" aria-label="' + esc(t("sr_btn")) + '"><button class="btn sm ghost" data-act="sr-close" aria-label="Esc">Esc</button></div><div class="sr-list" role="listbox"></div><p class="sr-hint small muted">' + esc(t("sr_hint")) + "</p></div>";
+    document.body.appendChild(el); document.body.classList.add("tk-lock");
+    const inp = el.querySelector("#sr-q"); inp.value = SR.q; setTimeout(() => inp.focus(), 20);
+  }
+  SR.list = SR.q.trim() ? srSearch(SR.q) : srPopular();
+  if (SR.i >= SR.list.length) SR.i = 0;
+  const box = el.querySelector(".sr-list");
+  box.innerHTML = (SR.q.trim() ? "" : '<div class="sr-sec small muted">' + esc(t("sr_recent")) + "</div>") + (SR.list.length ? SR.list.map((x, i) => '<button type="button" class="sr-it' + (i === SR.i ? " on" : "") + '" role="option" aria-selected="' + (i === SR.i) + '" data-act="sr-go" data-i="' + i + '"><span class="sr-k ' + x.kind + '">' + esc(t("sr_k_" + x.kind)) + '</span><span class="sr-t"><b>' + esc(x.label) + "</b>" + (x.sub ? "<small>" + esc(x.sub) + "</small>" : "") + "</span></button>").join("") : '<p class="muted" style="padding:14px">' + esc(t("sr_none")) + "</p>");
+  const on = box.querySelector(".sr-it.on"); if (on) on.scrollIntoView({ block: "nearest" });
+}
+function srOpen() { SR.open = true; SR.q = ""; SR.i = 0; if (typeof SV !== "undefined" && !SV.list && typeof svLoad === "function") svLoad(); srRender(); }
+function srClose() { SR.open = false; srRender(); }
+function srGo(i) { const x = SR.list[i]; if (!x) return; srClose(); try { x.go(); } catch (e) { console.error(e); } window.scrollTo(0, 0); }
+document.addEventListener("input", (ev) => { if (ev.target && ev.target.id === "sr-q") { SR.q = ev.target.value; SR.i = 0; srRender(); } });
+document.addEventListener("keydown", (ev) => {
+  const tag = (ev.target && ev.target.tagName) || "", typing = /INPUT|TEXTAREA|SELECT/.test(tag) || (ev.target && ev.target.isContentEditable);
+  if (!SR.open && ((ev.key === "/" && !typing) || ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "k"))) { ev.preventDefault(); srOpen(); return; }
+  if (!SR.open) return;
+  if (ev.key === "Escape") { ev.preventDefault(); srClose(); }
+  else if (ev.key === "ArrowDown") { ev.preventDefault(); SR.i = Math.min(SR.list.length - 1, SR.i + 1); srRender(); }
+  else if (ev.key === "ArrowUp") { ev.preventDefault(); SR.i = Math.max(0, SR.i - 1); srRender(); }
+  else if (ev.key === "Enter" && ev.target && ev.target.id === "sr-q") { ev.preventDefault(); srGo(SR.i); }
+});
+document.addEventListener("click", (ev) => {
+  const el = ev.target.closest && ev.target.closest('[data-act="sr-open"],[data-act="sr-close"],[data-act="sr-go"]'); if (!el) return;
+  ev.preventDefault();
+  if (el.dataset.act === "sr-open") srOpen(); else if (el.dataset.act === "sr-close") srClose(); else srGo(+el.dataset.i);
+});
+/* زر البحث في الشريط العلوي جنب الساعة */
+function srHook() {
+  const tools = document.querySelector(".top .tools"); if (!tools || tools.querySelector(".sr-btn")) return;
+  const b = document.createElement("button"); b.type = "button"; b.className = "btn sm sr-btn"; b.setAttribute("data-act", "sr-open"); b.setAttribute("aria-label", t("sr_btn"));
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="sr-btn-t">' + esc(t("sr_btn")) + '…</span><kbd>/</kbd>';
+  const clock = document.getElementById("topclock");
+  if (clock && clock.parentNode === tools) clock.after(b); else tools.insertBefore(b, tools.firstChild);
+}
 /* ===== مِراس: دليل رموز السوق السعودي =====
    كل شركات السوق الرئيسية (تاسي) مقسّمة حسب القطاع، كما يصنّفها أرقام.
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].

@@ -4,7 +4,7 @@
    مقارنة، ومستويات اتفقت عليها أكثر من مدرسة، ونتيجة نهائية مع سبب واضح.
    في وضع الإعادة (Replay) يحلل الشموع الظاهرة بس، فما يشوف المستقبل. */
 Object.assign(UI, {
-  sca_h: ["حلّل بمدارس التحليل", "Analyse with the schools"],
+  sca_h: ["نتيجة التحليل بالمدارس", "Schools analysis result"], sca_row: ["المدارس", "Schools"], sca_guide: ["دليل المدارس", "Schools guide"],
   sca_p: ["اختر مدرسة أو أكثر، واضغط حلّل الشارت. كل مدرسة تقرأ نفس الشموع بقواعدها، وبعدها نقارن ونطلع بنتيجة وحدة ونشرح ليش.", "Pick one or more schools and press Analyse. Each school reads the same candles by its own rules, then we compare and reach one conclusion, with the reasons."],
   sca_add: ["+ أضف مدرسة", "+ Add a school"], sca_all: ["كل المدارس", "All schools"], sca_clear: ["مسح", "Clear"],
   sca_go: ["حلّل الشارت", "Analyse the chart"], sca_again: ["الشارت تغيّر، حلّل من جديد", "The chart changed, analyse again"],
@@ -327,23 +327,31 @@ function scaResultHtml(R) {
     "<h3>" + esc(t("sca_cmp")) + "</h3>" + cmp + "<h3>" + esc(t("sca_each")) + "</h3>" + reads +
     '<p class="small muted" style="margin:0">' + esc(t("sca_how")) + " " + esc(t("sca_note")) + "</p></div>";
 }
+/* صف المدارس داخل لوحة التحكم الأساسية في الشارت (مع السهم والمؤشرات والرسم) */
+function scaRow() {
+  if (!CH || !CH.data) return "";
+  const key = chartCfg().sym + "|" + CH.e, stale = SCA.res && SCA.key !== key, all = SCA.sel.length === SCA_SCHOOLS.length;
+  const chips = all ? '<span class="indchip"><span>' + esc(t("sca_all")) + ' <span class="num muted">' + SCA_SCHOOLS.length + '</span></span><button data-act="sca-clear" aria-label="' + esc(t("sca_clear")) + '">×</button></span>'
+    : SCA.sel.map((id) => '<span class="indchip"><span>' + esc(scaName(id)) + '</span><button data-act="sca-del" data-id="' + id + '" aria-label="' + esc(t("ch_remove")) + '">×</button></span>').join("");
+  const left = SCA_SCHOOLS.filter((id) => !SCA.sel.includes(id));
+  const add = left.length ? '<select class="addsel" data-sca="add" aria-label="' + esc(t("sca_add")) + '"><option value="">' + esc(t("sca_add")) + "</option>" + (left.length > 1 ? '<option value="*">' + esc(t("sca_all")) + "</option>" : "") + left.map((id) => '<option value="' + id + '">' + esc(scaName(id)) + "</option>").join("") + "</select>" : "";
+  return '<div class="row sca-row"><b class="small">' + esc(t("sca_row")) + "</b>" + chips + add + (SCA.sel.length && !all ? '<button class="btn sm ghost" data-act="sca-clear">' + esc(t("sca_clear")) + "</button>" : "") +
+    '<button class="btn sm primary" data-act="sca-go"' + (SCA.sel.length ? "" : " disabled") + ">" + (typeof ICON_READ !== "undefined" ? ICON_READ + " " : "") + esc(t(stale ? "sca_again" : "sca_go")) + '</button><a class="small" href="#schools">' + esc(t("sca_guide")) + "</a></div>";
+}
+/* تحت الشارت: النتيجة + الحفظ والتصدير + اسأل */
 function scaPanel() {
   if (!CH || !CH.data) return "";
   const cfg = chartCfg(), key = cfg.sym + "|" + CH.e;
   if (SCA.keyPending) { SCA.key = key; SCA.keyPending = false; }
-  const chips = SCA.sel.map((id) => '<span class="chip"><span>' + esc(scaName(id)) + '</span><button data-act="sca-del" data-id="' + id + '" aria-label="' + esc(t("ch_remove")) + '">×</button></span>').join("");
-  const left = SCA_SCHOOLS.filter((id) => !SCA.sel.includes(id));
-  const add = left.length ? '<select class="addsel" data-sca="add" aria-label="' + esc(t("sca_add")) + '"><option value="">' + esc(t("sca_add")) + "</option>" + left.map((id) => '<option value="' + id + '">' + esc(scaName(id)) + "</option>").join("") + "</select>" : "";
-  const stale = SCA.res && SCA.key !== key;
-  return '<div class="panel stack sca"><div class="row" style="justify-content:space-between;align-items:center"><h3 style="font-size:18px;margin:0">' + esc(t("sca_h")) + '</h3><a class="small" href="#schools">' + esc(t("sch_h")) + ' ↗</a></div><p class="small muted" style="margin:0">' + esc(t("sca_p")) + "</p>" +
-    '<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">' + chips + add + (left.length ? '<button class="btn sm ghost" data-act="sca-all">' + esc(t("sca_all")) + "</button>" : "") + (SCA.sel.length ? '<button class="btn sm ghost" data-act="sca-clear">' + esc(t("sca_clear")) + "</button>" : "") + "</div>" +
-    '<p class="small muted" style="margin:0">' + esc(t("sca_fund")) + "</p>" +
-    '<div><button class="btn primary" data-act="sca-go"' + (SCA.sel.length ? "" : " disabled") + ">" + esc(t(stale ? "sca_again" : "sca_go")) + "</button></div>" +
-    (SCA.res && !stale ? scaResultHtml(SCA.res) + (typeof svBar === "function" ? svBar() : "") : "") + (typeof scaAiBox === "function" ? scaAiBox() : "") + "</div>";
+  const stale = SCA.res && SCA.key !== key, has = SCA.res && !stale;
+  const ai = typeof scaAiBox === "function" ? scaAiBox() : "";
+  if (!has && !stale && !ai) return "";
+  return '<div class="panel stack sca">' + (has || stale ? '<div class="row" style="justify-content:space-between;align-items:center"><h3 style="font-size:18px;margin:0">' + esc(t("sca_h")) + "</h3>" + (stale ? '<button class="btn sm primary" data-act="sca-go">' + esc(t("sca_again")) + "</button>" : "") + "</div>" : "") +
+    (has ? scaResultHtml(SCA.res) + (typeof svBar === "function" ? svBar() : "") : "") + ai + "</div>";
 }
 document.addEventListener("change", (ev) => {
   if (!ev.target.dataset || ev.target.dataset.sca !== "add" || !ev.target.value) return;
-  SCA.sel.push(ev.target.value); scaSave(); render();
+  if (ev.target.value === "*") SCA.sel = SCA_SCHOOLS.slice(); else SCA.sel.push(ev.target.value); scaSave(); render();
 });
 document.addEventListener("click", (ev) => {
   const el = ev.target.closest && ev.target.closest('[data-act^="sca-"]'); if (!el) return;
