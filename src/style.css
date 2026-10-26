@@ -1420,3 +1420,12 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .as-lesson{display:flex;align-items:center;gap:10px;border:1px solid #CFE0FF;background:#F5F8FF;border-radius:14px;padding:12px 14px;margin-block:18px}.as-lesson>div{display:flex;flex-direction:column;flex:1}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .as-lesson{background:#151C33;border-color:#2A3A66}:root:not([data-theme="light"]) .as-ic,:root:not([data-theme="light"]) .as-link{background:#1E2647;color:#AFC0FF}}
 :root[data-theme="dark"] .as-lesson{background:#151C33;border-color:#2A3A66}:root[data-theme="dark"] .as-ic,:root[data-theme="dark"] .as-link{background:#1E2647;color:#AFC0FF}
+/* أخبار السهم */
+.sn-btn{display:inline-flex;align-items:center;gap:6px}
+.sn-field{align-self:end;justify-self:start}
+.sca-out h3 .sn-btn{vertical-align:middle;margin-inline-start:6px}
+#snsheet{position:fixed;inset:0;z-index:62;display:flex;align-items:flex-end;justify-content:center}
+@media (min-width:720px){#snsheet{align-items:center}}
+.sn-list{list-style:none;margin:10px 0 0;padding:0;display:grid}
+.sn-list li{padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}.sn-list li:last-child{border-bottom:0}
+.sn-t{margin:0;font-weight:600;line-height:1.55}.sn-t[dir="ltr"]{text-align:left}

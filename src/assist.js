@@ -50,6 +50,8 @@ function asContext() {
     if (r.startsWith("sch-")) { const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === r); if (s) ctx.school = { name: L(s.name), idea: L(s.idea), tools: s.tools.map(L), pros: s.pro.map(L), cons: s.con.map(L) }; }
     if (typeof tkItems === "function") ctx.indices = tkItems().map((x) => ({ index: L(x.it.n), close: x.st.c, today: +(100 * (x.st.d || 0)).toFixed(2) + "%", month: x.st.m != null ? +(100 * x.st.m).toFixed(2) + "%" : null, schools_result: x.R ? x.R.fb : null, date: x.st.date }));
     if (["news", "", "home"].includes(r) && typeof NW !== "undefined" && NW.data) ctx.news = (NW.data.items || []).slice(0, 15).map((x) => ({ t: x.t, sym: x.sym, src: x.src, at: x.at }));
+    const fs = AS.focus || (r === "chart" && typeof chartCfg === "function" ? chartCfg().sym : null);
+    if (fs && typeof snItems === "function" && typeof NW !== "undefined" && NW.data) ctx.symbol_news = { symbol: fs, items: snItems(fs).map((x) => ({ t: x.t, src: x.src, at: x.at })) };
     if (typeof NW !== "undefined" && NW.brief && NW.brief.items) ctx.daily_brief = NW.brief.items.map((x) => x.h);
     if (typeof DK !== "undefined" && DK.loaded && ["portfolio", "pf", "", "home"].includes(r)) { const H = dkHoldings(); ctx.portfolio = H.open.map((h) => ({ sym: h.sym, qty: h.qty, avg: +h.avg.toFixed(2), value: +h.value.toFixed(2), pl: +h.pl.toFixed(2) })); }
     if (typeof DG !== "undefined" && DG.data && typeof dhDivs === "function") ctx.upcoming_dividends = dhDivs().slice(0, 8);

@@ -1440,6 +1440,15 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .as-lesson{display:flex;align-items:center;gap:10px;border:1px solid #CFE0FF;background:#F5F8FF;border-radius:14px;padding:12px 14px;margin-block:18px}.as-lesson>div{display:flex;flex-direction:column;flex:1}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .as-lesson{background:#151C33;border-color:#2A3A66}:root:not([data-theme="light"]) .as-ic,:root:not([data-theme="light"]) .as-link{background:#1E2647;color:#AFC0FF}}
 :root[data-theme="dark"] .as-lesson{background:#151C33;border-color:#2A3A66}:root[data-theme="dark"] .as-ic,:root[data-theme="dark"] .as-link{background:#1E2647;color:#AFC0FF}
+/* أخبار السهم */
+.sn-btn{display:inline-flex;align-items:center;gap:6px}
+.sn-field{align-self:end;justify-self:start}
+.sca-out h3 .sn-btn{vertical-align:middle;margin-inline-start:6px}
+#snsheet{position:fixed;inset:0;z-index:62;display:flex;align-items:flex-end;justify-content:center}
+@media (min-width:720px){#snsheet{align-items:center}}
+.sn-list{list-style:none;margin:10px 0 0;padding:0;display:grid}
+.sn-list li{padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}.sn-list li:last-child{border-bottom:0}
+.sn-t{margin:0;font-weight:600;line-height:1.55}.sn-t[dir="ltr"]{text-align:left}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -3219,7 +3228,7 @@ function pageChart() {
     (canWl ? '<form class="row" data-form="watch" novalidate><input id="wl-new" placeholder="' + esc(t("wl_ph")) + '" maxlength="40" style="flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px"><button class="btn" type="submit">' + esc(t("wl_add")) + '</button></form><div class="row">' + (WL || []).map((w) => '<span class="chip"><span>' + esc(w) + (quoteOf(w) && quoteOf(w).live ? " " + esc(L(quoteOf(w).name)) : "") + '</span><button data-act="wl-del" data-sym="' + esc(w) + '" aria-label="' + esc(t("j_del")) + '">×</button></span>').join("") + "</div>" + importHtml() : '<div><a class="btn" href="#settings">' + esc(t("set_h")) + "</a></div>") + "</div>";
 
   return '<div class="wrap' + (chSide() ? " ch-page" : "") + '"><div class="page-head"><h1>' + esc(t("ch_h")) + "</h1><p>" + esc(t("ch_p")) + '</p></div><div class="stack" style="padding-block:18px">' +
-    '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
+    '<div class="panel stack"><div class="form-grid ch-grid">' + symSel + typeSel + nSel + (typeof newsBtn === "function" && newsBtn(cfg.sym) ? '<div class="field sn-field">' + newsBtn(cfg.sym, true) + "</div>" : "") + '</div><div class="row"><b class="small">' + esc(t("ch_ind")) + "</b>" + IND_KEYS.filter((d) => indOn(cfg, d[0])).map((d) => chip(d[0])).join("") + addSel + '<a class="small" href="#g-indicators">' + esc(t("ch_ind_guide")) + "</a></div>" +
     (typeof scaRow === "function" ? scaRow() : "") + '<div class="row"><b class="small">' + esc(t("ch_tools")) + "</b>" + tools + '<button class="btn sm ghost" data-act="ch-clear"' + (draws.length ? "" : " disabled") + ">" + esc(t("ch_clear")) + '</button></div><p class="small muted" id="ch-hint">' + esc(t(hint)) + "</p>" + (["vwap", "rvol", "obv", "cmf", "mfi"].some((k) => indOn(cfg, k)) && !hasVol(full) ? '<p class="small notice" style="margin:0">' + esc(t("ch_novol")) + "</p>" : "") + "</div>" +
     '<div class="chartbox' + (chTool !== "cursor" ? " drawing" : "") + '"><div class="ch-top">' + read + '<div class="row" style="gap:6px;flex-wrap:nowrap"><button class="btn sm primary" data-act="ch-analyze" title="' + esc(t("fb_h")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("fb_btn")) + '</span></button><button class="btn sm' + (chReading ? " on" : "") + '" data-act="ch-read" title="' + esc(t("ch_read")) + '">' + ICON_READ + '<span class="hide-s">' + esc(t("ch_read")) + '</span></button><button class="btn sm" data-act="ch-full" title="' + esc(t("ch_full")) + '" aria-label="' + esc(t("ch_full")) + '">' + ICON_FULL + "</button></div></div>" + '<div class="ch-body' + (chSide() ? " side" : "") + '">' + svg + chInfoBox() + "</div></div>" +
     (chReading ? readingHtml() : "") +
@@ -4457,7 +4466,7 @@ function scaResultHtml(R) {
   const reads = R.res.map((r) => '<details class="sca-read"' + (R.res.length <= 3 ? " open" : "") + '><summary><b><a href="#sch-' + r.id + '">' + esc(scaName(r.id)) + "</a></b>" + scaTag(r.bias) + '<span class="small muted num" dir="ltr">' + (r.na ? "-" : (r.score > 0 ? "+" : "") + r.score.toFixed(1)) + "</span></summary><ul>" + r.lines.map((l) => "<li>" + esc(l) + "</li>").join("") + "</ul></details>").join("");
   const cmp = '<div class="tablewrap"><table class="sch-tbl"><thead><tr><th>' + esc(t("sch_name")) + "</th><th>" + esc(t("ex_bias")) + "</th><th>" + esc(t("sca_score")) + "</th><th>" + esc(t("sca_w")) + "</th></tr></thead><tbody>" + R.res.map((r) => "<tr><td>" + esc(scaName(r.id)) + "</td><td>" + scaTag(r.bias) + '</td><td class="num" dir="ltr">' + (r.na ? "-" : (r.score > 0 ? "+" : "") + r.score.toFixed(1)) + '</td><td class="num">' + (r.na ? "-" : r.w) + "</td></tr>").join("") + "</tbody></table></div>";
   const lvl = R.groups.length ? '<div class="tablewrap"><table class="sch-tbl"><thead><tr><th></th><th>' + esc(L(["السعر", "Price"])) + "</th><th>" + esc(t("sca_src")) + "</th></tr></thead><tbody>" + R.groups.map((g) => "<tr><td>" + (g.p > R.c ? '<span class="tag ex-dn">' + esc(t("sca_res")) + "</span>" : '<span class="tag up">' + esc(t("sca_sup")) + "</span>") + '</td><td class="num" dir="ltr">' + px(g.p) + "</td><td>" + esc(g.ids.map(scaName).join(L(["، ", ", "]))) + "</td></tr>").join("") + '</tbody></table></div><div><button class="btn sm" data-act="sca-draw">' + esc(t("sca_draw")) + "</button></div>" : '<p class="small muted">' + esc(L(["ما فيه مستوى اتفقت عليه مدرستين أو أكثر. اختر مدارس أكثر.", "No level is shared by two or more schools. Pick more schools."])) + "</p>";
-  return '<div class="stack sca-out"><h3>' + esc(t("sca_res_h")) + ' <span class="small muted num" dir="ltr">' + esc(R.date || "") + " · " + px(R.c) + "</span></h3>" + final +
+  return '<div class="stack sca-out"><h3>' + esc(t("sca_res_h")) + ' <span class="small muted num" dir="ltr">' + esc(R.date || "") + " · " + px(R.c) + "</span> " + (typeof newsBtn === "function" ? newsBtn(chartCfg().sym, true) : "") + "</h3>" + final +
     "<h3>" + esc(t("sca_why")) + "</h3><ul>" + why.map((w) => "<li>" + esc(w) + "</li>").join("") + "</ul>" +
     "<h3>" + esc(t("sca_lv")) + "</h3>" + lvl + "<h3>" + esc(t("sca_scen")) + "</h3><ul>" + scen.map((w) => "<li>" + esc(w) + "</li>").join("") + "</ul>" +
     "<h3>" + esc(t("sca_cmp")) + "</h3>" + cmp + "<h3>" + esc(t("sca_each")) + "</h3>" + reads +
@@ -4621,7 +4630,7 @@ function dkSaved() {
   const q = SV.q.trim().toLowerCase(), list = SV.list.filter((x) => !q || [x.sym, x.name, x.title].some((v) => String(v || "").toLowerCase().includes(q)));
   const groups = {}; list.forEach((x) => { (groups[x.sym] = groups[x.sym] || []).push(x); });
   const tag = (b) => (typeof scaTag === "function" ? scaTag(b) : "");
-  const item = (x) => '<li class="sv-it"><div class="sv-main"><b>' + esc(x.title) + '</b><span class="small muted num" dir="ltr">' + esc((x.date || "") + (x.price != null ? " · " + x.price : "")) + "</span>" + tag(x.fb) + '<span class="small muted">' + esc(whenText(x.upd)) + '</span></div><div class="row" style="gap:6px"><button class="btn sm primary" data-act="sv-open" data-id="' + esc(x.id) + '">' + esc(t("sv_open")) + '</button><button class="btn sm" data-act="sv-pdf" data-id="' + esc(x.id) + '">PDF</button><button class="btn sm" data-act="sv-word" data-id="' + esc(x.id) + '">Word</button><button class="btn sm ghost" data-act="sv-del" data-id="' + esc(x.id) + '">' + esc(t(SV.del === x.id ? "sv_del2" : "sv_del")) + "</button></div></li>";
+  const item = (x) => '<li class="sv-it"><div class="sv-main"><b>' + esc(x.title) + '</b><span class="small muted num" dir="ltr">' + esc((x.date || "") + (x.price != null ? " · " + x.price : "")) + "</span>" + tag(x.fb) + '<span class="small muted">' + esc(whenText(x.upd)) + '</span></div><div class="row" style="gap:6px">' + (typeof newsBtn === "function" ? newsBtn(x.sym) : "") + '<button class="btn sm primary" data-act="sv-open" data-id="' + esc(x.id) + '">' + esc(t("sv_open")) + '</button><button class="btn sm" data-act="sv-pdf" data-id="' + esc(x.id) + '">PDF</button><button class="btn sm" data-act="sv-word" data-id="' + esc(x.id) + '">Word</button><button class="btn sm ghost" data-act="sv-del" data-id="' + esc(x.id) + '">' + esc(t(SV.del === x.id ? "sv_del2" : "sv_del")) + "</button></div></li>";
   const body = Object.keys(groups).length ? Object.entries(groups).map(([s, arr]) => '<section class="panel stack"><h3 style="margin:0"><span class="num">' + esc(s) + "</span> " + esc(arr[0].name || "") + ' <span class="tag num">' + arr.length + '</span></h3><ul class="sv-list">' + arr.map(item).join("") + "</ul></section>").join("") : '<div class="notice">' + esc(t("sv_none")) + "</div>";
   return '<div class="stack"><div class="dg-intro"><h2 style="margin:0">' + esc(t("sv_h")) + '</h2><p class="muted" style="margin:4px 0 0">' + esc(t("sv_p")) + '</p></div><input class="sv-q" data-svq="1" placeholder="' + esc(t("sv_search")) + '" value="' + esc(SV.q) + '">' + body + "</div>";
 }
@@ -4926,7 +4935,7 @@ function tkSheetRender() {
     (R ? "<h3>" + esc(t("tk_analysis")) + ' <span class="small muted num" dir="ltr">' + (R.tot > 0 ? "+" : "") + R.tot.toFixed(2) + " · " + esc(t("sca_agree").replace("{a}", R.agree).replace("{n}", R.nAct)) + "</span></h3><ul>" + ex.why.map((l) => "<li>" + esc(l) + "</li>").join("") + "</ul>" +
       (R.groups.length ? "<h3>" + esc(t("sca_lv")) + '</h3><div class="tk-lv">' + R.groups.map((g) => '<span class="tag ' + (g.p > R.c ? "ex-dn" : "up") + '"><span class="num" dir="ltr">' + tkFmt(g.p) + "</span> · " + esc(t(g.p > R.c ? "sca_res" : "sca_sup")) + " · " + g.ids.length + "</span>").join("") + "</div>" : "") +
       "<h3>" + esc(t("sca_scen")) + "</h3><ul>" + ex.scen.map((l) => "<li>" + esc(l) + "</li>").join("") + "</ul>" : "") +
-    '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn primary" data-act="tk-chart" data-s="' + esc(x.it.s) + '">' + esc(t("tk_open")) + '</button><button class="btn" data-act="tk-chart" data-ask="1" data-s="' + esc(x.it.s) + '">' + esc(t("tk_ask")) + "</button></div>" +
+    '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn primary" data-act="tk-chart" data-s="' + esc(x.it.s) + '">' + esc(t("tk_open")) + '</button><button class="btn" data-act="tk-chart" data-ask="1" data-s="' + esc(x.it.s) + '">' + esc(t("tk_ask")) + "</button>" + (typeof newsBtn === "function" ? newsBtn(x.it.s, true) : "") + "</div>" +
     '<p class="small muted" style="margin:8px 0 0">' + (live ? esc(t("tk_live")) + " " : "") + esc(t("tk_note")) + "</p></div>";
   if (sh.dataset.h !== html) { sh.innerHTML = html; sh.dataset.h = html; }
 }
@@ -5231,6 +5240,8 @@ function asContext() {
     if (r.startsWith("sch-")) { const s = typeof SCHOOLS !== "undefined" && SCHOOLS.find((x) => "sch-" + x.id === r); if (s) ctx.school = { name: L(s.name), idea: L(s.idea), tools: s.tools.map(L), pros: s.pro.map(L), cons: s.con.map(L) }; }
     if (typeof tkItems === "function") ctx.indices = tkItems().map((x) => ({ index: L(x.it.n), close: x.st.c, today: +(100 * (x.st.d || 0)).toFixed(2) + "%", month: x.st.m != null ? +(100 * x.st.m).toFixed(2) + "%" : null, schools_result: x.R ? x.R.fb : null, date: x.st.date }));
     if (["news", "", "home"].includes(r) && typeof NW !== "undefined" && NW.data) ctx.news = (NW.data.items || []).slice(0, 15).map((x) => ({ t: x.t, sym: x.sym, src: x.src, at: x.at }));
+    const fs = AS.focus || (r === "chart" && typeof chartCfg === "function" ? chartCfg().sym : null);
+    if (fs && typeof snItems === "function" && typeof NW !== "undefined" && NW.data) ctx.symbol_news = { symbol: fs, items: snItems(fs).map((x) => ({ t: x.t, src: x.src, at: x.at })) };
     if (typeof NW !== "undefined" && NW.brief && NW.brief.items) ctx.daily_brief = NW.brief.items.map((x) => x.h);
     if (typeof DK !== "undefined" && DK.loaded && ["portfolio", "pf", "", "home"].includes(r)) { const H = dkHoldings(); ctx.portfolio = H.open.map((h) => ({ sym: h.sym, qty: h.qty, avg: +h.avg.toFixed(2), value: +h.value.toFixed(2), pl: +h.pl.toFixed(2) })); }
     if (typeof DG !== "undefined" && DG.data && typeof dhDivs === "function") ctx.upcoming_dividends = dhDivs().slice(0, 8);
@@ -5321,6 +5332,62 @@ function asLessonBox() {
   if (!(typeof HOSTED !== "undefined" && HOSTED)) return "";
   return '<div class="as-lesson"><span class="as-ic"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z" fill="currentColor"/></svg></span><div><b>' + esc(t("as_lesson")) + '</b><small class="muted">' + esc(t("as_lesson_p")) + '</small></div><button type="button" class="btn sm primary" data-act="as-lesson" data-q="' + esc(L(["اشرح لي هذا الدرس بمثال من السوق السعودي", "Explain this lesson with a Saudi market example"])) + '">' + esc(t("as_ask")) + "</button></div>";
 }
+/* ===== مِراس: أخبار السهم (أيقونة 📰 جنب كل سهم) =====
+   تفتح نافذة فيها آخر أخبار الرمز من news.json (يتحدث 4 مرات يومياً ويغطي كل أسهم الشارت)،
+   وروابط للبحث عن أخبار أكثر: Google News، وأرقام للسوق السعودي، وYahoo Finance للعالمي. */
+Object.assign(UI, {
+  sn_btn: ["أخبار السهم", "Stock news"], sn_h: ["أخبار {s}", "{s} news"], sn_none: ["ما لقيت أخبار لهذا الرمز في آخر 48 ساعة.", "No news for this symbol in the last 48 hours."],
+  sn_more: ["أخبار أكثر", "More news"], sn_mkt: ["أخبار السوق", "Market news"], sn_ask: ["اسأل المساعد عن أخباره", "Ask the assistant about its news"],
+  sn_loading: ["جاري تحميل الأخبار…", "Loading news…"], sn_note: ["الأخبار تتحدث 4 مرات في اليوم.", "News refreshes 4 times a day."]
+});
+const SN = { s: null };
+const SN_IC = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M5 5h11v14H6a1 1 0 0 1-1-1z M16 9h3v9a1 1 0 0 1-1 1h-2 M8 9h5M8 12h5M8 15h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+function newsBtn(sym, withLabel) {
+  if (!sym || (typeof PRACTICE !== "undefined" && PRACTICE[sym]) || !(typeof HOSTED !== "undefined" && HOSTED && CFG.token)) return "";
+  return '<button type="button" class="btn sm sn-btn" data-act="sn-open" data-s="' + esc(sym) + '" title="' + esc(t("sn_btn")) + '" aria-label="' + esc(t("sn_btn") + " " + sym) + '">' + SN_IC + (withLabel ? "<span>" + esc(t("sn_btn")) + "</span>" : "") + "</button>";
+}
+function snItems(sym) {
+  const all = (typeof NW !== "undefined" && NW.data && NW.data.items) || [];
+  if (sym[0] === "^") { const mk = /TASI/.test(sym) ? "sa" : "us"; return all.filter((x) => !x.sym && (x.mk === mk || x.mk === "macro")).slice(0, 12); }
+  if (sym === "XAU" || sym === "XAG") return all.filter((x) => /gold|silver|ذهب|فضة/i.test(x.t) || x.topic === "Gold").slice(0, 12);
+  const own = all.filter((x) => x.sym === sym);
+  if (own.length) return own.sort((a, b) => (b.at > a.at ? 1 : -1)).slice(0, 12);
+  // سهم ما يغطيه جامع الأخبار: نطابق بالاسم الكامل بس (الأسماء القصيرة مثل «الرياض» تطابق أخبار ثانية)
+  const full = String((typeof EXTRA !== "undefined" && EXTRA && EXTRA.symbols && EXTRA.symbols[sym] && EXTRA.symbols[sym].n) || "").toLowerCase();
+  return full.length > 7 ? all.filter((x) => x.t.toLowerCase().includes(full)).slice(0, 12) : [];
+}
+function snLinks(sym) {
+  const nm = typeof symName === "function" ? symName(sym) : sym, sa = /^\d{4}$/.test(sym), idx = sym[0] === "^";
+  const gq = sa ? nm + " سهم" : idx ? nm : (typeof EXTRA !== "undefined" && EXTRA && EXTRA.symbols && EXTRA.symbols[sym] ? EXTRA.symbols[sym].n : nm) + " stock";
+  const links = [["Google News", "https://news.google.com/search?q=" + encodeURIComponent(gq) + (sa ? "&hl=ar&gl=SA&ceid=SA:ar" : "&hl=en-US&gl=US&ceid=US:en")]];
+  if (sa) links.push(["أرقام", "https://www.argaam.com/ar/search?q=" + encodeURIComponent(nm)]);
+  links.push(["Yahoo Finance", "https://finance.yahoo.com/quote/" + encodeURIComponent(sa ? sym + ".SR" : sym === "XAU" ? "GC=F" : sym === "XAG" ? "SI=F" : sym) + "/news"]);
+  return links;
+}
+function snRender() {
+  let el = document.getElementById("snsheet");
+  if (!SN.s) { if (el) el.remove(); document.body.classList.remove("tk-lock"); return; }
+  if (!el) { el = document.createElement("div"); el.id = "snsheet"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); document.body.appendChild(el); document.body.classList.add("tk-lock"); }
+  el.dir = S.lang === "ar" ? "rtl" : "ltr";
+  const s = SN.s, nm = typeof symName === "function" ? symName(s) : s, loaded = typeof NW !== "undefined" && NW.loaded;
+  if (!loaded && typeof loadNews === "function") loadNews();
+  SN.wait = !loaded;
+  const items = loaded ? snItems(s) : [];
+  const list = !loaded ? '<p class="muted">' + esc(t("sn_loading")) + "</p>" : items.length ? '<ul class="sn-list">' + items.map((x) => '<li><div class="nw-meta">' + (x.imp >= 3 ? '<span class="tag nw-hot">' + esc(t("nw_hot")) + "</span>" : "") + '<span class="small muted">' + esc(x.src || "") + " · " + esc(nwAgo(x.at)) + '</span></div><p class="sn-t" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + '</p><a class="small" href="' + esc(nwLink(x.url)) + '" target="_blank" rel="noopener noreferrer">' + esc(t("nw_more")) + " ↗</a></li>").join("") + "</ul>" : '<p class="muted">' + esc(t("sn_none")) + "</p>";
+  el.innerHTML = '<div class="tk-back" data-act="sn-close"></div><div class="tk-card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:nowrap"><div style="flex:1;min-width:0"><h2 style="margin:0">' + esc(t(s[0] === "^" ? "sn_mkt" : "sn_h").replace("{s}", s.replace(/^\^/, "") + " " + nm)) + '</h2><p class="small muted" style="margin:2px 0 0">' + esc(t("sn_note")) + (typeof NW !== "undefined" && NW.data && NW.data.fetched_at ? " · " + esc(whenText(NW.data.fetched_at)) : "") + '</p></div><button class="btn sm" data-act="sn-close" aria-label="' + esc(t("tk_close")) + '">✕</button></div>' + list +
+    '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px"><b class="small">' + esc(t("sn_more")) + ":</b>" + snLinks(s).map(([n, u]) => '<a class="btn sm" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(n) + " ↗</a>").join("") +
+    (typeof asOpen === "function" ? '<button class="btn sm primary" data-act="sn-ask">✦ ' + esc(t("sn_ask")) + "</button>" : "") + '</div><p class="small muted" style="margin:8px 0 0">' + esc(t("nw_note")) + "</p></div>";
+}
+document.addEventListener("click", (e) => {
+  const el = e.target.closest && e.target.closest('[data-act="sn-open"],[data-act="sn-close"],[data-act="sn-ask"]'); if (!el) return;
+  e.preventDefault(); e.stopPropagation();
+  if (el.dataset.act === "sn-open") { SN.s = el.dataset.s; snRender(); }
+  else if (el.dataset.act === "sn-close") { SN.s = null; snRender(); }
+  else { const s = SN.s, nm = typeof symName === "function" ? symName(s) : s; SN.s = null; snRender(); if (typeof AS !== "undefined") AS.focus = s; asOpen(L(["وش آخر أخبار " + s + " " + nm + " وكيف ممكن تأثر عليه؟", "What is the latest news on " + s + " " + nm + " and how might it affect it?"])); }
+}, true);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && SN.s) { SN.s = null; snRender(); } });
+/* بعد ما توصل الأخبار، حدّث النافذة لو مفتوحة */
+setInterval(() => { if (SN.s && SN.wait && typeof NW !== "undefined" && NW.loaded) snRender(); }, 700);
 /* ===== مِراس: دليل رموز السوق السعودي =====
    كل شركات السوق الرئيسية (تاسي) مقسّمة حسب القطاع، كما يصنّفها أرقام.
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
@@ -7919,7 +7986,7 @@ function dkTop() {
       (v.sharia === "no" ? '<div class="notice">' + esc(t("tp_noshar")) + "</div>" : v.sharia !== "ok" ? '<p class="small muted" style="margin:0">' + esc(t("tp_unknown")) + "</p>" : "") +
       '<div class="sc-checks">' + ["trend", "vwap", "rsi", "rvol", "cmf", "atr"].map((c) => { const ok = (v.checks || []).includes(c); return '<span class="sc-ck' + (ok ? " ok" : "") + '">' + (ok ? "✓" : "✗") + " " + esc(t("sc_c_" + c)) + "</span>"; }).join("") + "</div>" +
       (why.length ? '<div class="tp-why"><b class="small">' + esc(t("tp_why")) + '</b><ul>' + why.map((w) => "<li>" + esc(w) + "</li>").join("") + "</ul></div>" : "") +
-      '<div class="row"><button class="btn sm primary" data-act="top-ai" data-s="' + esc(s) + '">' + esc(t("tp_ai")) + '</button><a class="btn sm" href="' + news + '" target="_blank" rel="noopener">' + esc(t("tp_news")) + ' ↗</a><button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button></div></div>";
+      '<div class="row"><button class="btn sm primary" data-act="top-ai" data-s="' + esc(s) + '">' + esc(t("tp_ai")) + '</button>' + (typeof newsBtn === "function" && newsBtn(s) ? newsBtn(s, true) : '<a class="btn sm" href="' + news + '" target="_blank" rel="noopener">' + esc(t("tp_news")) + ' ↗</a>') + '<button class="btn sm ghost" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button></div></div>";
   };
   const left = (TOP.log || []).filter((x) => x.out).slice(-6).reverse();
   setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); if (typeof ntMark === "function") ntMark((TOP.log || []).filter((x) => x.in).map((x) => "m:" + x.s + "|" + x.in)); topBell(); } catch (e) {} }, 1500);

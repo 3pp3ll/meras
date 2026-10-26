@@ -91,7 +91,7 @@ function tkSheetRender() {
     (R ? "<h3>" + esc(t("tk_analysis")) + ' <span class="small muted num" dir="ltr">' + (R.tot > 0 ? "+" : "") + R.tot.toFixed(2) + " · " + esc(t("sca_agree").replace("{a}", R.agree).replace("{n}", R.nAct)) + "</span></h3><ul>" + ex.why.map((l) => "<li>" + esc(l) + "</li>").join("") + "</ul>" +
       (R.groups.length ? "<h3>" + esc(t("sca_lv")) + '</h3><div class="tk-lv">' + R.groups.map((g) => '<span class="tag ' + (g.p > R.c ? "ex-dn" : "up") + '"><span class="num" dir="ltr">' + tkFmt(g.p) + "</span> · " + esc(t(g.p > R.c ? "sca_res" : "sca_sup")) + " · " + g.ids.length + "</span>").join("") + "</div>" : "") +
       "<h3>" + esc(t("sca_scen")) + "</h3><ul>" + ex.scen.map((l) => "<li>" + esc(l) + "</li>").join("") + "</ul>" : "") +
-    '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn primary" data-act="tk-chart" data-s="' + esc(x.it.s) + '">' + esc(t("tk_open")) + '</button><button class="btn" data-act="tk-chart" data-ask="1" data-s="' + esc(x.it.s) + '">' + esc(t("tk_ask")) + "</button></div>" +
+    '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn primary" data-act="tk-chart" data-s="' + esc(x.it.s) + '">' + esc(t("tk_open")) + '</button><button class="btn" data-act="tk-chart" data-ask="1" data-s="' + esc(x.it.s) + '">' + esc(t("tk_ask")) + "</button>" + (typeof newsBtn === "function" ? newsBtn(x.it.s, true) : "") + "</div>" +
     '<p class="small muted" style="margin:8px 0 0">' + (live ? esc(t("tk_live")) + " " : "") + esc(t("tk_note")) + "</p></div>";
   if (sh.dataset.h !== html) { sh.innerHTML = html; sh.dataset.h = html; }
 }
