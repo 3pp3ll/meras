@@ -5087,7 +5087,7 @@ Object.assign(UI, {
   dh_short: ["اختصارات", "Shortcuts"], dh_idx: ["المؤشرات اليوم", "Indices today"], dh_idx_open: ["التفاصيل", "Details"],
   dh_news: ["أهم أخبار اليوم", "Today's top news"], dh_news_all: ["كل الأخبار", "All news"], dh_pf: ["محفظتي", "My portfolio"], dh_pf_open: ["افتح المحفظة", "Open portfolio"],
   dh_pf_none: ["ما سجلت صفقات للحين.", "No trades recorded yet."], dh_pf_n: ["{n} أسهم مفتوحة", "{n} open holdings"],
-  dh_div: ["توزيعات قريبة", "Upcoming dividends"], dh_div_all: ["كل التوزيعات", "All dividends"], dh_div_none: ["ما فيه توزيعات خلال 30 يوم في قائمتك.", "No dividends in the next 30 days on your list."],
+  dh_div: ["توزيعات قريبة", "Upcoming dividends"], dh_div_all: ["كل التوزيعات", "All dividends"], dh_div_none: ["ما فيه توزيعات خلال 30 يوم في قائمتك.", "No dividends in the next 30 days on your list."], dh_div_sa: ["التوزيعات السعودية", "Saudi dividends"], dh_div_gl: ["العالمية", "Global"],
   dh_decl: ["معلن", "Declared"], dh_est: ["متوقع", "Expected"], dh_days: ["بعد {n} يوم", "in {n} days"], dh_today: ["اليوم", "today"],
   dh_learn: ["كمّل التعلم", "Keep learning"], dh_lessons: ["{d} من {n} درس", "{d} of {n} lessons"], dh_go: ["كمّل", "Continue"],
   dh_pin_x: ["إخفاء", "Dismiss"], dh_pin_div: ["توزيع {k} لـ {s} بعد {n} يوم ({d}). آخر يوم شراء {b}.", "{k} dividend for {s} in {n} days ({d}). Last buy day {b}."],
@@ -5130,18 +5130,24 @@ function pagePfHub() { return '<div class="wrap"><div class="page-head"><h1>' + 
 
 /* ----- الرئيسية (لوحة المالك اليومية) ----- */
 function dhDivs() {
+  /* التوزيعات القريبة: السعودية (dividends.json) والعالمية (divglobal.json) مع بعض، الأقرب أول */
   const out = [], today = new Date(); today.setHours(0, 0, 0, 0);
-  if (typeof DG !== "undefined" && DG.data && DG.data.stocks) DG.data.stocks.forEach((s) => {
-    if (!s.next) return; const d = new Date(s.next + "T00:00:00"), n = Math.round((d - today) / 864e5);
-    if (n >= 0 && n <= 30) out.push({ s: s.s, name: s.n, n, date: s.next, decl: !!s.decl, amt: s.decl ? s.decl.amt : s.last ? s.last[1] : null, cur: s.cur, chg: s.decl ? s.decl.chg : null });
+  const days = (d) => Math.round((new Date(d + "T00:00:00") - today) / 864e5);
+  if (typeof DIV !== "undefined" && DIV && DIV.stocks) DIV.stocks.forEach((s) => {
+    if (!s.next_ex) return; const n = days(s.next_ex);
+    if (n >= 0 && n <= 30) out.push({ s: s.s, name: s.name, n, date: s.next_ex, decl: !!s.announced, amt: s.next_amt != null ? s.next_amt : s.last_amt, cur: "SAR", sa: 1, go: "dividends" });
   });
-  return out.sort((a, b) => a.n - b.n);
+  if (typeof DG !== "undefined" && DG.data && DG.data.stocks) DG.data.stocks.forEach((s) => {
+    if (!s.next) return; const n = days(s.next);
+    if (n >= 0 && n <= 30) out.push({ s: s.s, name: s.n, n, date: s.next, decl: !!s.decl, amt: s.decl ? s.decl.amt : s.last ? s.last[1] : null, cur: s.cur, chg: s.decl ? s.decl.chg : null, go: "gdiv" });
+  });
+  return out.sort((a, b) => a.n - b.n || (b.decl - a.decl) || (b.sa || 0) - (a.sa || 0));
 }
 const PIN_KEY = "meras.pin";
 function dhPin() {
   let off = ""; try { off = localStorage.getItem(PIN_KEY) || ""; } catch (e) {}
   const items = [];
-  dhDivs().filter((x) => x.decl && x.n <= 7).forEach((x) => { const lb = typeof dgLastBuy === "function" ? dgLastBuy(x.date) : x.date; items.push({ id: "div|" + x.s + "|" + x.date, tone: "amber", go: "gdiv", text: t("dh_pin_div").replace("{k}", t("dh_decl")).replace("{s}", x.s).replace("{n}", x.n).replace("{d}", "\u2066" + x.date + "\u2069").replace("{b}", "\u2066" + lb + "\u2069") }); });
+  dhDivs().filter((x) => x.decl && x.n <= 7).forEach((x) => { const lb = x.sa && typeof buyBy === "function" ? buyBy(x.date) : typeof dgLastBuy === "function" ? dgLastBuy(x.date) : x.date;   // السعودي: يتخطى الجمعة والسبت items.push({ id: "div|" + x.s + "|" + x.date, tone: "amber", go: x.go, text: t("dh_pin_div").replace("{k}", t("dh_decl")).replace("{s}", x.s + (x.sa ? " " + x.name : "")).replace("{n}", x.n).replace("{d}", "\u2066" + x.date + "\u2069").replace("{b}", "\u2066" + lb + "\u2069") }); });
   (typeof tkItems === "function" ? tkItems() : []).forEach((x) => { const d = x.st.d || 0; if (Math.abs(d) >= 0.02) items.push({ id: "idx|" + x.it.s + "|" + x.st.date, tone: d > 0 ? "up" : "down", tk: x.it.s, text: t("dh_pin_idx").replace("{s}", L(x.it.n)).replace("{w}", t(d > 0 ? "dh_up" : "dh_down")).replace("{p}", "⁦" + tkPct(Math.abs(d)).replace("+", "") + "⁩") }); });
   const p = items.find((x) => x.id !== off); if (!p) return "";
   return '<div class="dh-pin ' + p.tone + '" role="status"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>' +
@@ -5152,12 +5158,13 @@ function dhCard(title, link, linkLabel, body, cls) {
 }
 function pageDash() {
   if (typeof DG !== "undefined" && !DG.loaded && typeof loadDG === "function") loadDG();
+  if (typeof DIV !== "undefined" && !DIV && typeof loadDividends === "function") loadDividends();
   if (typeof NW !== "undefined" && !NW.loaded && typeof loadNews === "function") loadNews();
   if (typeof DK !== "undefined" && !DK.loaded && typeof loadDesk === "function") loadDesk();
   if (typeof EXTRA !== "undefined" && !EXTRA && typeof loadExtra === "function") loadExtra();
   const first = nextLesson("inv") || LESSONS[0], done = LESSONS.filter((l) => isDone(l.id)).length;
   const hero = '<section class="dh-hero"><div class="wrap"><div class="dh-hero-t"><p class="dh-eyebrow">' + esc(t("hero_eyebrow")) + "</p><h1>" + t("hero_h") + '</h1><p class="dh-lead">' + esc(t("hero_p_short")) + '</p></div><div class="row" style="gap:8px"><a class="btn primary" href="#l-' + first.id + '">' + esc(t("dh_go")) + ": " + esc(L(first.title)) + '</a><a class="btn ghost" href="#learn">' + esc(t("nav_learn")) + "</a></div></div></section>";
-  const sc = [["chart", "nav_chart", "chart"], ["portfolio", "dk_t_pf", "invest"], ["screener", "sc_t", "tech"], ["gdiv", "dividends", "dividends"], ["saved", "sv_t", "journal"], ["movers", "tp_t", "tech"]];
+  const sc = [["chart", "nav_chart", "chart"], ["portfolio", "dk_t_pf", "invest"], ["screener", "sc_t", "tech"], ["dividends", "dividends", "dividends"], ["saved", "sv_t", "journal"], ["movers", "tp_t", "tech"]];
   const shortcuts = '<div class="dh-sc">' + sc.map(([h, k, ic]) => '<a href="#' + h + '"><span class="dh-sci">' + (typeof DK_IC !== "undefined" && DK_IC[ROUTE_DESK[h]] ? '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">' + DK_IC[ROUTE_DESK[h]] + "</svg>" : secIc(ic, 22)) + "</span><b>" + esc(t(k === "dividends" ? "dh_div" : k)) + "</b></a>").join("") + "</div>";
   const idx = (typeof tkItems === "function" ? tkItems() : []);
   const idxCard = dhCard(t("dh_idx"), "#indices", t("nav_indices"), idx.length ? '<div class="dh-idx">' + idx.map((x) => dhIdxCard(x, false)).join("") + "</div>" : '<p class="muted small">' + esc(t("dh_loading")) + "</p>");
@@ -5167,8 +5174,8 @@ function pageDash() {
   let pfBody = '<p class="muted small">' + esc(t("dh_loading")) + "</p>";
   if (typeof DK !== "undefined" && DK.loaded) { try { const H = dkHoldings("SAR"), U = dkHoldings("USD"); pfBody = H.open.length || U.open.length ? (H.open.length ? '<b class="dh-big num">' + money(H.value, "SAR") + ' <small class="muted">SAR</small></b><span>' + dkSign(H.unreal) + (H.cost ? ' <span class="small">' + dkSign((H.unreal / H.cost) * 100, 1, "%") + "</span>" : "") + "</span>" : "") + (U.open.length ? '<b class="num">' + money(U.value, "USD") + "</b>" : "") + '<span class="small muted">' + esc(t("dh_pf_n").replace("{n}", H.open.length + U.open.length)) + "</span>" : '<p class="muted small">' + esc(t("dh_pf_none")) + "</p>"; } catch (e) { pfBody = ""; } }
   const pfCard = dhCard(t("dh_pf"), "#portfolio", t("dh_pf_open"), '<div class="stack" style="gap:4px">' + pfBody + "</div>");
-  const dv = dhDivs().slice(0, 4);
-  const divCard = dhCard(t("dh_div"), "#gdiv", t("dh_div_all"), dv.length ? '<ul class="dh-div">' + dv.map((x) => '<li><span><b class="num">' + esc(x.s) + '</b> <span class="tag ' + (x.decl ? "dg-off" : "") + '">' + esc(t(x.decl ? "dh_decl" : "dh_est")) + "</span>" + (x.amt != null ? ' <span class="num" dir="ltr">' + x.amt + (x.cur === "USD" ? "$" : " " + (x.cur || "")) + "</span>" : "") + '</span><small class="muted">' + esc(x.n ? t("dh_days").replace("{n}", x.n) : t("dh_today")) + "</small></li>").join("") + "</ul>" : '<p class="muted small">' + esc(t(typeof DG !== "undefined" && DG.loaded ? "dh_div_none" : "dh_loading")) + "</p>");
+  const dv = dhDivs().slice(0, 6);
+  const divCard = dhCard(t("dh_div"), "#dividends", t("dh_div_sa"), dv.length ? '<ul class="dh-div">' + dv.map((x) => '<li><span><a class="num" href="#' + x.go + '"><b>' + esc(x.s) + "</b></a>" + (x.sa ? ' <span class="small">' + esc(x.name) + "</span>" : "") + ' <span class="tag ' + (x.decl ? "dg-off" : "") + '">' + esc(t(x.decl ? "dh_decl" : "dh_est")) + "</span>" + (x.amt != null ? ' <span class="num" dir="ltr">' + x.amt + (x.cur === "USD" ? "$" : x.cur === "SAR" ? " ر.س" : " " + (x.cur || "")) + "</span>" : "") + '</span><small class="muted">' + esc(x.n ? t("dh_days").replace("{n}", x.n) : t("dh_today")) + "</small></li>").join("") + '</ul><a class="small" href="#gdiv">' + esc(t("dh_div_gl")) + " ←</a>" : '<p class="muted small">' + esc(t((typeof DG !== "undefined" && DG.loaded) || (typeof DIV !== "undefined" && DIV) ? "dh_div_none" : "dh_loading")) + "</p>");
   const learnCard = dhCard(t("dh_learn"), "#tracks", t("nav_tracks"), '<span>' + esc(L(first.title)) + '</span><div class="dh-bar"><i style="width:' + Math.round((done / LESSONS.length) * 100) + '%"></i></div><small class="muted">' + esc(t("dh_lessons").replace("{d}", done).replace("{n}", LESSONS.length)) + '</small><div><a class="btn sm primary" href="#l-' + first.id + '">' + esc(t("dh_go")) + "</a></div>");
   return hero + '<div class="wrap dh"><div class="stack" style="padding-block:16px 40px;gap:16px">' + dhPin() + shortcuts +
     '<div class="dh-cols"><div class="dh-main stack" style="gap:16px">' + idxCard + newsCard + '</div><aside class="dh-side stack" style="gap:16px">' + pfCard + divCard + learnCard + "</aside></div>" +
@@ -5887,6 +5894,7 @@ async function loadDividends() {
     DIVW = w && Array.isArray(w.data) ? w.data.map(String) : [];
   } catch (e) {}
   divLoading = false;
+  if (route() === "" && typeof isOwner === "function" && isOwner()) render();
   if (route() === "dividends" && !(document.activeElement && /INPUT|SELECT/.test(document.activeElement.tagName))) render();
 }
 async function toggleStar(sym) {

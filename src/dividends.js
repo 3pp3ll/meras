@@ -63,6 +63,7 @@ async function loadDividends() {
     DIVW = w && Array.isArray(w.data) ? w.data.map(String) : [];
   } catch (e) {}
   divLoading = false;
+  if (route() === "" && typeof isOwner === "function" && isOwner()) render();
   if (route() === "dividends" && !(document.activeElement && /INPUT|SELECT/.test(document.activeElement.tagName))) render();
 }
 async function toggleStar(sym) {
