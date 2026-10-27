@@ -272,3 +272,6 @@ document.addEventListener("submit", async (e) => {
 }, true);
 
 if (HOSTED) { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => setTimeout(maInit, 50)); else setTimeout(maInit, 50); }
+
+/* ارتفاع الهيدر الفعلي (مع الشريط المتحرك) للقوائم اللاصقة */
+(function () { const upd = () => { const h = document.getElementById("top"); if (h) document.documentElement.style.setProperty("--hdr-h", h.offsetHeight + "px"); }; window.addEventListener("resize", upd); setInterval(upd, 1500); setTimeout(upd, 300); })();

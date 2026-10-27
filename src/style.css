@@ -1589,3 +1589,6 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .dve>p{padding:6px 16px 14px}
 @media (max-width:560px){.dve-line{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:14px}.dve-line li:nth-child(2)::before{inset-inline-end:50%}.dve-line li:nth-child(3)::before{inset-inline-start:50%}}
 @media (max-width:640px){.dve-grid{grid-template-columns:minmax(0,1fr)}}
+/* القائمة الجانبية: تلصق تحت الهيدر وتتمرر من داخلها عشان تبان كل الأقسام */
+.dk-side,.side-shell > .dk-side{top:calc(var(--hdr-h,112px) + 12px + env(safe-area-inset-top,0px))!important;max-height:calc(100vh - var(--hdr-h,112px) - 24px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;border-radius:16px}
+.dk-side::-webkit-scrollbar{width:6px}.dk-side::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}

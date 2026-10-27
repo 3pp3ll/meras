@@ -1623,6 +1623,9 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .dve>p{padding:6px 16px 14px}
 @media (max-width:560px){.dve-line{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:14px}.dve-line li:nth-child(2)::before{inset-inline-end:50%}.dve-line li:nth-child(3)::before{inset-inline-start:50%}}
 @media (max-width:640px){.dve-grid{grid-template-columns:minmax(0,1fr)}}
+/* القائمة الجانبية: تلصق تحت الهيدر وتتمرر من داخلها عشان تبان كل الأقسام */
+.dk-side,.side-shell > .dk-side{top:calc(var(--hdr-h,112px) + 12px + env(safe-area-inset-top,0px))!important;max-height:calc(100vh - var(--hdr-h,112px) - 24px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;border-radius:16px}
+.dk-side::-webkit-scrollbar{width:6px}.dk-side::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -9604,6 +9607,9 @@ document.addEventListener("submit", async (e) => {
 }, true);
 
 if (HOSTED) { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => setTimeout(maInit, 50)); else setTimeout(maInit, 50); }
+
+/* ارتفاع الهيدر الفعلي (مع الشريط المتحرك) للقوائم اللاصقة */
+(function () { const upd = () => { const h = document.getElementById("top"); if (h) document.documentElement.style.setProperty("--hdr-h", h.offsetHeight + "px"); }; window.addEventListener("resize", upd); setInterval(upd, 1500); setTimeout(upd, 300); })();
 /* ===== مِراس: إدارة الفريق =====
    المالك يعطي أي مستخدم صلاحيات محددة (المدونة، المستخدمين، مكتبي). الصلاحية اللي ما تنعطى ما تظهر للعضو أصلاً.
    كل تحقق حقيقي يصير في قاعدة البيانات (has_perm و set_perms)، والواجهة بس تعكسه. */
