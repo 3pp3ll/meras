@@ -60,7 +60,8 @@ function snRender() {
   if (!loaded && typeof loadNews === "function") loadNews();
   SN.wait = !loaded;
   const items = loaded ? snItems(s) : [];
-  const foreign = items.some((x) => x.lang !== "ar");
+  const webItems = typeof WN !== "undefined" && WN[s] && WN[s].v && WN[s].v.items ? WN[s].v.items : [];
+  const foreign = items.concat(webItems).some((x) => x.lang !== "ar");
   const head = (x) => {
     const tr = SN.tr && x.lang !== "ar" && SN_TR[x.t];
     return tr ? '<p class="sn-t" dir="rtl">' + esc(tr) + '</p><p class="small muted sn-orig" dir="ltr">' + esc(x.t) + "</p>" : '<p class="sn-t" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</p>";
@@ -69,14 +70,16 @@ function snRender() {
   const trNote = SN.tr && (SN.trBusy || SN.trErr) ? '<p class="small ' + (SN.trErr ? "sn-err" : "muted") + '" style="margin:6px 0 0">' + esc(SN.trBusy ? t("sn_tr_wait") : SN.trErr) + "</p>" : "";
   const list = !loaded ? '<p class="muted">' + esc(t("sn_loading")) + "</p>" : items.length ? trNote + '<ul class="sn-list">' + items.map((x) => '<li><div class="nw-meta">' + (x.imp >= 3 ? '<span class="tag nw-hot">' + esc(t("nw_hot")) + "</span>" : "") + '<span class="small muted">' + esc(x.src || "") + " · " + esc(nwAgo(x.at)) + '</span></div>' + head(x) + '<a class="small" href="' + esc(nwLink(x.url)) + '" target="_blank" rel="noopener noreferrer">' + esc(t("nw_more")) + " ↗</a>" + gLink(x) + "</li>").join("") + "</ul>" : '<p class="muted">' + esc(t("sn_none")) + "</p>";
   const trBtn = loaded && foreign ? '<button type="button" class="btn sm sn-trb' + (SN.tr ? " on" : "") + '" data-act="sn-tr" aria-pressed="' + SN.tr + '" title="' + esc(t(SN.tr ? "sn_tr_off" : "sn_tr")) + '" aria-label="' + esc(t(SN.tr ? "sn_tr_off" : "sn_tr")) + '">' + SN_TR_IC + "</button>" : "";
-  el.innerHTML = '<div class="tk-back" data-act="sn-close"></div><div class="tk-card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:nowrap"><div style="flex:1;min-width:0"><div class="row" style="gap:8px;flex-wrap:nowrap;align-items:center"><h2 style="margin:0">' + esc(t(s[0] === "^" ? "sn_mkt" : "sn_h").replace("{s}", s.replace(/^\^/, "") + " " + nm)) + "</h2>" + trBtn + '</div><p class="small muted" style="margin:2px 0 0">' + esc(t("sn_note")) + (typeof NW !== "undefined" && NW.data && NW.data.fetched_at ? " · " + esc(whenText(NW.data.fetched_at)) : "") + '</p></div><button class="btn sm" data-act="sn-close" aria-label="' + esc(t("tk_close")) + '">✕</button></div>' + list +
+  const wantWeb = loaded && s[0] !== "^" && items.length < 4 && typeof webNews === "function";
+  if (wantWeb && !WN[s]) webNews(s).then(() => { if (SN.s === s) { snRender(); if (SN.tr) snTranslate(((WN[s] && WN[s].v && WN[s].v.items) || []).concat(snItems(s))); } });
+  el.innerHTML = '<div class="tk-back" data-act="sn-close"></div><div class="tk-card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:nowrap"><div style="flex:1;min-width:0"><div class="row" style="gap:8px;flex-wrap:nowrap;align-items:center"><h2 style="margin:0">' + esc(t(s[0] === "^" ? "sn_mkt" : "sn_h").replace("{s}", s.replace(/^\^/, "") + " " + nm)) + "</h2>" + trBtn + '</div><p class="small muted" style="margin:2px 0 0">' + esc(t("sn_note")) + (typeof NW !== "undefined" && NW.data && NW.data.fetched_at ? " · " + esc(whenText(NW.data.fetched_at)) : "") + '</p></div><button class="btn sm" data-act="sn-close" aria-label="' + esc(t("tk_close")) + '">✕</button></div>' + list + (wantWeb ? wnBlock(s) : "") +
     '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px"><b class="small">' + esc(t("sn_more")) + ":</b>" + snLinks(s).map(([n, u]) => '<a class="btn sm" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(n) + " ↗</a>").join("") +
     (typeof asOpen === "function" ? '<button class="btn sm primary" data-act="sn-ask">✦ ' + esc(t("sn_ask")) + "</button>" : "") + '</div><p class="small muted" style="margin:8px 0 0">' + esc(t("nw_note")) + "</p></div>";
 }
 document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act="sn-open"],[data-act="sn-close"],[data-act="sn-ask"],[data-act="sn-tr"]'); if (!el) return;
   e.preventDefault(); e.stopPropagation();
-  if (el.dataset.act === "sn-tr") { SN.tr = !SN.tr; SN.trErr = ""; try { localStorage.setItem("meras.sntr.on", SN.tr ? "1" : ""); } catch (x) {} snRender(); if (SN.tr) snTranslate(snItems(SN.s)); return; }
+  if (el.dataset.act === "sn-tr") { SN.tr = !SN.tr; SN.trErr = ""; try { localStorage.setItem("meras.sntr.on", SN.tr ? "1" : ""); } catch (x) {} snRender(); if (SN.tr) snTranslate(snItems(SN.s).concat((typeof WN !== "undefined" && WN[SN.s] && WN[SN.s].v && WN[SN.s].v.items) || [])); return; }
   if (el.dataset.act === "sn-open") { SN.s = el.dataset.s; try { SN.tr = localStorage.getItem("meras.sntr.on") === "1"; } catch (x) {} SN.trErr = ""; snRender(); if (SN.tr && NW.loaded) snTranslate(snItems(SN.s)); }
   else if (el.dataset.act === "sn-close") { SN.s = null; snRender(); }
   else { const s = SN.s, nm = typeof symName === "function" ? symName(s) : s; SN.s = null; snRender(); if (typeof AS !== "undefined") AS.focus = s; asOpen(L(["وش آخر أخبار " + s + " " + nm + " وكيف ممكن تأثر عليه؟", "What is the latest news on " + s + " " + nm + " and how might it affect it?"])); }

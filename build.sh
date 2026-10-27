@@ -8,7 +8,7 @@ body() {
   echo '<style>'; cat src/style.css; echo '</style>'
   echo '<header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>'
   echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>'
-  echo '<script>'; cat src/content.js src/app.js src/theme.js src/chart.js src/lab.js src/fib.js src/guides.js src/schools.js src/example.js src/schoolchart.js src/saved.js src/ticker.js src/search.js src/sections.js src/assist.js src/symnews.js src/symbols.js src/indicators.js src/sync.js src/ai.js src/dividends.js src/tech.js src/invest.js src/metals.js src/nav.js src/owner.js src/desk.js src/apps.js src/us.js src/extra.js src/sharia.js src/screener.js src/top.js src/divglobal.js src/news.js src/notify.js src/landing.js src/tree.js src/options.js src/auth.js src/blog.js src/boot.js; echo '</script>'
+  echo '<script>'; cat src/content.js src/app.js src/theme.js src/chart.js src/lab.js src/fib.js src/guides.js src/schools.js src/example.js src/schoolchart.js src/saved.js src/ticker.js src/search.js src/sections.js src/assist.js src/symnews.js src/webnews.js src/symbols.js src/indicators.js src/sync.js src/ai.js src/dividends.js src/tech.js src/invest.js src/metals.js src/nav.js src/owner.js src/desk.js src/apps.js src/us.js src/extra.js src/sharia.js src/screener.js src/top.js src/divglobal.js src/news.js src/notify.js src/landing.js src/tree.js src/options.js src/auth.js src/team.js src/blog.js src/boot.js; echo '</script>'
 }
 {
 cat <<'HEAD'

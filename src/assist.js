@@ -65,6 +65,7 @@ const AS_SYSTEM = (lang) => [
   "1. Use the numbers in the context; if something is not there, say so plainly and suggest where in Meras to find it.",
   "2. Explain, compare and discuss conditional scenarios, levels and risk. Never give a direct instruction to buy or sell, never promise outcomes, never invent probabilities.",
   "3. When pointing to a Meras page, write a link exactly as [[#route|label]] using routes from the page list only (e.g. [[#chart|الشارت]]). At most 3 links per answer.",
+  "5. If the context has web_news, those are headlines fetched just now from the web (Google News covering Argaam, Maaal, Aleqtisadiah and Tadawul announcements as reported). Use them for news questions, mention the source name and date, and say if they look thin. Never claim you cannot search when web_news is present.",
   "4. Keep answers short (under 170 words) unless asked for detail. Plain text, short paragraphs or '-' lists, no markdown headings or bold, English digits (0-9).",
   "Language and tone: " + (lang === "ar" ? "friendly Saudi Arabic, like an experienced friend." : "plain friendly English.")
 ].join("\n");
@@ -74,7 +75,7 @@ async function asAsk(q) {
   if (!AI.model) { AS.err = t("ai_need_model"); asRender(); return; }
   if (asUsed() >= asLimit()) { AS.err = t("as_limit"); asRender(); return; }
   AS.msgs.push({ r: "u", t: q }); AS.busy = true; AS.err = ""; asRender();
-  const msgs = [{ role: "system", content: AS_SYSTEM(S.lang) }, { role: "user", content: "Meras pages:\n" + asCatalog() + "\n\nContext JSON:\n" + JSON.stringify(asContext()) }, { role: "assistant", content: S.lang === "ar" ? "تمام، وصلتني." : "Got it." }];
+  const msgs = [{ role: "system", content: AS_SYSTEM(S.lang) }, { role: "user", content: "Meras pages:\n" + asCatalog() + "\n\nContext JSON:\n" + JSON.stringify(typeof asCtxWeb === "function" ? await asCtxWeb(q) : asContext()) }, { role: "assistant", content: S.lang === "ar" ? "تمام، وصلتني." : "Got it." }];
   AS.msgs.slice(-9, -1).forEach((m) => msgs.push({ role: m.r === "u" ? "user" : "assistant", content: m.t }));
   msgs.push({ role: "user", content: q });
   let text = "", err = "";

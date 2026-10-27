@@ -15,7 +15,7 @@ Object.assign(UI, {
   bl_title: ["العنوان", "Title"], bl_body: ["وش تبي تشارك؟", "What would you like to share?"], bl_body_ph: ["تجربة، فكرة، درس تعلمته، أو ملاحظة على المنصة… بدون توصيات شراء أو بيع.", "An experience, idea, lesson, or platform feedback… no buy/sell recommendations."],
   bl_send: ["انشر", "Publish"], bl_sending: ["جاري الفحص والنشر…", "Checking and publishing…"], bl_pub_ok: ["انتشر منشورك ✓", "Your post is live ✓"],
   bl_pub_held: ["وصل منشورك، وبيطلع بعد مراجعة الإدارة.", "Received. It will appear after review."], bl_rules: ["ممنوع: توصيات شراء أو بيع، أسعار دخول وأهداف لسهم محدد، وروابط قنوات أو اشتراكات.", "Not allowed: buy/sell calls, entry prices or targets for a named share, and links to channels or paid groups."],
-  bl_mod: ["بانتظار المراجعة", "Pending review"], bl_approve: ["اعتماد", "Approve"], bl_hide: ["حجب", "Hide"], bl_reject: ["رفض", "Reject"], bl_del: ["حذف", "Delete"], bl_mod_none: ["ما فيه منشورات بانتظار المراجعة.", "Nothing pending."],
+  bl_mod: ["بانتظار المراجعة", "Pending review"], bl_approve: ["اعتماد", "Approve"], bl_hide: ["حجب", "Hide"], bl_edit: ["تعديل", "Edit"], bl_save: ["حفظ", "Save"], bl_reject: ["رفض", "Reject"], bl_del: ["حذف", "Delete"], bl_mod_none: ["ما فيه منشورات بانتظار المراجعة.", "Nothing pending."],
   bl_ai: ["سبب الحجب:", "Flag reason:"], bl_email: ["البريد الإلكتروني", "Email"], bl_pass: ["كلمة المرور", "Password"], bl_name: ["الاسم اللي يظهر مع منشوراتك", "Display name"],
   bl_in: ["دخول", "Sign in"], bl_up: ["إنشاء حساب", "Create account"], bl_forgot: ["نسيت كلمة المرور؟", "Forgot password?"], bl_remember: ["تذكرني", "Remember me"],
   bl_have: ["عندك حساب؟", "Have an account?"], bl_new: ["ما عندك حساب؟", "New here?"], bl_out: ["تسجيل الخروج", "Sign out"], bl_hi: ["أهلاً {n}", "Hi {n}"],
@@ -86,16 +86,26 @@ async function blFetch() {
   BL.posts = a.data || []; BL.held = b.data || [];
   BL.mine = []; BL.pending = [];
   if (BL.user) { const { data } = await BL.sb.from("posts").select("*").eq("author", BL.user.id).neq("status", "published").order("created_at", { ascending: false }); BL.mine = data || []; }
-  if (BL.prof && BL.prof.is_admin) { const { data } = await BL.sb.from("posts").select("*").eq("status", "held").order("created_at", { ascending: true }); BL.pending = data || []; }
+  if (blCan("blog_approve") || blCan("blog_hide")) { const { data } = await BL.sb.from("posts").select("*").eq("status", "held").order("created_at", { ascending: true }); BL.pending = data || []; }
 }
 
 /* ---------- الواجهة ---------- */
 function blCard(p) {
   return '<a class="bl-card b-' + p.c.slice(1) + '" href="#b-' + p.id + '"><span class="bl-tag">' + esc(p.tag) + '</span><h3>' + esc(p.title) + '</h3><p>' + esc(p.lead) + '</p><span class="bl-meta small muted">' + esc(t("bl_team")) + " · " + esc(blDate(p.date)) + " · " + esc(t("bl_read").replace("{n}", p.min)) + "</span></a>";
 }
+const blCan = (k) => typeof MA !== "undefined" && MA.can && MA.can(k);
+function blTools(p, held) {
+  const b = [];
+  if (BL.edit === p.id) return '<form class="stack bl-editf" data-form="bl-edit" data-id="' + p.id + '"><input id="bl-et" maxlength="120" value="' + esc(p.title) + '"><textarea id="bl-eb" rows="6" maxlength="5000">' + esc(p.body) + '</textarea><div class="row" style="gap:6px"><button class="btn sm primary">' + esc(t("bl_save")) + '</button><button type="button" class="btn sm ghost" data-act="bl-edit" data-id="' + p.id + '">✕</button></div></form>';
+  if (held && blCan("blog_approve")) b.push('<button class="btn sm primary" data-act="bl-ok" data-id="' + p.id + '">' + esc(t("bl_approve")) + "</button>", '<button class="btn sm ghost" data-act="bl-no" data-id="' + p.id + '">' + esc(t("bl_reject")) + "</button>");
+  if (!held && blCan("blog_hide")) b.push('<button class="btn sm ghost" data-act="bl-hide" data-id="' + p.id + '">🔒 ' + esc(t("bl_hide")) + "</button>");
+  if (blCan("blog_edit")) b.push('<button class="btn sm ghost" data-act="bl-edit" data-id="' + p.id + '">✎ ' + esc(t("bl_edit")) + "</button>");
+  if (blCan("blog_delete")) b.push('<button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button>");
+  return b.length ? '<div class="row" style="gap:6px;flex-wrap:wrap">' + b.join("") + "</div>" : "";
+}
 function blUserPost(p) {
   return '<article class="bl-up panel"><header class="bl-upH"><span class="bl-av">' + esc((p.author_name || "؟").trim()[0]) + '</span><div><b>' + esc(p.author_name || "") + '</b><span class="small muted">' + esc(blDate(p.created_at)) + '</span></div></header><h3>' + esc(p.title) + '</h3><div class="bl-upB">' + esc(p.body).replace(/\n/g, "<br>") + '</div><p class="bl-disc small">' + esc(t("bl_disc")) + "</p>" +
-    (BL.prof && BL.prof.is_admin ? '<div class="row" style="gap:6px"><button class="btn sm ghost" data-act="bl-hide" data-id="' + p.id + '">🔒 ' + esc(t("bl_hide")) + '</button><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div>" : "") + "</article>";
+    blTools(p, false) + "</article>";
 }
 function blHeldCard(p, own) {
   const body = own ? p.body : "";
@@ -126,10 +136,10 @@ function blCompose() {
       : m + '<button class="btn primary" data-act="bl-compose">✎ ' + esc(t("bl_write")) + "</button>") + "</div>";
 }
 function blModeration() {
-  if (!(BL.prof && BL.prof.is_admin)) return "";
+  if (!(blCan("blog_approve") || blCan("blog_hide"))) return "";
   return '<details class="panel bl-mod" open><summary><b>' + esc(t("bl_mod")) + '</b> <span class="tag amber">' + BL.pending.length + "</span></summary>" +
     (BL.pending.length ? BL.pending.map((p) => '<div class="bl-modi"><b>' + esc(p.title) + '</b><span class="small muted"> — ' + esc(p.author_name || "") + " · " + esc(blDate(p.created_at)) + '</span><div class="bl-upB">' + esc(p.body).replace(/\n/g, "<br>") + "</div>" + (p.ai_reason ? '<p class="small bl-err" style="margin:4px 0">' + esc(t("bl_ai")) + " " + esc(p.ai_reason) + "</p>" : "") +
-      '<div class="row" style="gap:6px"><button class="btn sm primary" data-act="bl-ok" data-id="' + p.id + '">' + esc(t("bl_approve")) + '</button><button class="btn sm ghost" data-act="bl-no" data-id="' + p.id + '">' + esc(t("bl_reject")) + '</button><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div></div>").join("") : '<p class="small muted">' + esc(t("bl_mod_none")) + "</p>") + "</details>";
+      blTools(p, true) + "</div>").join("") : '<p class="small muted">' + esc(t("bl_mod_none")) + "</p>") + "</details>";
 }
 function pageBlog() {
   if (blReady() && !BL.started && !BL.loading) setTimeout(blInit, 0);
@@ -170,9 +180,9 @@ document.addEventListener("click", async (e) => {
   if (a === "bl-peek") { BL.peek[el.dataset.id] = !BL.peek[el.dataset.id]; el.classList.toggle("open", !!BL.peek[el.dataset.id]); return; }
   if (!BL.sb) return;
   if (a === "bl-out") { await BL.sb.auth.signOut(); BL.compose = false; BL.msg = ""; return; }
-  if (a === "bl-hide") { el.disabled = true; await BL.sb.from("posts").update({ status: "held", reviewed_at: new Date().toISOString() }).eq("id", el.dataset.id); await blFetch(); blPaint(); return; }
-  if (a === "bl-ok" || a === "bl-no") { el.disabled = true; await BL.sb.from("posts").update({ status: a === "bl-ok" ? "published" : "rejected", reviewed_at: new Date().toISOString() }).eq("id", el.dataset.id); await blFetch(); blPaint(); return; }
-  if (a === "bl-del") { if (el.dataset.sure !== "1") { el.dataset.sure = "1"; el.textContent = "؟"; return; } await BL.sb.from("posts").delete().eq("id", el.dataset.id); await blFetch(); blPaint(); }
+  if (a === "bl-edit") { BL.edit = BL.edit === +el.dataset.id ? null : +el.dataset.id; blPaint(); return; }
+  if (a === "bl-hide" || a === "bl-ok" || a === "bl-no") { el.disabled = true; const { error } = await BL.sb.rpc("moderate_post", { pid: +el.dataset.id, act: { "bl-hide": "hide", "bl-ok": "approve", "bl-no": "reject" }[a] }); if (error) toast(t("tm_err")); await blFetch(); blPaint(); return; }
+  if (a === "bl-del") { if (el.dataset.sure !== "1") { el.dataset.sure = "1"; el.textContent = "؟"; return; } const { error } = await BL.sb.rpc("moderate_post", { pid: +el.dataset.id, act: "delete" }); if (error) toast(t("tm_err")); await blFetch(); blPaint(); }
 });
 document.addEventListener("submit", async (e) => {
   const f = e.target; if (!f.dataset || !/^bl-/.test(f.dataset.form || "")) return;
@@ -181,6 +191,10 @@ document.addEventListener("submit", async (e) => {
   const kind = f.dataset.form, okEmail = (x) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x);
   const page = location.href.split("#")[0] + "#blog";
   try {
+    if (kind === "bl-edit") {
+      const { error } = await BL.sb.rpc("edit_post", { pid: +f.dataset.id, new_title: v("bl-et"), new_body: document.getElementById("bl-eb").value });
+      if (error) { toast(t("tm_err")); return; } BL.edit = null; await blFetch(); blPaint(); return;
+    }
     if (kind === "bl-login") {
       if (!okEmail(v("bl-em"))) return blMsg(t("bl_err_email"));
       const rem = document.getElementById("bl-rem").checked; let was = true; try { was = localStorage.getItem("meras.bl.rem") !== "0"; localStorage.setItem("meras.bl.rem", rem ? "1" : "0"); } catch (x) {}

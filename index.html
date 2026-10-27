@@ -1578,6 +1578,20 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 @media (min-width:761px){.top .wrap{flex-wrap:nowrap}.tools{flex:none}}
 @media (min-width:761px) and (max-width:1400px){.top .wrap{gap:10px}.nav a{padding:7px 9px;font-size:15.5px}[dir="rtl"] .clock{margin-left:12px}[dir="ltr"] .clock{margin-right:12px}}
 @media (min-width:761px) and (max-width:1180px){.clock .csec{display:none}.nav a{padding:6px 7px;font-size:15px}}
+
+/* ===== إدارة الفريق ===== */
+.tm-u{display:grid;gap:10px}
+.tm-uh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tm-un{flex:1;min-width:160px;display:flex;flex-direction:column}
+.tm-chips{display:flex;gap:6px;flex-wrap:wrap}
+.tm-form{display:grid;gap:12px}
+.tm-form fieldset{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:0;display:grid;gap:6px}
+.tm-form legend{font-weight:700;padding:0 6px}
+.tm-chk{display:flex;align-items:center;gap:8px;cursor:pointer}.tm-chk input{width:18px;height:18px;accent-color:var(--amber-ink)}
+.tm-warn{color:var(--down);margin:2px 0 0;line-height:1.6}
+.bl-editf input,.bl-editf textarea{width:100%;box-sizing:border-box}
+
+.wn-h{font-size:15px;margin:14px 0 4px;padding-top:10px;border-top:1px dashed var(--line)}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2681,7 +2695,7 @@ function renderNow() {
   else if (r.startsWith("sch-")) html = pageSchool(r.slice(4));
   else if (r.startsWith("b-") && typeof pageBlogPost === "function") html = pageBlogPost(r.slice(2));
   else if (typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[r] && r !== "tech") html = deskPage(r);
-  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), home: () => (typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), market: pageMarketHub, pf: pagePfHub, map: pageMap, indices: pageIndices, welcome: pageLanding, learn: pageLearn, services: pagePfHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, blog: typeof pageBlog === "function" ? pageBlog : pageHome, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
+  else html = ({ "": () => (typeof lnShow === "function" && lnShow() ? pageLanding() : typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), home: () => (typeof isOwner === "function" && isOwner() ? pageDash() : pageGate()), market: pageMarketHub, pf: pagePfHub, map: pageMap, indices: pageIndices, welcome: pageLanding, learn: pageLearn, services: pagePfHub, tracks: pageTracks, journal: pageJournal, calc: pageCalc, glossary: pageGlossary, blog: typeof pageBlog === "function" ? pageBlog : pageHome, team: typeof pageTeam === "function" ? pageTeam : pageHome, symbols: pageSymbols, analyses: pageAnalyses, dividends: pageDividends, tech: pageTech, invest: pageInvest, metals: pageMetals, owner: pageOwner, desk: pageDesk, shared: pageShared, sharia: pageSharia, progress: pageProgress, plans: pagePlans, checkout: pageCheckout, account: pageAccount, settings: pageSettings, chart: pageChart, guides: pageGuides, schools: pageSchools, lab: pageLab }[r] || pageHome)();
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; if (["learn", "market", "pf"].includes(g) && typeof sideShell === "function") html = sideShell(g, r, html); }
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "pf" || g === "market" ? "s" : r === "" || r === "home" ? "a" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;
@@ -5390,6 +5404,7 @@ const AS_SYSTEM = (lang) => [
   "1. Use the numbers in the context; if something is not there, say so plainly and suggest where in Meras to find it.",
   "2. Explain, compare and discuss conditional scenarios, levels and risk. Never give a direct instruction to buy or sell, never promise outcomes, never invent probabilities.",
   "3. When pointing to a Meras page, write a link exactly as [[#route|label]] using routes from the page list only (e.g. [[#chart|الشارت]]). At most 3 links per answer.",
+  "5. If the context has web_news, those are headlines fetched just now from the web (Google News covering Argaam, Maaal, Aleqtisadiah and Tadawul announcements as reported). Use them for news questions, mention the source name and date, and say if they look thin. Never claim you cannot search when web_news is present.",
   "4. Keep answers short (under 170 words) unless asked for detail. Plain text, short paragraphs or '-' lists, no markdown headings or bold, English digits (0-9).",
   "Language and tone: " + (lang === "ar" ? "friendly Saudi Arabic, like an experienced friend." : "plain friendly English.")
 ].join("\n");
@@ -5399,7 +5414,7 @@ async function asAsk(q) {
   if (!AI.model) { AS.err = t("ai_need_model"); asRender(); return; }
   if (asUsed() >= asLimit()) { AS.err = t("as_limit"); asRender(); return; }
   AS.msgs.push({ r: "u", t: q }); AS.busy = true; AS.err = ""; asRender();
-  const msgs = [{ role: "system", content: AS_SYSTEM(S.lang) }, { role: "user", content: "Meras pages:\n" + asCatalog() + "\n\nContext JSON:\n" + JSON.stringify(asContext()) }, { role: "assistant", content: S.lang === "ar" ? "تمام، وصلتني." : "Got it." }];
+  const msgs = [{ role: "system", content: AS_SYSTEM(S.lang) }, { role: "user", content: "Meras pages:\n" + asCatalog() + "\n\nContext JSON:\n" + JSON.stringify(typeof asCtxWeb === "function" ? await asCtxWeb(q) : asContext()) }, { role: "assistant", content: S.lang === "ar" ? "تمام، وصلتني." : "Got it." }];
   AS.msgs.slice(-9, -1).forEach((m) => msgs.push({ role: m.r === "u" ? "user" : "assistant", content: m.t }));
   msgs.push({ role: "user", content: q });
   let text = "", err = "";
@@ -5529,7 +5544,8 @@ function snRender() {
   if (!loaded && typeof loadNews === "function") loadNews();
   SN.wait = !loaded;
   const items = loaded ? snItems(s) : [];
-  const foreign = items.some((x) => x.lang !== "ar");
+  const webItems = typeof WN !== "undefined" && WN[s] && WN[s].v && WN[s].v.items ? WN[s].v.items : [];
+  const foreign = items.concat(webItems).some((x) => x.lang !== "ar");
   const head = (x) => {
     const tr = SN.tr && x.lang !== "ar" && SN_TR[x.t];
     return tr ? '<p class="sn-t" dir="rtl">' + esc(tr) + '</p><p class="small muted sn-orig" dir="ltr">' + esc(x.t) + "</p>" : '<p class="sn-t" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</p>";
@@ -5538,14 +5554,16 @@ function snRender() {
   const trNote = SN.tr && (SN.trBusy || SN.trErr) ? '<p class="small ' + (SN.trErr ? "sn-err" : "muted") + '" style="margin:6px 0 0">' + esc(SN.trBusy ? t("sn_tr_wait") : SN.trErr) + "</p>" : "";
   const list = !loaded ? '<p class="muted">' + esc(t("sn_loading")) + "</p>" : items.length ? trNote + '<ul class="sn-list">' + items.map((x) => '<li><div class="nw-meta">' + (x.imp >= 3 ? '<span class="tag nw-hot">' + esc(t("nw_hot")) + "</span>" : "") + '<span class="small muted">' + esc(x.src || "") + " · " + esc(nwAgo(x.at)) + '</span></div>' + head(x) + '<a class="small" href="' + esc(nwLink(x.url)) + '" target="_blank" rel="noopener noreferrer">' + esc(t("nw_more")) + " ↗</a>" + gLink(x) + "</li>").join("") + "</ul>" : '<p class="muted">' + esc(t("sn_none")) + "</p>";
   const trBtn = loaded && foreign ? '<button type="button" class="btn sm sn-trb' + (SN.tr ? " on" : "") + '" data-act="sn-tr" aria-pressed="' + SN.tr + '" title="' + esc(t(SN.tr ? "sn_tr_off" : "sn_tr")) + '" aria-label="' + esc(t(SN.tr ? "sn_tr_off" : "sn_tr")) + '">' + SN_TR_IC + "</button>" : "";
-  el.innerHTML = '<div class="tk-back" data-act="sn-close"></div><div class="tk-card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:nowrap"><div style="flex:1;min-width:0"><div class="row" style="gap:8px;flex-wrap:nowrap;align-items:center"><h2 style="margin:0">' + esc(t(s[0] === "^" ? "sn_mkt" : "sn_h").replace("{s}", s.replace(/^\^/, "") + " " + nm)) + "</h2>" + trBtn + '</div><p class="small muted" style="margin:2px 0 0">' + esc(t("sn_note")) + (typeof NW !== "undefined" && NW.data && NW.data.fetched_at ? " · " + esc(whenText(NW.data.fetched_at)) : "") + '</p></div><button class="btn sm" data-act="sn-close" aria-label="' + esc(t("tk_close")) + '">✕</button></div>' + list +
+  const wantWeb = loaded && s[0] !== "^" && items.length < 4 && typeof webNews === "function";
+  if (wantWeb && !WN[s]) webNews(s).then(() => { if (SN.s === s) { snRender(); if (SN.tr) snTranslate(((WN[s] && WN[s].v && WN[s].v.items) || []).concat(snItems(s))); } });
+  el.innerHTML = '<div class="tk-back" data-act="sn-close"></div><div class="tk-card"><div class="row" style="justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:nowrap"><div style="flex:1;min-width:0"><div class="row" style="gap:8px;flex-wrap:nowrap;align-items:center"><h2 style="margin:0">' + esc(t(s[0] === "^" ? "sn_mkt" : "sn_h").replace("{s}", s.replace(/^\^/, "") + " " + nm)) + "</h2>" + trBtn + '</div><p class="small muted" style="margin:2px 0 0">' + esc(t("sn_note")) + (typeof NW !== "undefined" && NW.data && NW.data.fetched_at ? " · " + esc(whenText(NW.data.fetched_at)) : "") + '</p></div><button class="btn sm" data-act="sn-close" aria-label="' + esc(t("tk_close")) + '">✕</button></div>' + list + (wantWeb ? wnBlock(s) : "") +
     '<div class="row" style="gap:8px;flex-wrap:wrap;margin-top:10px"><b class="small">' + esc(t("sn_more")) + ":</b>" + snLinks(s).map(([n, u]) => '<a class="btn sm" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' + esc(n) + " ↗</a>").join("") +
     (typeof asOpen === "function" ? '<button class="btn sm primary" data-act="sn-ask">✦ ' + esc(t("sn_ask")) + "</button>" : "") + '</div><p class="small muted" style="margin:8px 0 0">' + esc(t("nw_note")) + "</p></div>";
 }
 document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act="sn-open"],[data-act="sn-close"],[data-act="sn-ask"],[data-act="sn-tr"]'); if (!el) return;
   e.preventDefault(); e.stopPropagation();
-  if (el.dataset.act === "sn-tr") { SN.tr = !SN.tr; SN.trErr = ""; try { localStorage.setItem("meras.sntr.on", SN.tr ? "1" : ""); } catch (x) {} snRender(); if (SN.tr) snTranslate(snItems(SN.s)); return; }
+  if (el.dataset.act === "sn-tr") { SN.tr = !SN.tr; SN.trErr = ""; try { localStorage.setItem("meras.sntr.on", SN.tr ? "1" : ""); } catch (x) {} snRender(); if (SN.tr) snTranslate(snItems(SN.s).concat((typeof WN !== "undefined" && WN[SN.s] && WN[SN.s].v && WN[SN.s].v.items) || [])); return; }
   if (el.dataset.act === "sn-open") { SN.s = el.dataset.s; try { SN.tr = localStorage.getItem("meras.sntr.on") === "1"; } catch (x) {} SN.trErr = ""; snRender(); if (SN.tr && NW.loaded) snTranslate(snItems(SN.s)); }
   else if (el.dataset.act === "sn-close") { SN.s = null; snRender(); }
   else { const s = SN.s, nm = typeof symName === "function" ? symName(s) : s; SN.s = null; snRender(); if (typeof AS !== "undefined") AS.focus = s; asOpen(L(["وش آخر أخبار " + s + " " + nm + " وكيف ممكن تأثر عليه؟", "What is the latest news on " + s + " " + nm + " and how might it affect it?"])); }
@@ -5553,6 +5571,45 @@ document.addEventListener("click", (e) => {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && SN.s) { SN.s = null; snRender(); } });
 /* بعد ما توصل الأخبار، حدّث النافذة لو مفتوحة */
 setInterval(() => { if (SN.s && SN.wait && typeof NW !== "undefined" && NW.loaded) { snRender(); if (SN.tr) snTranslate(snItems(SN.s)); } }, 700);
+/* ===== مِراس: أخبار السهم من الإنترنت =====
+   لما ما نلقى أخبار للسهم في news.json، نسأل دالة stocknews في Supabase (تبحث في Google News: أرقام، مال، الاقتصادية، وإعلانات تداول المنشورة).
+   تستخدمها نافذة أخبار السهم والمساعد الذكي. */
+Object.assign(UI, { wn_h: ["من الإنترنت الآن", "From the web now"], wn_wait: ["أدوّر على أخبار السهم في الإنترنت…", "Searching the web for news…"], wn_none: ["ما لقيت أخبار له في آخر أسبوعين.", "No news in the last two weeks."], wn_src: ["المصدر: Google News (أرقام، مال، الاقتصادية…)", "Source: Google News"] });
+const WN = {};
+function wnName(sym) { return (typeof saName === "function" && saName(sym)) || (typeof EXTRA !== "undefined" && EXTRA && EXTRA.symbols && EXTRA.symbols[sym] && EXTRA.symbols[sym].n) || (typeof symName === "function" ? symName(sym) : "") || ""; }
+async function webNews(sym, ms) {
+  if (!sym || sym[0] === "^" || typeof MA_SB === "undefined") return null;
+  const c = WN[sym]; if (c && c.v && Date.now() - c.at < 15 * 60 * 1000) return c.v; if (c && c.p) return c.p;
+  const ctl = typeof AbortController !== "undefined" ? new AbortController() : null; const timer = ctl ? setTimeout(() => ctl.abort(), ms || 9000) : null;
+  const p = fetch(MA_SB.url + "/functions/v1/stocknews", { method: "POST", headers: { apikey: MA_SB.key, "Content-Type": "application/json" }, body: JSON.stringify({ sym, name: wnName(sym), days: 14 }), signal: ctl ? ctl.signal : undefined })
+    .then((r) => (r.ok ? r.json() : null)).catch(() => null)
+    .then((v) => { if (timer) clearTimeout(timer); WN[sym] = { at: Date.now(), v }; return v; });
+  WN[sym] = { p }; return p;
+}
+/* يكتشف السهم في سؤال المساعد: رمز تداول، أو اسم سهم سعودي، أو رمز عالمي معروف */
+function wnDetect(q) {
+  const m = q.match(/(?:^|\D)(\d{4})(?:\D|$)/); if (m && typeof SA_MAP !== "undefined" && SA_MAP[m[1]]) return m[1];
+  if (typeof SA_MAP !== "undefined") { let best = null; Object.entries(SA_MAP).forEach(([c, x]) => { if (x.n && x.n.length > 2 && q.includes(x.n) && (!best || x.n.length > SA_MAP[best].n.length)) best = c; }); if (best) return best; }
+  const u = q.match(/\b([A-Z]{1,5})\b/); if (u && typeof EXTRA !== "undefined" && EXTRA && EXTRA.symbols && EXTRA.symbols[u[1]]) return u[1];
+  return null;
+}
+async function asCtxWeb(q) {
+  const ctx = typeof asContext === "function" ? asContext() : {};
+  const sym = wnDetect(q) || (typeof AS !== "undefined" && AS.focus) || null;
+  if (sym) {
+    const own = typeof snItems === "function" && typeof NW !== "undefined" && NW.data ? snItems(sym) : [];
+    const want = own.length < 3 || /ابحث|دوّر|دور|خارج|تداول|أرقام|ارقام|اخبار|أخبار|news|search/i.test(q);
+    if (want) { const w = await webNews(sym, 8000); ctx.web_news = { symbol: sym, name: wnName(sym), fetched_now_from: "Google News (Argaam, Maaal, Aleqtisadiah, Tadawul announcements as reported)", items: w && w.items ? w.items.slice(0, 12).map((x) => ({ t: x.t, src: x.src, at: x.at })) : [] }; }
+  }
+  return ctx;
+}
+/* نافذة أخبار السهم: نضيف أخبار الإنترنت تحت أخبار المنصة */
+function wnBlock(sym) {
+  const c = WN[sym];
+  if (!c || c.p && !c.v) return '<h3 class="wn-h">' + esc(t("wn_h")) + '</h3><p class="small muted">' + esc(t("wn_wait")) + "</p>";
+  const items = (c.v && c.v.items) || [];
+  return '<h3 class="wn-h">' + esc(t("wn_h")) + "</h3>" + (items.length ? '<ul class="sn-list">' + items.map((x) => '<li><div class="nw-meta"><span class="small muted">' + esc(x.src || "") + " · " + esc(typeof nwAgo === "function" ? nwAgo(x.at) : x.at) + '</span></div><p class="sn-t" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc((typeof SN !== "undefined" && SN.tr && SN_TR && SN_TR[x.t]) || x.t) + '</p><a class="small" href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer">' + esc(t("nw_more")) + " ↗</a></li>").join("") + "</ul>" : '<p class="small muted">' + esc(t("wn_none")) + "</p>") + '<p class="small muted" style="margin:4px 0 0">' + esc(t("wn_src")) + "</p>";
+}
 /* ===== مِراس: دليل رموز السوق السعودي =====
    كل شركات السوق الرئيسية (تاسي) مقسّمة حسب القطاع، كما يصنّفها أرقام.
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
@@ -9225,7 +9282,7 @@ Object.assign(UI, {
   ma_e_cred: ["الإيميل أو كلمة المرور غير صحيحة.", "Wrong email or password."], ma_e_email: ["اكتب إيميل صحيح.", "Enter a valid email."], ma_e_pw: ["كلمة المرور لازم تكون ٨ أحرف أو أكثر.", "Password must be 8+ characters."],
   ma_e_conf: ["أكّد إيميلك من الرابط اللي وصلك، بعدها سجّل دخولك.", "Confirm your email first."], ma_e_dup: ["هذا الإيميل مسجّل. سجّل دخولك أو استعد كلمة المرور.", "This email is registered. Sign in instead."],
   ma_e_net: ["تعذّر الاتصال. تأكد من الإنترنت.", "Connection failed."], ma_e_rate: ["محاولات كثيرة. انتظر شوي وجرّب مرة ثانية.", "Too many attempts. Wait a bit."],
-  ma_out: ["تسجيل الخروج", "Sign out"], ma_owner: ["المالك", "Owner"], ma_member: ["عضو", "Member"], ma_lang: ["English", "عربي"],
+  ma_out: ["تسجيل الخروج", "Sign out"], ma_staff: ["فريق الإدارة", "Team"], ma_owner: ["المالك", "Owner"], ma_member: ["عضو", "Member"], ma_lang: ["English", "عربي"],
   ma_mfa_h: ["التحقق بخطوتين", "Two-step verification"], ma_mfa_new: ["لحماية لوحة المالك، اربط حسابك بتطبيق مصادقة (Google Authenticator أو Microsoft Authenticator): امسح الرمز، ثم اكتب الرقم اللي يطلع لك.", "To protect the owner area, scan this code with an authenticator app, then enter the 6-digit number."],
   ma_mfa_key: ["أو اكتب هذا المفتاح في التطبيق:", "Or type this key into the app:"], ma_mfa_code: ["الرمز من التطبيق (٦ أرقام)", "6-digit code"], ma_mfa_go: ["تحقق وافتح", "Verify and unlock"],
   ma_mfa_ask: ["اكتب الرمز من تطبيق المصادقة عشان تفتح أدوات المالك.", "Enter the code from your authenticator app to unlock the owner tools."], ma_mfa_bad: ["الرمز غير صحيح أو انتهى وقته. جرّب الرمز الجديد.", "Wrong or expired code."],
@@ -9239,6 +9296,9 @@ const MA_SB = { url: "https://tefqkwyyyxyeviagrryr.supabase.co", key: "sb_publis
 const MA_LOCK = "meras.ownerlock", MA_STORE = "meras.auth";
 const MA = { sb: null, user: null, prof: null, aal: null, factor: null, enroll: null, open: false, view: "login", msg: "", ok: false, unlocked: false, subs: [], ready: false };
 MA.on = (fn) => MA.subs.push(fn);
+MA.can = (p) => !!(MA.user && MA.prof && !MA.prof.banned && (MA.prof.is_admin || (MA.prof.perms && MA.prof.perms[p])));
+MA.desk = () => MA.can("desk");
+MA.staff = () => !!(MA.prof && !MA.prof.is_admin && MA.prof.perms && Object.keys(MA.prof.perms).some((k) => MA.prof.perms[k]));
 const maEmit = () => MA.subs.forEach((f) => { try { f(); } catch (e) {} });
 const maRem = () => { try { return localStorage.getItem("meras.rem") !== "0"; } catch (e) { return true; } };
 const maHasSession = () => { try { return !!(localStorage.getItem(MA_STORE) || sessionStorage.getItem(MA_STORE)); } catch (e) { return false; } };
@@ -9277,7 +9337,7 @@ async function maSetUser(u) {
     const { data } = await MA.sb.from("profiles").select("*").eq("id", u.id).maybeSingle();
     MA.prof = data || { name: (u.user_metadata && u.user_metadata.name) || u.email.split("@")[0], is_admin: false };
   }
-  if (MA.prof.is_admin) await maAdminGate(); else if (maLocked() && typeof CFG !== "undefined" && CFG.token) { maWipe(); if (typeof render === "function") render(); }
+  if (MA.desk()) await maAdminGate(); else if (maLocked() && typeof CFG !== "undefined" && CFG.token) { maWipe(); if (typeof render === "function") render(); }
   maPaint(); maEmit();
 }
 /* الأدمن: التحقق بخطوتين ثم جلب المفاتيح */
@@ -9297,7 +9357,7 @@ async function maLoadSecrets() {
     CFG = Object.assign({}, CFG, { owner: data.gh_owner || CFG.owner, repo: data.gh_repo || CFG.repo, token: data.gh_token });
     try { localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); } catch (e) {}
     if (data.ai_key && typeof AI !== "undefined") { AI.key = data.ai_key; if (data.ai_model) AI.model = data.ai_model; try { localStorage.setItem(AI_KEY, JSON.stringify(AI)); } catch (e) {} }
-  } else if (local.token) { await maPushSecrets(); MA.msg = t("ma_sec_saved"); MA.ok = true; }
+  } else if (local.token && MA.prof.is_admin) { await maPushSecrets(); MA.msg = t("ma_sec_saved"); MA.ok = true; }
   else { MA.msg = t("ma_sec_none"); MA.ok = false; }
   MA.unlocked = true;
   try { localStorage.setItem(MA_LOCK, "1"); } catch (e) {}
@@ -9342,11 +9402,13 @@ function maView() {
     '<div class="ma-f"><label for="ma-code">' + esc(t("ma_mfa_code")) + '</label><input id="ma-code" inputmode="numeric" autocomplete="one-time-code" dir="ltr" maxlength="6" pattern="[0-9]*"></div>' + maMsg() + '<button class="ma-go" type="submit">' + esc(t("ma_mfa_go")) + "</button></form>";
   if (v === "mfa") return '<form data-form="ma-mfa" novalidate><p class="ma-h">' + esc(t("ma_mfa_h")) + '</p><p class="ma-s">' + esc(t("ma_mfa_ask")) + '</p><div class="ma-f"><label for="ma-code">' + esc(t("ma_mfa_code")) + '</label><input id="ma-code" inputmode="numeric" autocomplete="one-time-code" dir="ltr" maxlength="6" pattern="[0-9]*"></div>' + maMsg() + '<button class="ma-go" type="submit">' + esc(t("ma_mfa_go")) + "</button></form>";
   // me
-  const p = MA.prof || {}, admin = !!p.is_admin;
+  const p = MA.prof || {}, admin = !!p.is_admin, staff = MA.staff();
   const links = [["account", "nav_account"], ["progress", "nav_progress"]];
+  if (admin || staff) links.unshift(["team", admin ? "tm_h" : "tm_mine"]);
   if (admin && MA.unlocked) links.unshift(["desk", "dk_h"], ["owner", "pm_owner"], ["map", "pm_map"], ["settings", "set_h"]);
-  return '<div class="ma-me"><span class="ma-av big">' + esc((p.name || MA.user.email || "؟").trim()[0]) + '</span><div><b>' + esc(p.name || "") + '</b><span dir="ltr">' + esc(MA.user.email) + '</span></div></div><span class="ma-pill' + (admin ? "" : " n") + '">' + esc(t(admin ? "ma_owner" : "ma_member")) + "</span>" +
-    (MA.msg ? maMsg() : "") + (admin && !MA.unlocked ? '<button type="button" class="ma-go" data-act="ma-unlock">🔒 ' + esc(t("ma_unlock")) + "</button>" : "") +
+  else if (MA.desk() && MA.unlocked) links.unshift(["desk", "dk_h"]);
+  return '<div class="ma-me"><span class="ma-av big">' + esc((p.name || MA.user.email || "؟").trim()[0]) + '</span><div><b>' + esc(p.name || "") + '</b><span dir="ltr">' + esc(MA.user.email) + '</span></div></div><span class="ma-pill' + (admin ? "" : " n") + '">' + esc(t(admin ? "ma_owner" : staff ? "ma_staff" : "ma_member")) + "</span>" +
+    (MA.msg ? maMsg() : "") + (MA.desk() && !MA.unlocked ? '<button type="button" class="ma-go" data-act="ma-unlock">🔒 ' + esc(t("ma_unlock")) + "</button>" : "") +
     '<nav class="ma-links">' + links.map(([h, k]) => '<a class="ma-mi" href="#' + h + '">' + esc(t(k)) + "</a>").join("") + maLang() + '<button type="button" class="ma-mi out" data-act="ma-out">' + esc(t("ma_out")) + "</button></nav>";
 }
 function maPaint() {
@@ -9374,7 +9436,7 @@ window.addEventListener("resize", maPlace); window.addEventListener("scroll", ()
 function maOpen(view) {
   MA.open = true; MA.msg = ""; if (view) MA.view = view;
   if (!MA.sb && HOSTED) maInit();
-  if (MA.user && MA.prof && MA.prof.is_admin && !MA.unlocked && MA.aal !== "aal2" && view !== "me") MA.view = MA.factor ? "mfa" : MA.view;
+  if (MA.user && MA.desk() && !MA.unlocked && MA.aal !== "aal2" && view !== "me") MA.view = MA.factor ? "mfa" : MA.view;
   maPaint(); const f = document.querySelector("#ma-pop input:not([type=checkbox])"); if (f) f.focus();
 }
 function maClose() { MA.open = false; MA.msg = ""; if (!["reset"].includes(MA.view)) MA.view = "login"; maPaint(); }
@@ -9425,7 +9487,7 @@ document.addEventListener("submit", async (e) => {
       const { data, error } = await MA.sb.auth.signInWithPassword({ email: v("ma-em"), password: document.getElementById("ma-pw").value });
       if (error) return maSay(maErr(error));
       MA.msg = ""; await maSetUser(data.user);
-      if (MA.prof && MA.prof.is_admin && !MA.unlocked) { if (MA.factor) MA.view = "mfa"; else return maStartEnroll(); maPaint(); return; }
+      if (MA.desk() && !MA.unlocked) { if (MA.factor) MA.view = "mfa"; else return maStartEnroll(); maPaint(); return; }
       maClose();
     } else if (k === "ma-signup") {
       const pw = document.getElementById("ma-pw").value;
@@ -9455,6 +9517,79 @@ document.addEventListener("submit", async (e) => {
 }, true);
 
 if (HOSTED) { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => setTimeout(maInit, 50)); else setTimeout(maInit, 50); }
+/* ===== مِراس: إدارة الفريق =====
+   المالك يعطي أي مستخدم صلاحيات محددة (المدونة، المستخدمين، مكتبي). الصلاحية اللي ما تنعطى ما تظهر للعضو أصلاً.
+   كل تحقق حقيقي يصير في قاعدة البيانات (has_perm و set_perms)، والواجهة بس تعكسه. */
+Object.assign(UI, {
+  tm_h: ["إدارة الموقع", "Site admin"], tm_mine: ["صلاحياتي", "My permissions"],
+  tm_p: ["أعطِ أي مستخدم صلاحيات محددة. اللي ما تختاره ما يظهر له أصلاً، ومكتبي ما ينفتح إلا إذا اخترته.", "Give any user specific permissions. Anything you don't tick stays hidden from them."],
+  tm_p_staff: ["هذي الصلاحيات اللي أعطاك إياها مالك المنصة.", "These are the permissions the owner gave you."],
+  tm_login: ["سجّل دخولك أولاً.", "Sign in first."], tm_none: ["ما عندك صلاحيات إدارة.", "You have no admin permissions."],
+  tm_q: ["ابحث بالاسم أو الإيميل", "Search by name or email"], tm_save: ["حفظ الصلاحيات", "Save permissions"], tm_saved: ["انحفظت ✓", "Saved ✓"],
+  tm_ban: ["إيقاف عن النشر", "Block from posting"], tm_unban: ["إلغاء الإيقاف", "Unblock"], tm_banned: ["موقوف", "Blocked"], tm_owner: ["المالك", "Owner"],
+  tm_g_blog: ["المدونة", "Blog"], tm_g_users: ["المستخدمين", "Users"], tm_g_desk: ["مكتبي", "My desk"],
+  tm_blog_approve: ["مراجعة واعتماد المنشورات المحجوبة", "Review and approve held posts"], tm_blog_hide: ["حجب أي منشور", "Hide any post"],
+  tm_blog_edit: ["تعديل نص المنشورات", "Edit posts"], tm_blog_delete: ["حذف المنشورات", "Delete posts"],
+  tm_users_view: ["عرض قائمة المستخدمين", "See the user list"], tm_users_ban: ["إيقاف المستخدمين عن النشر", "Block users from posting"],
+  tm_desk: ["مكتبي وأدوات المالك", "My desk and owner tools"],
+  tm_desk_warn: ["تنبيه: مكتبي يفتح له مفاتيحك (GitHub والذكاء) وكل أدوات المالك: المحفظة والأخبار وأفضل حركة. ما تعطيها إلا لشخص تثق فيه تماماً.", "Warning: this opens your keys and every owner tool. Only give it to someone you fully trust."],
+  tm_go_blog: ["افتح المدونة", "Open the blog"], tm_perms: ["الصلاحيات", "Permissions"], tm_all: ["كل الصلاحيات", "Everything"], tm_err: ["ما عندك صلاحية لهذا.", "You don't have permission for this."], tm_count: ["{n} مستخدم", "{n} users"]
+});
+const TM_PERMS = [["tm_g_blog", ["blog_approve", "blog_hide", "blog_edit", "blog_delete"]], ["tm_g_users", ["users_view", "users_ban"]], ["tm_g_desk", ["desk"]]];
+const TM = { users: null, q: "", loading: false, err: "", open: null, saved: null };
+
+async function tmLoad() {
+  if (!(typeof MA !== "undefined" && MA.sb && MA.can("users_view"))) return;
+  TM.loading = true;
+  const { data, error } = await MA.sb.rpc("list_users");
+  TM.loading = false; TM.users = data || []; TM.err = error ? t("tm_err") : "";
+  tmPaint();
+}
+function tmChips(perms) {
+  const on = TM_PERMS.flatMap(([, l]) => l).filter((k) => perms && perms[k]);
+  return on.length ? on.map((k) => '<span class="tag' + (k === "desk" ? " amber" : "") + '">' + esc(t("tm_" + k)) + "</span>").join("") : '<span class="small muted">—</span>';
+}
+function tmRow(u) {
+  const admin = MA.prof && MA.prof.is_admin, open = TM.open === u.id;
+  const head = '<div class="tm-uh"><span class="bl-av">' + esc((u.name || u.email || "؟").trim()[0]) + '</span><div class="tm-un"><b>' + esc(u.name || "") + (u.is_admin ? ' <span class="tag up">' + esc(t("tm_owner")) + "</span>" : "") + (u.banned ? ' <span class="tag down">' + esc(t("tm_banned")) + "</span>" : "") + '</b><span class="small muted" dir="ltr">' + esc(u.email || "") + "</span></div>" +
+    (admin && !u.is_admin ? '<button type="button" class="btn sm' + (open ? " primary" : "") + '" data-act="tm-edit" data-id="' + u.id + '" aria-expanded="' + open + '">' + esc(t("tm_perms")) + "</button>" : "") +
+    (!u.is_admin && MA.can("users_ban") ? '<button type="button" class="btn sm ghost" data-act="tm-ban" data-id="' + u.id + '" data-b="' + (u.banned ? 0 : 1) + '">' + esc(t(u.banned ? "tm_unban" : "tm_ban")) + "</button>" : "") + "</div>";
+  const chips = '<div class="tm-chips">' + (u.is_admin ? '<span class="tag up">' + esc(t("tm_all")) + "</span>" : tmChips(u.perms)) + "</div>";
+  const form = open ? '<form class="tm-form" data-form="tm-perms" data-id="' + u.id + '">' + TM_PERMS.map(([g, list]) => '<fieldset><legend>' + esc(t(g)) + "</legend>" + list.map((k) => '<label class="tm-chk"><input type="checkbox" name="' + k + '"' + (u.perms && u.perms[k] ? " checked" : "") + "> " + esc(t("tm_" + k)) + "</label>").join("") + (g === "tm_g_desk" ? '<p class="small tm-warn">' + esc(t("tm_desk_warn")) + "</p>" : "") + "</fieldset>").join("") +
+    '<div class="row" style="gap:8px"><button class="btn primary">' + esc(t("tm_save")) + "</button>" + (TM.saved === u.id ? '<span class="small bl-ok">' + esc(t("tm_saved")) + "</span>" : "") + "</div></form>" : "";
+  return '<div class="panel tm-u">' + head + (open ? "" : chips) + form + "</div>";
+}
+function pageTeam() {
+  if (typeof MA === "undefined" || !MA.user) return '<div class="wrap"><div class="page-head"><h1>' + esc(t("tm_h")) + '</h1></div><div class="notice" style="margin-block:18px">' + esc(t("tm_login")) + ' <button class="btn sm primary" data-act="ma-toggle">' + esc(t("ma_in")) + "</button></div></div>";
+  const admin = MA.prof && MA.prof.is_admin, perms = (MA.prof && MA.prof.perms) || {};
+  if (!admin && !MA.staff()) return '<div class="wrap"><div class="page-head"><h1>' + esc(t("tm_mine")) + '</h1></div><div class="notice" style="margin-block:18px">' + esc(t("tm_none")) + "</div></div>";
+  if (MA.can("users_view") && !TM.users && !TM.loading) setTimeout(tmLoad, 0);
+  const mine = admin ? "" : '<div class="panel stack"><b>' + esc(t("tm_mine")) + '</b><div class="tm-chips">' + tmChips(perms) + "</div>" + (["blog_approve", "blog_hide", "blog_edit", "blog_delete"].some((k) => perms[k]) ? '<a class="btn sm" href="#blog">' + esc(t("tm_go_blog")) + "</a>" : "") + "</div>";
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t(admin ? "tm_h" : "tm_mine")) + "</h1><p>" + esc(t(admin ? "tm_p" : "tm_p_staff")) + '</p></div><div class="stack" style="padding-block:18px 40px" id="tm-out">' + tmBody(mine) + "</div></div>";
+}
+function tmBody(mine) {
+  if (!MA.can("users_view")) return mine || "";
+  const q = TM.q.trim().toLowerCase(), list = (TM.users || []).filter((u) => !q || (u.name || "").toLowerCase().includes(q) || (u.email || "").toLowerCase().includes(q));
+  return (mine || "") + '<div class="row" style="gap:10px;align-items:center"><input type="search" id="tm-q" data-tm="q" placeholder="' + esc(t("tm_q")) + '" value="' + esc(TM.q) + '" style="flex:1;min-width:200px"><span class="small muted">' + esc(t("tm_count").replace("{n}", (TM.users || []).length)) + "</span></div>" +
+    (TM.err ? '<div class="notice">' + esc(TM.err) + "</div>" : "") + (TM.users ? list.map(tmRow).join("") : '<p class="muted">…</p>');
+}
+function tmPaint() { if (typeof route === "function" && route() === "team") { const o = document.getElementById("tm-out"); if (o) { const tmp = document.createElement("div"); tmp.innerHTML = pageTeam(); const n = tmp.querySelector("#tm-out"); if (n) { const f = document.activeElement && document.activeElement.id === "tm-q"; o.innerHTML = n.innerHTML; if (f) { const i = document.getElementById("tm-q"); i.focus(); i.setSelectionRange(i.value.length, i.value.length); } } } else if (typeof render === "function") render(); } }
+if (typeof MA !== "undefined") MA.on(() => { TM.users = null; tmPaint(); });
+document.addEventListener("input", (e) => { if (e.target.dataset && e.target.dataset.tm === "q") { TM.q = e.target.value; tmPaint(); } });
+document.addEventListener("click", async (e) => {
+  const el = e.target.closest && e.target.closest('[data-act^="tm-"]'); if (!el) return;
+  e.preventDefault();
+  if (el.dataset.act === "tm-edit") { TM.open = TM.open === el.dataset.id ? null : el.dataset.id; TM.saved = null; tmPaint(); return; }
+  if (el.dataset.act === "tm-ban") { el.disabled = true; const { error } = await MA.sb.rpc("set_ban", { uid: el.dataset.id, flag: el.dataset.b === "1" }); if (error) toast(t("tm_err")); await tmLoad(); }
+});
+document.addEventListener("submit", async (e) => {
+  const f = e.target; if (!f.dataset || f.dataset.form !== "tm-perms") return;
+  e.preventDefault(); e.stopPropagation();
+  const perms = {}; f.querySelectorAll("input[type=checkbox]").forEach((c) => { if (c.checked) perms[c.name] = true; });
+  const { error } = await MA.sb.rpc("set_perms", { uid: f.dataset.id, new_perms: perms });
+  if (error) { toast(t("tm_err")); return; }
+  TM.saved = f.dataset.id; await tmLoad();
+}, true);
 /* ===== مِراس: المدونة =====
    مقالات فريق مِراس (ثابتة هنا)، ومنشورات المستخدمين من Supabase بعد تسجيل الدخول.
    كل منشور يمر على فلتر ذكاء اصطناعي في السيرفر: لو فيه توصية شراء/بيع ينحجب (يظهر مغطى بنقاط) لين توافق الإدارة. */
@@ -9472,7 +9607,7 @@ Object.assign(UI, {
   bl_title: ["العنوان", "Title"], bl_body: ["وش تبي تشارك؟", "What would you like to share?"], bl_body_ph: ["تجربة، فكرة، درس تعلمته، أو ملاحظة على المنصة… بدون توصيات شراء أو بيع.", "An experience, idea, lesson, or platform feedback… no buy/sell recommendations."],
   bl_send: ["انشر", "Publish"], bl_sending: ["جاري الفحص والنشر…", "Checking and publishing…"], bl_pub_ok: ["انتشر منشورك ✓", "Your post is live ✓"],
   bl_pub_held: ["وصل منشورك، وبيطلع بعد مراجعة الإدارة.", "Received. It will appear after review."], bl_rules: ["ممنوع: توصيات شراء أو بيع، أسعار دخول وأهداف لسهم محدد، وروابط قنوات أو اشتراكات.", "Not allowed: buy/sell calls, entry prices or targets for a named share, and links to channels or paid groups."],
-  bl_mod: ["بانتظار المراجعة", "Pending review"], bl_approve: ["اعتماد", "Approve"], bl_hide: ["حجب", "Hide"], bl_reject: ["رفض", "Reject"], bl_del: ["حذف", "Delete"], bl_mod_none: ["ما فيه منشورات بانتظار المراجعة.", "Nothing pending."],
+  bl_mod: ["بانتظار المراجعة", "Pending review"], bl_approve: ["اعتماد", "Approve"], bl_hide: ["حجب", "Hide"], bl_edit: ["تعديل", "Edit"], bl_save: ["حفظ", "Save"], bl_reject: ["رفض", "Reject"], bl_del: ["حذف", "Delete"], bl_mod_none: ["ما فيه منشورات بانتظار المراجعة.", "Nothing pending."],
   bl_ai: ["سبب الحجب:", "Flag reason:"], bl_email: ["البريد الإلكتروني", "Email"], bl_pass: ["كلمة المرور", "Password"], bl_name: ["الاسم اللي يظهر مع منشوراتك", "Display name"],
   bl_in: ["دخول", "Sign in"], bl_up: ["إنشاء حساب", "Create account"], bl_forgot: ["نسيت كلمة المرور؟", "Forgot password?"], bl_remember: ["تذكرني", "Remember me"],
   bl_have: ["عندك حساب؟", "Have an account?"], bl_new: ["ما عندك حساب؟", "New here?"], bl_out: ["تسجيل الخروج", "Sign out"], bl_hi: ["أهلاً {n}", "Hi {n}"],
@@ -9543,16 +9678,26 @@ async function blFetch() {
   BL.posts = a.data || []; BL.held = b.data || [];
   BL.mine = []; BL.pending = [];
   if (BL.user) { const { data } = await BL.sb.from("posts").select("*").eq("author", BL.user.id).neq("status", "published").order("created_at", { ascending: false }); BL.mine = data || []; }
-  if (BL.prof && BL.prof.is_admin) { const { data } = await BL.sb.from("posts").select("*").eq("status", "held").order("created_at", { ascending: true }); BL.pending = data || []; }
+  if (blCan("blog_approve") || blCan("blog_hide")) { const { data } = await BL.sb.from("posts").select("*").eq("status", "held").order("created_at", { ascending: true }); BL.pending = data || []; }
 }
 
 /* ---------- الواجهة ---------- */
 function blCard(p) {
   return '<a class="bl-card b-' + p.c.slice(1) + '" href="#b-' + p.id + '"><span class="bl-tag">' + esc(p.tag) + '</span><h3>' + esc(p.title) + '</h3><p>' + esc(p.lead) + '</p><span class="bl-meta small muted">' + esc(t("bl_team")) + " · " + esc(blDate(p.date)) + " · " + esc(t("bl_read").replace("{n}", p.min)) + "</span></a>";
 }
+const blCan = (k) => typeof MA !== "undefined" && MA.can && MA.can(k);
+function blTools(p, held) {
+  const b = [];
+  if (BL.edit === p.id) return '<form class="stack bl-editf" data-form="bl-edit" data-id="' + p.id + '"><input id="bl-et" maxlength="120" value="' + esc(p.title) + '"><textarea id="bl-eb" rows="6" maxlength="5000">' + esc(p.body) + '</textarea><div class="row" style="gap:6px"><button class="btn sm primary">' + esc(t("bl_save")) + '</button><button type="button" class="btn sm ghost" data-act="bl-edit" data-id="' + p.id + '">✕</button></div></form>';
+  if (held && blCan("blog_approve")) b.push('<button class="btn sm primary" data-act="bl-ok" data-id="' + p.id + '">' + esc(t("bl_approve")) + "</button>", '<button class="btn sm ghost" data-act="bl-no" data-id="' + p.id + '">' + esc(t("bl_reject")) + "</button>");
+  if (!held && blCan("blog_hide")) b.push('<button class="btn sm ghost" data-act="bl-hide" data-id="' + p.id + '">🔒 ' + esc(t("bl_hide")) + "</button>");
+  if (blCan("blog_edit")) b.push('<button class="btn sm ghost" data-act="bl-edit" data-id="' + p.id + '">✎ ' + esc(t("bl_edit")) + "</button>");
+  if (blCan("blog_delete")) b.push('<button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button>");
+  return b.length ? '<div class="row" style="gap:6px;flex-wrap:wrap">' + b.join("") + "</div>" : "";
+}
 function blUserPost(p) {
   return '<article class="bl-up panel"><header class="bl-upH"><span class="bl-av">' + esc((p.author_name || "؟").trim()[0]) + '</span><div><b>' + esc(p.author_name || "") + '</b><span class="small muted">' + esc(blDate(p.created_at)) + '</span></div></header><h3>' + esc(p.title) + '</h3><div class="bl-upB">' + esc(p.body).replace(/\n/g, "<br>") + '</div><p class="bl-disc small">' + esc(t("bl_disc")) + "</p>" +
-    (BL.prof && BL.prof.is_admin ? '<div class="row" style="gap:6px"><button class="btn sm ghost" data-act="bl-hide" data-id="' + p.id + '">🔒 ' + esc(t("bl_hide")) + '</button><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div>" : "") + "</article>";
+    blTools(p, false) + "</article>";
 }
 function blHeldCard(p, own) {
   const body = own ? p.body : "";
@@ -9583,10 +9728,10 @@ function blCompose() {
       : m + '<button class="btn primary" data-act="bl-compose">✎ ' + esc(t("bl_write")) + "</button>") + "</div>";
 }
 function blModeration() {
-  if (!(BL.prof && BL.prof.is_admin)) return "";
+  if (!(blCan("blog_approve") || blCan("blog_hide"))) return "";
   return '<details class="panel bl-mod" open><summary><b>' + esc(t("bl_mod")) + '</b> <span class="tag amber">' + BL.pending.length + "</span></summary>" +
     (BL.pending.length ? BL.pending.map((p) => '<div class="bl-modi"><b>' + esc(p.title) + '</b><span class="small muted"> — ' + esc(p.author_name || "") + " · " + esc(blDate(p.created_at)) + '</span><div class="bl-upB">' + esc(p.body).replace(/\n/g, "<br>") + "</div>" + (p.ai_reason ? '<p class="small bl-err" style="margin:4px 0">' + esc(t("bl_ai")) + " " + esc(p.ai_reason) + "</p>" : "") +
-      '<div class="row" style="gap:6px"><button class="btn sm primary" data-act="bl-ok" data-id="' + p.id + '">' + esc(t("bl_approve")) + '</button><button class="btn sm ghost" data-act="bl-no" data-id="' + p.id + '">' + esc(t("bl_reject")) + '</button><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div></div>").join("") : '<p class="small muted">' + esc(t("bl_mod_none")) + "</p>") + "</details>";
+      blTools(p, true) + "</div>").join("") : '<p class="small muted">' + esc(t("bl_mod_none")) + "</p>") + "</details>";
 }
 function pageBlog() {
   if (blReady() && !BL.started && !BL.loading) setTimeout(blInit, 0);
@@ -9627,9 +9772,9 @@ document.addEventListener("click", async (e) => {
   if (a === "bl-peek") { BL.peek[el.dataset.id] = !BL.peek[el.dataset.id]; el.classList.toggle("open", !!BL.peek[el.dataset.id]); return; }
   if (!BL.sb) return;
   if (a === "bl-out") { await BL.sb.auth.signOut(); BL.compose = false; BL.msg = ""; return; }
-  if (a === "bl-hide") { el.disabled = true; await BL.sb.from("posts").update({ status: "held", reviewed_at: new Date().toISOString() }).eq("id", el.dataset.id); await blFetch(); blPaint(); return; }
-  if (a === "bl-ok" || a === "bl-no") { el.disabled = true; await BL.sb.from("posts").update({ status: a === "bl-ok" ? "published" : "rejected", reviewed_at: new Date().toISOString() }).eq("id", el.dataset.id); await blFetch(); blPaint(); return; }
-  if (a === "bl-del") { if (el.dataset.sure !== "1") { el.dataset.sure = "1"; el.textContent = "؟"; return; } await BL.sb.from("posts").delete().eq("id", el.dataset.id); await blFetch(); blPaint(); }
+  if (a === "bl-edit") { BL.edit = BL.edit === +el.dataset.id ? null : +el.dataset.id; blPaint(); return; }
+  if (a === "bl-hide" || a === "bl-ok" || a === "bl-no") { el.disabled = true; const { error } = await BL.sb.rpc("moderate_post", { pid: +el.dataset.id, act: { "bl-hide": "hide", "bl-ok": "approve", "bl-no": "reject" }[a] }); if (error) toast(t("tm_err")); await blFetch(); blPaint(); return; }
+  if (a === "bl-del") { if (el.dataset.sure !== "1") { el.dataset.sure = "1"; el.textContent = "؟"; return; } const { error } = await BL.sb.rpc("moderate_post", { pid: +el.dataset.id, act: "delete" }); if (error) toast(t("tm_err")); await blFetch(); blPaint(); }
 });
 document.addEventListener("submit", async (e) => {
   const f = e.target; if (!f.dataset || !/^bl-/.test(f.dataset.form || "")) return;
@@ -9638,6 +9783,10 @@ document.addEventListener("submit", async (e) => {
   const kind = f.dataset.form, okEmail = (x) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x);
   const page = location.href.split("#")[0] + "#blog";
   try {
+    if (kind === "bl-edit") {
+      const { error } = await BL.sb.rpc("edit_post", { pid: +f.dataset.id, new_title: v("bl-et"), new_body: document.getElementById("bl-eb").value });
+      if (error) { toast(t("tm_err")); return; } BL.edit = null; await blFetch(); blPaint(); return;
+    }
     if (kind === "bl-login") {
       if (!okEmail(v("bl-em"))) return blMsg(t("bl_err_email"));
       const rem = document.getElementById("bl-rem").checked; let was = true; try { was = localStorage.getItem("meras.bl.rem") !== "0"; localStorage.setItem("meras.bl.rem", rem ? "1" : "0"); } catch (x) {}
