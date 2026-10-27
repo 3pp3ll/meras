@@ -9194,7 +9194,7 @@ Object.assign(UI, {
   bl_title: ["العنوان", "Title"], bl_body: ["وش تبي تشارك؟", "What would you like to share?"], bl_body_ph: ["تجربة، فكرة، درس تعلمته، أو ملاحظة على المنصة… بدون توصيات شراء أو بيع.", "An experience, idea, lesson, or platform feedback… no buy/sell recommendations."],
   bl_send: ["انشر", "Publish"], bl_sending: ["جاري الفحص والنشر…", "Checking and publishing…"], bl_pub_ok: ["انتشر منشورك ✓", "Your post is live ✓"],
   bl_pub_held: ["وصل منشورك، وبيطلع بعد مراجعة الإدارة.", "Received. It will appear after review."], bl_rules: ["ممنوع: توصيات شراء أو بيع، أسعار دخول وأهداف لسهم محدد، وروابط قنوات أو اشتراكات.", "Not allowed: buy/sell calls, entry prices or targets for a named share, and links to channels or paid groups."],
-  bl_mod: ["بانتظار المراجعة", "Pending review"], bl_approve: ["اعتماد", "Approve"], bl_reject: ["رفض", "Reject"], bl_del: ["حذف", "Delete"], bl_mod_none: ["ما فيه منشورات بانتظار المراجعة.", "Nothing pending."],
+  bl_mod: ["بانتظار المراجعة", "Pending review"], bl_approve: ["اعتماد", "Approve"], bl_hide: ["حجب", "Hide"], bl_reject: ["رفض", "Reject"], bl_del: ["حذف", "Delete"], bl_mod_none: ["ما فيه منشورات بانتظار المراجعة.", "Nothing pending."],
   bl_ai: ["سبب الحجب:", "Flag reason:"], bl_email: ["البريد الإلكتروني", "Email"], bl_pass: ["كلمة المرور", "Password"], bl_name: ["الاسم اللي يظهر مع منشوراتك", "Display name"],
   bl_in: ["دخول", "Sign in"], bl_up: ["إنشاء حساب", "Create account"], bl_forgot: ["نسيت كلمة المرور؟", "Forgot password?"], bl_remember: ["تذكرني", "Remember me"],
   bl_have: ["عندك حساب؟", "Have an account?"], bl_new: ["ما عندك حساب؟", "New here?"], bl_out: ["تسجيل الخروج", "Sign out"], bl_hi: ["أهلاً {n}", "Hi {n}"],
@@ -9290,7 +9290,7 @@ function blCard(p) {
 }
 function blUserPost(p) {
   return '<article class="bl-up panel"><header class="bl-upH"><span class="bl-av">' + esc((p.author_name || "؟").trim()[0]) + '</span><div><b>' + esc(p.author_name || "") + '</b><span class="small muted">' + esc(blDate(p.created_at)) + '</span></div></header><h3>' + esc(p.title) + '</h3><div class="bl-upB">' + esc(p.body).replace(/\n/g, "<br>") + '</div><p class="bl-disc small">' + esc(t("bl_disc")) + "</p>" +
-    (BL.prof && BL.prof.is_admin ? '<div class="row" style="gap:6px"><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div>" : "") + "</article>";
+    (BL.prof && BL.prof.is_admin ? '<div class="row" style="gap:6px"><button class="btn sm ghost" data-act="bl-hide" data-id="' + p.id + '">🔒 ' + esc(t("bl_hide")) + '</button><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div>" : "") + "</article>";
 }
 function blHeldCard(p, own) {
   const body = own ? p.body : "";
@@ -9324,7 +9324,7 @@ function blModeration() {
   if (!(BL.prof && BL.prof.is_admin)) return "";
   return '<details class="panel bl-mod" open><summary><b>' + esc(t("bl_mod")) + '</b> <span class="tag amber">' + BL.pending.length + "</span></summary>" +
     (BL.pending.length ? BL.pending.map((p) => '<div class="bl-modi"><b>' + esc(p.title) + '</b><span class="small muted"> — ' + esc(p.author_name || "") + " · " + esc(blDate(p.created_at)) + '</span><div class="bl-upB">' + esc(p.body).replace(/\n/g, "<br>") + "</div>" + (p.ai_reason ? '<p class="small bl-err" style="margin:4px 0">' + esc(t("bl_ai")) + " " + esc(p.ai_reason) + "</p>" : "") +
-      '<div class="row" style="gap:6px"><button class="btn sm primary" data-act="bl-ok" data-id="' + p.id + '">' + esc(t("bl_approve")) + '</button><button class="btn sm ghost" data-act="bl-no" data-id="' + p.id + '">' + esc(t("bl_reject")) + "</button></div></div>").join("") : '<p class="small muted">' + esc(t("bl_mod_none")) + "</p>") + "</details>";
+      '<div class="row" style="gap:6px"><button class="btn sm primary" data-act="bl-ok" data-id="' + p.id + '">' + esc(t("bl_approve")) + '</button><button class="btn sm ghost" data-act="bl-no" data-id="' + p.id + '">' + esc(t("bl_reject")) + '</button><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div></div>").join("") : '<p class="small muted">' + esc(t("bl_mod_none")) + "</p>") + "</details>";
 }
 function pageBlog() {
   if (blReady() && !BL.sb && !BL.loading) setTimeout(blInit, 0);
@@ -9364,6 +9364,7 @@ document.addEventListener("click", async (e) => {
   if (a === "bl-peek") { BL.peek[el.dataset.id] = !BL.peek[el.dataset.id]; el.classList.toggle("open", !!BL.peek[el.dataset.id]); return; }
   if (!BL.sb) return;
   if (a === "bl-out") { await BL.sb.auth.signOut(); BL.compose = false; BL.msg = ""; return; }
+  if (a === "bl-hide") { el.disabled = true; await BL.sb.from("posts").update({ status: "held", reviewed_at: new Date().toISOString() }).eq("id", el.dataset.id); await blFetch(); blPaint(); return; }
   if (a === "bl-ok" || a === "bl-no") { el.disabled = true; await BL.sb.from("posts").update({ status: a === "bl-ok" ? "published" : "rejected", reviewed_at: new Date().toISOString() }).eq("id", el.dataset.id); await blFetch(); blPaint(); return; }
   if (a === "bl-del") { if (el.dataset.sure !== "1") { el.dataset.sure = "1"; el.textContent = "؟"; return; } await BL.sb.from("posts").delete().eq("id", el.dataset.id); await blFetch(); blPaint(); }
 });
