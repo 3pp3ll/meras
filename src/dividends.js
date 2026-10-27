@@ -9,8 +9,8 @@ Object.assign(UI, {
   dv_search: ["ابحث بالرمز أو الاسم", "Search by symbol or name"],
   dv_nomu: ["أظهر أسهم نمو (للمستثمرين المؤهلين فقط)", "Show Nomu shares (qualified investors only)"], dv_nomu_tag: ["نمو", "Nomu"],
   dv_f_all: ["الكل", "All"], dv_f_30: ["خلال 30 يوم", "Within 30 days"], dv_f_star: ["نجومي", "Starred"],
-  dv_sym: ["السهم", "Share"], dv_price: ["السعر", "Price"], dv_next: ["التوزيع القادم للسهم", "Next dividend / share"], dv_ex: ["تاريخ الاستحقاق", "Ex-date"],
-  dv_left: ["باقي", "In"], dv_days: ["يوم", "days"], dv_buyby: ["آخر يوم شراء", "Buy by"], dv_yld: ["العائد السنوي", "Yearly yield"],
+  dv_sym: ["السهم", "Share"], dv_price: ["السعر", "Price"], dv_next: ["التوزيع القادم للسهم", "Next dividend / share"], dv_ex: ["أول يوم بدون توزيع", "Ex-date"],
+  dv_left: ["باقي", "In"], dv_days: ["يوم", "days"], dv_buyby: ["آخر يوم شراء (الأحقية)", "Buy by (record day)"], dv_yld: ["العائد السنوي", "Yearly yield"],
   dv_min: ["أقل مبلغ (سهم واحد)", "Minimum (one share)"], dv_sh: ["أسهم بمبلغك", "Shares for your amount"], dv_get: ["يجيك في الدفعة القادمة", "Your next payout"],
   dv_ann: ["معلن", "announced"], dv_exp: ["متوقع", "expected"], dv_none: ["ما فيه تاريخ", "no date"],
   dv_star: ["نبّهني عن هذا السهم", "Alert me about this share"], dv_starred: ["انضاف للتنبيهات. السكربت ينبهك قبل 30 يوم وقبل 5 أيام", "Added. The script alerts you 30 and 5 days before"], dv_unstarred: ["انشال من التنبيهات", "Removed from alerts"],
@@ -19,7 +19,7 @@ Object.assign(UI, {
   dv_alert_h: ["التنبيهات", "Alerts"],
   dv_alert: ["اضغط النجمة جنب أي سهم. كل يوم 4:30 م يفحص السكربت التواريخ، ويفتح لك تنبيه في مستودع meras-data قبل الاستحقاق بـ 30 يوم (تجهّز المبلغ) وقبله بـ 5 أيام (وقت الشراء). عشان يوصلك على الجوال ثبّت تطبيق GitHub وفعّل إشعاراته.", "Tap the star next to any share. Every day at 4:30 pm the script checks the dates and opens an alert in the meras-data repository 30 days before the ex-date (get the money ready) and 5 days before (time to buy). To get it on your phone, install the GitHub app and turn on its notifications."],
   dv_rule_h: ["متى تستحق التوزيع؟", "When are you entitled?"],
-  dv_rule: ["تاريخ الاستحقاق (Ex) هو أول يوم تداول ما يعطيك التوزيع. لازم تشتري قبله بيوم تداول على الأقل، يعني في \"آخر يوم شراء\" بالجدول أو قبله. التاريخ المعلن من الشركة هو المرجع، والمتوقع محسوب من توزيعات السنة الماضية وممكن يتغير.", "The ex-date is the first trading day that no longer carries the dividend. You must buy at least one trading day before it, on the \"buy by\" date in the table or earlier. The company's announced date is the reference; an expected date is estimated from last year's payouts and can change."],
+  dv_rule: ["آخر يوم شراء هو يوم الأحقية نفسه: اللي يملك السهم بنهاية تداوله يستحق التوزيع. اليوم اللي بعده (Ex) هو أول يوم يتداول فيه السهم بدون التوزيع. التاريخ المعلن من الشركة هو المرجع، والمتوقع محسوب من توزيعات السنة الماضية وممكن يتغير.", "The last buy day is the record (eligibility) day itself: whoever holds the share at its close gets the dividend. The next day (ex-date) is the first that trades without it. The company's announcement is the reference; expected dates are estimated from last year and may change."],
   dv_sell_h: ["تشتري قبل وتبيع بعد؟", "Buy before, sell after?"],
   dv_sell: ["في يوم الاستحقاق ينزل السعر غالباً بقريب من مبلغ التوزيع، لأن الفلوس طلعت من الشركة. فلو اشتريت قبلها بيوم وبعت بعدها مباشرة، غالباً ترجع قريب من رأس مالك، والعمولة تاكل جزء من التوزيع. الفكرة تنجح أكثر مع أسهم تحتفظ فيها فترة أطول.", "On the ex-date the price usually drops by roughly the dividend, because the cash has left the company. Buy the day before and sell right after, and you usually end up near where you started, with commission eating part of the payout. The idea works better with shares you hold for longer."],
   dv_fee_note: ["مع مبلغ صغير انتبه للعمولة: بعض الوسطاء عندهم حد أدنى للعمولة لكل أمر، وممكن ياكل جزء كبير من توزيع صغير. اسأل وسيطك عن الحد الأدنى.", "With a small amount, watch the commission: some brokers charge a minimum per order, which can eat much of a small dividend. Ask your broker about their minimum."],
@@ -77,6 +77,28 @@ async function toggleStar(sym) {
   render();
 }
 
+/* ----- متى تكون لك أحقية الأرباح؟ (بطاقة تعليمية أعلى صفحة التوزيعات) ----- */
+Object.assign(UI, {
+  dve_h: ["متى تكون لك أحقية الأرباح؟", "When are you entitled to a dividend?"],
+  dve_lead: ["أربع قواعد تكفيك عشان ما يفوتك توزيع، وما تشتري سهم على أمل توزيع ما هو لك.", "Four rules so you never miss a dividend, or buy for one that isn't yours."],
+  dve_1h: ["شرط الأحقية", "The rule"], dve_1: ["التوزيع لمالكي السهم بنهاية تداول يوم الأحقية (الاستحقاق) اللي تحدده الشركة في إعلانها، والمقيّدين في سجل المساهمين لدى «إيداع».", "The dividend goes to holders at the close of the record (eligibility) day set in the company's announcement, as registered with Edaa."],
+  dve_2h: ["آخر يوم شراء", "Last day to buy"], dve_2: ["تقدر تشتري حتى إغلاق يوم الأحقية نفسه. إذا اشتريت في اليوم اللي بعده أو بعدها، التوزيع يروح للبائع.", "You can buy up to the close of the record day itself. Buy the next day or later and the dividend goes to the seller."],
+  dve_3h: ["تسوية T+2", "T+2 settlement"], dve_3: ["الصفقات في تداول تتسوى خلال يومي عمل، عشان كذا «إيداع» يثبّت السجل بنهاية ثاني يوم تداول بعد الأحقية. هذا محسوب في القاعدة، فما تحتاج تشتري قبلها بأيام.", "Trades settle in two business days, so Edaa fixes the register at the end of the second trading day after the record day. That is already built into the rule, so you don't need to buy days earlier."],
+  dve_4h: ["اليوم اللي بعد الأحقية", "The day after"], dve_4: ["يتداول السهم «بدون أرباح»، وينزل سعره غالباً بقدر قريب من قيمة التوزيع. فالشراء قبل الأحقية والبيع بعدها مو ربح مجاني.", "The share trades ex-dividend and usually drops by about the dividend. Buying before and selling after is not free money."],
+  dve_t1: ["يوم الأحقية", "Record day"], dve_t1s: ["آخر يوم شراء", "Last buy day"], dve_t2: ["اليوم التالي", "Next day"], dve_t2s: ["بدون أرباح، السعر ينزل", "Ex-dividend, price drops"],
+  dve_t3: ["ثاني يوم تداول", "Second trading day"], dve_t3s: ["إيداع يثبّت السجل", "Edaa fixes the register"], dve_t4: ["يوم التوزيع", "Payment day"], dve_t4s: ["الفلوس في محفظتك", "Cash in your account"],
+  dve_src: ["المصدر: إعلانات توزيع الأرباح في تداول السعودية.", "Source: dividend announcements on Saudi Exchange."], dve_more: ["الدرس كامل", "Full lesson"]
+});
+function dvEligHtml() {
+  let open = true; try { open = localStorage.getItem("meras.dve") !== "0"; } catch (e) {}
+  const steps = [["dve_t1", "dve_t1s", "on"], ["dve_t2", "dve_t2s", "dn"], ["dve_t3", "dve_t3s", ""], ["dve_t4", "dve_t4s", "up"]];
+  const rules = [["dve_1h", "dve_1"], ["dve_2h", "dve_2"], ["dve_3h", "dve_3"], ["dve_4h", "dve_4"]];
+  return '<details class="panel dve"' + (open ? " open" : "") + ' data-act="dve-tg"><summary><span class="dve-ic" aria-hidden="true">٪</span><span><b>' + esc(t("dve_h")) + '</b><small class="muted">' + esc(t("dve_lead")) + "</small></span></summary>" +
+    '<ol class="dve-line">' + steps.map(([a, b, c]) => '<li class="' + c + '"><b>' + esc(t(a)) + "</b><small>" + esc(t(b)) + "</small></li>").join("") + "</ol>" +
+    '<div class="dve-grid">' + rules.map(([h, p], i) => '<div class="dve-r"><span class="dve-n">' + (i + 1) + "</span><div><b>" + esc(t(h)) + "</b><p>" + esc(t(p)) + "</p></div></div>").join("") + "</div>" +
+    '<p class="small muted" style="margin:0">' + esc(t("dve_src")) + ' <a href="#l-inv-2-3">' + esc(t("dve_more")) + " ←</a></p></details>";
+}
+document.addEventListener("toggle", (e) => { if (e.target.classList && e.target.classList.contains("dve")) { try { localStorage.setItem("meras.dve", e.target.open ? "1" : "0"); } catch (x) {} } }, true);
 function pageDividends() {
   const c = divCfg(), list = divList(), real = list !== DIV_SAMPLE, canStar = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   if (canStar && DIVW == null) setTimeout(loadDividends, 0);
@@ -91,7 +113,7 @@ function pageDividends() {
   const count = real ? '<span class="small muted">' + esc(t("dv_count").replace("{n}", list.length).replace("{d}", DIV.as_of || whenText(DIV.fetched_at))) + "</span>" : "";
   return svcShell("dividends",
     '<p class="muted" style="max-width:64ch">' + esc(t("dv_p")) + ' <a href="#l-inv-2-3">' + esc(t("dv_lesson")) + "</a></p>" +
-    (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") +
+    (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") + dvEligHtml() +
     '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(c.q) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" + count + "</div></div>" +
     '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
     '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +

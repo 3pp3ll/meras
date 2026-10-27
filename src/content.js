@@ -194,6 +194,14 @@ const LESSONS = [
       { h: ["تاريخ الأحقية", "The eligibility date"] },
       { p: ["الشركة تعلن تاريخ أحقية. اللي يملك السهم بنهاية تداول ذاك اليوم يستحق التوزيع، حتى لو باع اليوم اللي بعده. واللي يشتري بعده ما يستحق.", "The company announces an eligibility date. Whoever holds the share at the end of trading that day is entitled to the dividend, even if they sell the next day. Whoever buys after it is not."] },
       { p: ["في اليوم اللي بعد الأحقية ينخفض سعر السهم غالباً بمقدار قريب من التوزيع، لأن المبلغ طلع من الشركة. فشراء السهم قبل الأحقية بيوم عشان التوزيع فقط ما يعتبر ربح مجاني.", "The day after eligibility the share price usually drops by roughly the dividend, because the cash has left the company. So buying the day before just for the dividend is not free money."] },
+      { h: ["إيداع وتسوية T+2", "Edaa and T+2 settlement"] },
+      { p: ["الصفقات في السوق السعودي تتسوى خلال يومي عمل (T+2)، يعني ملكيتك تنقيد رسمياً في سجل «إيداع» بعد يومين من الشراء. عشان كذا الشركات تكتب في إعلانها: الأحقية لمالكي الأسهم بنهاية تداول يوم الاستحقاق، والمقيّدين في سجل المساهمين بنهاية ثاني يوم تداول يليه. النتيجة بسيطة: آخر يوم تقدر تشتري فيه وتستحق التوزيع هو يوم الأحقية نفسه، قبل الإغلاق.", "Saudi trades settle in two business days (T+2): your ownership is registered with Edaa two days after you buy. So announcements say the dividend goes to holders at the close of the due date who are on the register at the end of the second trading day after it. In practice the last day to buy and still get the dividend is the due date itself, before the close."] },
+      { ul: [
+        ["يوم الأحقية: آخر يوم شراء.", "Record day: last day to buy."],
+        ["اليوم التالي: السهم «بدون أرباح» وسعره ينزل غالباً.", "Next day: the share trades ex-dividend and usually dips."],
+        ["ثاني يوم تداول بعد الأحقية: إيداع يثبّت سجل المستحقين.", "Second trading day after: Edaa fixes the register."],
+        ["يوم التوزيع: الفلوس تنزل في محفظتك، وممكن يكون بعد الأحقية بأسابيع.", "Payment day: cash lands in your account, sometimes weeks later."]
+      ] },
       { h: ["عائد التوزيع", "Dividend yield"] },
       { p: ["عائد التوزيع = التوزيع السنوي للسهم ÷ سعر السهم × 100. سهم سعره 50 ريال ويوزع 2 ريال في السنة، عائده 4%. هذا الرقم يخليك تقارن بين الأسهم، وبين الأسهم وبدائل ثانية.", "Dividend yield = annual dividend per share ÷ share price × 100. A share at SAR 50 paying SAR 2 a year yields 4%. This number lets you compare shares with each other and with alternatives."] },
       { note: ["العائد العالي جداً إنذار مو هدية: ممكن يكون السعر نازل لأن السوق يتوقع إن الشركة بتخفض التوزيع. شيّك هل أرباح الشركة تغطي توزيعاتها.", "A very high yield is a warning, not a gift: the price may be down because the market expects a dividend cut. Check whether the company's profit covers its dividends."] },
@@ -205,7 +213,10 @@ const LESSONS = [
         why: ["4 ÷ 80 × 100 = 5%.", "4 ÷ 80 × 100 = 5%."] },
       { q: ["اشتريت السهم في اليوم اللي بعد تاريخ الأحقية. هل تستحق التوزيع؟", "You bought the share the day after the eligibility date. Are you entitled to the dividend?"],
         opts: [["نعم", "Yes"], ["لا", "No"], ["نصه", "Half of it"]], a: 1,
-        why: ["الأحقية لمن يملك السهم بنهاية يوم الأحقية.", "Entitlement goes to whoever holds the share at the end of the eligibility date."] }
+        why: ["الأحقية لمن يملك السهم بنهاية يوم الأحقية.", "Entitlement goes to whoever holds the share at the end of the eligibility date."] },
+      { q: ["اشتريت السهم يوم الأحقية نفسه الساعة 2 الظهر. هل تستحق التوزيع؟", "You bought on the record day itself at 2 pm. Are you entitled?"],
+        opts: [["نعم، لأني أملكه بنهاية تداول يوم الأحقية", "Yes, I hold it at the close of the record day"], ["لا، لازم قبلها بيومين بسبب T+2", "No, I needed to buy two days earlier because of T+2"], ["حسب سعر الإغلاق", "Depends on the closing price"]], a: 0,
+        why: ["الإعلان يحسب T+2 مسبقاً: السجل يتثبت بنهاية ثاني يوم تداول بعد الأحقية، فشراؤك قبل إغلاق يوم الأحقية يكفي.", "The announcement already allows for T+2: the register is fixed two trading days later, so buying before the close of the record day is enough."] }
     ] },
 
   { id: "inv-2-4", track: "inv", level: 2, mins: 8, title: ["ربحية السهم ومكرر الربحية", "Earnings per share and the P/E ratio"],
