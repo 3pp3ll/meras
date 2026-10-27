@@ -28,6 +28,7 @@ const MA_SB = { url: "https://tefqkwyyyxyeviagrryr.supabase.co", key: "sb_publis
 const MA_LOCK = "meras.ownerlock", MA_STORE = "meras.auth";
 const MA = { sb: null, user: null, prof: null, aal: null, factor: null, enroll: null, open: false, view: "login", msg: "", ok: false, unlocked: false, subs: [], ready: false };
 MA.on = (fn) => MA.subs.push(fn);
+setTimeout(() => MA.on(() => { const h = document.getElementById("top"); if (h && typeof headerHtml === "function" && typeof route === "function" && !(typeof lnShow === "function" && lnShow())) { h.innerHTML = headerHtml(route()); if (typeof maPaint === "function") maPaint(); } }), 0);
 MA.can = (p) => !!(MA.user && MA.prof && !MA.prof.banned && (MA.prof.is_admin || (MA.prof.perms && MA.prof.perms[p])));
 MA.desk = () => MA.can("desk");
 MA.staff = () => !!(MA.prof && !MA.prof.is_admin && MA.prof.perms && Object.keys(MA.prof.perms).some((k) => MA.prof.perms[k]));

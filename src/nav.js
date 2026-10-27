@@ -64,8 +64,8 @@ Object.assign(UI, { back_desk: ["رجوع لمكتبي", "Back to my desk"], bac
 function headerHtml(r) {
   trackBack(r);
   const g = groupOf(r), sub = subOf(r);
-  const own = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
-  const top = SECTIONS.filter((x) => !x[2] || own).map(([h, k]) => '<a href="#' + h + '"' + ((h === "" ? g === "home" : g === h) ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + (own ? "" : '<a href="#plans"' + (g === "plans" ? ' aria-current="page"' : "") + ">" + esc(t("nav_plans")) + "</a>");
+  const own = (typeof HOSTED !== "undefined" && HOSTED && CFG.token) || (typeof MA !== "undefined" && MA.prof && MA.prof.is_admin);
+  const top = SECTIONS.filter((x) => !x[2] || own).map(([h, k]) => '<a href="#' + h + '"' + ((h === "" ? g === "home" : g === h) ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + ('<a href="#plans"' + (g === "plans" ? ' aria-current="page"' : "") + ">" + esc(t("nav_plans")) + "</a>");
   const back = BACK && typeof HOSTED !== "undefined" && HOSTED && CFG.token ? '<a class="btn sm back-btn" href="#' + BACK.r + '" data-act="nav-back" title="' + esc(t(BACK.r === "desk" ? "back_desk" : "back_owner")) + '"><span aria-hidden="true">↩</span> <span>' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")) + "</span></a>" : "";
   let fab = document.getElementById("backfab");
   if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }

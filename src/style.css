@@ -1558,3 +1558,9 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .bl-editf input,.bl-editf textarea{width:100%;box-sizing:border-box}
 
 .wn-h{font-size:15px;margin:14px 0 4px;padding-top:10px;border-top:1px dashed var(--line)}
+
+/* الهيدر أعرض على الشاشات الكبيرة عشان تظهر كل الأقسام، وبطاقة الترحيب تملأ السطر */
+@media (min-width:1200px){.top .wrap{max-width:1400px}}
+.nav a{flex:none}
+.dh-hero-t{flex:1 1 420px}
+.dh-eyebrow{white-space:normal}

@@ -1592,6 +1592,12 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .bl-editf input,.bl-editf textarea{width:100%;box-sizing:border-box}
 
 .wn-h{font-size:15px;margin:14px 0 4px;padding-top:10px;border-top:1px dashed var(--line)}
+
+/* الهيدر أعرض على الشاشات الكبيرة عشان تظهر كل الأقسام، وبطاقة الترحيب تملأ السطر */
+@media (min-width:1200px){.top .wrap{max-width:1400px}}
+.nav a{flex:none}
+.dh-hero-t{flex:1 1 420px}
+.dh-eyebrow{white-space:normal}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -6802,8 +6808,8 @@ Object.assign(UI, { back_desk: ["رجوع لمكتبي", "Back to my desk"], bac
 function headerHtml(r) {
   trackBack(r);
   const g = groupOf(r), sub = subOf(r);
-  const own = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
-  const top = SECTIONS.filter((x) => !x[2] || own).map(([h, k]) => '<a href="#' + h + '"' + ((h === "" ? g === "home" : g === h) ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + (own ? "" : '<a href="#plans"' + (g === "plans" ? ' aria-current="page"' : "") + ">" + esc(t("nav_plans")) + "</a>");
+  const own = (typeof HOSTED !== "undefined" && HOSTED && CFG.token) || (typeof MA !== "undefined" && MA.prof && MA.prof.is_admin);
+  const top = SECTIONS.filter((x) => !x[2] || own).map(([h, k]) => '<a href="#' + h + '"' + ((h === "" ? g === "home" : g === h) ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + ('<a href="#plans"' + (g === "plans" ? ' aria-current="page"' : "") + ">" + esc(t("nav_plans")) + "</a>");
   const back = BACK && typeof HOSTED !== "undefined" && HOSTED && CFG.token ? '<a class="btn sm back-btn" href="#' + BACK.r + '" data-act="nav-back" title="' + esc(t(BACK.r === "desk" ? "back_desk" : "back_owner")) + '"><span aria-hidden="true">↩</span> <span>' + esc(t(BACK.r === "desk" ? "dk_h" : "ow_h")) + "</span></a>" : "";
   let fab = document.getElementById("backfab");
   if (!fab) { fab = document.createElement("a"); fab.id = "backfab"; fab.setAttribute("data-act", "nav-back"); document.body.appendChild(fab); }
@@ -9296,6 +9302,7 @@ const MA_SB = { url: "https://tefqkwyyyxyeviagrryr.supabase.co", key: "sb_publis
 const MA_LOCK = "meras.ownerlock", MA_STORE = "meras.auth";
 const MA = { sb: null, user: null, prof: null, aal: null, factor: null, enroll: null, open: false, view: "login", msg: "", ok: false, unlocked: false, subs: [], ready: false };
 MA.on = (fn) => MA.subs.push(fn);
+setTimeout(() => MA.on(() => { const h = document.getElementById("top"); if (h && typeof headerHtml === "function" && typeof route === "function" && !(typeof lnShow === "function" && lnShow())) { h.innerHTML = headerHtml(route()); if (typeof maPaint === "function") maPaint(); } }), 0);
 MA.can = (p) => !!(MA.user && MA.prof && !MA.prof.banned && (MA.prof.is_admin || (MA.prof.perms && MA.prof.perms[p])));
 MA.desk = () => MA.can("desk");
 MA.staff = () => !!(MA.prof && !MA.prof.is_admin && MA.prof.perms && Object.keys(MA.prof.perms).some((k) => MA.prof.perms[k]));
