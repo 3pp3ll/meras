@@ -1460,7 +1460,7 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 /* ===== المدونة ===== */
 .bl-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start}
 @media (max-width:900px){.bl-wrap{grid-template-columns:minmax(0,1fr)}.bl-side{order:-1}}
-.bl-side{position:sticky;top:90px}
+@media (min-width:901px){.bl-side{position:sticky;top:90px}}
 .bl-tabs{display:flex;gap:6px;flex-wrap:wrap}
 .bl-tabs button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font:600 14px var(--body);cursor:pointer}
 .bl-tabs button[aria-selected="true"]{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
