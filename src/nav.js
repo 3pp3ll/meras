@@ -318,13 +318,4 @@ document.addEventListener("click", (e) => { const p = e.target.closest && e.targ
   window.addEventListener("scroll", upd, { passive: true }); upd();
 })();
 
-/* ----- hidden door: 5 quick taps on the logo square open the owner dashboard (only on the owner's linked device) ----- */
-(function () {
-  let n = 0, timer = null;
-  document.addEventListener("click", (e) => {
-    const logo = e.target.closest && e.target.closest(".brand svg"); if (!logo) return;
-    if (!(typeof HOSTED !== "undefined" && HOSTED && CFG.token)) return;
-    n++; clearTimeout(timer); timer = setTimeout(() => { n = 0; }, 1500);
-    if (n >= 5) { n = 0; e.preventDefault(); location.hash = "owner"; }
-  }, true);
-})();
+/* باب المالك صار بتسجيل دخول الأدمن من أيقونة الحساب (auth.js) */

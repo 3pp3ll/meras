@@ -79,6 +79,22 @@ do $$ begin
   end if;
 end $$;
 
+-- ============ مفاتيح المالك (توكن GitHub ومفتاح الذكاء) ============
+-- ما يقدر يقراها أو يعدلها إلا الأدمن بعد التحقق بخطوتين (aal2)
+create table if not exists public.owner_secrets (
+  id int primary key default 1 check (id = 1),
+  gh_owner text, gh_repo text, gh_token text,
+  ai_key text, ai_model text,
+  updated_at timestamptz not null default now()
+);
+alter table public.owner_secrets enable row level security;
+drop policy if exists "secrets owner" on public.owner_secrets;
+create policy "secrets owner" on public.owner_secrets for all
+  using (public.is_admin() and coalesce(auth.jwt()->>'aal', '') = 'aal2')
+  with check (public.is_admin() and coalesce(auth.jwt()->>'aal', '') = 'aal2');
+revoke all on public.owner_secrets from anon;
+grant select, insert, update on public.owner_secrets to authenticated;
+
 -- ============ اجعل نفسك المالك ============
 -- بعد ما تسجّل حسابك من صفحة المدونة، شغّل هذا بإيميلك:
 -- insert into public.profiles (id, email, name, is_admin)

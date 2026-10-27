@@ -1498,3 +1498,44 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .bl-ok{color:var(--up);margin:0}.bl-err{color:var(--down);margin:0}
 .bl-auth h3,.bl-me h3{margin:0}
 @media (prefers-reduced-motion:reduce){.bl-card,.bl-scr-cover{transition:none}}
+
+/* ===== قائمة الحساب (auth.js) ===== */
+.ma-btn{position:relative;padding:5px 8px;min-width:38px;display:inline-grid;place-items:center}
+.ma-av{width:24px;height:24px;border-radius:50%;background:var(--amber);color:var(--on-amber);display:grid;place-items:center;font-weight:700;font-size:13px}
+.ma-av.big{width:44px;height:44px;font-size:18px;flex:none}
+.ma-dot{position:absolute;top:-3px;inset-inline-start:-3px;width:10px;height:10px;border-radius:50%;background:var(--up);border:2px solid var(--surface)}
+.ma-pop{position:fixed;z-index:1200;width:330px;max-width:calc(100vw - 24px);max-height:calc(100vh - 90px);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;box-shadow:0 22px 50px rgba(20,30,50,.28);padding:18px;animation:maDrop .16s ease-out}
+@keyframes maDrop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ma-pop{animation:none}}
+.ma-h{font-size:19px;font-weight:700;margin:0 0 2px}
+.ma-s{color:var(--muted);font-size:13.5px;margin:0 0 12px;line-height:1.6}
+.ma-f{display:grid;gap:5px;margin-bottom:12px}
+.ma-f label{font-weight:700;font-size:13px}
+.ma-f input{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--bg);color:var(--ink);font:500 15px var(--body);box-sizing:border-box}
+.ma-f input[dir=ltr]{text-align:left}
+.ma-pw{position:relative}.ma-pw input{padding-inline-start:44px}
+.ma-eye{position:absolute;inset-block:0;inset-inline-start:4px;width:36px;border:0;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center;border-radius:8px}
+.ma-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-2px 0 10px;font-size:13.5px}
+.ma-chk{display:flex;align-items:center;gap:7px;cursor:pointer}.ma-chk input{width:17px;height:17px;accent-color:var(--amber-ink)}
+.ma-lnk{border:0;background:none;color:var(--amber-ink);font:700 13.5px var(--body);cursor:pointer;padding:2px;text-decoration:underline;text-underline-offset:3px}
+.ma-go{width:100%;height:44px;border:0;border-radius:11px;background:var(--amber);color:var(--on-amber);font:700 15px var(--body);cursor:pointer;margin-bottom:6px}
+.ma-go:disabled{opacity:.6;cursor:wait}
+.ma-go.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.ma-sep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:10px 0}
+.ma-sep::before,.ma-sep::after{content:"";flex:1;height:1px;background:var(--line)}
+.ma-alt{text-align:center;font-size:13.5px;color:var(--muted);margin:8px 0 0}
+.ma-msg{font-size:13px;margin:-4px 0 10px;line-height:1.55;min-height:0}.ma-msg:empty{display:none}
+.ma-msg.err{color:var(--down)}.ma-msg.ok{color:var(--up)}
+.ma-me{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.ma-me>div{min-width:0;display:flex;flex-direction:column}
+.ma-me span[dir=ltr]{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;text-align:start}
+.ma-pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--up-soft);color:var(--up);margin-bottom:10px}
+.ma-pill.n{background:var(--sunk);color:var(--muted)}
+.ma-links{display:grid;gap:2px;border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+.ma-mi{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border:0;background:none;border-radius:10px;font:600 14.5px var(--body);color:var(--ink);cursor:pointer;text-align:start;text-decoration:none;box-sizing:border-box}
+.ma-mi:hover{background:var(--sunk)}.ma-mi.out{color:var(--down)}
+.ma-lang{margin-top:8px;border-top:1px solid var(--line);border-radius:0;padding-top:12px}
+.ma-links .ma-lang{border-top:0;margin-top:0;padding-top:9px;border-radius:10px}
+.ma-qr{display:grid;place-items:center;background:#fff;border-radius:12px;padding:10px;margin-bottom:6px}.ma-qr img{width:180px;height:180px}
+.ma-key{font-size:12px;word-break:break-all;background:var(--sunk);padding:2px 6px;border-radius:6px}
+.ma-pop button:focus-visible,.ma-pop input:focus-visible,.ma-pop a:focus-visible,.ma-btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}

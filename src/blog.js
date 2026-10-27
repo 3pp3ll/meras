@@ -24,8 +24,7 @@ Object.assign(UI, {
   bl_err_fill: ["اكتب العنوان والنص.", "Add a title and text."], bl_err_net: ["تعذّر الاتصال. جرّب مرة ثانية.", "Connection failed. Try again."], bl_newpw: ["كلمة مرور جديدة", "New password"], bl_pw_ok: ["تغيّرت كلمة المرور ✓", "Password changed ✓"]
 });
 
-/* ===== إعداد Supabase لمِراس (مشروع مستقل عن عقود) — قيم عامة وآمنة للنشر ===== */
-const BL_SB = { url: "https://tefqkwyyyxyeviagrryr.supabase.co", key: "sb_publishable_PVNaPHPTkQ2X87uLOuufuQ_rEc6D6MD" };
+/* الحساب مشترك مع أيقونة الحساب فوق (auth.js) */
 
 const BL_POSTS = [
   { id: "habits", tag: "سلوك المتداول", min: 4, date: "2026-10-20", c: "tl", title: "خمس عادات تفرّق بين المتداول اللي يتعلّم والمتداول اللي يخسر",
@@ -67,32 +66,17 @@ const BL_POSTS = [
 ];
 
 const BL = { tab: "all", sb: null, loading: false, user: null, prof: null, posts: [], held: [], mine: [], pending: [], view: "login", msg: "", msgOk: false, compose: false, sending: false, peek: {} };
-const blReady = () => !!(BL_SB.url && BL_SB.key);
+const blReady = () => typeof HOSTED !== "undefined" && HOSTED && typeof MA !== "undefined";
 const blDate = (d) => { try { return new Date(d).toLocaleDateString(S.lang === "ar" ? "ar-SA-u-ca-gregory-nu-latn" : "en-GB", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { return d; } };
 
-/* ---------- Supabase ---------- */
-function blLoadLib() {
-  if (window.supabase) return Promise.resolve();
-  return new Promise((ok, no) => { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
-}
+/* ---------- Supabase (من auth.js) ---------- */
+function blSync() { BL.sb = MA.sb; BL.user = MA.user; BL.prof = MA.prof; }
 async function blInit() {
-  if (!blReady() || BL.sb || BL.loading) return; BL.loading = true;
-  try {
-    await blLoadLib();
-    let remember = true; try { remember = localStorage.getItem("meras.bl.rem") !== "0"; } catch (e) {}
-    BL.sb = window.supabase.createClient(BL_SB.url, BL_SB.key, { auth: { storageKey: "meras.blauth", storage: remember ? localStorage : sessionStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
-    BL.sb.auth.onAuthStateChange((ev, ses) => { if (ev === "PASSWORD_RECOVERY") BL.view = "reset"; setTimeout(() => blSetUser(ses ? ses.user : null), 0); });
-    const { data } = await BL.sb.auth.getSession();
-    await blSetUser(data.session ? data.session.user : null, true);
-  } catch (e) { BL.msg = t("bl_err_net"); }
-  BL.loading = false; blPaint();
+  if (!blReady() || BL.loading) return; BL.loading = true;
+  if (!MA.sb && typeof maInit === "function") await maInit();
+  blSync(); await blFetch(); BL.loading = false; BL.started = true; blPaint();
 }
-async function blSetUser(u, quiet) {
-  const same = (u && u.id) === (BL.user && BL.user.id) && BL.prof;
-  BL.user = u;
-  if (!u) BL.prof = null; else if (!same) { const { data } = await BL.sb.from("profiles").select("*").eq("id", u.id).maybeSingle(); BL.prof = data || { name: (u.user_metadata && u.user_metadata.name) || u.email.split("@")[0] }; }
-  await blFetch(); if (!quiet) blPaint();
-}
+if (typeof MA !== "undefined") MA.on(async () => { if (!BL.started) return; blSync(); await blFetch(); blPaint(); });
 async function blFetch() {
   if (!BL.sb) return;
   const [a, b] = await Promise.all([
@@ -121,7 +105,7 @@ function blHeldCard(p, own) {
 }
 function blAuthBox() {
   if (!blReady()) return '<div class="notice">' + esc(t("bl_soon")) + "</div>";
-  if (BL.loading && !BL.sb) return '<p class="small muted">…</p>';
+  if (!BL.user) return '<div class="panel stack bl-auth"><b>' + esc(t("bl_write")) + '</b><p class="small muted" style="margin:0">' + esc(t("bl_login_to")) + '</p><div class="row" style="gap:8px"><button type="button" class="btn primary" data-act="bl-login">' + esc(t("bl_in")) + '</button><button type="button" class="btn ghost" data-act="bl-signup">' + esc(t("bl_up")) + "</button></div></div>";
   const m = BL.msg ? '<p class="small ' + (BL.msgOk ? "bl-ok" : "bl-err") + '" role="status">' + esc(BL.msg) + "</p>" : "";
   const pw = (id, ac) => '<div class="field"><label for="' + id + '">' + esc(t(id === "bl-np" ? "bl_newpw" : "bl_pass")) + '</label><div class="bl-pw"><input id="' + id + '" type="password" dir="ltr" autocomplete="' + ac + '"><button type="button" class="bl-eye" data-act="bl-eye" data-for="' + id + '" aria-label="👁">👁</button></div></div>';
   const em = '<div class="field"><label for="bl-em">' + esc(t("bl_email")) + '</label><input id="bl-em" type="email" dir="ltr" autocomplete="email"></div>';
@@ -137,7 +121,7 @@ function blAuthBox() {
 function blCompose() {
   if (!BL.user) return "";
   const m = BL.msg ? '<p class="small ' + (BL.msgOk ? "bl-ok" : "bl-err") + '" role="status">' + esc(BL.msg) + "</p>" : "";
-  return '<div class="panel stack bl-me"><div class="row" style="justify-content:space-between"><b>' + esc(t("bl_hi").replace("{n}", (BL.prof && BL.prof.name) || "")) + '</b><button class="btn ghost sm" data-act="bl-out">' + esc(t("bl_out")) + "</button></div>" +
+  return '<div class="panel stack bl-me"><div class="row" style="justify-content:space-between"><b>' + esc(t("bl_hi").replace("{n}", (BL.prof && BL.prof.name) || "")) + '</b><button class="btn ghost sm" data-act="ma-out">' + esc(t("bl_out")) + "</button></div>" +
     (BL.compose ? '<form class="stack" data-form="bl-post" novalidate><div class="field"><label for="bl-t">' + esc(t("bl_title")) + '</label><input id="bl-t" maxlength="120"></div><div class="field"><label for="bl-b">' + esc(t("bl_body")) + '</label><textarea id="bl-b" rows="6" maxlength="5000" placeholder="' + esc(t("bl_body_ph")) + '"></textarea></div><p class="small muted" style="margin:0">' + esc(t("bl_rules")) + "</p>" + m + '<div class="row"><button class="btn primary"' + (BL.sending ? " disabled" : "") + ">" + esc(t(BL.sending ? "bl_sending" : "bl_send")) + '</button><button type="button" class="btn ghost" data-act="bl-compose">✕</button></div></form>'
       : m + '<button class="btn primary" data-act="bl-compose">✎ ' + esc(t("bl_write")) + "</button>") + "</div>";
 }
@@ -148,7 +132,7 @@ function blModeration() {
       '<div class="row" style="gap:6px"><button class="btn sm primary" data-act="bl-ok" data-id="' + p.id + '">' + esc(t("bl_approve")) + '</button><button class="btn sm ghost" data-act="bl-no" data-id="' + p.id + '">' + esc(t("bl_reject")) + '</button><button class="btn sm ghost" data-act="bl-del" data-id="' + p.id + '">' + esc(t("bl_del")) + "</button></div></div>").join("") : '<p class="small muted">' + esc(t("bl_mod_none")) + "</p>") + "</details>";
 }
 function pageBlog() {
-  if (blReady() && !BL.sb && !BL.loading) setTimeout(blInit, 0);
+  if (blReady() && !BL.started && !BL.loading) setTimeout(blInit, 0);
   const tabs = [["all", "bl_all"], ["ours", "bl_ours"], ["comm", "bl_comm"]];
   const ours = BL.tab !== "comm" ? '<div class="bl-grid">' + BL_POSTS.map(blCard).join("") + "</div>" : "";
   const heldOthers = BL.held.filter((h) => !(BL.user && h.author === BL.user.id));
@@ -178,6 +162,7 @@ const blMsg = (m, ok) => { BL.msg = m; BL.msgOk = !!ok; blPaint(); };
 document.addEventListener("click", async (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="bl-"]'); if (!el) return;
   const a = el.dataset.act;
+  if (a === "bl-login" || a === "bl-signup") { e.preventDefault(); e.stopPropagation(); window.scrollTo({ top: 0, behavior: "smooth" }); setTimeout(() => maOpen(a === "bl-login" ? "login" : "signup"), 250); return; }
   if (a === "bl-tab") { BL.tab = el.dataset.t; blPaint(); return; }
   if (a === "bl-view") { BL.view = el.dataset.v; BL.msg = ""; blPaint(); return; }
   if (a === "bl-eye") { const i = document.getElementById(el.dataset.for); if (i) i.type = i.type === "password" ? "text" : "password"; return; }

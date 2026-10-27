@@ -112,12 +112,7 @@ function pageDash() {
 Object.assign(UI, { hero_p_short: ["ثلاثة مسارات: المستثمر والمتداول والمبرمج. شرح، مثال على سهم من تاسي، تمرين في سجلك.", "Three tracks: investor, trader, developer. A lesson, a TASI example, practice in your journal."] });
 
 /* ----- قائمة الحساب (الإعدادات، الحساب، الباقات، لوحة المالك، هيكل المنصة) ----- */
-function profileMenu() {
-  const owner = isOwner();
-  const links = [["map", "pm_map"], ["settings", "set_h"], ["account", "nav_account"], ["plans", "nav_plans"]].concat(owner ? [["owner", "pm_owner"]] : []);
-  return '<details class="pmenu"><summary class="btn sm" aria-label="' + esc(t("pm_menu")) + '"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></g></svg></summary><div class="pm-pop">' +
-    links.map(([h, k]) => '<a href="#' + h + '">' + esc(t(k)) + "</a>").join("") + '<button type="button" class="pm-m" data-act="lang">' + (S.lang === "ar" ? "English" : "عربي") + "</button></div></details>";
-}
+/* profileMenu صار في auth.js (دخول وحساب) */
 document.addEventListener("click", (e) => {
   const x = e.target.closest && e.target.closest('[data-act="pin-x"]');
   if (x) { e.preventDefault(); try { localStorage.setItem(PIN_KEY, x.dataset.id); } catch (err) {} render(); return; }
