@@ -27,12 +27,13 @@ Object.assign(UI, {
 const NAV_GROUPS = {
   market: { label: "nav_market", items: [["chart", "nav_chart", "d_chart"], ["indices", "nav_indices", "d_indices", 1], ["tech", "tab_tech", "d_tech"], ["metals", "tab_met", "d_met"], ["screener", "sc_t", "dk_g_sc", 1], ["movers", "tp_t", "dk_g_top", 1], ["usm", "us_t", "dk_g_us", 1]] },
   pf: { label: "nav_pf", items: [["apps", "ap_t", "dk_g_apps", 1], ["portfolio", "dk_t_pf", "dk_g_pf", 1], ["journal", "tab_journal", "d_journal"], ["saved", "sv_t", "dk_g_sv", 1], ["analyses", "nav_an", "d_an"], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["dividends", "tab_div", "d_div"], ["gdiv", "dg_t", "dk_g_dg", 1], ["invest", "tab_inv", "d_invest"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] },
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["progress", "nav_progress", "d_prog"]] }
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["blog", "nav_blog", "d_blog"], ["progress", "nav_progress", "d_prog"]] }
 };
 /* بنود المالك (العلامة 1) تختفي إذا ما فيه ربط GitHub */
 const navItems = (g) => (NAV_GROUPS[g] ? NAV_GROUPS[g].items.filter((x) => !x[3] || (typeof HOSTED !== "undefined" && HOSTED && CFG.token)) : []);
-const SECTIONS = [["", "nav_home"], ["market", "nav_market"], ["pf", "nav_pf"], ["news", "nav_news", 1], ["learn", "nav_learn"]];
+const SECTIONS = [["", "nav_home"], ["market", "nav_market"], ["pf", "nav_pf"], ["news", "nav_news", 1], ["learn", "nav_learn"], ["blog", "nav_blog"]];
 function groupOf(r) {
+  if (r === "blog" || r.startsWith("b-")) return "blog";
   if (r === "learn" || r.startsWith("l-") || r.startsWith("g-") || r.startsWith("sch-")) return "learn";
   if (r === "services" || r === "pf") return "pf";
   if (r === "market") return "market";
@@ -131,6 +132,7 @@ const SEC_IC = {
   guides: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5M9 8h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
   glossary: '<path d="M4 18l4-12 4 12M5.5 14h5M14 7h6l-6 10h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
   symbols: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4L7 20M17 4l-2 16M4 9h16M3 15h16"/></g>',
+  blog: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></g>',
   progress: '<g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></g>',
   journal: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></g>',
   invest: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M16.5 7.5c-.8-1.3-2.4-2-4.5-2-2.5 0-4 1.2-4 3s1.5 2.6 4 3.2 4 1.4 4 3.3-1.6 3.2-4.2 3.2c-2.1 0-3.7-.8-4.5-2.2"/></g>',

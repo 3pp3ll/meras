@@ -1,0 +1,86 @@
+-- مِراس — قاعدة بيانات المدونة (مشروع Supabase مستقل عن عقود)
+-- انسخ الملف كامل في Supabase ← SQL Editor ← New query ثم Run. آمن لإعادة التشغيل.
+
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text,
+  name text,
+  is_admin boolean not null default false,
+  banned boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create or replace function public.handle_new_user() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id, email, name)
+  values (new.id, new.email, left(coalesce(nullif(trim(new.raw_user_meta_data->>'name'), ''), split_part(new.email, '@', 1)), 40))
+  on conflict (id) do nothing;
+  return new;
+end $$;
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();
+
+create or replace function public.is_admin() returns boolean
+language sql stable security definer set search_path = public as $$
+  select coalesce((select is_admin from public.profiles where id = auth.uid()), false)
+$$;
+
+create table if not exists public.posts (
+  id bigserial primary key,
+  author uuid references auth.users(id) on delete cascade,
+  author_name text,
+  title text not null check (char_length(title) between 1 and 120),
+  body text not null check (char_length(body) between 1 and 5000),
+  status text not null default 'held' check (status in ('published', 'held', 'rejected')),
+  ai_flag boolean not null default false,
+  ai_reason text,
+  created_at timestamptz not null default now(),
+  reviewed_at timestamptz
+);
+create index if not exists posts_status_created on public.posts (status, created_at desc);
+
+alter table public.profiles enable row level security;
+alter table public.posts enable row level security;
+
+drop policy if exists "profiles read" on public.profiles;
+create policy "profiles read" on public.profiles for select using (id = auth.uid() or public.is_admin());
+drop policy if exists "profiles admin" on public.profiles;
+create policy "profiles admin" on public.profiles for update using (public.is_admin()) with check (public.is_admin());
+
+-- المنشور المعتمد يشوفه الكل، والمحجوب يشوفه كاتبه والإدارة بس
+drop policy if exists "posts read" on public.posts;
+create policy "posts read" on public.posts for select using (status = 'published' or author = auth.uid() or public.is_admin());
+-- النشر يتم من دالة post في السيرفر فقط (تفحص التوصيات)، والاعتماد والحذف للإدارة
+drop policy if exists "posts admin update" on public.posts;
+create policy "posts admin update" on public.posts for update using (public.is_admin()) with check (public.is_admin());
+drop policy if exists "posts delete" on public.posts;
+create policy "posts delete" on public.posts for delete using (author = auth.uid() or public.is_admin());
+
+-- المنشورات المحجوبة تظهر للكل كبطاقة مغطاة: الاسم والتاريخ فقط بدون النص
+create or replace function public.held_stubs()
+returns table (id bigint, author uuid, author_name text, created_at timestamptz)
+language sql stable security definer set search_path = public as $$
+  select id, author, author_name, created_at from public.posts where status = 'held' order by created_at desc limit 30
+$$;
+
+revoke all on public.profiles, public.posts from anon;
+grant select on public.posts to anon, authenticated;
+grant select on public.profiles to authenticated;
+grant update (status, reviewed_at) on public.posts to authenticated;
+grant update (name, is_admin, banned) on public.profiles to authenticated;
+grant delete on public.posts to authenticated;
+grant execute on function public.held_stubs() to anon, authenticated;
+grant execute on function public.is_admin() to anon, authenticated;
+do $$ begin
+  if exists (select 1 from pg_roles where rolname = 'service_role') then
+    grant select, insert, update on public.posts, public.profiles to service_role;
+    grant usage, select on all sequences in schema public to service_role;
+  end if;
+end $$;
+
+-- ============ اجعل نفسك المالك ============
+-- بعد ما تسجّل حسابك من صفحة المدونة، شغّل هذا بإيميلك:
+-- insert into public.profiles (id, email, name, is_admin)
+-- select id, email, 'مِراس', true from auth.users where email = 'your@email.com'
+-- on conflict (id) do update set is_admin = true;
