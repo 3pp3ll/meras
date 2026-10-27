@@ -16,6 +16,7 @@ Object.assign(UI, {
   dk_saved: ["انحفظ", "Saved"], dk_del: ["احذف", "Delete"], dk_sure: ["متأكد؟", "Sure?"], dk_edit: ["عدّل", "Edit"], dk_save: ["احفظ", "Save"], dk_cancel: ["إلغاء", "Cancel"],
   dk_xlsx: ["صدّر Excel", "Export to Excel"], dk_open_ch: ["الشارت", "Chart"], dk_loading: ["جارٍ فتح مكتبي…", "Opening your desk…"],
   dk_new_an: ["تحليل جديد", "New analysis"], dk_an_sym: ["السهم", "Share"], dk_an_reason: ["وش شفت في الشارت؟", "What did you see on the chart?"], dk_an_plan: ["خطة الدخول", "Entry plan"],
+  dk_symq: ["ابحث باسم السهم أو رمزه", "Search by name or symbol"], dk_symq_none: ["ما فيه سهم بهالاسم", "No matching share"],
   dk_entry: ["سعر الدخول", "Entry"], dk_stop: ["الوقف", "Stop"], dk_target: ["الهدف", "Target"], dk_status: ["الحالة", "Status"],
   dk_s_watch: ["أراقب", "Watching"], dk_s_in: ["دخلت", "Entered"], dk_s_out: ["طلعت", "Exited"], dk_s_cancel: ["ألغيت", "Cancelled"],
   dk_draws: ["رسوماتك الحالية على شارت هذا السهم تنحفظ مع التحليل ({n}).", "Your current drawings on this share's chart are saved with the analysis ({n})."],
@@ -134,7 +135,7 @@ function dkAnForm() {
   const sym = a.sym || (S.chart && syms.includes(S.chart.sym) ? S.chart.sym : syms[0]), n = (S.drawings && S.drawings[sym] || []).length;
   const f = (id, k, v) => '<div class="field"><label for="' + id + '">' + esc(t(k)) + '</label><input id="' + id + '" type="number" min="0" step="0.01" inputmode="decimal" value="' + esc(v == null ? "" : v) + '"></div>';
   const st = [["watch", "dk_s_watch"], ["in", "dk_s_in"], ["out", "dk_s_out"], ["cancel", "dk_s_cancel"]];
-  return '<form class="panel stack" data-form="dk-an" data-id="' + esc(a.id || "") + '" novalidate><h3>' + esc(t(a.id ? "dk_edit" : "dk_new_an")) + '</h3><div class="form-grid"><div class="field"><label for="da-sym">' + esc(t("dk_an_sym")) + '</label><select id="da-sym"' + (a.id ? " disabled" : ' data-dk="an-sym"') + ">" + syms.map((s) => '<option value="' + esc(s) + '"' + (s === sym ? " selected" : "") + ">" + esc(s + " " + dkName(s)) + "</option>").join("") + "</select></div>" +
+  return '<form class="panel stack" data-form="dk-an" data-id="' + esc(a.id || "") + '" novalidate><h3>' + esc(t(a.id ? "dk_edit" : "dk_new_an")) + '</h3><div class="form-grid"><div class="field"><label for="da-sym">' + esc(t("dk_an_sym")) + '</label>' + (a.id ? "" : '<input id="da-symq" type="search" data-dk="an-symq" autocomplete="off" placeholder="' + esc(t("dk_symq")) + '" aria-label="' + esc(t("dk_symq")) + '" style="margin-bottom:6px">') + '<select id="da-sym"' + (a.id ? " disabled" : ' data-dk="an-sym" data-all="' + esc(JSON.stringify(syms.map((x) => [x, dkName(x)]))) + '"') + ">" + syms.map((s) => '<option value="' + esc(s) + '"' + (s === sym ? " selected" : "") + ">" + esc(s + " " + dkName(s)) + "</option>").join("") + "</select></div>" +
     '<div class="field"><label for="da-status">' + esc(t("dk_status")) + '</label><select id="da-status">' + st.map(([v, k]) => '<option value="' + v + '"' + ((a.status || "watch") === v ? " selected" : "") + ">" + esc(t(k)) + "</option>").join("") + "</select></div>" +
     f("da-entry", "dk_entry", a.entry) + f("da-stop", "dk_stop", a.stop) + f("da-target", "dk_target", a.target) + "</div>" +
     '<div class="field"><label for="da-reason">' + esc(t("dk_an_reason")) + '</label><textarea id="da-reason" rows="3">' + esc(a.reason || "") + '</textarea></div><div class="field"><label for="da-plan">' + esc(t("dk_an_plan")) + '</label><textarea id="da-plan" rows="2">' + esc(a.plan || "") + "</textarea></div>" +
@@ -257,4 +258,14 @@ document.addEventListener("submit", async (e) => {
     else DK.data.charts.push(Object.assign({ id: "a" + Date.now().toString(36), at: Date.now(), sym, date: h.length ? h[h.length - 1].d : today(), price: h.length ? h[h.length - 1].c : null, draws: dkCopyDraws(sym), ind: S.chart ? JSON.parse(JSON.stringify(S.chart)) : null }, rec));
     dkAn = null; render(); await saveDesk(); render();
   }
+});
+document.addEventListener("input", (e) => {
+  if (!e.target.dataset || e.target.dataset.dk !== "an-symq") return;
+    const sel = document.getElementById("da-sym"); if (!sel) return;
+    let all = []; try { all = JSON.parse(sel.dataset.all || "[]"); } catch (x) {}
+    const q = e.target.value.trim(), norm = (v) => (typeof shNorm === "function" ? shNorm(v) : String(v).toLowerCase());
+    const nq = norm(q), cur = sel.value;
+    const rows = all.filter(([c, n]) => !q || c.startsWith(q) || norm(c + " " + n).includes(nq));
+    sel.innerHTML = rows.length ? rows.map(([c, n]) => '<option value="' + esc(c) + '"' + (c === cur ? " selected" : "") + ">" + esc(c + " " + n) + "</option>").join("") : '<option value="" disabled selected>' + esc(t("dk_symq_none")) + "</option>";
+    if (rows.length && sel.value !== cur) sel.dispatchEvent(new Event("change", { bubbles: true }));
 });

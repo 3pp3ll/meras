@@ -1429,6 +1429,9 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .sn-list{list-style:none;margin:10px 0 0;padding:0;display:grid}
 .sn-list li{padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}.sn-list li:last-child{border-bottom:0}
 .sn-t{margin:0;font-weight:600;line-height:1.55}.sn-t[dir="ltr"]{text-align:left}
+.sn-orig{margin:2px 0 0;text-align:left;line-height:1.45}
+.sn-trb{padding:4px 7px;flex:none}.sn-trb.on{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.sn-err{color:var(--down)}
 .b-m{--c:var(--ta);--c2:var(--ta2);--cs:var(--ta-soft);--ci:var(--ta-ink)}
 .dh-sc{grid-template-columns:repeat(8,minmax(0,1fr))}.dh-sc a{position:relative}.dh-sc .bell-n{position:absolute;top:8px;inset-inline-end:8px}
 @media (max-width:1100px){.dh-sc{grid-template-columns:repeat(4,minmax(0,1fr))}}
