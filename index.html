@@ -9282,7 +9282,7 @@ Object.assign(UI, {
   ma_e_cred: ["الإيميل أو كلمة المرور غير صحيحة.", "Wrong email or password."], ma_e_email: ["اكتب إيميل صحيح.", "Enter a valid email."], ma_e_pw: ["كلمة المرور لازم تكون ٨ أحرف أو أكثر.", "Password must be 8+ characters."],
   ma_e_conf: ["أكّد إيميلك من الرابط اللي وصلك، بعدها سجّل دخولك.", "Confirm your email first."], ma_e_dup: ["هذا الإيميل مسجّل. سجّل دخولك أو استعد كلمة المرور.", "This email is registered. Sign in instead."],
   ma_e_net: ["تعذّر الاتصال. تأكد من الإنترنت.", "Connection failed."], ma_e_rate: ["محاولات كثيرة. انتظر شوي وجرّب مرة ثانية.", "Too many attempts. Wait a bit."],
-  ma_out: ["تسجيل الخروج", "Sign out"], ma_staff: ["فريق الإدارة", "Team"], ma_owner: ["المالك", "Owner"], ma_member: ["عضو", "Member"], ma_lang: ["English", "عربي"],
+  ma_out: ["تسجيل الخروج", "Sign out"], ma_staff: ["فريق الإدارة", "Team"], ma_e_prof: ["تعذّر قراءة بيانات حسابك من السيرفر", "Couldn't read your account details"], ma_owner: ["المالك", "Owner"], ma_member: ["عضو", "Member"], ma_lang: ["English", "عربي"],
   ma_mfa_h: ["التحقق بخطوتين", "Two-step verification"], ma_mfa_new: ["لحماية لوحة المالك، اربط حسابك بتطبيق مصادقة (Google Authenticator أو Microsoft Authenticator): امسح الرمز، ثم اكتب الرقم اللي يطلع لك.", "To protect the owner area, scan this code with an authenticator app, then enter the 6-digit number."],
   ma_mfa_key: ["أو اكتب هذا المفتاح في التطبيق:", "Or type this key into the app:"], ma_mfa_code: ["الرمز من التطبيق (٦ أرقام)", "6-digit code"], ma_mfa_go: ["تحقق وافتح", "Verify and unlock"],
   ma_mfa_ask: ["اكتب الرمز من تطبيق المصادقة عشان تفتح أدوات المالك.", "Enter the code from your authenticator app to unlock the owner tools."], ma_mfa_bad: ["الرمز غير صحيح أو انتهى وقته. جرّب الرمز الجديد.", "Wrong or expired code."],
@@ -9329,12 +9329,25 @@ async function maInit() {
   catch (e) { MA.msg = t("ma_e_net"); }
   MA.ready = true; maPaint(); maEmit();
 }
+async function maFetchProf(u) {
+  const { data, error } = await MA.sb.from("profiles").select("*").eq("id", u.id).maybeSingle();
+  MA.profErr = error ? (error.message || error.code || "error") : data ? "" : "no profile row";
+  return data;
+}
+/* كل ما تنفتح القائمة نحدّث بيانات الحساب (لو تغيّرت الصلاحيات من قاعدة البيانات تبان على طول) */
+async function maRefreshProf() {
+  if (!MA.sb || !MA.user) return;
+  const was = JSON.stringify(MA.prof || {}), d = await maFetchProf(MA.user);
+  if (d) MA.prof = d;
+  if (JSON.stringify(MA.prof || {}) !== was) { if (MA.desk() && !MA.unlocked) { await maAdminGate(); if (MA.aal !== "aal2") MA.view = MA.factor ? "mfa" : "enroll"; if (MA.view === "enroll") return maStartEnroll(); } maPaint(); maEmit(); }
+  else if (MA.profErr) maPaint();
+}
 async function maSetUser(u) {
   const changed = (u && u.id) !== (MA.user && MA.user.id);
   MA.user = u;
   if (!u) { MA.prof = null; MA.unlocked = false; MA.aal = null; if (maLocked() && typeof CFG !== "undefined" && CFG.token) { maWipe(); if (typeof render === "function") render(); } maPaint(); maEmit(); return; }
   if (changed || !MA.prof) {
-    const { data } = await MA.sb.from("profiles").select("*").eq("id", u.id).maybeSingle();
+    const data = await maFetchProf(u);
     MA.prof = data || { name: (u.user_metadata && u.user_metadata.name) || u.email.split("@")[0], is_admin: false };
   }
   if (MA.desk()) await maAdminGate(); else if (maLocked() && typeof CFG !== "undefined" && CFG.token) { maWipe(); if (typeof render === "function") render(); }
@@ -9408,7 +9421,7 @@ function maView() {
   if (admin && MA.unlocked) links.unshift(["desk", "dk_h"], ["owner", "pm_owner"], ["map", "pm_map"], ["settings", "set_h"]);
   else if (MA.desk() && MA.unlocked) links.unshift(["desk", "dk_h"]);
   return '<div class="ma-me"><span class="ma-av big">' + esc((p.name || MA.user.email || "؟").trim()[0]) + '</span><div><b>' + esc(p.name || "") + '</b><span dir="ltr">' + esc(MA.user.email) + '</span></div></div><span class="ma-pill' + (admin ? "" : " n") + '">' + esc(t(admin ? "ma_owner" : staff ? "ma_staff" : "ma_member")) + "</span>" +
-    (MA.msg ? maMsg() : "") + (MA.desk() && !MA.unlocked ? '<button type="button" class="ma-go" data-act="ma-unlock">🔒 ' + esc(t("ma_unlock")) + "</button>" : "") +
+    (MA.msg ? maMsg() : "") + (MA.profErr ? '<p class="ma-msg err">' + esc(t("ma_e_prof")) + " (" + esc(MA.profErr) + ")</p>" : "") + (MA.desk() && !MA.unlocked ? '<button type="button" class="ma-go" data-act="ma-unlock">🔒 ' + esc(t("ma_unlock")) + "</button>" : "") +
     '<nav class="ma-links">' + links.map(([h, k]) => '<a class="ma-mi" href="#' + h + '">' + esc(t(k)) + "</a>").join("") + maLang() + '<button type="button" class="ma-mi out" data-act="ma-out">' + esc(t("ma_out")) + "</button></nav>";
 }
 function maPaint() {
@@ -9438,6 +9451,7 @@ function maOpen(view) {
   if (!MA.sb && HOSTED) maInit();
   if (MA.user && MA.desk() && !MA.unlocked && MA.aal !== "aal2" && view !== "me") MA.view = MA.factor ? "mfa" : MA.view;
   maPaint(); const f = document.querySelector("#ma-pop input:not([type=checkbox])"); if (f) f.focus();
+  if (MA.user) maRefreshProf();
 }
 function maClose() { MA.open = false; MA.msg = ""; if (!["reset"].includes(MA.view)) MA.view = "login"; maPaint(); }
 window.maOpen = maOpen;
