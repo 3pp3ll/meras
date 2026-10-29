@@ -29,7 +29,7 @@ function deskPage(r) {
   const k = ROUTE_DESK[r], lab = (typeof MAP_DESK !== "undefined" && MAP_DESK.find((x) => x[0] === k) || [k, "dk_h"])[1];
   const head = '<div class="page-head"><h1>' + esc(t(lab)) + "</h1>" + (UI["dk_g_" + k] ? "<p>" + esc(t("dk_g_" + k)) + "</p>" : "") + "</div>";
   if (!isOwner()) return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t(HOSTED ? "ow_need" : "ow_preview")) + "</div></div>";
-  if (["pf", "ch"].includes(k) && !DK.loaded) { loadDesk(); return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
+  if (["pf", "ch", "apps", "sv"].includes(k) && !DK.loaded) { loadDesk(); return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
   if (typeof dkTab !== "undefined") dkTab = k;
   const fn = { pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, us: dkUS, nw: dkNews, sv: dkSaved, dg: dkDivGlobal, apps: dkApps, op: dkOptions }[k];
   let inner = ""; try { inner = fn(); } catch (e) { console.error(e); inner = '<div class="notice">' + esc(String(e && e.message || e)) + "</div>"; }

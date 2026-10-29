@@ -38,7 +38,7 @@ async function loadDesk(force) {
   await loadUS();
   try { const f = await readJson("desk.json"); DK.data = (f && f.data) || dkBlank(); DK.sha = f ? f.sha : undefined; } catch (e) { DK.data = DK.data || dkBlank(); toast(errText(e)); }
   ["trades", "charts"].forEach((k) => { if (!Array.isArray(DK.data[k])) DK.data[k] = []; }); DK.data.cfg = Object.assign({ feePct: 0.155, feeMin: 0, feeVat: 15, feeUS: 2.25 }, DK.data.cfg); if (DK.data.cfg.v !== 2 && DK.data.cfg.v !== 3) Object.assign(DK.data.cfg, { v: 2, feePct: 0.155, feeMin: 0, feeVat: 15 }); if (DK.data.cfg.v === 2) Object.assign(DK.data.cfg, { v: 3, feeUS: 0 });
-  DK.loading = false; DK.loaded = true; if (["desk", "portfolio", "mycharts", ""].includes(route())) render();
+  DK.loading = false; DK.loaded = true; if (["desk", "portfolio", "mycharts", ""].includes(route()) || (typeof ROUTE_DESK !== "undefined" && ROUTE_DESK[route()])) render();
 }
 async function saveDesk() {
   DK.data.updatedAt = new Date().toISOString();
