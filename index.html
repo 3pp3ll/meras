@@ -7702,11 +7702,12 @@ Object.assign(UI, {
   ap_tip: ["للتطبيق: افتح المنصة في متصفح الجوال مرة، وإذا طلع لك «فتح في التطبيق» اختره، وبعدها الأيقونة تفتح التطبيق على طول.", "Tip: open the platform once in your phone browser and choose “Open in app” if offered; the icon will then open the app."]
 });
 const AP_COLORS = ["#E9A03B", "#E8765A", "#C76BA4", "#3D6E97", "#2E9C73", "#7DC3E6", "#B4532E", "#6E7A8E"];
-const AP_SUGG = [["الراجحي كابيتال", "https://www.alrajhi-capital.sa"], ["دراية", "https://www.derayah.com"], ["Exness", "https://www.exness.com"], ["TradingView", "https://www.tradingview.com"], ["تداول السعودية", "https://www.saudiexchange.sa"], ["أرقام", "https://www.argaam.com"], ["يقين", "https://yaaqen.com"]];
+const AP_SUGG = [["مِلْكية", "https://3pp3ll.github.io/milkia/"], ["الراجحي كابيتال", "https://www.alrajhi-capital.sa"], ["دراية", "https://www.derayah.com"], ["Exness", "https://www.exness.com"], ["TradingView", "https://www.tradingview.com"], ["تداول السعودية", "https://www.saudiexchange.sa"], ["أرقام", "https://www.argaam.com"], ["يقين", "https://yaaqen.com"]];
 let apEdit = false, apForm = null;
 const apList = () => { if (!DK.data) return []; if (!Array.isArray(DK.data.apps)) DK.data.apps = [{ id: "a1", name: "منطاد", url: "https://3pp3ll.github.io/ad-studio/" }, { id: "a2", name: "دربي", url: "https://3pp3ll.github.io/darbi-E/" }, { id: "a3", name: "عقود", url: "https://3pp3ll.github.io/oqood/Contracts.html" }]; return DK.data.apps; };
-const AP_MINE = { "منطاد": "https://3pp3ll.github.io/ad-studio/", "دربي": "https://3pp3ll.github.io/darbi-E/", "عقود": "https://3pp3ll.github.io/oqood/Contracts.html" };
-const apFill = () => { (DK.data && DK.data.apps || []).forEach((a) => { if (!a.url && AP_MINE[a.name]) a.url = AP_MINE[a.name]; }); };
+const AP_MINE = { "منطاد": "https://3pp3ll.github.io/ad-studio/", "دربي": "https://3pp3ll.github.io/darbi-E/", "عقود": "https://3pp3ll.github.io/oqood/Contracts.html", "مِلْكية": "https://3pp3ll.github.io/milkia/", "ملكية": "https://3pp3ll.github.io/milkia/" };
+const apFill = () => { const L = DK.data && DK.data.apps || []; L.forEach((a) => { if (!a.url && AP_MINE[a.name]) a.url = AP_MINE[a.name]; });
+  if (DK.data && !DK.data.apMilkia && !L.some((a) => /milkia/.test(a.url || ""))) { L.push({ id: "a" + Date.now().toString(36), name: "مِلْكية", url: "https://3pp3ll.github.io/milkia/" }); DK.data.apMilkia = 1; } };
 const apInit = (n) => { const w = String(n || "?").replace(/^(ال)/, "").trim(); return w.slice(0, /^[A-Za-z]/.test(w) ? 2 : 1).toUpperCase(); };
 const apHost = (u) => { try { const x = new URL(u), h = x.hostname.replace(/^www\./, ""); return /github\.io$/.test(h) ? (x.pathname.split("/")[1] || h) : h; } catch (e) { return ""; } };
 function dkApps() {
