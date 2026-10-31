@@ -7715,8 +7715,12 @@ const apFill = () => { const L = DK.data && DK.data.apps || []; L.forEach((a) =>
   if (DK.data && !DK.data.apNafsak && !L.some((a) => /ma-nafsak/.test(a.url || ""))) { L.push({ id: "a" + Date.now().toString(36) + "n", name: "مع نفسك", url: "https://3pp3ll.github.io/ma-nafsak/" }); DK.data.apNafsak = 1; } };
 /* شعار كل منصة: الشعار اللي رفعته، وإلا نجرب أيقونة المنصة نفسها (icons/icon-192.png وغيرها)، وإذا ما لقينا يبقى الحرف */
 const apBase = (u) => { try { const x = new URL(u); return x.origin + x.pathname.replace(/[^/]*$/, ""); } catch (e) { return ""; } };
+/* شعارات منصاتك المعتمدة (تتقدّم على الأيقونة التلقائية) */
+const AP_LOGOS = { "ad-studio": "icons/apps/mentad.png" };
 const apIcons = (a) => {
   if (a.icon) return [a.icon];
+  const mine = (() => { try { const x = new URL(a.url); return /github\.io$/.test(x.hostname) ? AP_LOGOS[x.pathname.split("/")[1]] : ""; } catch (e) { return ""; } })();
+  if (mine) return [mine];
   if (!/^https:\/\//.test(a.url || "")) return [];
   const b = apBase(a.url), h = (() => { try { return new URL(a.url).hostname; } catch (e) { return ""; } })();
   const own = ["icons/icon-192.png", "icons/apple-touch-icon.png", "apple-touch-icon.png", "icon-192.png", "favicon.png"].map((f) => b + f);

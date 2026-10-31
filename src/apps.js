@@ -26,8 +26,8 @@ const apBase = (u) => { try { const x = new URL(u); return x.origin + x.pathname
 const AP_LOGOS = { "ad-studio": "icons/apps/mentad.png" };
 const apIcons = (a) => {
   if (a.icon) return [a.icon];
-  const own = (() => { try { const x = new URL(a.url); return /github\.io$/.test(x.hostname) ? AP_LOGOS[x.pathname.split("/")[1]] : ""; } catch (e) { return ""; } })();
-  if (own) return [own];
+  const mine = (() => { try { const x = new URL(a.url); return /github\.io$/.test(x.hostname) ? AP_LOGOS[x.pathname.split("/")[1]] : ""; } catch (e) { return ""; } })();
+  if (mine) return [mine];
   if (!/^https:\/\//.test(a.url || "")) return [];
   const b = apBase(a.url), h = (() => { try { return new URL(a.url).hostname; } catch (e) { return ""; } })();
   const own = ["icons/icon-192.png", "icons/apple-touch-icon.png", "apple-touch-icon.png", "icon-192.png", "favicon.png"].map((f) => b + f);
