@@ -205,7 +205,7 @@ document.addEventListener("submit", async (e) => {
       const pw = document.getElementById("bl-pw").value;
       if (!okEmail(v("bl-em"))) return blMsg(t("bl_err_email")); if (pw.length < 8) return blMsg(t("bl_err_short"));
       const { data, error } = await BL.sb.auth.signUp({ email: v("bl-em"), password: pw, options: { data: { name: v("bl-nm") || v("bl-em").split("@")[0] }, emailRedirectTo: page } });
-      if (error) return blMsg(blErr(error)); if (!data.session) blMsg(t("bl_confirm"), true);
+      if (error) return blMsg(blErr(error)); if (window.REF && data && data.user && (data.user.identities || []).length) REF.signup(); if (!data.session) blMsg(t("bl_confirm"), true);
     } else if (kind === "bl-forgot") {
       if (!okEmail(v("bl-em"))) return blMsg(t("bl_err_email"));
       await BL.sb.auth.resetPasswordForEmail(v("bl-em"), { redirectTo: page }); blMsg(t("bl_sent_link"), true);

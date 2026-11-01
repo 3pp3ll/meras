@@ -248,6 +248,7 @@ document.addEventListener("submit", async (e) => {
       if (!v("ma-nm")) return maSay(t("ma_name")); if (!okEm(v("ma-em"))) return maSay(t("ma_e_email")); if (pw.length < 8) return maSay(t("ma_e_pw"));
       const { data, error } = await MA.sb.auth.signUp({ email: v("ma-em"), password: pw, options: { data: { name: v("ma-nm") }, emailRedirectTo: page } });
       if (error) return maSay(maErr(error));
+      if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length && window.REF) REF.signup();
       if (data && data.user && Array.isArray(data.user.identities) && !data.user.identities.length) return maSay(t("ma_e_dup"));
       if (!data.session) return maSay(t("ma_up_ok"), true);
       maClose();
