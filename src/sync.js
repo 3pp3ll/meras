@@ -91,6 +91,7 @@ async function syncNow(quiet) {
       const remote = await readJson("state.json");
       const merged = mergeState(S, remote && remote.data && remote.data.state);
       const changedLocal = shared(merged) !== shared(S);
+      if (merged.div) delete merged.div.q;
       S = merged; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
       if (changedLocal && route() !== "settings") render();
       if (remote && remote.data && remote.data.state && shared(remote.data.state) === shared(S)) { ok = true; break; }

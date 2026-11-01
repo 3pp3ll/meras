@@ -543,3 +543,5 @@ function exportXlsx() {
   const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   saveFile("meras-journal-" + today() + ".xlsx", new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
 }
+/* أي نص في خانات البحث يروح مع تحديث الصفحة (حتى لو المتصفح حاول يرجّعه) */
+window.addEventListener("pageshow", () => { setTimeout(() => { document.querySelectorAll('input[type="search"], input[id$="-q"], input[id*="search"], input[placeholder^="ابحث"], input[placeholder^="Search"]').forEach((i) => { if (i.value && document.activeElement !== i) { i.value = ""; i.dispatchEvent(new Event("input", { bubbles: true })); } }); }, 0); });

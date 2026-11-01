@@ -2854,6 +2854,8 @@ function exportXlsx() {
   const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
   saveFile("meras-journal-" + today() + ".xlsx", new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
 }
+/* أي نص في خانات البحث يروح مع تحديث الصفحة (حتى لو المتصفح حاول يرجّعه) */
+window.addEventListener("pageshow", () => { setTimeout(() => { document.querySelectorAll('input[type="search"], input[id$="-q"], input[id*="search"], input[placeholder^="ابحث"], input[placeholder^="Search"]').forEach((i) => { if (i.value && document.activeElement !== i) { i.value = ""; i.dispatchEvent(new Event("input", { bubbles: true })); } }); }, 0); });
 /* ===== مِراس: الوضع النهاري والليلي ودرجة الغمق (لكل جهاز، ما يتزامن) ===== */
 const TH_KEY = "meras.theme";
 let TH = { mode: "auto", dim: 50 }, thOpen = false;
@@ -5919,6 +5921,7 @@ async function syncNow(quiet) {
       const remote = await readJson("state.json");
       const merged = mergeState(S, remote && remote.data && remote.data.state);
       const changedLocal = shared(merged) !== shared(S);
+      if (merged.div) delete merged.div.q;
       S = merged; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
       if (changedLocal && route() !== "settings") render();
       if (remote && remote.data && remote.data.state && shared(remote.data.state) === shared(S)) { ok = true; break; }
@@ -6176,9 +6179,10 @@ const DIV_SAMPLE = [
 const DIV_KEY = "meras.div";
 let DIV = null, DIVW = null, divLoading = false;
 try { DIV = JSON.parse(localStorage.getItem(DIV_KEY) || "null"); } catch (e) {}
-const divCfg = () => { if (!S.div) S.div = {}; const d = { budget: 500, fee: 0.15, f: "all", q: "", nomu: false }; for (const k in d) if (S.div[k] == null) S.div[k] = d[k]; return S.div; };
+const divCfg = () => { if (!S.div) S.div = {}; const d = { budget: 500, fee: 0.15, f: "all", nomu: false }; for (const k in d) if (S.div[k] == null) S.div[k] = d[k]; return S.div; };
 /* البحث ما ينحفظ بين الزيارات، عشان ما تفتح الصفحة وتلقاها مفلترة على سهمين */
-try { if (typeof S !== "undefined" && S && S.div) S.div.q = ""; } catch (e) {}
+let DVQ = ""; /* نص البحث يعيش في الذاكرة بس: يروح مع تحديث الصفحة وما ينحفظ ولا يتزامن */
+try { if (typeof S !== "undefined" && S && S.div) delete S.div.q; } catch (e) {}
 const divList = () => (DIV && Array.isArray(DIV.stocks) && DIV.stocks.length ? DIV.stocks : DIV_SAMPLE);
 const divPx = (x) => { const q = LIVE.quotes && LIVE.quotes[x.s]; return q && numOr(q.price) != null ? q.price : x.price; };
 const dayDiff = (iso) => { if (!iso) return null; const a = new Date(iso + "T00:00:00"), b = new Date(today() + "T00:00:00"); return Math.round((a - b) / 864e5); };
@@ -6245,14 +6249,14 @@ function pageDividends() {
   return svcShell("dividends",
     '<p class="muted" style="max-width:64ch">' + esc(t("dv_p")) + ' <a href="#l-inv-2-3">' + esc(t("dv_lesson")) + "</a></p>" +
     (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") + dvEligHtml() +
-    '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(c.q) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
+    '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(DVQ) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
     '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
     '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +
     '<p class="small muted">' + esc(t("dv_src")) + " " + esc(t("disclaimer")) + "</p>");
 }
 function runDiv() {
   if (!document.querySelector(".dv-table")) return;
-  const c = divCfg(), fee = Math.max(0, c.fee) / 100, q = String(c.q || "").trim().toLowerCase(), set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+  const c = divCfg(), fee = Math.max(0, c.fee) / 100, q = String(DVQ || "").trim().toLowerCase(), set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
   let shown = 0, all = 0;
   divList().forEach((x, i) => {
     const row = document.getElementById("dv-r" + i); if (!row) return;
@@ -6274,7 +6278,7 @@ function runDiv() {
 document.addEventListener("input", (e) => {
   const id = e.target.dataset && e.target.dataset.div; if (!id) return;
   const c = divCfg();
-  if (id === "dv-q") { c.q = e.target.value; save(); runDiv(); return; }
+  if (id === "dv-q") { DVQ = e.target.value; runDiv(); return; }
   if (id === "dv-nomu") { c.nomu = e.target.checked; save(); runDiv(); return; }
   const v = parseFloat(e.target.value), key = { "dv-budget": "budget", "dv-fee": "fee" }[id];
   if (key && isFinite(v) && v >= 0) { c[key] = v; save(); runDiv(); }
@@ -6282,7 +6286,7 @@ document.addEventListener("input", (e) => {
 document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act="dv-f"],[data-act="dv-star"],[data-act="dv-pdf"],[data-act="dv-clear"]'); if (!el) return;
   if (el.dataset.act === "dv-pdf") { exportDivPdf(); return; }
-  if (el.dataset.act === "dv-clear") { const c = divCfg(); c.q = ""; c.f = "all"; save(); render(); return; }
+  if (el.dataset.act === "dv-clear") { DVQ = ""; divCfg().f = "all"; save(); render(); return; }
   if (el.dataset.act === "dv-f") { divCfg().f = el.dataset.f; save(); render(); }
   else toggleStar(el.dataset.sym);
 });
