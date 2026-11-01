@@ -6,7 +6,7 @@ Object.assign(UI, {
   tab_div: ["التوزيعات", "Dividends"],
   dv_p: ["كل أسهم السوق اللي توزع أرباح، مرتبة حسب أقرب تاريخ استحقاق. سهم واحد يكفي عشان تستحق التوزيع، والجدول يحسب لك كم يجيك بالمبلغ اللي تحدده.", "Every dividend-paying share on the market, sorted by the nearest ex-date. One share is enough to qualify, and the table works out what your chosen amount would earn."],
   dv_budget: ["المبلغ لكل سهم (ريال)", "Amount per share (SAR)"], dv_fee: ["العمولة لكل عملية %", "Commission per side %"],
-  dv_search: ["ابحث بالرمز أو الاسم", "Search by symbol or name"],
+  dv_search: ["ابحث بالرمز أو الاسم", "Search by symbol or name"], dv_shown: ["يظهر {n} من {m}", "Showing {n} of {m}"], dv_clear: ["اعرض الكل", "Show all"],
   dv_nomu: ["أظهر أسهم نمو (للمستثمرين المؤهلين فقط)", "Show Nomu shares (qualified investors only)"], dv_nomu_tag: ["نمو", "Nomu"],
   dv_f_all: ["الكل", "All"], dv_f_30: ["خلال 30 يوم", "Within 30 days"], dv_f_star: ["نجومي", "Starred"],
   dv_sym: ["السهم", "Share"], dv_price: ["السعر", "Price"], dv_next: ["التوزيع القادم للسهم", "Next dividend / share"], dv_ex: ["أول يوم بدون توزيع", "Ex-date"],
@@ -48,6 +48,8 @@ const DIV_KEY = "meras.div";
 let DIV = null, DIVW = null, divLoading = false;
 try { DIV = JSON.parse(localStorage.getItem(DIV_KEY) || "null"); } catch (e) {}
 const divCfg = () => { if (!S.div) S.div = {}; const d = { budget: 500, fee: 0.15, f: "all", q: "", nomu: false }; for (const k in d) if (S.div[k] == null) S.div[k] = d[k]; return S.div; };
+/* البحث ما ينحفظ بين الزيارات، عشان ما تفتح الصفحة وتلقاها مفلترة على سهمين */
+try { if (typeof S !== "undefined" && S && S.div) S.div.q = ""; } catch (e) {}
 const divList = () => (DIV && Array.isArray(DIV.stocks) && DIV.stocks.length ? DIV.stocks : DIV_SAMPLE);
 const divPx = (x) => { const q = LIVE.quotes && LIVE.quotes[x.s]; return q && numOr(q.price) != null ? q.price : x.price; };
 const dayDiff = (iso) => { if (!iso) return null; const a = new Date(iso + "T00:00:00"), b = new Date(today() + "T00:00:00"); return Math.round((a - b) / 864e5); };
@@ -114,7 +116,7 @@ function pageDividends() {
   return svcShell("dividends",
     '<p class="muted" style="max-width:64ch">' + esc(t("dv_p")) + ' <a href="#l-inv-2-3">' + esc(t("dv_lesson")) + "</a></p>" +
     (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") + dvEligHtml() +
-    '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(c.q) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" + count + "</div></div>" +
+    '<div class="panel stack"><div class="form-grid">' + inp("dv-budget", "dv_budget", c.budget, 50) + inp("dv-fee", "dv_fee", c.fee, 0.01) + '<div class="field"><label for="dv-q">' + esc(t("dv_search")) + '</label><input id="dv-q" value="' + esc(c.q) + '" data-div="dv-q" autocomplete="off"></div></div><div class="row">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
     '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
     '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +
     '<p class="small muted">' + esc(t("dv_src")) + " " + esc(t("disclaimer")) + "</p>");
@@ -122,11 +124,13 @@ function pageDividends() {
 function runDiv() {
   if (!document.querySelector(".dv-table")) return;
   const c = divCfg(), fee = Math.max(0, c.fee) / 100, q = String(c.q || "").trim().toLowerCase(), set = (id, h) => { const el = document.getElementById(id); if (el) el.innerHTML = h; };
+  let shown = 0, all = 0;
   divList().forEach((x, i) => {
     const row = document.getElementById("dv-r" + i); if (!row) return;
     const px = divPx(x), days = dayDiff(x.next_ex), sh = px > 0 ? Math.floor(c.budget / (px * (1 + fee))) : 0;
     const show = (!q || x.s.includes(q) || String(x.name || "").toLowerCase().includes(q)) && (c.f === "all" || (c.f === "30" && days != null && days >= 0 && days <= 30) || (c.f === "star" && DIVW && DIVW.includes(x.s)));
     row.hidden = !show || (!c.nomu && /^9/.test(x.s) && !q);
+    if (c.nomu || !/^9/.test(x.s)) all++; if (!row.hidden) shown++;
     row.className = days != null && days >= 0 && days <= 5 ? "dv-soon" : days != null && days >= 0 && days <= 30 ? "dv-month" : "";
     set("dv-p" + i, fmt(px));
     set("dv-d" + i, days == null ? "–" : days < 0 ? "–" : days + " " + esc(t("dv_days")));
@@ -135,6 +139,8 @@ function runDiv() {
     set("dv-s" + i, int(sh));
     set("dv-a" + i, x.next_amt ? fmt(sh * x.next_amt) : "–");
   });
+  const sh = document.getElementById("dv-shown");
+  if (sh) sh.innerHTML = shown < all ? '<b>' + esc(t("dv_shown").replace("{n}", shown).replace("{m}", all)) + '</b> <button type="button" class="btn sm ghost" data-act="dv-clear">' + esc(t("dv_clear")) + "</button>" : "";
 }
 document.addEventListener("input", (e) => {
   const id = e.target.dataset && e.target.dataset.div; if (!id) return;
@@ -145,8 +151,9 @@ document.addEventListener("input", (e) => {
   if (key && isFinite(v) && v >= 0) { c[key] = v; save(); runDiv(); }
 });
 document.addEventListener("click", (e) => {
-  const el = e.target.closest && e.target.closest('[data-act="dv-f"],[data-act="dv-star"],[data-act="dv-pdf"]'); if (!el) return;
+  const el = e.target.closest && e.target.closest('[data-act="dv-f"],[data-act="dv-star"],[data-act="dv-pdf"],[data-act="dv-clear"]'); if (!el) return;
   if (el.dataset.act === "dv-pdf") { exportDivPdf(); return; }
+  if (el.dataset.act === "dv-clear") { const c = divCfg(); c.q = ""; c.f = "all"; save(); render(); return; }
   if (el.dataset.act === "dv-f") { divCfg().f = el.dataset.f; save(); render(); }
   else toggleStar(el.dataset.sym);
 });
