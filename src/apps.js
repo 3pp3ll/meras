@@ -19,6 +19,7 @@ const apList = () => { if (!DK.data) return []; if (!Array.isArray(DK.data.apps)
 const AP_MINE = { "منطاد": "https://3pp3ll.github.io/ad-studio/", "دربي": "https://3pp3ll.github.io/darbi-E/", "عقود": "https://3pp3ll.github.io/oqood/Contracts.html", "مِلْكية": "https://3pp3ll.github.io/milkia/", "ملكية": "https://3pp3ll.github.io/milkia/", "مع نفسك": "https://3pp3ll.github.io/ma-nafsak/" };
 const apFill = () => { const L = DK.data && DK.data.apps || []; L.forEach((a) => { if (!a.url && AP_MINE[a.name]) a.url = AP_MINE[a.name]; });
   if (DK.data && !DK.data.apMilkia && !L.some((a) => /milkia/.test(a.url || ""))) { L.push({ id: "a" + Date.now().toString(36), name: "مِلْكية", url: "https://3pp3ll.github.io/milkia/" }); DK.data.apMilkia = 1; }
+  if (DK.data && !DK.data.apRefs && !L.some((a) => /refs\.html/.test(a.url || ""))) { L.push({ id: "r" + Date.now().toString(36), name: "الإحالات", url: "https://3pp3ll.github.io/meras/refs.html", color: "#C76BA4" }); DK.data.apRefs = 1; }
   if (DK.data && !DK.data.apNafsak && !L.some((a) => /ma-nafsak/.test(a.url || ""))) { L.push({ id: "a" + Date.now().toString(36) + "n", name: "مع نفسك", url: "https://3pp3ll.github.io/ma-nafsak/" }); DK.data.apNafsak = 1; } };
 /* شعار كل منصة: الشعار اللي رفعته، وإلا نجرب أيقونة المنصة نفسها (icons/icon-192.png وغيرها)، وإذا ما لقينا يبقى الحرف */
 const apBase = (u) => { try { const x = new URL(u); return x.origin + x.pathname.replace(/[^/]*$/, ""); } catch (e) { return ""; } };
