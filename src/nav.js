@@ -294,7 +294,7 @@ function instBar() {
   el.innerHTML = '<div class="in-row"><img src="icons/icon-192.png" alt="" width="44" height="44"><div class="in-txt"><b>' + esc(t("in_h")) + "</b><span>" + esc(t("in_p")) + '</span></div><button class="btn sm primary" data-act="in-go">' + esc(t(ios ? "in_how" : "in_btn")) + '</button><button class="in-x" data-act="in-close" aria-label="' + esc(t("in_close")) + '">×</button></div>' +
     (ios && instHow ? '<p class="in-ios">' + (instSafari() ? t("in_ios") : esc(t("in_ios_other"))) + "</p>" : "");
 }
-window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); INST_EVT = e; setTimeout(instBar, 2500); });
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); INST_EVT = e; setTimeout(instBar, 3000); });
 window.addEventListener("appinstalled", () => { INST_EVT = null; const el = document.getElementById("instbar"); if (el) el.remove(); toast(t("in_done")); });
 document.addEventListener("click", async (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="in-"]'); if (!el) return;
@@ -303,7 +303,7 @@ document.addEventListener("click", async (e) => {
   else { instHow = !instHow; instBar(); }
 });
 window.addEventListener("hashchange", () => setTimeout(instBar, 50));
-setTimeout(instBar, 4000);
+setTimeout(instBar, 3000);
 
 document.addEventListener("click", (e) => { const p = e.target.closest && e.target.closest(".page-head > p"); if (p && window.matchMedia("(max-width:640px)").matches) p.classList.toggle("open"); });
 
