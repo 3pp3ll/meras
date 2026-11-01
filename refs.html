@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>روابط الإحالة</title>
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#fbf6f2;--card:#fff;--ink:#1f2937;--muted:#6b7280;--line:#efe3da;--acc:#e8765a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:980px;margin:0 auto;padding:22px 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:1.6rem;margin:0}
+p.s{color:var(--muted);margin:4px 0 0}
+a.b{color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.04)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div><h1>روابط الإحالة</h1><p class="s">كل منصاتك في مكان واحد: اختر المنصة، اعمل رابط، وتابع كم زيارة وكم تسجيل جا منه.</p></div><a class="b" href="./#owner">← رجوع لمِراس</a></header>
+  <section class="card" id="hub" aria-live="polite"><p class="s">جاري التحميل…</p></section>
+</div>
+<script src="ref.js"></script>
+<script>REF.hub(document.getElementById('hub'), new URLSearchParams(location.search).get('p') || 'meras');</script>
+</body>
+</html>

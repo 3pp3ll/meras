@@ -6,7 +6,7 @@ Object.assign(UI, {
   ow_h: ["لوحة المالك", "Owner dashboard"], ow_p: ["كل شي عن المنصة في مكان واحد. هذي الصفحة لك أنت بس.", "Everything about the platform in one place. This page is for you only."],
   ow_need: ["لوحة المالك تفتح بس على جهاز مربوط بمستودع البيانات. اربطه من الإعدادات أول.", "The owner dashboard only opens on a device connected to the data repository. Connect it in Settings first."],
   ow_preview: ["لوحة المالك تشتغل في النسخة المنشورة على GitHub، مو في هذي المعاينة.", "The owner dashboard works in the version published on GitHub, not in this preview."],
-  ow_t_refs: ["روابط الإحالة", "Referral links"], ow_t_data: ["البيانات", "Data"], ow_t_lists: ["قوائم المتابعة", "Watchlists"], ow_t_backup: ["النسخ والمزامنة", "Backup and sync"], ow_t_content: ["المحتوى", "Content"], ow_t_users: ["المستخدمون", "Users"],
+  ow_t_refs: ["روابط الإحالة", "Referral links"], ow_refs_p: ["كل منصاتك هنا: اضغط المنصة وتطلع روابطها وأرقامها.", "All your platforms: tap one to see its links and numbers."], ow_refs_open: ["افتحها كصفحة مستقلة", "Open as a separate page"], ow_t_data: ["البيانات", "Data"], ow_t_lists: ["قوائم المتابعة", "Watchlists"], ow_t_backup: ["النسخ والمزامنة", "Backup and sync"], ow_t_content: ["المحتوى", "Content"], ow_t_users: ["المستخدمون", "Users"],
   ow_loading: ["جارٍ القراءة من المستودع…", "Reading the repository…"], ow_reload: ["حدّث", "Refresh"],
   ow_jobs: ["التحديث التلقائي", "Automatic updates"], ow_job: ["المهمة", "Job"], ow_sched: ["الموعد", "Schedule"], ow_lastrun: ["آخر تشغيل", "Last run"], ow_result: ["النتيجة", "Result"], ow_fileat: ["آخر تحديث للملف", "File updated"],
   ow_run: ["شغّل الآن", "Run now"], ow_ran: ["انطلب التشغيل. يبان هنا خلال دقيقة.", "Run requested. It shows here within a minute."],
@@ -180,7 +180,7 @@ function owUsers() {
     '<datalist id="ow-plats">' + OW_PLATFORMS.map((p) => '<option value="' + esc(p) + '">').join("") + "</datalist>";
 }
 
-function owRefs() { setTimeout(() => { const el = document.getElementById("ow-refs"); if (el && window.REF && !el.dataset.on) { el.dataset.on = "1"; REF.panel(el, { title: t("ow_t_refs") }); } }, 0); return '<div class="panel" id="ow-refs"></div>'; }
+function owRefs() { setTimeout(() => { const el = document.getElementById("ow-refs"); if (el && window.REF && !el.dataset.on) { el.dataset.on = "1"; REF.hub(el, "meras"); } }, 0); return '<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px"><p class="muted" style="margin:0">' + esc(t("ow_refs_p")) + '</p><a class="btn sm" href="refs.html" target="_blank" rel="noopener">' + esc(t("ow_refs_open")) + ' ↗</a></div><div class="panel" id="ow-refs"></div>'; }
 function pageOwner() {
   const head = '<div class="wrap"><div class="page-head"><h1>' + esc(t("ow_h")) + "</h1><p>" + esc(t("ow_p")) + "</p></div>";
   if (!HOSTED) return head + '<div class="notice" style="margin-block:18px">' + esc(t("ow_preview")) + "</div></div>";

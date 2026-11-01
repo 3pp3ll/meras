@@ -1,4 +1,4 @@
-window.REF_CFG = { platform: "meras", base: "https://3pp3ll.github.io/meras/" };
+window.REF_CFG = window.REF_CFG || { platform: "meras", base: "https://3pp3ll.github.io/meras/" };
 /* روابط الإحالة — مشترك بين كل المنصات (العدّاد المركزي في مشروع عقود على Supabase)
    - أول ما يدخل الزائر من رابط فيه ?ref=كود تنحسب «زيارة» وينحفظ الكود في جهازه 60 يوم.
    - REF.signup() تنادى بعد إنشاء حساب ناجح، فتنحسب «تسجيل» للكود.
@@ -36,7 +36,7 @@ window.REF_CFG = { platform: "meras", base: "https://3pp3ll.github.io/meras/" };
     } catch (e) {}
   })();
 
-  function link(code) { return BASE + (BASE.includes('?') ? '&' : '?') + 'ref=' + encodeURIComponent(code); }
+  function link(code, base) { base = base || BASE; return base + (base.includes('?') ? '&' : '?') + 'ref=' + encodeURIComponent(code); }
   const n = (x) => Number(x || 0).toLocaleString('ar-SA-u-nu-latn');
   const when = (t) => t ? new Date(t).toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { day: 'numeric', month: 'short' }) : '—';
   function css() {
@@ -52,16 +52,17 @@ window.REF_CFG = { platform: "meras", base: "https://3pp3ll.github.io/meras/" };
   }
   async function panel(el, opt) {
     if (!el) return; css(); opt = opt || {};
+    const plat = opt.platform || PLATFORM, base = opt.base || BASE, L = (c) => link(c, base);
     el.classList.add('oqref');
     el.innerHTML = '<h3>' + esc(opt.title || 'روابط الإحالة') + '</h3><p class="h">اكتب اسم للرابط (مثل main أو tiktok أو اسم صديق) وانسخه. تحت تشوف كم زيارة وكم تسجيل جا من كل رابط.</p>' +
       '<div class="mk"><input type="text" dir="ltr" placeholder="main" aria-label="اسم الرابط" data-ref="name"><button type="button" class="p" data-ref="make">اعمل الرابط</button></div><div data-ref="out"></div>' +
       '<div data-ref="stats"><p class="e">جاري التحميل…</p></div>';
     const out = el.querySelector('[data-ref="out"]'), st = el.querySelector('[data-ref="stats"]');
     const copy = async (t, b) => { try { await navigator.clipboard.writeText(t); } catch (e) { prompt('انسخ الرابط:', t); } if (b) { const o = b.textContent; b.textContent = 'تم ✓'; setTimeout(() => { b.textContent = o; }, 1400); } };
-    const make = () => { const c = clean(el.querySelector('[data-ref="name"]').value) || 'main'; out.innerHTML = '<div class="out"><code>' + esc(link(c)) + '</code><button type="button" data-ref="copy" data-c="' + esc(c) + '">نسخ</button></div>'; };
+    const make = () => { const c = clean(el.querySelector('[data-ref="name"]').value) || 'main'; out.innerHTML = '<div class="out"><code>' + esc(L(c)) + '</code><button type="button" data-ref="copy" data-c="' + esc(c) + '">نسخ</button></div>'; };
     async function load() {
       try {
-        const rows = await rpc('ref_stats', { p_platform: PLATFORM }) || [];
+        const rows = await rpc('ref_stats', { p_platform: plat }) || [];
         st.innerHTML = rows.length ? '<table><thead><tr><th>الرابط</th><th>زيارات</th><th>تسجيلات</th><th>آخر 7 أيام</th><th>آخر نشاط</th><th></th></tr></thead><tbody>' +
           rows.map((r) => '<tr><td dir="ltr" style="text-align:start"><b>' + esc(r.code) + '</b></td><td class="num">' + n(r.visits) + '</td><td class="num"><b>' + n(r.signups) + '</b></td><td class="num">' + n(r.visits7) + ' / ' + n(r.signups7) + '</td><td>' + esc(when(r.last_at)) + '</td><td><button type="button" class="cp" data-ref="copy" data-c="' + esc(r.code) + '">نسخ</button></td></tr>').join('') +
           '</tbody></table><p class="e">«آخر 7 أيام» = زيارات / تسجيلات. الزيارة تنحسب مرة وحدة لكل جهاز.</p><button type="button" data-ref="reload" style="margin-top:6px">تحديث</button>'
@@ -69,12 +70,30 @@ window.REF_CFG = { platform: "meras", base: "https://3pp3ll.github.io/meras/" };
       } catch (e) { st.innerHTML = '<p class="e">ما قدرت أجيب الأرقام. تأكد إن ملف refs.sql مشغّل في Supabase (مشروع عقود).</p><button type="button" data-ref="reload">حاول مرة ثانية</button>'; }
     }
     el.onclick = (e) => { const b = e.target.closest('[data-ref]'); if (!b) return; const a = b.dataset.ref;
-      if (a === 'make') make(); if (a === 'copy') copy(link(b.dataset.c), b); if (a === 'reload') { st.innerHTML = '<p class="e">جاري التحميل…</p>'; load(); } };
+      if (a === 'make') make(); if (a === 'copy') copy(L(b.dataset.c), b); if (a === 'reload') { st.innerHTML = '<p class="e">جاري التحميل…</p>'; load(); } };
     el.querySelector('[data-ref="name"]').onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); make(); } };
     load();
   }
+  /* كل المنصات في مكان واحد: بطاقة لكل منصة بمجموع الزيارات والتسجيلات، وتحتها روابط المنصة المختارة */
+  const ALL = [['meras', 'مِراس', 'https://3pp3ll.github.io/meras/'], ['oqood', 'عقود', 'https://3pp3ll.github.io/oqood/Contracts.html'], ['milkia', 'مِلْكية', 'https://3pp3ll.github.io/milkia/'],
+    ['adstudio', 'منطاد (الاستوديو)', 'https://3pp3ll.github.io/ad-studio/'], ['darbi', 'دربي', 'https://3pp3ll.github.io/darbi-E/'], ['manafsak', 'مع نفسك', 'https://3pp3ll.github.io/ma-nafsak/']];
+  async function hub(el, sel) {
+    if (!el) return; css(); sel = sel || PLATFORM;
+    el.innerHTML = '<div class="oqref-hub" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px"></div><div class="oqref-one"></div>';
+    const cards = el.querySelector('.oqref-hub'), one = el.querySelector('.oqref-one');
+    const res = await Promise.all(ALL.map(([p]) => rpc('ref_stats', { p_platform: p }).then((r) => r || []).catch(() => null)));
+    const draw = () => {
+      cards.innerHTML = ALL.map(([p, name], i) => { const r = res[i] || [], v = r.reduce((a, x) => a + +x.visits, 0), sg = r.reduce((a, x) => a + +x.signups, 0);
+        return '<button type="button" data-hub="' + p + '" aria-pressed="' + (p === sel) + '" style="text-align:start;padding:10px 12px;border-radius:12px;border:1.5px solid ' + (p === sel ? '#c9a84c' : 'rgba(127,127,127,.3)') + ';background:' + (p === sel ? 'rgba(201,168,76,.12)' : 'transparent') + ';color:inherit;font:inherit;cursor:pointer"><b style="display:block">' + esc(name) + '</b><span style="font-size:.84rem;opacity:.8">' + n(v) + ' زيارة · <b>' + n(sg) + '</b> تسجيل</span></button>'; }).join('');
+      const it = ALL.find((x) => x[0] === sel) || ALL[0];
+      panel(one, { platform: it[0], base: it[2], title: 'روابط ' + it[1] });
+    };
+    cards.onclick = (e) => { const b = e.target.closest('[data-hub]'); if (!b) return; sel = b.dataset.hub; draw(); };
+    draw();
+  }
   window.REF = {
-    platform: PLATFORM, link, panel,
+    hub,
+    platform: PLATFORM, link, panel, stats: (p) => rpc('ref_stats', { p_platform: p || PLATFORM }),
     code: () => (saved() || {}).code || '',
     signup() { const s = saved(); if (s) { track(s.code, 'signup'); return s.code; } return ''; }
   };
