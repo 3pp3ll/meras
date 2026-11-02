@@ -3,7 +3,7 @@
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
    saName(رمز) ترجع الاسم المختصر، وتستخدمها صفحات المنصة بدل ما تكتب الاسم الطويل. */
 Object.assign(UI, {
-  nav_symbols: ["الرموز", "Symbols"], d_symbols: ["رموز أسهم السوق السعودي مقسّمة حسب القطاع.", "Saudi share codes grouped by sector."],
+  nav_symbols: ["السوق السعودي", "Saudi market"], d_symbols: ["كل أسهم السوق السعودي مقسّمة حسب القطاع.", "Every Saudi share, grouped by sector."],
   sy_h: ["دليل الرموز", "Symbol guide"], sy_p: ["رمز كل سهم في السوق السعودي الرئيسي (تاسي) واسمه، مقسّمة حسب القطاع. اكتب الرمز أو الاسم وتلقاه.", "Every share on the Saudi main market (TASI) with its code, grouped by sector. Type a code or name to find it."],
   sy_q: ["ابحث برمز أو اسم… مثل 1211 أو معادن", "Search by code or name… e.g. 1211"], sy_n: ["{n} سهم", "{n} shares"], sy_all: ["{n} سهم في {s} قطاع", "{n} shares in {s} sectors"],
   sy_open: ["افتح الكل", "Expand all"], sy_close: ["سكّر الكل", "Collapse all"], sy_chart: ["الشارت", "Chart"], sy_none: ["ما لقيت سهم بهالرمز أو الاسم.", "No share matches."],

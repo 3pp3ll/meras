@@ -1638,6 +1638,11 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .rd-lv small{color:var(--muted);font-size:12px}
 .rd-news{margin:0;padding-inline-start:18px}
 .nt-ic.radar{color:#3b7dd8}
+
+.rd-prog{display:flex;flex-direction:column;gap:6px}
+.rd-prog>div{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.rd-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3b7dd8,#2f9e6e);transition:width 1s linear}
+.rd-prog span{font-size:13px;color:var(--muted)}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5774,7 +5779,7 @@ function wnBlock(sym) {
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
    saName(رمز) ترجع الاسم المختصر، وتستخدمها صفحات المنصة بدل ما تكتب الاسم الطويل. */
 Object.assign(UI, {
-  nav_symbols: ["الرموز", "Symbols"], d_symbols: ["رموز أسهم السوق السعودي مقسّمة حسب القطاع.", "Saudi share codes grouped by sector."],
+  nav_symbols: ["السوق السعودي", "Saudi market"], d_symbols: ["كل أسهم السوق السعودي مقسّمة حسب القطاع.", "Every Saudi share, grouped by sector."],
   sy_h: ["دليل الرموز", "Symbol guide"], sy_p: ["رمز كل سهم في السوق السعودي الرئيسي (تاسي) واسمه، مقسّمة حسب القطاع. اكتب الرمز أو الاسم وتلقاه.", "Every share on the Saudi main market (TASI) with its code, grouped by sector. Type a code or name to find it."],
   sy_q: ["ابحث برمز أو اسم… مثل 1211 أو معادن", "Search by code or name… e.g. 1211"], sy_n: ["{n} سهم", "{n} shares"], sy_all: ["{n} سهم في {s} قطاع", "{n} shares in {s} sectors"],
   sy_open: ["افتح الكل", "Expand all"], sy_close: ["سكّر الكل", "Collapse all"], sy_chart: ["الشارت", "Chart"], sy_none: ["ما لقيت سهم بهالرمز أو الاسم.", "No share matches."],
@@ -6953,9 +6958,9 @@ Object.assign(UI, {
 });
 
 const NAV_GROUPS = {
-  market: { label: "nav_market", items: [["chart", "nav_chart", "d_chart"], ["indices", "nav_indices", "d_indices", 1], ["tech", "tab_tech", "d_tech"], ["metals", "tab_met", "d_met"], ["screener", "sc_t", "dk_g_sc", 1], ["movers", "tp_t", "dk_g_top", 1], ["radar", "rd_t", "dk_g_rd", 1], ["usm", "us_t", "dk_g_us", 1]] },
+  market: { label: "nav_market", items: [["chart", "nav_chart", "d_chart"], ["symbols", "nav_symbols", "d_symbols"], ["indices", "nav_indices", "d_indices", 1], ["tech", "tab_tech", "d_tech"], ["metals", "tab_met", "d_met"], ["screener", "sc_t", "dk_g_sc", 1], ["movers", "tp_t", "dk_g_top", 1], ["radar", "rd_t", "dk_g_rd", 1], ["usm", "us_t", "dk_g_us", 1]] },
   pf: { label: "nav_pf", items: [["apps", "ap_t", "dk_g_apps", 1], ["portfolio", "dk_t_pf", "dk_g_pf", 1], ["journal", "tab_journal", "d_journal"], ["saved", "sv_t", "dk_g_sv", 1], ["analyses", "nav_an", "d_an"], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["dividends", "tab_div", "d_div"], ["gdiv", "dg_t", "dk_g_dg", 1], ["invest", "tab_inv", "d_invest"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] },
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["symbols", "nav_symbols", "d_symbols"], ["blog", "nav_blog", "d_blog"], ["progress", "nav_progress", "d_prog"]] }
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["blog", "nav_blog", "d_blog"], ["progress", "nav_progress", "d_prog"]] }
 };
 /* بنود المالك (العلامة 1) تختفي إذا ما فيه ربط GitHub */
 const navItems = (g) => (NAV_GROUPS[g] ? NAV_GROUPS[g].items.filter((x) => !x[3] || (typeof HOSTED !== "undefined" && HOSTED && CFG.token)) : []);
@@ -9139,10 +9144,45 @@ Object.assign(UI, {
   rd_r2: ["اكتفِ بـ 3% إلى 5% واطلع. البناء تراكمي.", "Take 3% to 5% and exit. Build up gradually."],
   rd_r3: ["الوقف قبل الدخول. إذا المخاطرة أكبر من الهدف، اترك السهم.", "Set the stop before entry. If the risk is bigger than the target, skip it."],
   rd_r4: ["حلّل الشارت والخبر قبل أي قرار.", "Check the chart and the news before any decision."],
+  rd_refresh: ["حدّث الحين", "Refresh now"], rd_busy: ["جاري المسح… {t}", "Scanning… {t}"], rd_almost: ["يخلص المسح خلال لحظات…", "Finishing the scan…"], rd_done: ["تم تحديث الرادار", "Radar updated"],
+  rd_noperm: ["مفتاح GitHub ما عنده صلاحية تشغيل المسح (Actions: Read and write). المسح التلقائي كل 4 ساعات شغال عادي.", "Your GitHub token can't start the scan (needs Actions: Read and write). The 4-hourly scan still runs."],
   nt_f_radar: ["الرادار", "Radar"], nt_radar: ["{s} {n} · {k}", "{s} {n} · {k}"], nt_radar_p: ["{c} ({g}) · هدف 3% {t3} · الوقف {st}", "{c} ({g}) · 3% target {t3} · stop {st}"]
 });
 
-let RD = null, rdLoading = false, rdF = "all", rdM = "all";
+let RD = null, rdLoading = false, rdF = "all", rdM = "all", RDJ = null;   // RDJ: مسح يدوي شغال {start, since}
+const RD_WAIT = 180;
+const rdApi = (path, opt) => fetch("https://api.github.com/repos/" + CFG.owner + "/" + CFG.repo + path, Object.assign({ headers: { Authorization: "Bearer " + CFG.token, Accept: "application/vnd.github+json" } }, opt || {}));
+async function rdRefresh() {
+  if (RDJ) return;
+  try {
+    const r = await rdApi("/actions/workflows/radar.yml/dispatches", { method: "POST", headers: { Authorization: "Bearer " + CFG.token, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: JSON.stringify({ ref: "main" }) });
+    if (!r.ok) { toast(t(r.status === 403 || r.status === 404 ? "rd_noperm" : "e_net")); return; }
+  } catch (e) { toast(t("e_net")); return; }
+  RDJ = { start: Date.now(), since: new Date(Date.now() - 60000).toISOString() };
+  render(); rdTick();
+}
+function rdPaint() {
+  if (!RDJ) return;
+  const el = document.getElementById("rd-prog"), left = Math.max(0, RD_WAIT - Math.round((Date.now() - RDJ.start) / 1000));
+  if (el) {
+    el.querySelector("i").style.width = Math.min(100, (1 - left / RD_WAIT) * 100) + "%";
+    el.querySelector("span").textContent = left > 0 ? t("rd_busy").replace("{t}", Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0")) : t("rd_almost");
+  }
+}
+async function rdTick() {
+  if (!RDJ) return;
+  rdPaint();
+  const sec = Math.round((Date.now() - RDJ.start) / 1000);
+  if (sec >= 40 && Date.now() - (RDJ.poll || 0) > 15000) {
+    RDJ.poll = Date.now();
+    try {
+      const r = await rdApi("/actions/workflows/radar.yml/runs?event=workflow_dispatch&per_page=1&created=>" + RDJ.since.slice(0, 19));
+      const run = r.ok ? ((await r.json()).workflow_runs || [])[0] : null;
+      if ((run && run.status === "completed") || sec > 600) { await new Promise((ok) => setTimeout(ok, 8000)); RDJ = null; RD = null; await loadRadar(); toast(t("rd_done")); render(); return; }
+    } catch (e) {}
+  }
+  setTimeout(rdTick, 1000);
+}
 const RD_IC = '<path d="M12 12l6-6M19.1 4.9A10 10 0 1 0 22 12M16.2 7.8A6 6 0 1 0 18 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/>';
 if (typeof DK_IC !== "undefined") DK_IC.rd = RD_IC;
 if (typeof NT_IC !== "undefined") NT_IC.radar = RD_IC;
@@ -9183,7 +9223,9 @@ function dkRadar() {
   const list = (RD.items || []).filter((x) => (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
   const log = (RD.log || []).slice(-15).reverse();
   setTimeout(() => { if (typeof ntMark === "function") ntMark((RD.log || []).map((x) => "r:" + x.id)); if (typeof topBell === "function") topBell(); }, 1500);
-  return head + '<p class="small muted" style="margin:0">' + esc(t("rd_scan").replace("{n}", RD.scanned || 0).replace("{d}", whenText(RD.updated))) + "</p>" +
+  const bar = RDJ ? '<div class="rd-prog" id="rd-prog"><div><i></i></div><span>' + esc(t("rd_busy").replace("{t}", "3:00")) + "</span></div>" : "";
+  if (RDJ) setTimeout(rdPaint, 30);
+  return head + '<div class="row" style="justify-content:space-between;align-items:center"><p class="small muted" style="margin:0">' + esc(t("rd_scan").replace("{n}", RD.scanned || 0).replace("{d}", whenText(RD.updated))) + '</p><button class="btn sm" data-act="rd-refresh"' + (RDJ ? " disabled" : "") + '>⟳ ' + esc(t("rd_refresh")) + "</button></div>" + bar +
     chips(rdF, "type", ["all", "breakout", "gainer", "momentum"]) + chips(rdM, "mk", ["all", "sa", "us"]) +
     (rdF !== "all" ? '<p class="small muted" style="margin:0">' + esc(t("rd_d_" + rdF)) + "</p>" : "") +
     (list.length ? '<div class="stack">' + list.map(rdCard).join("") + "</div>" : '<div class="notice">' + esc(t("rd_none")) + "</div>") +
@@ -9199,6 +9241,7 @@ function rdBellItems() {
 document.addEventListener("click", (e) => {
   const el = e.target.closest && e.target.closest('[data-act^="rd-"]'); if (!el) return;
   const a = el.dataset.act;
+  if (a === "rd-refresh") { rdRefresh(); return; }
   if (a === "rd-f") { if (el.dataset.key === "type") rdF = el.dataset.f; else rdM = el.dataset.f; render(); }
   else if (a === "rd-chart") {
     const s = el.dataset.s, m = el.dataset.m;

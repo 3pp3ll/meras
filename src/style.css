@@ -1604,3 +1604,8 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .rd-lv small{color:var(--muted);font-size:12px}
 .rd-news{margin:0;padding-inline-start:18px}
 .nt-ic.radar{color:#3b7dd8}
+
+.rd-prog{display:flex;flex-direction:column;gap:6px}
+.rd-prog>div{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.rd-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3b7dd8,#2f9e6e);transition:width 1s linear}
+.rd-prog span{font-size:13px;color:var(--muted)}
