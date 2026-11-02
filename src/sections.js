@@ -21,7 +21,7 @@ Object.assign(UI, {
 });
 
 /* صفحات مكتبي → مساراتها الجديدة */
-const DESK_ROUTE = { pf: "portfolio", ch: "mycharts", sc: "screener", top: "movers", us: "usm", nw: "news", sv: "saved", dg: "gdiv", apps: "apps", op: "options", tech: "tech" };
+const DESK_ROUTE = { pf: "portfolio", ch: "mycharts", sc: "screener", top: "movers", rd: "radar", us: "usm", nw: "news", sv: "saved", dg: "gdiv", apps: "apps", op: "options", tech: "tech" };
 const ROUTE_DESK = Object.fromEntries(Object.entries(DESK_ROUTE).map(([k, v]) => [v, k]));
 const isOwner = () => typeof HOSTED !== "undefined" && HOSTED && !!CFG.token;
 const deskOn = (k) => route() === DESK_ROUTE[k] || (route() === "desk" && typeof dkTab !== "undefined" && dkTab === k) || (route() === "" && isOwner());
@@ -31,7 +31,7 @@ function deskPage(r) {
   if (!isOwner()) return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t(HOSTED ? "ow_need" : "ow_preview")) + "</div></div>";
   if (["pf", "ch", "apps", "sv"].includes(k) && !DK.loaded) { loadDesk(); return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t("dk_loading")) + "</div></div>"; }
   if (typeof dkTab !== "undefined") dkTab = k;
-  const fn = { pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, us: dkUS, nw: dkNews, sv: dkSaved, dg: dkDivGlobal, apps: dkApps, op: dkOptions }[k];
+  const fn = { pf: dkPortfolio, ch: dkCharts, sc: dkScreener, top: dkTop, rd: () => dkRadar(), us: dkUS, nw: dkNews, sv: dkSaved, dg: dkDivGlobal, apps: dkApps, op: dkOptions }[k];
   let inner = ""; try { inner = fn(); } catch (e) { console.error(e); inner = '<div class="notice">' + esc(String(e && e.message || e)) + "</div>"; }
   return '<div class="wrap deskp">' + head + '<div class="stack" style="padding-block:14px 40px">' + inner + "</div></div>";
 }

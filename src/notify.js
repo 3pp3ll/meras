@@ -29,9 +29,10 @@ function ntItems() {
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   if (owner && typeof TOP !== "undefined" && TOP && Array.isArray(TOP.log)) TOP.log.filter((x) => x.in).slice(-40).forEach((x) => items.push({ id: "m:" + x.s + "|" + x.in, kind: "mover", x, date: x.in }));
   if (typeof dgBellItems === "function") dgBellItems().forEach((d) => items.push(d));
+  try { if (owner && typeof rdBellItems === "function") rdBellItems().forEach((d) => items.push(d)); } catch (e) {}
   return items.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 }
-function ntUnread() { const r = ntRead(); return ntItems().filter((i) => !r.has(i.id) && (i.kind === "notice" || i.kind === "div" || i.x.sharia === "ok")).length; }
+function ntUnread() { const r = ntRead(); return ntItems().filter((i) => ntIsUnread(i, r)).length; }
 /* ----- the list as a sheet: from the bottom on the phone (above the tab bar), from the top on a wide screen.
    Rests at half the screen, drags to full screen, drags away to close. ----- */
 Object.assign(UI, {
@@ -48,7 +49,7 @@ const NT_IC = {
   news: '<path d="M12 3v4M12 17v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M3 12h4M17 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
 };
 const ntCat = (i) => (i.kind === "notice" ? (i.n.kind === "promo" ? "promo" : "news") : i.kind);
-const ntIsUnread = (i, r) => !r.has(i.id) && (i.kind !== "mover" || i.x.sharia === "ok");
+const ntIsUnread = (i, r) => !r.has(i.id) && (i.kind === "radar" ? i.x.strength >= 3 : i.kind !== "mover" || i.x.sharia === "ok");
 function ntDay(d) {
   if (!d) return t("nt_d_old");
   const n = Math.round((new Date(today() + "T00:00:00") - new Date(String(d).slice(0, 10) + "T00:00:00")) / 864e5);
@@ -63,6 +64,10 @@ function ntRow(i, r) {
   } else if (i.kind === "div") {
     const d = i.r; title = t("nt_div_t").replace("{s}", d.s).replace("{n}", d.n || "").replace("{d}", d.next); body = t("nt_div_p").replace("{y}", fmt(d.yld, 2)); when = "";
     acts = '<button class="btn sm" data-act="nt-div">' + esc(t("nt_go_stock")) + "</button>";
+  } else if (i.kind === "radar") {
+    const x = i.x; title = t("nt_radar").replace("{s}", x.s).replace("{n}", (typeof dkName === "function" && dkName(x.s)) || x.n || "").replace("{k}", t("rd_" + x.type));
+    body = t("nt_radar_p").replace("{c}", fmt(x.close, 2)).replace("{g}", (x.chg >= 0 ? "+" : "") + fmt(x.chg, 2) + "%").replace("{t3}", fmt(x.t3, 2)).replace("{st}", fmt(x.stop, 2)) + " · " + t("rd_str").replace("{n}", x.strength);
+    acts = '<button class="btn sm" data-act="nt-radar">' + esc(t("nt_go_why")) + "</button>";
   } else {
     const x = i.x; title = t("nt_mover").replace("{s}", x.s).replace("{n}", (typeof dkName === "function" && dkName(x.s)) || x.n || "").replace("{x}", x.score);
     body = x.sharia === "ok" ? t("sh_ok") : x.sharia === "no" ? t("tp_noshar") : t("nt_unknown_sh");
@@ -72,7 +77,7 @@ function ntRow(i, r) {
 }
 function ntPanel() {
   const all = ntItems(), r = ntRead(), un = all.filter((i) => ntIsUnread(i, r)).length;
-  const cats = ["all"].concat(["promo", "mover", "div", "news"].filter((k) => all.some((i) => ntCat(i) === k)));
+  const cats = ["all"].concat(["promo", "mover", "radar", "div", "news"].filter((k) => all.some((i) => ntCat(i) === k)));
   if (!cats.includes(ntF)) ntF = "all";
   const list = all.filter((i) => ntF === "all" || ntCat(i) === ntF);
   let day = "", rows = "";
@@ -161,6 +166,7 @@ document.addEventListener("click", (e) => {
   if (a === "nt-copy") { navigator.clipboard && navigator.clipboard.writeText(el.dataset.c).then(() => toast(t("nt_copied"))).catch(() => {}); }
   else if (a === "nt-readall") { ntMark(ntItems().map((i) => i.id)); document.getElementById("nt-body").innerHTML = ntPanel(); topBell(); }
   else if (a === "nt-div") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") { dkTab = "dg"; dkGrid = false; } if (route() === "desk") render(); else location.hash = "desk"; }
+  else if (a === "nt-radar") { e.preventDefault(); ntToggle(false); location.hash = "radar"; }
   else if (a === "nt-mover") { e.preventDefault(); ntToggle(false); if (typeof dkTab !== "undefined") { dkTab = "top"; dkGrid = false; } if (route() === "desk") render(); else location.hash = "desk"; }
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && ntOpen) ntToggle(false); });
