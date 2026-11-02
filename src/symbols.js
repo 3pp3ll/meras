@@ -3,7 +3,7 @@
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
    saName(رمز) ترجع الاسم المختصر، وتستخدمها صفحات المنصة بدل ما تكتب الاسم الطويل. */
 Object.assign(UI, {
-  nav_symbols: ["السوق السعودي", "Saudi market"], d_symbols: ["كل أسهم السوق السعودي مقسّمة حسب القطاع.", "Every Saudi share, grouped by sector."],
+  nav_symbols: ["السوق السعودي", "Saudi market"], sy_upn: ["أسهم صاعدة اليوم", "Shares up today"], sy_dnn: ["أسهم نازلة اليوم", "Shares down today"], d_symbols: ["كل أسهم السوق السعودي مقسّمة حسب القطاع.", "Every Saudi share, grouped by sector."],
   sy_h: ["دليل الرموز", "Symbol guide"], sy_p: ["رمز كل سهم في السوق السعودي الرئيسي (تاسي) واسمه، مقسّمة حسب القطاع. اكتب الرمز أو الاسم وتلقاه.", "Every share on the Saudi main market (TASI) with its code, grouped by sector. Type a code or name to find it."],
   sy_q: ["ابحث برمز أو اسم… مثل 1211 أو معادن", "Search by code or name… e.g. 1211"], sy_n: ["{n} سهم", "{n} shares"], sy_all: ["{n} سهم في {s} قطاع", "{n} shares in {s} sectors"],
   sy_open: ["افتح الكل", "Expand all"], sy_close: ["سكّر الكل", "Collapse all"], sy_chart: ["الشارت", "Chart"], sy_none: ["ما لقيت سهم بهالرمز أو الاسم.", "No share matches."],
@@ -49,6 +49,13 @@ async function syRefresh(btn) {
 const SY_IC = {
   "البنوك": "bank", "الطاقة": "energy", "الإتصالات": "tel", "المواد الاساسية": "mat", "التأمين": "ins"
 };
+/* عدد الصاعد (أخضر) والنازل (أحمر) في القطاع من آخر أسعار */
+function syUpDown(rows) {
+  if (!SYQ.q) return "";
+  let up = 0, dn = 0;
+  rows.forEach(([c]) => { const r = SYQ.q[c]; if (!r || r[3] == null) return; if (r[3] > 0) up++; else if (r[3] < 0) dn++; });
+  return '<span class="tag sy-up num" title="' + esc(t("sy_upn")) + '">▲ ' + up + '</span><span class="tag sy-dn num" title="' + esc(t("sy_dnn")) + '">▼ ' + dn + "</span>";
+}
 function pageSymbols() {
   const q = syQ.trim(), nq = typeof shNorm === "function" ? shNorm(q) : q.toLowerCase();
   const match = (r) => !q || r[0].startsWith(q) || (typeof shNorm === "function" ? shNorm(r[1] + " " + r[2]) : (r[1] + " " + r[2]).toLowerCase()).includes(nq);
@@ -56,7 +63,7 @@ function pageSymbols() {
   const groups = SA_SECTORS.map(([sec, list], i) => {
     const rows = list.filter(match); total += rows.length; if (!rows.length) return "";
     const open = q ? true : syOpen === "all" ? true : syOpen === "none" ? false : i < 1;
-    return '<details class="panel sy-sec"' + (open ? " open" : "") + '><summary><b>' + esc(sec) + '</b><span class="tag amber">' + esc(t("sy_n").replace("{n}", rows.length)) + '</span></summary><ul class="sy-list">' +
+    return '<details class="panel sy-sec"' + (open ? " open" : "") + '><summary><b>' + esc(sec) + '</b><span class="sy-cnt"><span class="tag amber">' + esc(t("sy_n").replace("{n}", rows.length)) + "</span>" + syUpDown(rows) + '</span></summary><ul class="sy-list">' +
       rows.slice().sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([c, n, f]) => { const has = typeof chartData === "function" && chartData(c).length > 1; return '<li><span class="sy-code num">' + esc(c) + '</span><span class="sy-nm" title="' + esc(f || n) + '"><b>' + esc(n) + "</b></span>" + (has ? '<button class="btn sm ghost sy-cb" data-act="sy-chart" data-s="' + esc(c) + '" title="' + esc(t("sy_chart")) + '" aria-label="' + esc(t("sy_chart") + " " + n) + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"/></svg></button>' : "") + syPrice(c) + "</li>"; }).join("") + "</ul></details>";
   }).join("");
   const n = SA_SECTORS.reduce((a, [, l]) => a + l.length, 0);

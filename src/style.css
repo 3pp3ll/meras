@@ -1609,3 +1609,7 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .rd-prog>div{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
 .rd-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3b7dd8,#2f9e6e);transition:width 1s linear}
 .rd-prog span{font-size:13px;color:var(--muted)}
+.sy-cnt{display:inline-flex;gap:6px;align-items:center;margin-inline-start:auto}
+.sy-sec summary .sy-cnt{margin-inline-start:auto}
+.tag.sy-up{background:rgba(47,158,110,.14);color:#1f8a5b}
+.tag.sy-dn{background:rgba(214,69,69,.13);color:#c23b3b}

@@ -1643,6 +1643,10 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .rd-prog>div{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
 .rd-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3b7dd8,#2f9e6e);transition:width 1s linear}
 .rd-prog span{font-size:13px;color:var(--muted)}
+.sy-cnt{display:inline-flex;gap:6px;align-items:center;margin-inline-start:auto}
+.sy-sec summary .sy-cnt{margin-inline-start:auto}
+.tag.sy-up{background:rgba(47,158,110,.14);color:#1f8a5b}
+.tag.sy-dn{background:rgba(214,69,69,.13);color:#c23b3b}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -4335,10 +4339,11 @@ function pageSchools() {
   const table = '<div class="panel stack"><h2 style="margin:0">' + esc(t("sch_cmp")) + '</h2><div class="tablewrap"><table class="sch-tbl"><thead><tr><th>' + esc(t("sch_name")) + "</th><th>" + esc(t("sch_lvl")) + "</th><th>" + esc(t("sch_obj")) + "</th><th>" + esc(t("sch_tf")) + "</th></tr></thead><tbody>" +
     SCHOOLS.map((s) => '<tr><td><a href="#sch-' + s.id + '">' + esc(L(s.name)) + "</a></td><td>" + schMeter(s.lvl) + " " + esc(t("sch_l" + s.lvl)) + "</td><td>" + schMeter(s.obj) + " " + esc(t("sch_o" + s.obj)) + "</td><td>" + esc(L(s.tf)) + "</td></tr>").join("") + "</tbody></table></div></div>";
   const tip = '<div class="notice"><b>' + esc(t("sch_tip_h")) + ":</b> " + esc(t("sch_tip")) + "</div>";
-  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sch_h")) + "</h1><p>" + esc(t("sch_p")) + '</p></div><div class="stack" style="padding-block:20px 40px">' + tip + (typeof exTeaser === "function" ? exTeaser() : "") + '<div class="grid3">' + cards + "</div>" + table + '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p></div></div>";
+  return '<div class="wrap"><div class="page-head"><h1>' + esc(t("sch_h")) + "</h1><p>" + esc(t("sch_p")) + '</p></div><div class="stack" style="padding-block:20px 40px">' + tip + (typeof exTeaser === "function" ? exTeaser() : "") + '<a class="panel row" href="#sch-momentum" style="justify-content:space-between;text-decoration:none"><b>📡 ' + esc(t("ml_teaser")) + '</b><span class="btn sm">' + esc(t("open")) + "</span></a>" + '<div class="grid3">' + cards + "</div>" + table + '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p></div></div>";
 }
 function pageSchool(id) {
   if (id === "tsla" && typeof pageTslaExample === "function") return pageTslaExample();
+  if (id === "momentum" && typeof pageMomentumLesson === "function") return pageMomentumLesson();
   const i = SCHOOLS.findIndex((x) => x.id === id); if (i < 0) return pageSchools();
   const s = SCHOOLS[i], nx = SCHOOLS[(i + 1) % SCHOOLS.length];
   const list = (arr) => "<ul>" + arr.map((x) => "<li>" + esc(L(x)) + "</li>").join("") + "</ul>";
@@ -5779,7 +5784,7 @@ function wnBlock(sym) {
    كل سهم: [الرمز، الاسم المختصر، الاسم الكامل كما في قوائم الهيئات الشرعية].
    saName(رمز) ترجع الاسم المختصر، وتستخدمها صفحات المنصة بدل ما تكتب الاسم الطويل. */
 Object.assign(UI, {
-  nav_symbols: ["السوق السعودي", "Saudi market"], d_symbols: ["كل أسهم السوق السعودي مقسّمة حسب القطاع.", "Every Saudi share, grouped by sector."],
+  nav_symbols: ["السوق السعودي", "Saudi market"], sy_upn: ["أسهم صاعدة اليوم", "Shares up today"], sy_dnn: ["أسهم نازلة اليوم", "Shares down today"], d_symbols: ["كل أسهم السوق السعودي مقسّمة حسب القطاع.", "Every Saudi share, grouped by sector."],
   sy_h: ["دليل الرموز", "Symbol guide"], sy_p: ["رمز كل سهم في السوق السعودي الرئيسي (تاسي) واسمه، مقسّمة حسب القطاع. اكتب الرمز أو الاسم وتلقاه.", "Every share on the Saudi main market (TASI) with its code, grouped by sector. Type a code or name to find it."],
   sy_q: ["ابحث برمز أو اسم… مثل 1211 أو معادن", "Search by code or name… e.g. 1211"], sy_n: ["{n} سهم", "{n} shares"], sy_all: ["{n} سهم في {s} قطاع", "{n} shares in {s} sectors"],
   sy_open: ["افتح الكل", "Expand all"], sy_close: ["سكّر الكل", "Collapse all"], sy_chart: ["الشارت", "Chart"], sy_none: ["ما لقيت سهم بهالرمز أو الاسم.", "No share matches."],
@@ -5825,6 +5830,13 @@ async function syRefresh(btn) {
 const SY_IC = {
   "البنوك": "bank", "الطاقة": "energy", "الإتصالات": "tel", "المواد الاساسية": "mat", "التأمين": "ins"
 };
+/* عدد الصاعد (أخضر) والنازل (أحمر) في القطاع من آخر أسعار */
+function syUpDown(rows) {
+  if (!SYQ.q) return "";
+  let up = 0, dn = 0;
+  rows.forEach(([c]) => { const r = SYQ.q[c]; if (!r || r[3] == null) return; if (r[3] > 0) up++; else if (r[3] < 0) dn++; });
+  return '<span class="tag sy-up num" title="' + esc(t("sy_upn")) + '">▲ ' + up + '</span><span class="tag sy-dn num" title="' + esc(t("sy_dnn")) + '">▼ ' + dn + "</span>";
+}
 function pageSymbols() {
   const q = syQ.trim(), nq = typeof shNorm === "function" ? shNorm(q) : q.toLowerCase();
   const match = (r) => !q || r[0].startsWith(q) || (typeof shNorm === "function" ? shNorm(r[1] + " " + r[2]) : (r[1] + " " + r[2]).toLowerCase()).includes(nq);
@@ -5832,7 +5844,7 @@ function pageSymbols() {
   const groups = SA_SECTORS.map(([sec, list], i) => {
     const rows = list.filter(match); total += rows.length; if (!rows.length) return "";
     const open = q ? true : syOpen === "all" ? true : syOpen === "none" ? false : i < 1;
-    return '<details class="panel sy-sec"' + (open ? " open" : "") + '><summary><b>' + esc(sec) + '</b><span class="tag amber">' + esc(t("sy_n").replace("{n}", rows.length)) + '</span></summary><ul class="sy-list">' +
+    return '<details class="panel sy-sec"' + (open ? " open" : "") + '><summary><b>' + esc(sec) + '</b><span class="sy-cnt"><span class="tag amber">' + esc(t("sy_n").replace("{n}", rows.length)) + "</span>" + syUpDown(rows) + '</span></summary><ul class="sy-list">' +
       rows.slice().sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([c, n, f]) => { const has = typeof chartData === "function" && chartData(c).length > 1; return '<li><span class="sy-code num">' + esc(c) + '</span><span class="sy-nm" title="' + esc(f || n) + '"><b>' + esc(n) + "</b></span>" + (has ? '<button class="btn sm ghost sy-cb" data-act="sy-chart" data-s="' + esc(c) + '" title="' + esc(t("sy_chart")) + '" aria-label="' + esc(t("sy_chart") + " " + n) + '"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"/></svg></button>' : "") + syPrice(c) + "</li>"; }).join("") + "</ul></details>";
   }).join("");
   const n = SA_SECTORS.reduce((a, [, l]) => a + l.length, 0);
@@ -9215,7 +9227,7 @@ function rdCard(x) {
 function dkRadar() {
   if (!RD && !rdLoading) loadRadar();
   const chips = (cur, key, list) => '<div class="nt-filters" role="group">' + list.map((k) => '<button class="dg-chip" data-act="rd-f" data-key="' + key + '" data-f="' + k + '" aria-pressed="' + (cur === k) + '">' + esc(t(k === "all" ? "rd_all" : "rd_" + k)) + "</button>").join("") + "</div>";
-  const rules = '<details class="panel"><summary><b>' + esc(t("rd_rules")) + '</b></summary><ul class="small">' + ["rd_r1", "rd_r2", "rd_r3", "rd_r4"].map((k) => "<li>" + esc(t(k)) + "</li>").join("") + "</ul>" +
+  const rules = '<details class="panel"><summary><b>' + esc(t("rd_rules")) + '</b></summary><ul class="small">' + ["rd_r1", "rd_r2", "rd_r3", "rd_r4"].map((k) => "<li>" + esc(t(k)) + "</li>").join("") + "</ul>" + '<p class="small"><a href="#sch-momentum">' + esc(t("rd_lesson")) + " ←</a></p>" +
     ["breakout", "gainer", "momentum"].map((k) => '<p class="small"><b>' + esc(t("rd_" + k)) + ":</b> " + esc(t("rd_d_" + k)) + "</p>").join("") + "</details>";
   const head = '<p class="muted" style="margin:0">' + esc(t("rd_p")) + "</p>" + rules;
   if (!RD) return head + '<div class="notice">' + esc(t("dk_loading")) + "</div>";
@@ -9256,6 +9268,59 @@ document.addEventListener("click", (e) => {
 if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) {
   loadRadar();
   setInterval(() => { if (document.visibilityState === "visible") loadRadar(); }, 15 * 60 * 1000);
+}
+
+/* ----- درس: طريقة حساب الزخم (التعليم ← مدارس التحليل ← #sch-momentum) ----- */
+const MOM_LESSON = [
+  [["الشموع اليومية لآخر 6 شهور", "Daily candles for the last 6 months"],
+   ["كل شمعة فيها الافتتاح والأعلى والأدنى والإقفال والحجم. الرادار يسحبها لكل سهم، وشمعة اليوم تتحدث أثناء الجلسة.", "Each candle has open, high, low, close and volume. The radar pulls them for every share; today's candle updates during the session."],
+   ["هي المادة الخام: كل القراءات اللي تحت تنحسب منها.", "The raw material: every reading below is computed from them."]],
+  [["أعلى سعر في آخر 20 يوم", "The 20-day high"],
+   ["أعلى قمة وصلها السهم في آخر 20 جلسة (تقريباً شهر تداول)، بدون اليوم.", "The highest price of the last 20 sessions (about a trading month), excluding today."],
+   ["إذا أقفل السهم اليوم فوقها، معناه كسر مقاومة الشهر: هذا الاختراق.", "If today's close is above it, the share broke the month's resistance: that is the breakout."]],
+  [["الحجم النسبي", "Relative volume"],
+   ["حجم اليوم ÷ متوسط حجم آخر 20 يوم. مثال: المتوسط مليون سهم واليوم تداول 2.5 مليون، يعني الحجم النسبي 2.5.", "Today's volume ÷ the 20-day average. Example: average 1M shares, today 2.5M, relative volume 2.5."],
+   ["الاختراق بدون حجم غالباً يفشل. الرادار يطلب 1.8 أو أكثر للاختراق، و2.5 أو أكثر عشان يعطيه قوة إضافية.", "Breakouts without volume often fail. The radar needs 1.8+ for a breakout and 2.5+ for extra strength."]],
+  [["المتوسط المتحرك 20 و50", "The 20 and 50 moving averages"],
+   ["متوسط إقفال آخر 20 يوم، ومتوسط آخر 50 يوم. مثال: مجموع إقفالات 20 يوم ÷ 20.", "The average close of the last 20 days and of the last 50. Example: the sum of 20 closes ÷ 20."],
+   ["السعر فوق متوسط 20 ومتوسط 20 فوق 50 يعني اتجاه صاعد واضح. هذا شرط ركوب الموجة بدل شراء سهم ينهار.", "Price above the 20, and the 20 above the 50, means a clear uptrend: the rule for riding the wave instead of buying a falling share."]],
+  [["مؤشر القوة النسبية RSI 14", "RSI 14"],
+   ["يقارن متوسط الصعود بمتوسط النزول في آخر 14 يوم، ويعطي رقم من 0 إلى 100. فوق 70 تشبع شراء، وتحت 30 تشبع بيع.", "Compares average gains with average losses over 14 days, giving 0 to 100. Above 70 is overbought, below 30 oversold."],
+   ["الرادار يبي RSI بين 55 و75: زخم صاعد قوي، بس السهم ما وصل لمرحلة الطفرة اللي غالباً يجي بعدها تصحيح.", "The radar wants 55 to 75: strong upward momentum, but not yet the spike that is often followed by a pullback."]],
+  [["متوسط المدى الحقيقي ATR 14", "Average True Range (ATR 14)"],
+   ["متوسط حركة السهم اليومية بالريال أو الدولار لآخر 14 يوم، ويحسب الفجوات بين الأيام. مثال: سهم سعره 50 ومتوسط حركته 1.5، يعني يتحرك 3% باليوم تقريباً.", "The share's average daily range over 14 days, gaps included. Example: price 50 and ATR 1.5 means about 3% a day."],
+   ["منه ينحسب الوقف: غالباً 1.5 ضعف ATR تحت السعر، أو تحت القمة المخترقة. ونسبة المخاطرة = المسافة للوقف ÷ السعر.", "The stop comes from it: usually 1.5× ATR below price, or below the broken high. Risk % = distance to stop ÷ price."]],
+  [["تغير اليوم وتغير 5 أيام", "Today's change and 5-day change"],
+   ["تغير اليوم = (إقفال اليوم ÷ إقفال أمس − 1). تغير 5 أيام = (إقفال اليوم ÷ إقفال قبل 5 جلسات − 1).", "Today's change = today's close ÷ yesterday's − 1. 5-day change = today's close ÷ the close 5 sessions ago − 1."],
+   ["يطلع منه الأكثر ارتفاعاً (4% أو أكثر بالسعودي، 6% أو أكثر بالأمريكي)، والزخم المستمر (6% أو أكثر في 5 أيام).", "This gives the top gainers (4%+ Saudi, 6%+ US) and steady momentum (6%+ in 5 days)."]],
+  [["السيولة", "Liquidity"],
+   ["متوسط قيمة التداول اليومية لآخر 20 يوم = السعر × الحجم.", "Average daily traded value over 20 days = price × volume."],
+   ["أقل من 5 مليون ريال (أو 20 مليون دولار) ينستبعد: سهم بدون سيولة صعب تطلع منه بسرعة.", "Below 5M SAR (or 20M USD) is skipped: an illiquid share is hard to exit quickly."]],
+  [["الأخبار", "News"],
+   ["من نفس مصدر أخبار مِراس (Google News) لكل سهم نتابعه.", "From the same Meras news source (Google News) for each share we follow."],
+   ["إذا السهم من الأكثر ارتفاعاً ومعه خبر (نتائج، عقد، استحواذ)، ترتفع قوة الإشارة لأن الحركة المدفوعة بخبر تكمل عادة أيام.", "A top gainer with news (results, a contract, a deal) gets more strength: news-driven moves often run for days."]]
+];
+const MOM_SIG = [
+  ["rd_breakout", ["إقفال فوق أعلى 20 يوم + حجم نسبي 1.8 أو أكثر + فوق متوسط 50. القوة تزيد مع حجم 2.5 أو أكثر، ومع اتجاه 20 فوق 50.", "Close above the 20-day high + relative volume 1.8+ + above the 50 average. Strength rises with volume 2.5+ and the 20 above the 50."]],
+  ["rd_gainer", ["ارتفاع اليوم 4% أو أكثر (6% للأمريكي) + حجم نسبي 1.5 أو أكثر. القوة تزيد مع حجم 2.5 أو أكثر، وفوق متوسط 50، ومع وجود خبر.", "Up 4%+ today (6% US) + relative volume 1.5+. Strength rises with volume 2.5+, above the 50 average, and with news."]],
+  ["rd_momentum", ["فوق متوسط 20 و50 + صعود 6% أو أكثر في 5 أيام + RSI بين 55 و75 + حركة يومية بين 1.5% و8%. القوة تزيد مع صعود 10% أو أكثر، وحجم 1.3 أو أكثر.", "Above the 20 and 50 + up 6%+ in 5 days + RSI 55 to 75 + daily range 1.5% to 8%. Strength rises with 10%+ and volume 1.3+."]]
+];
+Object.assign(UI, {
+  ml_t: ["طريقة حساب الزخم", "How momentum is calculated"], ml_p: ["القراءات اللي يعتمد عليها رادار الزخم في مِراس، وكيف ينحسب كل رقم، وليش يهم للمضاربة من أيام لأسبوع.", "The readings behind the Meras momentum radar, how each number is computed, and why it matters for trades of a few days to a week."],
+  ml_what: ["وش هو الزخم؟", "What is momentum?"], ml_what_p: ["الزخم هو سرعة وقوة حركة السعر. الفكرة: السهم اللي يتحرك بقوة مع سيولة عالية غالباً يكمل حركته كم يوم، فتدخل معه بدل ما تحاول تشتري سهم ينهار لأنه رخيص.", "Momentum is the speed and strength of a price move. The idea: a share moving strongly on high volume often keeps going for a few days, so you ride it instead of buying a falling share because it looks cheap."],
+  ml_calc: ["كيف ينحسب", "How it's computed"], ml_use: ["كيف يستخدمه الرادار", "How the radar uses it"], ml_sig: ["الإشارات الثلاث وقوتها", "The three signals and their strength"],
+  ml_lv: ["الهدف والوقف", "Target and stop"], ml_lv_p: ["الهدف الأول = سعر الإقفال × 1.03، والثاني × 1.05. الوقف من ATR أو تحت القمة المخترقة. إذا المخاطرة أكبر من الهدف، الصفقة ما تستاهل.", "Target 1 = close × 1.03, target 2 = × 1.05. The stop comes from ATR or below the broken high. If the risk is bigger than the target, skip the trade."],
+  ml_open: ["افتح رادار الزخم", "Open the momentum radar"], ml_teaser: ["درس: طريقة حساب الزخم، والقراءات اللي يعتمد عليها الرادار", "Lesson: how momentum is calculated, and the readings behind the radar"], rd_lesson: ["اقرأ درس طريقة الحساب", "Read the lesson on how it's computed"]
+});
+function pageMomentumLesson() {
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  return '<div class="wrap"><div class="guide-head"><div class="crumbs"><a href="#schools">' + esc(t("sch_h")) + "</a> / " + esc(t("ml_t")) + "</div><h1>" + esc(t("ml_t")) + "</h1><p>" + esc(t("ml_p")) + "</p></div>" +
+    '<div class="stack" style="padding-block:16px 40px"><section class="panel stack"><h2>' + esc(t("ml_what")) + "</h2><p>" + esc(t("ml_what_p")) + "</p></section>" +
+    MOM_LESSON.map(([n, calc, use], i) => '<section class="panel stack"><h2><span class="num">' + (i + 1) + ".</span> " + esc(L(n)) + "</h2><p><b>" + esc(t("ml_calc")) + ":</b> " + esc(L(calc)) + "</p><p><b>" + esc(t("ml_use")) + ":</b> " + esc(L(use)) + "</p></section>").join("") +
+    '<section class="panel stack"><h2>' + esc(t("ml_sig")) + "</h2>" + MOM_SIG.map(([k, d]) => "<p><b>" + esc(t(k)) + ":</b> " + esc(L(d)) + "</p>").join("") + "</section>" +
+    '<section class="panel stack"><h2>' + esc(t("ml_lv")) + "</h2><p>" + esc(t("ml_lv_p")) + "</p><ul>" + ["rd_r1", "rd_r2", "rd_r3", "rd_r4"].map((k) => "<li>" + esc(t(k)) + "</li>").join("") + "</ul></section>" +
+    '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p>" +
+    '<div class="row" style="justify-content:space-between"><a class="btn" href="#schools">' + esc(t("sch_all")) + "</a>" + (owner ? '<a class="btn primary" href="#radar">' + esc(t("ml_open")) + "</a>" : "") + "</div></div></div>";
 }
 /* ===== مِراس: الشاشة الرئيسية للزوار =====
    أول ما يفتح الزائر مِراس يشوف نبذة عن المنصة وفكرتها، ومقتطفات عن محتواها، وزر دخول.

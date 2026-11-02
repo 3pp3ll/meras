@@ -91,7 +91,7 @@ function rdCard(x) {
 function dkRadar() {
   if (!RD && !rdLoading) loadRadar();
   const chips = (cur, key, list) => '<div class="nt-filters" role="group">' + list.map((k) => '<button class="dg-chip" data-act="rd-f" data-key="' + key + '" data-f="' + k + '" aria-pressed="' + (cur === k) + '">' + esc(t(k === "all" ? "rd_all" : "rd_" + k)) + "</button>").join("") + "</div>";
-  const rules = '<details class="panel"><summary><b>' + esc(t("rd_rules")) + '</b></summary><ul class="small">' + ["rd_r1", "rd_r2", "rd_r3", "rd_r4"].map((k) => "<li>" + esc(t(k)) + "</li>").join("") + "</ul>" +
+  const rules = '<details class="panel"><summary><b>' + esc(t("rd_rules")) + '</b></summary><ul class="small">' + ["rd_r1", "rd_r2", "rd_r3", "rd_r4"].map((k) => "<li>" + esc(t(k)) + "</li>").join("") + "</ul>" + '<p class="small"><a href="#sch-momentum">' + esc(t("rd_lesson")) + " ←</a></p>" +
     ["breakout", "gainer", "momentum"].map((k) => '<p class="small"><b>' + esc(t("rd_" + k)) + ":</b> " + esc(t("rd_d_" + k)) + "</p>").join("") + "</details>";
   const head = '<p class="muted" style="margin:0">' + esc(t("rd_p")) + "</p>" + rules;
   if (!RD) return head + '<div class="notice">' + esc(t("dk_loading")) + "</div>";
@@ -132,4 +132,57 @@ document.addEventListener("click", (e) => {
 if (typeof HOSTED !== "undefined" && HOSTED && CFG.token) {
   loadRadar();
   setInterval(() => { if (document.visibilityState === "visible") loadRadar(); }, 15 * 60 * 1000);
+}
+
+/* ----- درس: طريقة حساب الزخم (التعليم ← مدارس التحليل ← #sch-momentum) ----- */
+const MOM_LESSON = [
+  [["الشموع اليومية لآخر 6 شهور", "Daily candles for the last 6 months"],
+   ["كل شمعة فيها الافتتاح والأعلى والأدنى والإقفال والحجم. الرادار يسحبها لكل سهم، وشمعة اليوم تتحدث أثناء الجلسة.", "Each candle has open, high, low, close and volume. The radar pulls them for every share; today's candle updates during the session."],
+   ["هي المادة الخام: كل القراءات اللي تحت تنحسب منها.", "The raw material: every reading below is computed from them."]],
+  [["أعلى سعر في آخر 20 يوم", "The 20-day high"],
+   ["أعلى قمة وصلها السهم في آخر 20 جلسة (تقريباً شهر تداول)، بدون اليوم.", "The highest price of the last 20 sessions (about a trading month), excluding today."],
+   ["إذا أقفل السهم اليوم فوقها، معناه كسر مقاومة الشهر: هذا الاختراق.", "If today's close is above it, the share broke the month's resistance: that is the breakout."]],
+  [["الحجم النسبي", "Relative volume"],
+   ["حجم اليوم ÷ متوسط حجم آخر 20 يوم. مثال: المتوسط مليون سهم واليوم تداول 2.5 مليون، يعني الحجم النسبي 2.5.", "Today's volume ÷ the 20-day average. Example: average 1M shares, today 2.5M, relative volume 2.5."],
+   ["الاختراق بدون حجم غالباً يفشل. الرادار يطلب 1.8 أو أكثر للاختراق، و2.5 أو أكثر عشان يعطيه قوة إضافية.", "Breakouts without volume often fail. The radar needs 1.8+ for a breakout and 2.5+ for extra strength."]],
+  [["المتوسط المتحرك 20 و50", "The 20 and 50 moving averages"],
+   ["متوسط إقفال آخر 20 يوم، ومتوسط آخر 50 يوم. مثال: مجموع إقفالات 20 يوم ÷ 20.", "The average close of the last 20 days and of the last 50. Example: the sum of 20 closes ÷ 20."],
+   ["السعر فوق متوسط 20 ومتوسط 20 فوق 50 يعني اتجاه صاعد واضح. هذا شرط ركوب الموجة بدل شراء سهم ينهار.", "Price above the 20, and the 20 above the 50, means a clear uptrend: the rule for riding the wave instead of buying a falling share."]],
+  [["مؤشر القوة النسبية RSI 14", "RSI 14"],
+   ["يقارن متوسط الصعود بمتوسط النزول في آخر 14 يوم، ويعطي رقم من 0 إلى 100. فوق 70 تشبع شراء، وتحت 30 تشبع بيع.", "Compares average gains with average losses over 14 days, giving 0 to 100. Above 70 is overbought, below 30 oversold."],
+   ["الرادار يبي RSI بين 55 و75: زخم صاعد قوي، بس السهم ما وصل لمرحلة الطفرة اللي غالباً يجي بعدها تصحيح.", "The radar wants 55 to 75: strong upward momentum, but not yet the spike that is often followed by a pullback."]],
+  [["متوسط المدى الحقيقي ATR 14", "Average True Range (ATR 14)"],
+   ["متوسط حركة السهم اليومية بالريال أو الدولار لآخر 14 يوم، ويحسب الفجوات بين الأيام. مثال: سهم سعره 50 ومتوسط حركته 1.5، يعني يتحرك 3% باليوم تقريباً.", "The share's average daily range over 14 days, gaps included. Example: price 50 and ATR 1.5 means about 3% a day."],
+   ["منه ينحسب الوقف: غالباً 1.5 ضعف ATR تحت السعر، أو تحت القمة المخترقة. ونسبة المخاطرة = المسافة للوقف ÷ السعر.", "The stop comes from it: usually 1.5× ATR below price, or below the broken high. Risk % = distance to stop ÷ price."]],
+  [["تغير اليوم وتغير 5 أيام", "Today's change and 5-day change"],
+   ["تغير اليوم = (إقفال اليوم ÷ إقفال أمس − 1). تغير 5 أيام = (إقفال اليوم ÷ إقفال قبل 5 جلسات − 1).", "Today's change = today's close ÷ yesterday's − 1. 5-day change = today's close ÷ the close 5 sessions ago − 1."],
+   ["يطلع منه الأكثر ارتفاعاً (4% أو أكثر بالسعودي، 6% أو أكثر بالأمريكي)، والزخم المستمر (6% أو أكثر في 5 أيام).", "This gives the top gainers (4%+ Saudi, 6%+ US) and steady momentum (6%+ in 5 days)."]],
+  [["السيولة", "Liquidity"],
+   ["متوسط قيمة التداول اليومية لآخر 20 يوم = السعر × الحجم.", "Average daily traded value over 20 days = price × volume."],
+   ["أقل من 5 مليون ريال (أو 20 مليون دولار) ينستبعد: سهم بدون سيولة صعب تطلع منه بسرعة.", "Below 5M SAR (or 20M USD) is skipped: an illiquid share is hard to exit quickly."]],
+  [["الأخبار", "News"],
+   ["من نفس مصدر أخبار مِراس (Google News) لكل سهم نتابعه.", "From the same Meras news source (Google News) for each share we follow."],
+   ["إذا السهم من الأكثر ارتفاعاً ومعه خبر (نتائج، عقد، استحواذ)، ترتفع قوة الإشارة لأن الحركة المدفوعة بخبر تكمل عادة أيام.", "A top gainer with news (results, a contract, a deal) gets more strength: news-driven moves often run for days."]]
+];
+const MOM_SIG = [
+  ["rd_breakout", ["إقفال فوق أعلى 20 يوم + حجم نسبي 1.8 أو أكثر + فوق متوسط 50. القوة تزيد مع حجم 2.5 أو أكثر، ومع اتجاه 20 فوق 50.", "Close above the 20-day high + relative volume 1.8+ + above the 50 average. Strength rises with volume 2.5+ and the 20 above the 50."]],
+  ["rd_gainer", ["ارتفاع اليوم 4% أو أكثر (6% للأمريكي) + حجم نسبي 1.5 أو أكثر. القوة تزيد مع حجم 2.5 أو أكثر، وفوق متوسط 50، ومع وجود خبر.", "Up 4%+ today (6% US) + relative volume 1.5+. Strength rises with volume 2.5+, above the 50 average, and with news."]],
+  ["rd_momentum", ["فوق متوسط 20 و50 + صعود 6% أو أكثر في 5 أيام + RSI بين 55 و75 + حركة يومية بين 1.5% و8%. القوة تزيد مع صعود 10% أو أكثر، وحجم 1.3 أو أكثر.", "Above the 20 and 50 + up 6%+ in 5 days + RSI 55 to 75 + daily range 1.5% to 8%. Strength rises with 10%+ and volume 1.3+."]]
+];
+Object.assign(UI, {
+  ml_t: ["طريقة حساب الزخم", "How momentum is calculated"], ml_p: ["القراءات اللي يعتمد عليها رادار الزخم في مِراس، وكيف ينحسب كل رقم، وليش يهم للمضاربة من أيام لأسبوع.", "The readings behind the Meras momentum radar, how each number is computed, and why it matters for trades of a few days to a week."],
+  ml_what: ["وش هو الزخم؟", "What is momentum?"], ml_what_p: ["الزخم هو سرعة وقوة حركة السعر. الفكرة: السهم اللي يتحرك بقوة مع سيولة عالية غالباً يكمل حركته كم يوم، فتدخل معه بدل ما تحاول تشتري سهم ينهار لأنه رخيص.", "Momentum is the speed and strength of a price move. The idea: a share moving strongly on high volume often keeps going for a few days, so you ride it instead of buying a falling share because it looks cheap."],
+  ml_calc: ["كيف ينحسب", "How it's computed"], ml_use: ["كيف يستخدمه الرادار", "How the radar uses it"], ml_sig: ["الإشارات الثلاث وقوتها", "The three signals and their strength"],
+  ml_lv: ["الهدف والوقف", "Target and stop"], ml_lv_p: ["الهدف الأول = سعر الإقفال × 1.03، والثاني × 1.05. الوقف من ATR أو تحت القمة المخترقة. إذا المخاطرة أكبر من الهدف، الصفقة ما تستاهل.", "Target 1 = close × 1.03, target 2 = × 1.05. The stop comes from ATR or below the broken high. If the risk is bigger than the target, skip the trade."],
+  ml_open: ["افتح رادار الزخم", "Open the momentum radar"], ml_teaser: ["درس: طريقة حساب الزخم، والقراءات اللي يعتمد عليها الرادار", "Lesson: how momentum is calculated, and the readings behind the radar"], rd_lesson: ["اقرأ درس طريقة الحساب", "Read the lesson on how it's computed"]
+});
+function pageMomentumLesson() {
+  const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  return '<div class="wrap"><div class="guide-head"><div class="crumbs"><a href="#schools">' + esc(t("sch_h")) + "</a> / " + esc(t("ml_t")) + "</div><h1>" + esc(t("ml_t")) + "</h1><p>" + esc(t("ml_p")) + "</p></div>" +
+    '<div class="stack" style="padding-block:16px 40px"><section class="panel stack"><h2>' + esc(t("ml_what")) + "</h2><p>" + esc(t("ml_what_p")) + "</p></section>" +
+    MOM_LESSON.map(([n, calc, use], i) => '<section class="panel stack"><h2><span class="num">' + (i + 1) + ".</span> " + esc(L(n)) + "</h2><p><b>" + esc(t("ml_calc")) + ":</b> " + esc(L(calc)) + "</p><p><b>" + esc(t("ml_use")) + ":</b> " + esc(L(use)) + "</p></section>").join("") +
+    '<section class="panel stack"><h2>' + esc(t("ml_sig")) + "</h2>" + MOM_SIG.map(([k, d]) => "<p><b>" + esc(t(k)) + ":</b> " + esc(L(d)) + "</p>").join("") + "</section>" +
+    '<section class="panel stack"><h2>' + esc(t("ml_lv")) + "</h2><p>" + esc(t("ml_lv_p")) + "</p><ul>" + ["rd_r1", "rd_r2", "rd_r3", "rd_r4"].map((k) => "<li>" + esc(t(k)) + "</li>").join("") + "</ul></section>" +
+    '<p class="small muted" style="margin:0">' + esc(t("sch_note")) + "</p>" +
+    '<div class="row" style="justify-content:space-between"><a class="btn" href="#schools">' + esc(t("sch_all")) + "</a>" + (owner ? '<a class="btn primary" href="#radar">' + esc(t("ml_open")) + "</a>" : "") + "</div></div></div>";
 }
