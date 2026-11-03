@@ -161,6 +161,12 @@ td.n, th.n { text-align: end; }
 .field input, .field select { font: 500 14px var(--f-body); background: var(--sunk); color: var(--fg); border: 1px solid var(--line); border-radius: 9px; padding: 10px 11px; width: 100%; }
 .field input.ltr { direction: ltr; text-align: left; font-family: var(--f-num); }
 .stack { display: grid; gap: 14px; }
+.fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.panel h3 { font: 700 15px var(--f-display); margin: 4px 0 0; }
+.lrow { display: flex; gap: 6px; } .lrow input { flex: 1; min-width: 0; }
+.mrow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.mrow .who { display: grid; gap: 2px; min-width: 0; } .mrow .who span { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 600px) { .mrow { grid-template-columns: minmax(0, 1fr) auto; } .mrow .row { grid-column: 1 / -1; } .lrow { flex-wrap: wrap; } }
 .note { font-size: 13px; color: var(--muted); margin: 0; }
 .note b { color: var(--fg); }
 ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-size: 14px; }
@@ -216,6 +222,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       <a href="#signals"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>سجل التوصيات</a>
       <a href="#archive"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></g></svg>الأرشيف الشهري</a>
       <a href="#reports"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M12 12v6M9 15l3 3 3-3"/></g></svg>التقارير والتصدير</a>
+      <a href="#control"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></g></svg>لوحة التحكم</a>
       <a href="#settings"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></g></svg>الإعدادات</a>
     </nav>
     <div class="rail-foot">
@@ -258,8 +265,8 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var START_EQ = 100000, TARGET = 0.8;
   var MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
   var CAT = { ai: "الذكاء الاصطناعي", leaders: "القيادية", gold: "الذهب" };
-  var PAGES = ["overview", "signals", "archive", "reports", "settings"];
-  var TITLES = { overview: "الأداء", signals: "سجل التوصيات", archive: "الأرشيف الشهري", reports: "التقارير والتصدير", settings: "الإعدادات" };
+  var PAGES = ["overview", "signals", "archive", "reports", "control", "settings"];
+  var TITLES = { overview: "الأداء", signals: "سجل التوصيات", archive: "الأرشيف الشهري", reports: "التقارير والتصدير", control: "لوحة التحكم", settings: "الإعدادات" };
   var $ = function (id) { return document.getElementById(id); };
   var store = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -396,7 +403,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var cls = function (x) { return x > 0 ? "pos" : x < 0 ? "neg" : "zero"; };
 
   function filtersHtml(page) {
-    if (page === "settings" || page === "archive") return "";
+    if (page === "settings" || page === "archive" || page === "control") return "";
     var mk = monthKeys(), p = state.period;
     var chips = mk.map(function (k) { return '<button type="button" data-period="month:' + k + '" class="' + (p === "month:" + k ? "on" : "") + '">' + (k === monthKey(new Date()) ? "هذا الشهر · " : "") + monthName(k) + "</button>"; }).join("") +
       '<button type="button" data-period="all" class="' + (p === "all" ? "on" : "") + '">كل الفترة</button><button type="button" data-period="range" class="' + (p === "range" ? "on" : "") + '">فترة محددة</button>';
@@ -475,6 +482,93 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       (window.__installPrompt ? '<div><button class="btn" type="button" data-act="install">ثبّت التطبيق</button></div>' : "") + "</div></section>";
   }
 
+  /* ---------- لوحة التحكم: تكتب data/control.json في GitHub، والوكيل يطبقه في التشغيلة الجاية ---------- */
+  var CTRL = { data: null, sha: null, loading: false, err: null, edit: null, saving: false };
+  var CTRL_FILE = "data/control.json";
+  var b64 = function (s) { return btoa(unescape(encodeURIComponent(s))); };
+  var unb64 = function (s) { return decodeURIComponent(escape(atob(String(s).replace(/\s/g, "")))); };
+  function ctrlDefaults() {
+    var c = (DATA && DATA.control) || {};
+    return { trade_size_usd: c.trade_size_usd || 3000,
+      swing: Object.assign({ tp1_pct: 10, tp2_pct: 20, max_loss_pct: 5 }, c.swing || {}),
+      quick: { tp_pct: (c.quick || {}).tp_pct || 3, stop_pct: (c.quick || {}).stop_pct || 2 },
+      links: Object.assign({ channel: "", bot: "https://t.me/Matrix4H_ProBot" }, c.links || {}),
+      members: (c.members || []).map(function (m) { return Object.assign({}, m); }) };
+  }
+  function loadControl() {
+    if (DEMO) { CTRL.data = CTRL.data || ctrlDefaults(); return; }
+    var tk = token(); if (!tk || CTRL.loading) return;
+    CTRL.loading = true;
+    fetch("https://api.github.com/repos/" + REPO + "/contents/" + CTRL_FILE + "?t=" + Date.now(), {
+      cache: "no-store", headers: { Authorization: "Bearer " + tk.t, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }
+    }).then(function (r) {
+      if (r.status === 404) return null;
+      if (!r.ok) throw { code: r.status };
+      return r.json();
+    }).then(function (f) {
+      var base = ctrlDefaults();
+      if (f) { CTRL.sha = f.sha; try { var d = JSON.parse(unb64(f.content)); base = Object.assign(base, d, { swing: Object.assign(base.swing, d.swing || {}), quick: Object.assign(base.quick, d.quick || {}), links: Object.assign(base.links, d.links || {}) }); } catch (e) {} }
+      CTRL.data = base; CTRL.err = null;
+    }).catch(function (e) { CTRL.err = e && e.code ? String(e.code) : "net"; CTRL.data = CTRL.data || ctrlDefaults(); })
+      .then(function () { CTRL.loading = false; if (current === "control") render(); });
+  }
+  function saveControl(msg) {
+    if (DEMO) { toast("هذا عرض تجريبي، الحفظ ما يوصل للوكيل"); render(); return; }
+    var tk = token(); if (!tk) { toast("اربط التطبيق برمز من الإعدادات"); return; }
+    CTRL.saving = true; render();
+    var body = Object.assign({}, CTRL.data, { updated_at: new Date().toISOString().slice(0, 16) });
+    fetch("https://api.github.com/repos/" + REPO + "/contents/" + CTRL_FILE, {
+      method: "PUT", headers: { Authorization: "Bearer " + tk.t, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
+      body: JSON.stringify({ message: "control: " + msg, content: b64(JSON.stringify(body, null, 1) + "\n"), sha: CTRL.sha || undefined })
+    }).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw { code: r.status, j: j }; return j; }); })
+      .then(function (j) { CTRL.sha = j.content && j.content.sha; CTRL.err = null; toast("انحفظ · يتطبق في التشغيلة الجاية"); })
+      .catch(function (e) {
+        CTRL.err = e && e.code ? String(e.code) : "net";
+        toast(e && (e.code === 403 || e.code === 404) ? "الرمز يقرأ بس: عدّله لـ Read and write" : e && e.code === 409 ? "انحفظ تعديل ثاني قبلك، حدّث وجرب" : "ما قدرت أحفظ، جرّب مرة ثانية");
+        if (e && e.code === 409) { CTRL.sha = null; CTRL.data = null; loadControl(); }
+      })
+      .then(function () { CTRL.saving = false; render(); });
+  }
+  var CAT = { free: "مجاني", trial: "تجربة", premium: "مدفوع", vip: "سنوي" }, STAT = { pending: "بانتظار", active: "نشط", expired: "منتهي", banned: "محظور" };
+  function numField(id, label, val, step, min, max) {
+    return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" class="ltr" type="number" inputmode="decimal" step="' + step + '" min="' + min + '" max="' + max + '" value="' + esc(val) + '"></div>';
+  }
+  function pageControl() {
+    if (!CTRL.data) { loadControl(); return '<section><div class="empty"><b>جارٍ تحميل الإعدادات…</b></div></section>'; }
+    var c = CTRL.data, q = c.quick, s = c.swing, ed = CTRL.edit;
+    var warn = CTRL.err === "403" || CTRL.err === "404" ? '<div class="panel" style="border-color:var(--loss)"><p class="note"><b>الرمز يقرأ بس.</b> عشان تحفظ من هنا، عدّل رمز sentinel-app في GitHub وخل <b>Contents</b> على <b>Read and write</b>.</p></div>' : "";
+    var trade = '<form class="panel stack" id="ctl-trade" novalidate><h2>الصفقات</h2><p class="note">تتطبق على التوصيات الجديدة من التشغيلة الجاية. الصفقات المفتوحة تكمل بأرقامها.</p>' +
+      '<div class="fgrid">' + numField("c-size", "حجم الصفقة $", c.trade_size_usd, 100, 100, 50000) + "</div>" +
+      '<h3>المتوسطة</h3><div class="fgrid">' + numField("c-s1", "الهدف الأول %", s.tp1_pct, 0.5, 1, 50) + numField("c-s2", "الهدف البعيد % (اختياري)", s.tp2_pct, 0.5, 2, 100) + numField("c-sl", "أقصى وقف %", s.max_loss_pct, 0.5, 0.5, 15) + "</div>" +
+      '<h3>السريعة</h3><div class="fgrid">' + numField("c-q1", "الهدف %", q.tp_pct, 0.5, 0.5, 10) + numField("c-ql", "أقصى وقف %", q.stop_pct, 0.1, 0.3, 5) + '<div class="field"><label>المدة</label><input value="5 أيام تداول" disabled></div></div>' +
+      '<div class="row" style="justify-content:flex-start"><button class="btn" type="submit"' + (CTRL.saving ? " disabled" : "") + ">" + (CTRL.saving ? "جارٍ الحفظ…" : "احفظ") + '</button><span class="note">النشر للقنوات: <b>مقفل</b> طول شهر التجربة · التنفيذ: <b>الحساب التجريبي</b></span></div></form>';
+    var link = function (key, label, ph) {
+      var v = (c.links || {})[key] || "";
+      return '<div class="field"><label for="l-' + key + '">' + label + '</label><div class="lrow"><input id="l-' + key + '" class="ltr" type="url" placeholder="' + ph + '" value="' + esc(v) + '">' +
+        '<button class="btn ghost" type="button" data-act="copy" data-k="' + key + '">نسخ</button><button class="btn ghost" type="button" data-act="share" data-k="' + key + '">مشاركة</button></div></div>';
+    };
+    var links = '<form class="panel stack" id="ctl-links" novalidate><h2>روابط تيليجرام</h2><p class="note">شارك رابط القناة مع اللي تبي تضيفهم. رسائل البوت محمية من إعادة التوجيه والحفظ.</p>' +
+      link("channel", "رابط قناة التوصيات", "https://t.me/+…") + link("bot", "رابط البوت", "https://t.me/…") +
+      '<div><button class="btn" type="submit"' + (CTRL.saving ? " disabled" : "") + '>احفظ الروابط</button></div></form>';
+    var rows = (c.members || []).map(function (m, i) {
+      return '<div class="mrow"><div class="who"><b>' + esc(m.name || m.email) + ' <span class="tag">' + (m.language === "en" ? "EN" : "ع") + "</span></b><span class=\"num\">" + esc(m.email) + (m.telegram_id ? " · " + esc(m.telegram_id) : "") + "</span></div>" +
+        '<span class="tag">' + (CAT[m.category] || "—") + '</span><span class="note">' + (STAT[m.status] || "—") + (m.expires_at ? " · حتى " + esc(m.expires_at) : "") + "</span>" +
+        '<div class="row" style="gap:6px;justify-content:flex-end"><button class="btn ghost" type="button" data-act="m-edit" data-i="' + i + '">تعديل</button><button class="btn ghost" type="button" data-act="m-del" data-i="' + i + '">حذف</button></div></div>';
+    }).join("");
+    var m = ed == null ? null : ed === -1 ? { category: "trial", status: "active", language: "ar" } : c.members[ed];
+    var sel = function (id, label, map, v) { return '<div class="field"><label for="' + id + '">' + label + '</label><select id="' + id + '">' + Object.keys(map).map(function (k) { return '<option value="' + k + '"' + (v === k ? " selected" : "") + ">" + map[k] + "</option>"; }).join("") + "</select></div>"; };
+    var form = m ? '<form class="panel stack" id="ctl-member" novalidate><h3>' + (ed === -1 ? "مشترك جديد" : "تعديل " + esc(m.name || m.email)) + '</h3><div class="fgrid">' +
+      '<div class="field"><label for="m-name">الاسم</label><input id="m-name" value="' + esc(m.name || "") + '"></div>' +
+      '<div class="field"><label for="m-email">الإيميل</label><input id="m-email" class="ltr" type="email" value="' + esc(m.email || "") + '" required></div>' +
+      '<div class="field"><label for="m-tg">Telegram ID</label><input id="m-tg" class="ltr" inputmode="numeric" value="' + esc(m.telegram_id || "") + '"></div>' +
+      sel("m-cat", "الفئة", CAT, m.category) + sel("m-st", "الحالة", STAT, m.status) + sel("m-lang", "لغة التوصيات", { ar: "العربية", en: "English" }, m.language) +
+      '<div class="field"><label for="m-exp">ينتهي في</label><input id="m-exp" class="ltr" type="date" value="' + esc(m.expires_at || "") + '"></div></div>' +
+      '<div class="row" style="justify-content:flex-start"><button class="btn" type="submit">احفظ المشترك</button><button class="btn ghost" type="button" data-act="m-cancel">إلغاء</button></div></form>' : "";
+    var members = '<div class="panel stack"><div class="row"><h2>المشتركين</h2><button class="btn ghost" type="button" data-act="m-new">+ مشترك</button></div>' +
+      '<p class="note">في شهر التجربة القائمة للتجهيز بس: التوصيات توصلك أنت لين تفتح النشر.</p>' + form + (rows || '<div class="empty" style="padding:18px"><b>ما فيه مشتركين للحين</b>اضغط "+ مشترك" وأضف أول واحد، مثلاً أخوك.</div>') + "</div>";
+    return '<section class="stack">' + warn + trade + links + members + "</section>";
+  }
+
   /* ---------- التنقل ---------- */
   var current = "overview";
   function page() { var h = location.hash.replace("#", ""); return PAGES.indexOf(h) >= 0 ? h : "overview"; }
@@ -483,14 +577,14 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     document.querySelectorAll("#nav a").forEach(function (a) { a.classList.toggle("on", a.getAttribute("href") === "#" + current); });
     $("page-title").textContent = TITLES[current]; $("top-title").textContent = TITLES[current];
     var range = periodRange();
-    $("eyebrow").textContent = current === "settings" || current === "archive" ? "Sentinel" : range.label + (state.strat === "all" ? "" : " · " + stratName(state.strat));
-    $("page-desc").textContent = { overview: "نسبة النجاح والنتيجة تتحدث مع كل صفقة توصل هدف أو وقف.", signals: "كل توصية طلعت في الفترة ونتيجتها.", archive: "كل شهر بعداده، والسابق محفوظ.", reports: "صدّر أداء أي فترة كملف.", settings: "الربط والتثبيت." }[current];
+    $("eyebrow").textContent = current === "settings" || current === "archive" || current === "control" ? "Sentinel" : range.label + (state.strat === "all" ? "" : " · " + stratName(state.strat));
+    $("page-desc").textContent = { overview: "نسبة النجاح والنتيجة تتحدث مع كل صفقة توصل هدف أو وقف.", signals: "كل توصية طلعت في الفترة ونتيجتها.", archive: "كل شهر بعداده، والسابق محفوظ.", reports: "صدّر أداء أي فترة كملف.", control: "حجم الصفقة والأهداف والروابط والمشتركين.", settings: "الربط والتثبيت." }[current];
     $("demo-chip").hidden = !DEMO;
     $("filters").innerHTML = filtersHtml(current);
     var v = $("view");
     v.innerHTML = (ERR && ERR !== "net" && !DATA && current !== "settings")
       ? '<section><div class="empty"><b>' + (ERR === "token" ? "اربط التطبيق ببياناتك" : "ما قدرت أقرأ البيانات") + "</b>" + (ERR === "token" ? "من الإعدادات، خطوة وحدة." : "تأكد من رمز الوصول في الإعدادات.") + '</div><div style="margin-top:12px"><a class="btn" href="#settings" style="text-decoration:none">افتح الإعدادات</a></div></section>'
-      : ({ overview: pageOverview, signals: pageSignals, archive: pageArchive, reports: pageReports, settings: pageSettings }[current])();
+      : ({ overview: pageOverview, signals: pageSignals, archive: pageArchive, reports: pageReports, control: pageControl, settings: pageSettings }[current])();
     if (dir) { v.classList.remove("enter-next", "enter-prev"); void v.offsetWidth; v.classList.add("enter-" + dir); }
     trialBox();
   }
@@ -533,6 +627,17 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var a = el.dataset.act;
     if (a === "refresh") load(true);
     if (a === "forget") { store.del("sentinel.token"); toast("انحذف الرمز من هذا الجهاز"); load(true); }
+    if (a === "m-new") { CTRL.edit = -1; render(); return; }
+    if (a === "m-edit") { CTRL.edit = +el.dataset.i; render(); return; }
+    if (a === "m-cancel") { CTRL.edit = null; render(); return; }
+    if (a === "m-del") { var gone = CTRL.data.members.splice(+el.dataset.i, 1)[0]; CTRL.edit = null; saveControl("remove member " + (gone && gone.email)); return; }
+    if (a === "copy" || a === "share") {
+      var inp = $("l-" + el.dataset.k), url = inp && inp.value.trim();
+      if (!url) { toast("اكتب الرابط أول"); return; }
+      if (a === "share" && navigator.share) { navigator.share({ title: "Sentinel Signals", url: url }).catch(function () {}); return; }
+      (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function () { toast("انسخ الرابط"); }, function () { inp.select(); toast("حدد الرابط وانسخه"); });
+      return;
+    }
     if (a === "install" && window.__installPrompt) { window.__installPrompt.prompt(); window.__installPrompt = null; }
   });
   document.addEventListener("change", function (e) {
@@ -540,7 +645,31 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     if (e.target.id === "f-to") { state.to = e.target.value; saveView(); render(); }
   });
   document.addEventListener("submit", function (e) {
-    if (e.target.id !== "tk-form") return;
+    var id = e.target.id, val = function (x) { return ($(x) || {}).value; };
+    if (id === "ctl-trade") {
+      e.preventDefault();
+      var n = function (x) { return +val(x); };
+      if (!(n("c-s1") < n("c-s2"))) { toast("الهدف الأول لازم يكون أقل من البعيد"); return; }
+      CTRL.data.trade_size_usd = n("c-size");
+      CTRL.data.swing = { tp1_pct: n("c-s1"), tp2_pct: n("c-s2"), max_loss_pct: n("c-sl") };
+      CTRL.data.quick = { tp_pct: n("c-q1"), stop_pct: n("c-ql") };
+      saveControl("trade settings"); return;
+    }
+    if (id === "ctl-links") {
+      e.preventDefault();
+      CTRL.data.links = { channel: val("l-channel").trim(), bot: val("l-bot").trim() };
+      saveControl("telegram links"); return;
+    }
+    if (id === "ctl-member") {
+      e.preventDefault();
+      var email = val("m-email").trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast("اكتب إيميل صحيح"); return; }
+      var row = { name: val("m-name").trim(), email: email, telegram_id: val("m-tg").trim(), category: val("m-cat"), status: val("m-st"), language: val("m-lang"), expires_at: val("m-exp") };
+      CTRL.data.members = CTRL.data.members || [];
+      if (CTRL.edit === -1) CTRL.data.members.push(row); else CTRL.data.members[CTRL.edit] = row;
+      CTRL.edit = null; saveControl("member " + email); return;
+    }
+    if (id !== "tk-form") return;
     e.preventDefault();
     var v = $("tk").value.trim();
     if (v) store.set("sentinel.token", v);
