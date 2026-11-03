@@ -13,7 +13,7 @@ Object.assign(UI, {
   ap_tip: ["للتطبيق: افتح المنصة في متصفح الجوال مرة، وإذا طلع لك «فتح في التطبيق» اختره، وبعدها الأيقونة تفتح التطبيق على طول.", "Tip: open the platform once in your phone browser and choose “Open in app” if offered; the icon will then open the app."]
 });
 const AP_COLORS = ["#E9A03B", "#E8765A", "#C76BA4", "#3D6E97", "#2E9C73", "#7DC3E6", "#B4532E", "#6E7A8E"];
-const AP_SUGG = [["Sentinel", "https://claude.ai/artifact/73aNfidr8MdgZoExwmPwzh"], ["مِلْكية", "https://3pp3ll.github.io/milkia/"], ["مع نفسك", "https://3pp3ll.github.io/ma-nafsak/"],["الراجحي كابيتال", "https://www.alrajhi-capital.sa"], ["دراية", "https://www.derayah.com"], ["Exness", "https://www.exness.com"], ["TradingView", "https://www.tradingview.com"], ["تداول السعودية", "https://www.saudiexchange.sa"], ["أرقام", "https://www.argaam.com"], ["يقين", "https://yaaqen.com"]];
+const AP_SUGG = [["Sentinel", "https://3pp3ll.github.io/meras/sentinel/"], ["مِلْكية", "https://3pp3ll.github.io/milkia/"], ["مع نفسك", "https://3pp3ll.github.io/ma-nafsak/"],["الراجحي كابيتال", "https://www.alrajhi-capital.sa"], ["دراية", "https://www.derayah.com"], ["Exness", "https://www.exness.com"], ["TradingView", "https://www.tradingview.com"], ["تداول السعودية", "https://www.saudiexchange.sa"], ["أرقام", "https://www.argaam.com"], ["يقين", "https://yaaqen.com"]];
 let apEdit = false, apForm = null;
 const apList = () => { if (!DK.data) return []; if (!Array.isArray(DK.data.apps)) DK.data.apps = [{ id: "a1", name: "منطاد", url: "https://3pp3ll.github.io/ad-studio/" }, { id: "a2", name: "دربي", url: "https://3pp3ll.github.io/darbi-E/" }, { id: "a3", name: "عقود", url: "https://3pp3ll.github.io/oqood/Contracts.html" }]; return DK.data.apps; };
 const AP_MINE = { "منطاد": "https://3pp3ll.github.io/ad-studio/", "دربي": "https://3pp3ll.github.io/darbi-E/", "عقود": "https://3pp3ll.github.io/oqood/Contracts.html", "مِلْكية": "https://3pp3ll.github.io/milkia/", "ملكية": "https://3pp3ll.github.io/milkia/", "مع نفسك": "https://3pp3ll.github.io/ma-nafsak/" };
@@ -21,7 +21,9 @@ const apFill = () => { const L = DK.data && DK.data.apps || []; L.forEach((a) =>
   if (DK.data && !DK.data.apMilkia && !L.some((a) => /milkia/.test(a.url || ""))) { L.push({ id: "a" + Date.now().toString(36), name: "مِلْكية", url: "https://3pp3ll.github.io/milkia/" }); DK.data.apMilkia = 1; }
   if (DK.data && !DK.data.apRefs && !L.some((a) => /refs\.html/.test(a.url || ""))) { L.push({ id: "r" + Date.now().toString(36), name: "الإحالات", url: "https://3pp3ll.github.io/meras/refs.html", color: "#C76BA4" }); DK.data.apRefs = 1; }
   /* Sentinel Signals: داشبورد وكيل التوصيات (صفحة خاصة بالمالك على Claude) */
-  if (DK.data && !DK.data.apSentinel && !L.some((a) => /73aNfidr8MdgZoExwmPwzh/.test(a.url || ""))) { L.push({ id: "s" + Date.now().toString(36), name: "Sentinel", url: "https://claude.ai/artifact/73aNfidr8MdgZoExwmPwzh", icon: "icons/apps/sentinel.png" }); DK.data.apSentinel = 1; }
+  /* Sentinel صار تطبيق خاص داخل مراس: نحدّث الرابط القديم (صفحة Claude) للتطبيق */
+  L.forEach((a) => { if (/73aNfidr8MdgZoExwmPwzh/.test(a.url || "")) a.url = "https://3pp3ll.github.io/meras/sentinel/"; });
+  if (DK.data && !DK.data.apSentinel && !L.some((a) => /meras\/sentinel\//.test(a.url || ""))) { L.push({ id: "s" + Date.now().toString(36), name: "Sentinel", url: "https://3pp3ll.github.io/meras/sentinel/", icon: "icons/apps/sentinel.png" }); DK.data.apSentinel = 1; }
   if (DK.data && !DK.data.apNafsak && !L.some((a) => /ma-nafsak/.test(a.url || ""))) { L.push({ id: "a" + Date.now().toString(36) + "n", name: "مع نفسك", url: "https://3pp3ll.github.io/ma-nafsak/" }); DK.data.apNafsak = 1; } };
 /* شعار كل منصة: الشعار اللي رفعته، وإلا نجرب أيقونة المنصة نفسها (icons/icon-192.png وغيرها)، وإذا ما لقينا يبقى الحرف */
 const apBase = (u) => { try { const x = new URL(u); return x.origin + x.pathname.replace(/[^/]*$/, ""); } catch (e) { return ""; } };
@@ -29,7 +31,7 @@ const apBase = (u) => { try { const x = new URL(u); return x.origin + x.pathname
 const AP_LOGOS = { "ad-studio": "icons/apps/mentad.png" };
 const apIcons = (a) => {
   if (a.icon) return [a.icon];
-  if (/claude\.ai\/artifact\/73aNfidr8MdgZoExwmPwzh/.test(a.url || "")) return ["icons/apps/sentinel.png"];
+  if (/meras\/sentinel\/|73aNfidr8MdgZoExwmPwzh/.test(a.url || "")) return ["icons/apps/sentinel.png"];
   const mine = (() => { try { const x = new URL(a.url); return /github\.io$/.test(x.hostname) ? AP_LOGOS[x.pathname.split("/")[1]] : ""; } catch (e) { return ""; } })();
   if (mine) return [mine];
   if (!/^https:\/\//.test(a.url || "")) return [];
