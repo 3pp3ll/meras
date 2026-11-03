@@ -276,7 +276,9 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
   var money = function (x, sign) { var s = Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "$"; return sign ? (x > 0 ? "+" : x < 0 ? "−" : "") + s : (x < 0 ? "−" : "") + s; };
   var pct = function (x) { return x == null ? "—" : Math.round(x * 100) + "%"; };
-  var D = function (s) { return s ? new Date(s.length <= 10 ? s + "T00:00:00" : s) : null; };
+  // أوقات الوكيل بتوقيت UTC: نحولها لتوقيت جهازك. التواريخ بدون وقت تبقى كما هي.
+  var D = function (s) { return s ? new Date(s.length <= 10 ? s + "T00:00:00" : (/[zZ]|[+-]\d\d:?\d\d$/.test(s) ? s : s + "Z")) : null; };
+  var when = function (s) { var d = D(s); return d ? ymd(d) + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") : ""; };
   var ymd = function (d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
   var monthKey = function (d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); };
   var monthName = function (k) { var p = k.split("-"); return MONTHS[+p[1] - 1] + " " + p[0]; };
@@ -320,7 +322,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var DECIDED = { tp1: 1, tp2: 1, stopped: 1, timeout: 1 };
   function decidedAt(s) { return (s.status === "tp1" || s.status === "tp2") ? D(s.tp1_at || s.closed_at) : (s.status === "stopped" || s.status === "timeout") ? D(s.closed_at) : null; }
   function isWin(s) { return s.status === "tp1" || s.status === "tp2" || (s.status === "timeout" && (s.pnl || 0) > 0); }
-  function trialStart() { return DATA && DATA.trial_start ? D(DATA.trial_start.slice(0, 10)) : null; }
+  function trialStart() { return DATA && DATA.trial_start ? D(DATA.trial_start) : null; }
 
   function periodRange(p) {
     p = p || state.period;
@@ -439,7 +441,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       var si = statusInfo(s), pnl = s.status === "cancelled" || s.pnl == null ? '<span class="lv">—</span>' : '<span class="num ' + cls(s.pnl) + '">' + money(s.pnl, true) + "</span>";
       return "<tr><td class=\"lv num\">" + s.id + '</td><td><div class="sym">' + esc(s.symbol) + "<small>" + esc(CAT[s.category] || s.category) + '</small></div></td><td><span class="tag ' + s.strategy + '">' + stratName(s.strategy) + "</span></td>" +
         '<td class="n num">' + s.entry.toFixed(2) + '</td><td class="n num">' + s.tp1.toFixed(2) + '</td><td class="n num">' + (s.strategy === "quick" ? "—" : s.tp2.toFixed(2)) + '</td><td class="n num">' + s.stop.toFixed(2) + "</td>" +
-        '<td><span class="pill ' + si[1] + '">' + si[0] + '</span></td><td class="n">' + pnl + '</td><td class="lv num">' + (s.created_at || "").replace("T", " ").slice(0, 16) + "</td></tr>";
+        '<td><span class="pill ' + si[1] + '">' + si[0] + '</span></td><td class="n">' + pnl + '</td><td class="lv num">' + when(s.created_at) + "</td></tr>";
     }).join("");
   }
   function pageSignals() {
@@ -716,7 +718,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
   }
   function rowsFor(R) {
-    return R.list.map(function (s) { var si = statusInfo(s); return [s.id, s.symbol, stratName(s.strategy), s.entry, s.tp1, s.strategy === "quick" ? "" : s.tp2, s.stop, si[0], s.pnl == null || s.status === "cancelled" ? "" : Math.round(s.pnl * 100) / 100, (s.created_at || "").replace("T", " ")]; });
+    return R.list.map(function (s) { var si = statusInfo(s); return [s.id, s.symbol, stratName(s.strategy), s.entry, s.tp1, s.strategy === "quick" ? "" : s.tp2, s.stop, si[0], s.pnl == null || s.status === "cancelled" ? "" : Math.round(s.pnl * 100) / 100, when(s.created_at)]; });
   }
   var HEAD = ["#", "السهم", "النوع", "الدخول", "الهدف", "الهدف البعيد", "الوقف", "الحالة", "النتيجة $", "التاريخ"];
   function exportReport(fmt, p, btn) {
