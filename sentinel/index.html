@@ -362,7 +362,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var rows = (DATA ? DATA.equity : []).filter(function (e) { return e.strategy === key; });
     var upTo = rows.filter(function (e) { return D(e.day) <= range.to; }), before = rows.filter(function (e) { return D(e.day) < range.from; });
     if (!upTo.length) return null;
-    var end = upTo[upTo.length - 1].equity, start = before.length ? before[before.length - 1].equity : START_EQ;
+    var end = upTo[upTo.length - 1].equity, start = before.length ? before[before.length - 1].equity : startEq();
     return { end: end, change: end - start, day: upTo[upTo.length - 1].day };
   }
   function noData(range) {
@@ -418,7 +418,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var mseg = '<div class="seg" role="group" aria-label="السوق">' + ["us", "sa"].map(function (m) { return '<button type="button" data-market="' + m + '" class="' + (state.market === m ? "on" : "") + '">' + MKT[m] + "</button>"; }).join("") + "</div>";
     var seg = '<div class="seg" role="group" aria-label="نوع الصفقات">' + [["all", "الكل"], ["swing", "متوسطة"], ["quick", "سريعة"]].map(function (x) { return '<button type="button" data-strat="' + x[0] + '" class="' + (state.strat === x[0] ? "on" : "") + '">' + x[1] + "</button>"; }).join("") + "</div>";
     var range = p === "range" ? '<div class="range"><label for="f-from">من</label><input id="f-from" type="date" value="' + esc(state.from) + '"><label for="f-to">إلى</label><input id="f-to" type="date" value="' + esc(state.to) + '"></div>' : "";
-    return '<div class="months">' + chips + '</div><div class="row">' + mseg + seg + range + "</div>";
+    return '<div class="months">' + chips + '</div><div class="row">' + mseg + (SAR() ? "" : seg) + range + "</div>";
   }
 
   function emptyBox(range) {
@@ -429,7 +429,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   function pageOverview() {
     var range = periodRange();
     if (noData(range)) return emptyBox(range);
-    var st = stats(range), accts = ["swing", "quick"].filter(function (c) { return state.strat === "all" || state.strat === c; });
+    var st = stats(range), accts = ["swing", "quick"].filter(function (c) { return (state.strat === "all" || state.strat === c) && (!SAR() || c === "quick"); });
     var acc = accts.map(function (c) {
       var e = equityFor(c, range);
       return '<div class="panel acct"><div><span class="name">حساب ' + stratName(c) + (SAR() ? " · افتراضي" : "") + '</span><small>' + (e ? "رصيد يوم " + '<span class="num">' + e.day + "</span>" : "ما فيه لقطة رصيد في هذي الفترة") + '</small></div><div class="eq"><b class="num">' + (e ? money(e.end) : "—") + '</b>' + (e ? '<span class="num ' + cls(e.change) + '">' + money(e.change, true) + "</span>" : "") + "</div></div>";
@@ -443,6 +443,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       '<div class="accts">' + acc + "</div></section>";
   }
 
+  function startEq() { var m = DATA && DATA.markets && DATA.markets[state.market]; return m ? m.start_equity : SAR() ? 10000 : START_EQ; }
   function tradeSize() { var m = DATA && DATA.markets && DATA.markets[state.market]; return m ? m.trade_size : SAR() ? 5000 : (DATA && DATA.trade_size_usd) || 3000; }
   function signalRows(list) {
     return list.map(function (s) {
@@ -499,7 +500,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var unb64 = function (s) { return decodeURIComponent(escape(atob(String(s).replace(/\s/g, "")))); };
   function ctrlDefaults() {
     var c = (DATA && DATA.control) || {};
-    return { trade_size_usd: c.trade_size_usd || 3000, sa: { trade_size: (c.sa || {}).trade_size || 5000 },
+    return { trade_size_usd: c.trade_size_usd || 3000, sa: Object.assign({ trade_size: 1000, tp_pct: 5, stop_pct: 2.5, max_use_pct: 60 }, c.sa || {}),
       swing: Object.assign({ tp1_pct: 10, tp2_pct: 20, max_loss_pct: 5 }, c.swing || {}),
       quick: { tp_pct: (c.quick || {}).tp_pct || 3, stop_pct: (c.quick || {}).stop_pct || 2 },
       links: Object.assign({ channel: "", bot: "https://t.me/Matrix4H_ProBot" }, c.links || {}),
@@ -548,9 +549,11 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var c = CTRL.data, q = c.quick, s = c.swing, ed = CTRL.edit;
     var warn = CTRL.err === "403" || CTRL.err === "404" ? '<div class="panel" style="border-color:var(--loss)"><p class="note"><b>الرمز يقرأ بس.</b> عشان تحفظ من هنا، عدّل رمز sentinel-app في GitHub وخل <b>Contents</b> على <b>Read and write</b>.</p></div>' : "";
     var trade = '<form class="panel stack" id="ctl-trade" novalidate><h2>الصفقات</h2><p class="note">تتطبق على التوصيات الجديدة من التشغيلة الجاية. الصفقات المفتوحة تكمل بأرقامها.</p>' +
-      '<div class="fgrid">' + numField("c-size", "حجم الصفقة · الأمريكي $", c.trade_size_usd, 100, 100, 50000) + numField("c-sa", "حجم الصفقة · السعودي ريال", (c.sa || {}).trade_size || 5000, 500, 500, 200000) + "</div>" +
+      '<div class="fgrid">' + numField("c-size", "حجم الصفقة $", c.trade_size_usd, 100, 100, 50000) + "</div>" +
       '<h3>المتوسطة</h3><div class="fgrid">' + numField("c-s1", "الهدف الأول %", s.tp1_pct, 0.5, 1, 50) + numField("c-s2", "الهدف البعيد % (اختياري)", s.tp2_pct, 0.5, 2, 100) + numField("c-sl", "أقصى وقف %", s.max_loss_pct, 0.5, 0.5, 15) + "</div>" +
       '<h3>السريعة</h3><div class="fgrid">' + numField("c-q1", "الهدف %", q.tp_pct, 0.5, 0.5, 10) + numField("c-ql", "أقصى وقف %", q.stop_pct, 0.1, 0.3, 5) + '<div class="field"><label>المدة</label><input value="5 أيام تداول" disabled></div></div>' +
+      '<h3>🇸🇦 السوق السعودي · صفقات سريعة</h3><p class="note">حساب افتراضي <span class="num">10,000</span> ريال. الهدف ما يتعدى <span class="num">8%</span> لأن حد التذبذب اليومي <span class="num">10%</span>.</p><div class="fgrid">' +
+      numField("c-sa", "حجم الصفقة ريال", c.sa.trade_size, 100, 100, 200000) + numField("c-sa-tp", "الهدف %", c.sa.tp_pct, 0.5, 1, 8) + numField("c-sa-sl", "أقصى وقف %", c.sa.stop_pct, 0.5, 0.5, 5) + numField("c-sa-use", "أقصى استخدام من الحساب %", c.sa.max_use_pct, 5, 10, 100) + "</div>" +
       '<div class="row" style="justify-content:flex-start"><button class="btn" type="submit"' + (CTRL.saving ? " disabled" : "") + ">" + (CTRL.saving ? "جارٍ الحفظ…" : "احفظ") + '</button><span class="note">النشر للقنوات: <b>مقفل</b> طول شهر التجربة · التنفيذ: <b>الحساب التجريبي</b></span></div></form>';
     var link = function (key, label, ph) {
       var v = (c.links || {})[key] || "";
@@ -662,7 +665,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       var n = function (x) { return +val(x); };
       if (!(n("c-s1") < n("c-s2"))) { toast("الهدف الأول لازم يكون أقل من البعيد"); return; }
       CTRL.data.trade_size_usd = n("c-size");
-      CTRL.data.sa = { trade_size: n("c-sa") };
+      CTRL.data.sa = { trade_size: n("c-sa"), tp_pct: n("c-sa-tp"), stop_pct: n("c-sa-sl"), max_use_pct: n("c-sa-use") };
       CTRL.data.swing = { tp1_pct: n("c-s1"), tp2_pct: n("c-s2"), max_loss_pct: n("c-sl") };
       CTRL.data.quick = { tp_pct: n("c-q1"), stop_pct: n("c-ql") };
       saveControl("trade settings"); return;
