@@ -137,7 +137,7 @@ th { font-size: 12px; font-weight: 500; color: var(--muted); text-align: start; 
 td { padding: 11px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
 tr:last-child td { border-bottom: 0; }
 td.n, th.n { text-align: end; }
-.sym { font: 600 15px var(--f-num); } .sym small { display: block; font: 400 12px var(--f-body); color: var(--muted); }
+.sym { font: 600 15px var(--f-num); } .sym.ar { font: 700 15px var(--f-body); } .sym small { display: block; font: 400 12px var(--f-body); color: var(--muted); }
 .lv { color: var(--muted); font-size: 12px; }
 .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; }
 .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
@@ -265,7 +265,8 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var HOSTED = !window.claude && /^https?:$/.test(location.protocol) && !/[?&]demo\b/.test(location.search);
   var START_EQ = 100000, TARGET = 0.8;
   var MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-  var CAT = { ai: "الذكاء الاصطناعي", leaders: "القيادية", gold: "الذهب" };
+  var CAT = { ai: "الذكاء الاصطناعي", leaders: "القيادية", gold: "الذهب", sa_leaders: "القيادية السعودية", sa_tech: "التقنية السعودية" };
+  var MKT = { us: "🇺🇸 الأمريكي", sa: "🇸🇦 السعودي" };
   var PAGES = ["overview", "signals", "archive", "reports", "control", "settings"];
   var TITLES = { overview: "الأداء", signals: "سجل التوصيات", archive: "الأرشيف الشهري", reports: "التقارير والتصدير", control: "لوحة التحكم", settings: "الإعدادات" };
   var $ = function (id) { return document.getElementById(id); };
@@ -275,7 +276,10 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
-  var money = function (x, sign) { var s = Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "$"; return sign ? (x > 0 ? "+" : x < 0 ? "−" : "") + s : (x < 0 ? "−" : "") + s; };
+  var SAR = function () { return state && state.market === "sa"; };
+  var CUR = function () { return SAR() ? " SAR" : "$"; };
+  var CURW = function () { return SAR() ? "ريال" : "$"; };
+  var money = function (x, sign) { var s = Math.abs(x).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + CUR(); return sign ? (x > 0 ? "+" : x < 0 ? "−" : "") + s : (x < 0 ? "−" : "") + s; };
   var pct = function (x) { return x == null ? "—" : Math.round(x * 100) + "%"; };
   // أوقات الوكيل بتوقيت UTC: نحولها لتوقيت جهازك. التواريخ بدون وقت تبقى كما هي.
   var D = function (s) { return s ? new Date(s.length <= 10 ? s + "T00:00:00" : (/[zZ]|[+-]\d\d:?\d\d$/.test(s) ? s : s + "Z")) : null; };
@@ -285,7 +289,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var monthName = function (k) { var p = k.split("-"); return MONTHS[+p[1] - 1] + " " + p[0]; };
 
   var DATA = null, DEMO = false, FETCHED = null, ERR = null;
-  var state = { period: "month:" + monthKey(new Date()), from: "", to: "", strat: "all" };
+  var state = { period: "month:" + monthKey(new Date()), from: "", to: "", strat: "all", market: "us" };
   try { Object.assign(state, JSON.parse(store.get("sentinel.view") || "{}")); } catch (e) {}
   if (/^month:/.test(state.period) && state.period !== "month:" + monthKey(new Date()) && !store.get("sentinel.pinned")) state.period = "month:" + monthKey(new Date());
   var saveView = function () { store.set("sentinel.view", JSON.stringify(state)); };
@@ -339,7 +343,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   }
   function filtered(range, strat) {
     strat = strat || state.strat;
-    return (DATA ? DATA.signals : []).filter(function (s) { return strat === "all" || s.strategy === strat; });
+    return (DATA ? DATA.signals : []).filter(function (s) { return (s.market || "us") === state.market && (strat === "all" || s.strategy === strat); });
   }
   function stats(range, strat) {
     var all = filtered(range, strat), within = function (d) { return d && d >= range.from && d <= range.to; };
@@ -354,7 +358,8 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       avgWin: wins.length ? sum(wins) / wins.length : null, avgLoss: losses.length ? sum(losses) / losses.length : null, curve: curve };
   }
   function equityFor(code, range) {
-    var rows = (DATA ? DATA.equity : []).filter(function (e) { return e.strategy === code; });
+    var key = SAR() ? "sa-" + code : code;
+    var rows = (DATA ? DATA.equity : []).filter(function (e) { return e.strategy === key; });
     var upTo = rows.filter(function (e) { return D(e.day) <= range.to; }), before = rows.filter(function (e) { return D(e.day) < range.from; });
     if (!upTo.length) return null;
     var end = upTo[upTo.length - 1].equity, start = before.length ? before[before.length - 1].equity : START_EQ;
@@ -398,7 +403,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var sx = (right - pad) / Math.max(pts.length - 1, 1), sy = (h - 2 * pad) / (hi - lo);
     var xy = pts.map(function (v, i) { return [pad + i * sx, h - pad - (v - lo) * sy]; });
     var line = xy.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "), zy = h - pad - (0 - lo) * sy;
-    var g = ""; for (var v = lo; v <= hi + 1e-9; v += step) { var y = h - pad - (v - lo) * sy; g += '<line x1="' + pad + '" x2="' + right + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '"/><text x="' + (right + 8) + '" y="' + (y + 4).toFixed(1) + '" direction="ltr">' + (v ? (v > 0 ? "+" : "−") + Math.abs(v).toLocaleString("en-US") + "$" : "0") + "</text>"; }
+    var g = ""; for (var v = lo; v <= hi + 1e-9; v += step) { var y = h - pad - (v - lo) * sy; g += '<line x1="' + pad + '" x2="' + right + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '"/><text x="' + (right + 8) + '" y="' + (y + 4).toFixed(1) + '" direction="ltr">' + (v ? (v > 0 ? "+" : "−") + Math.abs(v).toLocaleString("en-US") + (SAR() ? "" : "$") : "0") + "</text>"; }
     var last = xy[xy.length - 1];
     return '<svg class="curve" viewBox="0 0 ' + w + " " + h + '" role="img" aria-label="الربح التراكمي"><g class="g">' + g + '</g><line class="zero-l" x1="' + pad + '" x2="' + right + '" y1="' + zy.toFixed(1) + '" y2="' + zy.toFixed(1) + '"/>' +
       '<polygon class="area" points="' + xy[0][0].toFixed(1) + "," + zy.toFixed(1) + " " + line + " " + last[0].toFixed(1) + "," + zy.toFixed(1) + '"/><polyline class="ln" points="' + line + '"/><circle class="dot" cx="' + last[0].toFixed(1) + '" cy="' + last[1].toFixed(1) + '" r="5"/></svg>';
@@ -410,9 +415,10 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var mk = monthKeys(), p = state.period;
     var chips = mk.map(function (k) { return '<button type="button" data-period="month:' + k + '" class="' + (p === "month:" + k ? "on" : "") + '">' + (k === monthKey(new Date()) ? "هذا الشهر · " : "") + monthName(k) + "</button>"; }).join("") +
       '<button type="button" data-period="all" class="' + (p === "all" ? "on" : "") + '">كل الفترة</button><button type="button" data-period="range" class="' + (p === "range" ? "on" : "") + '">فترة محددة</button>';
+    var mseg = '<div class="seg" role="group" aria-label="السوق">' + ["us", "sa"].map(function (m) { return '<button type="button" data-market="' + m + '" class="' + (state.market === m ? "on" : "") + '">' + MKT[m] + "</button>"; }).join("") + "</div>";
     var seg = '<div class="seg" role="group" aria-label="نوع الصفقات">' + [["all", "الكل"], ["swing", "متوسطة"], ["quick", "سريعة"]].map(function (x) { return '<button type="button" data-strat="' + x[0] + '" class="' + (state.strat === x[0] ? "on" : "") + '">' + x[1] + "</button>"; }).join("") + "</div>";
     var range = p === "range" ? '<div class="range"><label for="f-from">من</label><input id="f-from" type="date" value="' + esc(state.from) + '"><label for="f-to">إلى</label><input id="f-to" type="date" value="' + esc(state.to) + '"></div>' : "";
-    return '<div class="months">' + chips + '</div><div class="row">' + seg + range + "</div>";
+    return '<div class="months">' + chips + '</div><div class="row">' + mseg + seg + range + "</div>";
   }
 
   function emptyBox(range) {
@@ -426,21 +432,22 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var st = stats(range), accts = ["swing", "quick"].filter(function (c) { return state.strat === "all" || state.strat === c; });
     var acc = accts.map(function (c) {
       var e = equityFor(c, range);
-      return '<div class="panel acct"><div><span class="name">حساب ' + stratName(c) + '</span><small>' + (e ? "رصيد يوم " + '<span class="num">' + e.day + "</span>" : "ما فيه لقطة رصيد في هذي الفترة") + '</small></div><div class="eq"><b class="num">' + (e ? money(e.end) : "—") + '</b>' + (e ? '<span class="num ' + cls(e.change) + '">' + money(e.change, true) + "</span>" : "") + "</div></div>";
+      return '<div class="panel acct"><div><span class="name">حساب ' + stratName(c) + (SAR() ? " · افتراضي" : "") + '</span><small>' + (e ? "رصيد يوم " + '<span class="num">' + e.day + "</span>" : "ما فيه لقطة رصيد في هذي الفترة") + '</small></div><div class="eq"><b class="num">' + (e ? money(e.end) : "—") + '</b>' + (e ? '<span class="num ' + cls(e.change) + '">' + money(e.change, true) + "</span>" : "") + "</div></div>";
     }).join("");
     return '<section><div class="grid2"><div class="panel gauge-panel"><div class="lv">نسبة النجاح · من <span class="num">' + st.decided.length + "</span> صفقة محسومة</div>" + gauge(st.rate) +
       '<span class="verdict ' + (st.rate != null && st.rate >= TARGET ? "ok" : "") + '">' + (st.rate == null ? "ما فيه صفقات محسومة للحين" : st.rate >= TARGET ? "فوق الهدف" : "تحت الهدف حالياً") + "</span>" +
       '<div class="wl"><div><b>' + st.wins + "</b>ناجحة</div><div><b>" + st.losses + "</b>خاسرة</div><div><b>" + st.open + "</b>مفتوحة</div></div></div>" +
       '<div class="panel"><div class="kpis"><div class="kpi"><div class="k">صافي النتيجة</div><div class="v num ' + cls(st.net) + '">' + money(st.net, true) + '</div></div><div class="kpi"><div class="k">توصيات الفترة</div><div class="v num">' + st.issued.length + '</div></div><div class="kpi"><div class="k">متوسط الربح</div><div class="v num pos">' + (st.avgWin == null ? "—" : money(st.avgWin, true)) + '</div></div><div class="kpi"><div class="k">متوسط الخسارة</div><div class="v num neg">' + (st.avgLoss == null ? "—" : money(st.avgLoss, true)) + "</div></div></div>" +
       (st.curve.length ? curveSvg(st.curve) : '<div class="empty" style="border:0;padding:30px 0"><b>المنحنى يبدأ مع أول صفقة محسومة</b>الصفقات المفتوحة ما تنحسب لين توصل هدف أو وقف.</div>') +
-      '<div class="caption">الربح التراكمي بالدولار بترتيب وقت حسم كل صفقة، على صفقة <span class="num">' + money(DATA.trade_size_usd || 3000) + "</span> لكل توصية.</div></div></div>" +
+      '<div class="caption">الربح التراكمي ' + (SAR() ? "بالريال" : "بالدولار") + ' بترتيب وقت حسم كل صفقة، على صفقة <span class="num">' + money(tradeSize()) + "</span> لكل توصية.</div></div></div>" +
       '<div class="accts">' + acc + "</div></section>";
   }
 
+  function tradeSize() { var m = DATA && DATA.markets && DATA.markets[state.market]; return m ? m.trade_size : SAR() ? 5000 : (DATA && DATA.trade_size_usd) || 3000; }
   function signalRows(list) {
     return list.map(function (s) {
       var si = statusInfo(s), pnl = s.status === "cancelled" || s.pnl == null ? '<span class="lv">—</span>' : '<span class="num ' + cls(s.pnl) + '">' + money(s.pnl, true) + "</span>";
-      return "<tr><td class=\"lv num\">" + s.id + '</td><td><div class="sym">' + esc(s.symbol) + "<small>" + esc(CAT[s.category] || s.category) + '</small></div></td><td><span class="tag ' + s.strategy + '">' + stratName(s.strategy) + "</span></td>" +
+      return "<tr><td class=\"lv num\">" + s.id + '</td><td><div class="sym' + (s.name ? " ar" : "") + '">' + esc(s.name || s.symbol) + "<small>" + (s.name ? '<span class="num">' + esc(s.symbol) + "</span> · " : "") + esc(CAT[s.category] || s.category) + '</small></div></td><td><span class="tag ' + s.strategy + '">' + stratName(s.strategy) + "</span></td>" +
         '<td class="n num">' + s.entry.toFixed(2) + '</td><td class="n num">' + s.tp1.toFixed(2) + '</td><td class="n num">' + (s.strategy === "quick" ? "—" : s.tp2.toFixed(2)) + '</td><td class="n num">' + s.stop.toFixed(2) + "</td>" +
         '<td><span class="pill ' + si[1] + '">' + si[0] + "</span>" + (s.entered_at ? '<small class="when">دخل ' + when(s.entered_at) + "</small>" : "") + (s.closed_at && s.status !== "open" ? '<small class="when">انقفلت ' + when(s.closed_at) + "</small>" : "") + '</td><td class="n">' + pnl + '</td><td class="lv num">' + when(s.created_at) + "</td></tr>";
     }).join("");
@@ -492,7 +499,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var unb64 = function (s) { return decodeURIComponent(escape(atob(String(s).replace(/\s/g, "")))); };
   function ctrlDefaults() {
     var c = (DATA && DATA.control) || {};
-    return { trade_size_usd: c.trade_size_usd || 3000,
+    return { trade_size_usd: c.trade_size_usd || 3000, sa: { trade_size: (c.sa || {}).trade_size || 5000 },
       swing: Object.assign({ tp1_pct: 10, tp2_pct: 20, max_loss_pct: 5 }, c.swing || {}),
       quick: { tp_pct: (c.quick || {}).tp_pct || 3, stop_pct: (c.quick || {}).stop_pct || 2 },
       links: Object.assign({ channel: "", bot: "https://t.me/Matrix4H_ProBot" }, c.links || {}),
@@ -541,7 +548,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var c = CTRL.data, q = c.quick, s = c.swing, ed = CTRL.edit;
     var warn = CTRL.err === "403" || CTRL.err === "404" ? '<div class="panel" style="border-color:var(--loss)"><p class="note"><b>الرمز يقرأ بس.</b> عشان تحفظ من هنا، عدّل رمز sentinel-app في GitHub وخل <b>Contents</b> على <b>Read and write</b>.</p></div>' : "";
     var trade = '<form class="panel stack" id="ctl-trade" novalidate><h2>الصفقات</h2><p class="note">تتطبق على التوصيات الجديدة من التشغيلة الجاية. الصفقات المفتوحة تكمل بأرقامها.</p>' +
-      '<div class="fgrid">' + numField("c-size", "حجم الصفقة $", c.trade_size_usd, 100, 100, 50000) + "</div>" +
+      '<div class="fgrid">' + numField("c-size", "حجم الصفقة · الأمريكي $", c.trade_size_usd, 100, 100, 50000) + numField("c-sa", "حجم الصفقة · السعودي ريال", (c.sa || {}).trade_size || 5000, 500, 500, 200000) + "</div>" +
       '<h3>المتوسطة</h3><div class="fgrid">' + numField("c-s1", "الهدف الأول %", s.tp1_pct, 0.5, 1, 50) + numField("c-s2", "الهدف البعيد % (اختياري)", s.tp2_pct, 0.5, 2, 100) + numField("c-sl", "أقصى وقف %", s.max_loss_pct, 0.5, 0.5, 15) + "</div>" +
       '<h3>السريعة</h3><div class="fgrid">' + numField("c-q1", "الهدف %", q.tp_pct, 0.5, 0.5, 10) + numField("c-ql", "أقصى وقف %", q.stop_pct, 0.1, 0.3, 5) + '<div class="field"><label>المدة</label><input value="5 أيام تداول" disabled></div></div>' +
       '<div class="row" style="justify-content:flex-start"><button class="btn" type="submit"' + (CTRL.saving ? " disabled" : "") + ">" + (CTRL.saving ? "جارٍ الحفظ…" : "احفظ") + '</button><span class="note">النشر للقنوات: <b>مقفل</b> طول شهر التجربة · التنفيذ: <b>الحساب التجريبي</b></span></div></form>';
@@ -580,7 +587,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     document.querySelectorAll("#nav a").forEach(function (a) { a.classList.toggle("on", a.getAttribute("href") === "#" + current); });
     $("page-title").textContent = TITLES[current]; $("top-title").textContent = TITLES[current];
     var range = periodRange();
-    $("eyebrow").textContent = current === "settings" || current === "archive" || current === "control" ? "Sentinel" : range.label + (state.strat === "all" ? "" : " · " + stratName(state.strat));
+    $("eyebrow").textContent = current === "settings" || current === "archive" || current === "control" ? "Sentinel" : range.label + " · " + MKT[state.market].slice(MKT[state.market].indexOf(" ") + 1) + (state.strat === "all" ? "" : " · " + stratName(state.strat));
     $("page-desc").textContent = { overview: "نسبة النجاح والنتيجة تتحدث مع كل صفقة توصل هدف أو وقف.", signals: "كل توصية طلعت في الفترة ونتيجتها.", archive: "كل شهر بعداده، والسابق محفوظ.", reports: "صدّر أداء أي فترة كملف.", control: "حجم الصفقة والأهداف والروابط والمشتركين.", settings: "الربط والتثبيت." }[current];
     $("demo-chip").hidden = !DEMO;
     $("filters").innerHTML = filtersHtml(current);
@@ -621,10 +628,11 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   }, { passive: true });
 
   document.addEventListener("click", function (e) {
-    var el = e.target.closest("[data-period],[data-strat],[data-open],[data-export],[data-act]");
+    var el = e.target.closest("[data-period],[data-strat],[data-market],[data-open],[data-export],[data-act]");
     if (!el) return;
     if (el.dataset.period) { state.period = el.dataset.period; if (state.period !== "month:" + monthKey(new Date())) store.set("sentinel.pinned", "1"); else store.del("sentinel.pinned"); saveView(); render(); return; }
     if (el.dataset.strat) { state.strat = el.dataset.strat; saveView(); render(); return; }
+    if (el.dataset.market) { state.market = el.dataset.market; saveView(); render(); return; }
     if (el.dataset.open) { state.period = el.dataset.open; saveView(); location.hash = "overview"; render(); return; }
     if (el.dataset.export) { exportReport(el.dataset.export, el.dataset.p, el); return; }
     var a = el.dataset.act;
@@ -654,6 +662,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       var n = function (x) { return +val(x); };
       if (!(n("c-s1") < n("c-s2"))) { toast("الهدف الأول لازم يكون أقل من البعيد"); return; }
       CTRL.data.trade_size_usd = n("c-size");
+      CTRL.data.sa = { trade_size: n("c-sa") };
       CTRL.data.swing = { tp1_pct: n("c-s1"), tp2_pct: n("c-s2"), max_loss_pct: n("c-sl") };
       CTRL.data.quick = { tp_pct: n("c-q1"), stop_pct: n("c-ql") };
       saveControl("trade settings"); return;
@@ -709,9 +718,9 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       return { code: c, name: c === "all" ? "الإجمالي" : "حساب " + stratName(c), st: st, eq: e };
     });
     var list = filtered(range, strat).filter(function (s) { var d = D(s.created_at); return d >= range.from && d <= range.to; });
-    return { range: range, strat: strat, groups: groups, list: list, title: "تقرير أداء Sentinel · " + range.label + (strat === "all" ? "" : " · " + stratName(strat)),
-      file: "Sentinel-" + (range.key === "all" ? "all" : range.key === "range" ? ymd(range.from) + "_" + ymd(range.to) : range.key) + (strat === "all" ? "" : "-" + strat),
-      note: "نتائج حساب تجريبي (أموال وهمية) بأسعار السوق الحقيقية. للاطلاع فقط، وليست توصية أو استشارة مالية." };
+    return { range: range, strat: strat, groups: groups, list: list, title: "تقرير أداء Sentinel · " + (SAR() ? "السوق السعودي · " : "") + range.label + (strat === "all" ? "" : " · " + stratName(strat)),
+      file: "Sentinel-" + (range.key === "all" ? "all" : range.key === "range" ? ymd(range.from) + "_" + ymd(range.to) : range.key) + (SAR() ? "-SA" : "") + (strat === "all" ? "" : "-" + strat),
+      note: (SAR() ? "نتائج حساب افتراضي بالريال" : "نتائج حساب تجريبي (أموال وهمية)") + " بأسعار السوق الحقيقية. للاطلاع فقط، وليست توصية أو استشارة مالية." };
   }
   function save(blob, name) {
     var url = URL.createObjectURL(blob), a = document.createElement("a");
@@ -719,9 +728,9 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
   }
   function rowsFor(R) {
-    return R.list.map(function (s) { var si = statusInfo(s); return [s.id, s.symbol, stratName(s.strategy), s.entry, s.tp1, s.strategy === "quick" ? "" : s.tp2, s.stop, si[0], s.pnl == null || s.status === "cancelled" ? "" : Math.round(s.pnl * 100) / 100, when(s.created_at)]; });
+    return R.list.map(function (s) { var si = statusInfo(s); return [s.id, s.name ? s.symbol + " " + s.name : s.symbol, stratName(s.strategy), s.entry, s.tp1, s.strategy === "quick" ? "" : s.tp2, s.stop, si[0], s.pnl == null || s.status === "cancelled" ? "" : Math.round(s.pnl * 100) / 100, when(s.created_at)]; });
   }
-  var HEAD = ["#", "السهم", "النوع", "الدخول", "الهدف", "الهدف البعيد", "الوقف", "الحالة", "النتيجة $", "التاريخ"];
+  var HEAD = ["#", "السهم", "النوع", "الدخول", "الهدف", "الهدف البعيد", "الوقف", "الحالة", "النتيجة", "التاريخ"];
   function exportReport(fmt, p, btn) {
     var R = report(p);
     if (noData(R.range)) { toast("لا يوجد بيانات لهذي الفترة"); return; }
@@ -733,7 +742,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     if (fmt === "pdf") Promise.all([lib("jspdf"), lib("h2c")]).then(function () { return exportPdf(R); }).then(done).catch(fail);
   }
   function summaryAoa(R) {
-    var out = [["", "توصيات", "محسومة", "ناجحة", "خاسرة", "نسبة النجاح", "صافي النتيجة $", "رصيد الحساب $", "تغير الرصيد $"]];
+    var out = [["", "توصيات", "محسومة", "ناجحة", "خاسرة", "نسبة النجاح", "صافي النتيجة " + CURW(), "رصيد الحساب " + CURW(), "تغير الرصيد " + CURW()]];
     R.groups.forEach(function (g) { out.push([g.name, g.st.issued.length, g.st.decided.length, g.st.wins, g.st.losses, g.st.rate == null ? "" : Math.round(g.st.rate * 100) + "%", Math.round(g.st.net * 100) / 100, g.eq ? g.eq.end : "", g.eq ? Math.round(g.eq.change * 100) / 100 : ""]); });
     return out;
   }
@@ -743,8 +752,8 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     s1["!cols"] = [{ wch: 18 }, { wch: 9 }, { wch: 9 }, { wch: 9 }, { wch: 9 }, { wch: 12 }, { wch: 14 }, { wch: 15 }, { wch: 14 }];
     var s2 = X.utils.aoa_to_sheet([HEAD].concat(rowsFor(R)));
     s2["!cols"] = [{ wch: 5 }, { wch: 8 }, { wch: 9 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 20 }, { wch: 11 }, { wch: 17 }];
-    var eq = (DATA.equity || []).filter(function (e) { var d = D(e.day); return d >= R.range.from && d <= R.range.to && (R.strat === "all" || e.strategy === R.strat); }).map(function (e) { return [e.day, stratName(e.strategy), e.equity]; });
-    var s3 = X.utils.aoa_to_sheet([["اليوم", "الحساب", "الرصيد $"]].concat(eq));
+    var eq = (DATA.equity || []).filter(function (e) { var d = D(e.day); return d >= R.range.from && d <= R.range.to && /^sa-/.test(e.strategy) === SAR() && (R.strat === "all" || e.strategy.replace(/^sa-/, "") === R.strat); }).map(function (e) { return [e.day, stratName(e.strategy.replace(/^sa-/, "")), e.equity]; });
+    var s3 = X.utils.aoa_to_sheet([["اليوم", "الحساب", "الرصيد " + CURW()]].concat(eq));
     X.utils.book_append_sheet(wb, s1, "الملخص"); X.utils.book_append_sheet(wb, s2, "التوصيات"); X.utils.book_append_sheet(wb, s3, "الرصيد اليومي");
     wb.Workbook = { Views: [{ RTL: true }] };
     var out = X.write(wb, { bookType: "xlsx", type: "array" });
