@@ -288,7 +288,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var monthKey = function (d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); };
   var monthName = function (k) { var p = k.split("-"); return MONTHS[+p[1] - 1] + " " + p[0]; };
 
-  var DATA = null, DEMO = false, FETCHED = null, ERR = null;
+  var DATA = null, DEMO = false, FETCHED = null, ERR = null, ERR_DETAIL = "";
   var state = { period: "month:" + monthKey(new Date()), from: "", to: "", strat: "all", market: "us" };
   try { Object.assign(state, JSON.parse(store.get("sentinel.view") || "{}")); } catch (e) {}
   if (/^month:/.test(state.period) && state.period !== "month:" + monthKey(new Date()) && !store.get("sentinel.pinned")) state.period = "month:" + monthKey(new Date());
@@ -319,7 +319,10 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       if (force) toast("تم تحديث البيانات");
       render();
     }).catch(function (e) {
-      ERR = e && e.code === 401 ? "401" : e && e.code === 404 ? "404" : "net"; render();
+      ERR = e && e.code === 401 ? "401" : e && e.code === 404 ? "404" : "net";
+      ERR_DETAIL = e && e.code ? "رمز الخطأ " + e.code : (e && e.message) || "";
+      if (!force && !load.retried) { load.retried = true; setTimeout(function () { load(true); }, 4000); }
+      render();
     });
   }
 
@@ -483,7 +486,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   }
   function pageSettings() {
     var tk = token();
-    var status = DEMO ? "عرض تجريبي (ما يقرأ بياناتك)" : ERR === "token" ? "محتاج رمز وصول" : ERR === "401" ? "الرمز غير صحيح أو منتهي" : ERR === "404" ? "الرمز ما له صلاحية على sentinel-signals" : ERR === "net" ? "تعذر الاتصال بـ GitHub" : DATA ? "مربوط ويقرأ بياناتك" : "جارٍ التحميل";
+    var status = DEMO ? "عرض تجريبي (ما يقرأ بياناتك)" : ERR === "token" ? "محتاج رمز وصول" : ERR === "401" ? "الرمز غير صحيح أو منتهي" : ERR === "404" ? "الرمز ما له صلاحية على sentinel-signals" : ERR === "net" ? "تعذر الاتصال بـ GitHub" + (ERR_DETAIL ? " (" + ERR_DETAIL + ")" : "") : DATA ? "مربوط ويقرأ بياناتك" : "جارٍ التحميل";
     return '<section class="stack"><div class="panel stack"><h2>الربط بالبيانات</h2><p class="note">الحالة: <b>' + status + "</b>" + (tk ? " · الرمز: " + (tk.src === "meras" ? "رمز مراس على هذا الجهاز" : "رمز خاص بـ Sentinel") : "") + "</p>" +
       (FETCHED ? '<p class="note">آخر تحديث للبيانات: <span class="num">' + ymd(FETCHED) + " " + FETCHED.toTimeString().slice(0, 5) + '</span>' + (DATA && DATA.generated_at ? " · آخر تشغيل للوكيل: <span class=\"num\">" + DATA.generated_at.replace("T", " ") + " UTC</span>" : "") + "</p>" : "") +
       '<form id="tk-form" class="stack" novalidate><div class="field"><label for="tk">رمز الوصول (اختياري إذا رمز مراس فيه صلاحية)</label><input id="tk" class="ltr" type="password" autocomplete="off" placeholder="github_pat_…"></div><div class="exports"><button class="btn" type="submit">احفظ وحدّث</button>' + (store.get("sentinel.token") ? '<button class="btn ghost" type="button" data-act="forget">احذف الرمز</button>' : "") + "</div></form>" +
@@ -608,7 +611,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       var day = Math.min(30, Math.floor((new Date() - ts) / 864e5) + 1);
       $("trial-box").innerHTML = '<div class="k">شهر التجربة الخاص</div><div class="v">اليوم <span class="num">' + day + '</span> من <span class="num">30</span></div><div class="bar"><i style="width:' + Math.round(day / 30 * 100) + '%"></i></div>';
     }
-    $("fresh").innerHTML = '<span class="dot ' + (ERR ? "off" : "") + '"></span>' + (DEMO ? "عرض تجريبي" : ERR ? "غير متصل · آخر نسخة محفوظة" : FETCHED ? "محدّث " + FETCHED.toTimeString().slice(0, 5) : "جارٍ التحميل");
+    $("fresh").innerHTML = '<span class="dot ' + (ERR ? "off" : "") + '"></span>' + (DEMO ? "عرض تجريبي" : ERR ? "غير متصل · آخر نسخة محفوظة" + (ERR_DETAIL ? " · " + ERR_DETAIL : "") : FETCHED ? "محدّث " + FETCHED.toTimeString().slice(0, 5) : "جارٍ التحميل");
   }
 
   var rail = $("rail"), shade = $("shade"), menuBtn = $("menu-btn");
