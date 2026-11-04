@@ -348,6 +348,12 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     strat = strat || state.strat;
     return (DATA ? DATA.signals : []).filter(function (s) { return (s.market || "us") === state.market && (strat === "all" || s.strategy === strat); });
   }
+  /* رسوم التنفيذ التقديرية: دراية 2.25$ لكل أمر (شراء وبيع = 4.50$)، والوسيط السعودي تقريباً 0.15% لكل جهة */
+  var FEES = { us_per_order: 2.25, sa_pct: 0.15 };
+  function feeOf(s) {
+    if (!s.entered) return 0;
+    return (s.market || "us") === "sa" ? 2 * (s.size || 0) * FEES.sa_pct / 100 : 2 * FEES.us_per_order;
+  }
   function stats(range, strat) {
     var all = filtered(range, strat), within = function (d) { return d && d >= range.from && d <= range.to; };
     var issued = all.filter(function (s) { return within(D(s.created_at)); });
@@ -358,6 +364,8 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var curve = decided.slice().sort(function (a, b) { return decidedAt(a) - decidedAt(b); }).reduce(function (acc, s) { acc.push((acc.length ? acc[acc.length - 1] : 0) + (s.pnl || 0)); return acc; }, []);
     return { issued: issued, decided: decided, wins: wins.length, losses: losses.length, open: open.length,
       rate: decided.length ? wins.length / decided.length : null, net: sum(decided),
+      fees: decided.reduce(function (t, s) { return t + feeOf(s); }, 0),
+      netAfter: sum(decided) - decided.reduce(function (t, s) { return t + feeOf(s); }, 0),
       avgWin: wins.length ? sum(wins) / wins.length : null, avgLoss: losses.length ? sum(losses) / losses.length : null, curve: curve };
   }
   function equityFor(code, range) {
@@ -480,7 +488,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     var range = periodRange();
     var st = noData(range) ? null : stats(range);
     return '<section class="stack"><div class="panel stack"><h2>تقرير ' + esc(range.label) + (state.strat === "all" ? "" : " · " + stratName(state.strat)) + '</h2>' +
-      (st ? '<p class="note">يشمل: <b>' + st.issued.length + "</b> توصية، و<b>" + st.decided.length + "</b> صفقة محسومة، ونسبة نجاح <b>" + pct(st.rate) + "</b>، وصافي <b class=\"num\">" + money(st.net, true) + "</b>. اختار الفترة والنوع من فوق.</p>" + exportBtns(state.period, false) : emptyBox(range)) +
+      (st ? '<p class="note">يشمل: <b>' + st.issued.length + "</b> توصية، و<b>" + st.decided.length + "</b> صفقة محسومة، ونسبة نجاح <b>" + pct(st.rate) + "</b>، وصافي <b class=\"num\">" + money(st.net, true) + "</b>، وبعد الرسوم التقديرية <b class=\"num\">" + money(st.netAfter, true) + "</b> (" + (SAR() ? "عمولة الوسيط تقريباً " + FEES.sa_pct + "% للشراء ومثلها للبيع" : "دراية " + FEES.us_per_order + "$ للشراء ومثلها للبيع") + "). اختار الفترة والنوع من فوق.</p>" + exportBtns(state.period, false) : emptyBox(range)) +
       '<p class="note">التقرير فيه ملخص الفترة لكل حساب، وجدول التوصيات بنتائجها. PDF للمشاركة والسوشال ميديا، وExcel للتحليل، وWord للتعديل.</p></div>' +
       '<div class="panel"><p class="note">كل التقارير مكتوب عليها إنها <b>نتائج حساب تجريبي</b> و<b>ليست توصية أو استشارة مالية</b>، عشان تنشرها وأنت مرتاح.</p></div></section>';
   }
@@ -750,14 +758,14 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     if (fmt === "pdf") Promise.all([lib("jspdf"), lib("h2c")]).then(function () { return exportPdf(R); }).then(done).catch(fail);
   }
   function summaryAoa(R) {
-    var out = [["", "توصيات", "محسومة", "ناجحة", "خاسرة", "نسبة النجاح", "صافي النتيجة " + CURW(), "رصيد الحساب " + CURW(), "تغير الرصيد " + CURW()]];
-    R.groups.forEach(function (g) { out.push([g.name, g.st.issued.length, g.st.decided.length, g.st.wins, g.st.losses, g.st.rate == null ? "" : Math.round(g.st.rate * 100) + "%", Math.round(g.st.net * 100) / 100, g.eq ? g.eq.end : "", g.eq ? Math.round(g.eq.change * 100) / 100 : ""]); });
+    var out = [["", "توصيات", "محسومة", "ناجحة", "خاسرة", "نسبة النجاح", "صافي النتيجة " + CURW(), "رسوم تقديرية " + CURW(), "الصافي بعد الرسوم " + CURW(), "رصيد الحساب " + CURW(), "تغير الرصيد " + CURW()]];
+    R.groups.forEach(function (g) { out.push([g.name, g.st.issued.length, g.st.decided.length, g.st.wins, g.st.losses, g.st.rate == null ? "" : Math.round(g.st.rate * 100) + "%", Math.round(g.st.net * 100) / 100, Math.round(g.st.fees * 100) / 100, Math.round(g.st.netAfter * 100) / 100, g.eq ? g.eq.end : "", g.eq ? Math.round(g.eq.change * 100) / 100 : ""]); });
     return out;
   }
   function exportXlsx(R) {
     var X = window.XLSX, wb = X.utils.book_new();
     var s1 = X.utils.aoa_to_sheet([[R.title], [R.note], []].concat(summaryAoa(R)));
-    s1["!cols"] = [{ wch: 18 }, { wch: 9 }, { wch: 9 }, { wch: 9 }, { wch: 9 }, { wch: 12 }, { wch: 14 }, { wch: 15 }, { wch: 14 }];
+    s1["!cols"] = [{ wch: 18 }, { wch: 9 }, { wch: 9 }, { wch: 9 }, { wch: 9 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 17 }, { wch: 15 }, { wch: 14 }];
     var s2 = X.utils.aoa_to_sheet([HEAD].concat(rowsFor(R)));
     s2["!cols"] = [{ wch: 5 }, { wch: 8 }, { wch: 9 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 20 }, { wch: 11 }, { wch: 17 }];
     var eq = (DATA.equity || []).filter(function (e) { var d = D(e.day); return d >= R.range.from && d <= R.range.to && /^sa-/.test(e.strategy) === SAR() && (R.strat === "all" || e.strategy.replace(/^sa-/, "") === R.strat); }).map(function (e) { return [e.day, stratName(e.strategy.replace(/^sa-/, "")), e.equity]; });
