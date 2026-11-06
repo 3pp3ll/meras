@@ -1,10 +1,10 @@
 /* ===== مِراس: أفضل حركة + الجرس (للمالك فقط) =====
    top.json يكتبه GitHub Actions بعد إقفال السوق السعودي وبعد تحديث الأسهم الأمريكية:
-   الأسهم اللي نقاطها في الباحث 5 أو 6، ومتى دخلت القائمة ومتى طلعت.
+   الأسهم اللي نقاطها في الباحث 6 من 8 أو أكثر، ومتى دخلت القائمة ومتى طلعت.
    الجرس فوق يعرض عدد المرشحين الجدد، ونغمة لما يدخل سهم جديد والصفحة مفتوحة. */
 Object.assign(UI, {
-  tp_t: ["أفضل حركة", "Best movers"], tp_p: ["الأسهم اللي نقاطها في الباحث 5 أو 6. تتحدث لحالها بعد إقفال السوق السعودي، وبعد تحديث الأمريكي 3:30 الفجر. مرشحين للتحليل، مو توصية شراء.", "Shares scoring 5 or 6 in the screener. Updated after the Saudi close and after the US update. Candidates to analyse, not buy recommendations."],
-  tp_none: ["ما فيه سهم نقاطه 5 أو 6 الحين. أول ما يدخل سهم يوصلك الجرس.", "No share scores 5 or 6 right now. The bell rings when one enters."],
+  tp_t: ["أفضل حركة", "Best movers"], tp_p: ["الأسهم اللي نقاطها في الباحث 6 من 8 أو أكثر. تتحدث لحالها بعد إقفال السوق السعودي، وبعد تحديث الأمريكي 3:30 الفجر. مرشحين للتحليل، مو توصية شراء.", "Shares scoring 6 of 8 or more in the screener. Updated after the Saudi close and after the US update. Candidates to analyse, not buy recommendations."],
+  tp_none: ["ما فيه سهم نقاطه 6 من 8 أو أكثر الحين. أول ما يدخل سهم يوصلك الجرس.", "No share scores 6 of 8 or more right now. The bell rings when one enters."],
   tp_wait: ["القائمة تنحسب أول مرة بعد إقفال السوق السعودي اليوم (3:50 العصر).", "The list is first computed after today's Saudi close."],
   tp_new: ["جديد", "New"], tp_days: ["له {n} يوم في القائمة", "{n} days on the list"], tp_since: ["دخل {d}", "Entered {d}"], tp_left: ["طلعوا من القائمة مؤخراً", "Recently left the list"], tp_out: ["طلع {d} بنقاط {s}", "Left {d} at {s}"],
   tp_why: ["ليش تحرك؟", "Why did it move?"], tp_ai: ["حلّل في الشارت", "Analyse on the chart"], tp_news: ["أخباره", "News"],
@@ -80,7 +80,7 @@ function dkTop() {
   const days = (v) => Math.max(1, Math.round((new Date(v.d) - new Date(v.since)) / 864e5) + 1);
   const card = ([s, v]) => {
     const isNew = v.sharia === "ok" && !seen.includes(topKey(s, v)), why = topWhy(s), news = v.m === "SA" ? "https://www.google.com/search?tbm=nws&q=" + encodeURIComponent(s + " " + v.n + " سهم") : "https://finance.yahoo.com/quote/" + encodeURIComponent(s) + "/news";
-    return '<div class="panel stack tp-card' + (isNew ? " is-new" : "") + '"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3><span class="num">' + esc(s) + "</span> " + esc(dkName(s) || v.n) + (isNew ? ' <span class="tag amber">' + esc(t("tp_new")) + "</span>" : "") + '</h3><span class="small muted">' + esc(t(v.m === "SA" ? "sh_sa" : "sh_us")) + " · " + esc(t("tp_since").replace("{d}", v.since)) + " · " + esc(t("tp_days").replace("{n}", days(v))) + '</span></div><span class="tag ' + (v.score >= 6 ? "up" : "amber") + '">' + esc(t("sc_score")) + " " + v.score + "/6</span></div>" +
+    return '<div class="panel stack tp-card' + (isNew ? " is-new" : "") + '"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3><span class="num">' + esc(s) + "</span> " + esc(dkName(s) || v.n) + (isNew ? ' <span class="tag amber">' + esc(t("tp_new")) + "</span>" : "") + '</h3><span class="small muted">' + esc(t(v.m === "SA" ? "sh_sa" : "sh_us")) + " · " + esc(t("tp_since").replace("{d}", v.since)) + " · " + esc(t("tp_days").replace("{n}", days(v))) + '</span></div><span class="tag ' + (v.score >= 7 ? "up" : "amber") + '">' + esc(t("sc_score")) + " " + v.score + "/" + (v.of || 6) + "</span></div>" +
       (v.sharia === "no" ? '<div class="notice">' + esc(t("tp_noshar")) + "</div>" : v.sharia !== "ok" ? '<p class="small muted" style="margin:0">' + esc(t("tp_unknown")) + "</p>" : "") +
       '<div class="sc-checks">' + ["trend", "vwap", "rsi", "rvol", "cmf", "atr"].map((c) => { const ok = (v.checks || []).includes(c); return '<span class="sc-ck' + (ok ? " ok" : "") + '">' + (ok ? "✓" : "✗") + " " + esc(t("sc_c_" + c)) + "</span>"; }).join("") + "</div>" +
       (why.length ? '<div class="tp-why"><b class="small">' + esc(t("tp_why")) + '</b><ul>' + why.map((w) => "<li>" + esc(w) + "</li>").join("") + "</ul></div>" : "") +
@@ -89,9 +89,9 @@ function dkTop() {
   const left = (TOP.log || []).filter((x) => x.out).slice(-6).reverse();
   setTimeout(() => { try { const s = new Set(topSeen()); act.forEach(([k, v]) => { if (v.sharia === "ok") s.add(topKey(k, v)); }); localStorage.setItem("meras.topseen", JSON.stringify([...s].slice(-300))); if (typeof ntMark === "function") ntMark((TOP.log || []).filter((x) => x.in).map((x) => "m:" + x.s + "|" + x.in)); topBell(); } catch (e) {} }, 1500);
   TP_CARD = card; TP_ACT = act;
-  const mob = act.length ? '<ul class="dgm-list dg-mob">' + act.map(([s, v]) => mRow({ act: "tp-open", k: s, s, name: dkName(s) || v.n, cls: v.m === "SA" ? "dg-big" : "dg-tech", dot: v.sharia === "ok" ? "ok" : v.sharia === "no" ? "no" : "", meta: esc(t(v.m === "SA" ? "sh_sa" : "sh_us")) + " · " + esc(t("tp_days").replace("{n}", days(v))) + (v.sharia === "ok" && !seen.includes(topKey(s, v)) ? ' <span class="dg-soon">' + esc(t("tp_new")) + "</span>" : ""), end: '<b class="num">' + v.score + "/6</b>", endSub: v.rvol != null ? esc(t("ch_rvol")) + " " + fmt(v.rvol, 1) + "×" : "" })).join("") + "</ul>" : "";
+  const mob = act.length ? '<ul class="dgm-list dg-mob">' + act.map(([s, v]) => mRow({ act: "tp-open", k: s, s, name: dkName(s) || v.n, cls: v.m === "SA" ? "dg-big" : "dg-tech", dot: v.sharia === "ok" ? "ok" : v.sharia === "no" ? "no" : "", meta: esc(t(v.m === "SA" ? "sh_sa" : "sh_us")) + " · " + esc(t("tp_days").replace("{n}", days(v))) + (v.sharia === "ok" && !seen.includes(topKey(s, v)) ? ' <span class="dg-soon">' + esc(t("tp_new")) + "</span>" : ""), end: '<b class="num">' + v.score + "/" + (v.of || 6) + "</b>", endSub: v.rvol != null ? esc(t("ch_rvol")) + " " + fmt(v.rvol, 1) + "×" : "" })).join("") + "</ul>" : "";
   return head + '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + " " + esc(whenText(TOP.updated)) + "</p>" + (act.length ? '<div class="stack dg-desk">' + act.map(card).join("") + "</div>" + mob : '<div class="notice">' + esc(t("tp_none")) + "</div>") +
-    (left.length ? owPanel(t("tp_left"), '<ul class="tp-left">' + left.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc(dkName(x.s)) + ' <span class="small muted">' + esc(t("tp_out").replace("{d}", x.out).replace("{s}", x.score + "/6")) + "</span></li>").join("") + "</ul>") : "");
+    (left.length ? owPanel(t("tp_left"), '<ul class="tp-left">' + left.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc(dkName(x.s)) + ' <span class="small muted">' + esc(t("tp_out").replace("{d}", x.out).replace("{s}", x.score + "/" + (x.of || 6))) + "</span></li>").join("") + "</ul>") : "");
 }
 
 document.addEventListener("click", (e) => {

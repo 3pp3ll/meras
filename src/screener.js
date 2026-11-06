@@ -13,7 +13,7 @@ Object.assign(UI, {
   sc_run: ["ابحث", "Search"], sc_none: ["ما فيه سهم يطابق شروطك الحين. خفف الشروط أو انتظر شموع أكثر.", "No share matches your rules now. Relax the rules or wait for more candles."],
   sc_found: ["{n} مرشح من {m} سهم", "{n} candidates out of {m} shares"], sc_out: ["انستبعد {n}: {why}", "{n} excluded: {why}"],
   sc_x_sharia: ["الشرعية", "sharia"], sc_x_budget: ["الميزانية", "budget"], sc_x_hist: ["تاريخ قصير", "short history"], sc_x_purify: ["نسبة التطهير", "purification"], sc_x_unknown: ["شرعية غير محسوبة", "screening not computed"],
-  sc_score: ["النقاط", "Score"], sc_c_trend: ["فوق متوسط 20 الصاعد", "Above a rising 20 average"], sc_c_vwap: ["فوق VWAP", "Above VWAP"], sc_c_rsi: ["RSI بين 50 و70", "RSI 50 to 70"], sc_c_rvol: ["حجم نسبي 1.2 أو أكثر", "Relative volume 1.2+"], sc_c_cmf: ["تدفق أموال موجب", "Positive money flow"], sc_c_atr: ["حركة يومية 1.5% إلى 6%", "Daily move 1.5% to 6%"],
+  sc_score: ["النقاط", "Score"], sc_c_trend: ["فوق متوسط 20 الصاعد", "Above a rising 20 average"], sc_c_vwap: ["فوق VWAP", "Above VWAP"], sc_c_rsi: ["RSI بين 50 و70", "RSI 50 to 70"], sc_c_rvol: ["حجم نسبي 1.2 أو أكثر", "Relative volume 1.2+"], sc_c_cmf: ["تدفق أموال موجب", "Positive money flow"], sc_c_atr: ["حركة يومية 1.5% إلى 6%", "Daily move 1.5% to 6%"], sc_c_trend50: ["فوق متوسط 50 الصاعد", "Above a rising 50 average"], sc_c_ext: ["مو بعيد عن متوسط 20 (أقل من 8%)", "Not stretched (within 8% of the 20 average)"],
   sc_entry: ["دخول", "Entry"], sc_stop: ["وقف", "Stop"], sc_target: ["هدف", "Target"], sc_qty: ["كمية بميزانيتك", "Qty for your budget"], sc_risk: ["تخسر لو ضرب الوقف", "Loss if stopped"],
   sc_plan: ["الوقف 1.5 × متوسط المدى تحت الإغلاق، والهدف ضعف المسافة (عائد إلى مخاطرة 2).", "Stop 1.5 × average range below the close, target twice the distance (reward to risk 2)."],
   sc_save: ["احفظ في شارتاتي", "Save to my charts"], sc_purify_na: ["التطهير غير متوفر", "Purification n/a"], sc_note: ["الأسهم السعودية: قوائم الهيئات ما فيها نسب التطهير، فما ينطبق عليها شرط التطهير إلا لو سجلت نسبتها من مصدرك.", "Saudi shares: board lists have no purification ratios, so that rule only applies if you recorded one."],
@@ -58,14 +58,17 @@ function scRun() {
     const i = d.length - 1, c = d[i].c, budget = x.m === "SA" ? SC.bsa : SC.bus;
     const frac = x.m === "US" && SC.frac;
     if (!frac && c > budget) { out.budget++; return; }
-    const cl = d.map((r) => r.c), m20 = sma(cl, 20), rs = rsi(cl, 14), vw = vwapRoll(d, 20), rv = rvolS(d, 20), cf = cmfS(d, 20), atr = scAtr(d, i, 14), atrp = atr ? (atr / c) * 100 : null;
+    const cl = d.map((r) => r.c), m20 = sma(cl, 20), m50 = sma(cl, 50), rs = rsi(cl, 14), vw = vwapRoll(d, 20), rv = rvolS(d, 20), cf = cmfS(d, 20), atr = scAtr(d, i, 14), atrp = atr ? (atr / c) * 100 : null;
     const checks = [
       ["trend", m20[i] != null && m20[i - 5] != null && c > m20[i] && m20[i] > m20[i - 5]],
       ["vwap", vw[i] != null && c > vw[i]],
       ["rsi", rs[i] != null && rs[i] >= 50 && rs[i] <= 70],
       ["rvol", rv[i] != null && rv[i] >= 1.2],
       ["cmf", cf[i] != null && cf[i] > 0],
-      ["atr", atrp != null && atrp >= 1.5 && atrp <= 6]
+      ["atr", atrp != null && atrp >= 1.5 && atrp <= 6],
+      // إضافات: الاتجاه المتوسط يأكد الحركة، والسهم المبتعد كثير عن متوسطه غالباً يرجع له (ما نطارد القمة)
+      ["trend50", m50[i] != null && m50[i - 10] != null && c > m50[i] && m50[i] > m50[i - 10]],
+      ["ext", m20[i] != null && c <= m20[i] * 1.08]
     ];
     const score = checks.filter((k) => k[1]).length, stop = atr ? c - 1.5 * atr : null, target = stop ? c + 2 * (c - stop) : null, qty = frac ? Math.floor((budget / c) * 10000) / 10000 : Math.floor(budget / c);
     res.push({ x, sh, c, d: d[i].d, checks, score, rsi: rs[i], rvol: rv[i], atrp, stop, target, qty, risk: stop ? qty * (c - stop) : null });
@@ -94,14 +97,14 @@ function dkScreener() {
 function scResults() {
   const r = scRun(), why = Object.entries(r.out).filter(([, n]) => n).map(([k, n]) => t("sc_x_" + k) + " " + n).join("، ");
   const cur = (x, v, dd) => (v == null ? "–" : (x.m === "US" ? "$" : "") + fmt(v, dd == null ? 2 : dd));
-  const card = (o, k) => '<div class="panel stack sc-card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3><span class="num">' + esc(o.x.s) + "</span> " + esc(dkName(o.x.s)) + '</h3><span class="small muted">' + esc(t(o.x.m === "SA" ? "sh_sa" : "sh_us")) + ' · <span class="num">' + esc(o.d) + '</span></span></div><div class="row" style="gap:6px"><span class="tag ' + (o.score >= 5 ? "up" : o.score >= 3 ? "amber" : "") + '">' + esc(t("sc_score")) + " " + o.score + "/6</span><span class=\"tag" + (o.sh.ok ? " up" : "") + '">' + esc(o.sh.label) + "</span>" + (o.sh.purify != null ? '<span class="tag">' + esc(t("sh_purify")) + " " + fmt(o.sh.purify, 2) + "%</span>" : "") + "</div></div>" +
+  const card = (o, k) => '<div class="panel stack sc-card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3><span class="num">' + esc(o.x.s) + "</span> " + esc(dkName(o.x.s)) + '</h3><span class="small muted">' + esc(t(o.x.m === "SA" ? "sh_sa" : "sh_us")) + ' · <span class="num">' + esc(o.d) + '</span></span></div><div class="row" style="gap:6px"><span class="tag ' + (o.score >= 6 ? "up" : o.score >= 4 ? "amber" : "") + '">' + esc(t("sc_score")) + " " + o.score + "/8</span><span class=\"tag" + (o.sh.ok ? " up" : "") + '">' + esc(o.sh.label) + "</span>" + (o.sh.purify != null ? '<span class="tag">' + esc(t("sh_purify")) + " " + fmt(o.sh.purify, 2) + "%</span>" : "") + "</div></div>" +
     '<div class="sc-checks">' + o.checks.map(([c, ok]) => '<span class="sc-ck' + (ok ? " ok" : "") + '">' + (ok ? "✓" : "✗") + " " + esc(t("sc_c_" + c)) + "</span>").join("") + "</div>" +
     '<div class="result"><div><span>' + esc(t("sc_entry")) + "</span><b>" + cur(o.x, o.c) + "</b></div><div><span>" + esc(t("sc_stop")) + "</span><b>" + cur(o.x, o.stop) + "</b></div><div><span>" + esc(t("sc_target")) + "</span><b>" + cur(o.x, o.target) + "</b></div><div><span>" + esc(t("sc_qty")) + "</span><b>" + (o.qty % 1 ? fmt(o.qty, 4) : int(o.qty)) + "</b></div><div><span>" + esc(t("sc_risk")) + "</span><b>" + cur(o.x, o.risk) + "</b></div></div>" +
     '<p class="small muted" style="margin:0">RSI ' + (o.rsi != null ? fmt(o.rsi, 1) : "–") + " · " + esc(t("ch_rvol")) + " " + (o.rvol != null ? fmt(o.rvol, 2) + "×" : "–") + " · ATR " + (o.atrp != null ? fmt(o.atrp, 1) + "%" : "–") + " · " + esc(t("sc_plan")) + "</p>" +
     '<div class="row"><button class="btn sm" data-act="dk-chart" data-s="' + esc(o.x.s) + '">' + esc(t("dk_open_ch")) + '</button><button class="btn sm primary" data-act="sc-save" data-k="' + k + '">' + esc(t("sc_save")) + "</button></div></div>";
   SC_LAST = r.res; SC_CARD = card;
   return scFeeNote() + '<p class="small muted" style="margin:0">' + esc(t("sc_found").replace("{n}", r.res.length).replace("{m}", r.total)) + (why ? " · " + esc(t("sc_out").replace("{n}", Object.values(r.out).reduce((a, b) => a + b, 0)).replace("{why}", why)) : "") + "</p>" +
-    (r.res.length ? '<div class="stack dg-desk">' + r.res.map(card).join("") + "</div>" + '<ul class="dgm-list dg-mob">' + r.res.map((o, k) => mRow({ act: "sc-open", k: String(k), s: o.x.s, name: dkName(o.x.s), cls: o.x.m === "SA" ? "dg-big" : "dg-tech", meta: esc(t("sc_entry")) + " " + cur(o.x, o.c) + " · " + esc(t("sc_stop")) + " " + cur(o.x, o.stop), end: '<b class="num" style="color:var(' + (o.score >= 5 ? "--up" : o.score >= 3 ? "--amber-ink" : "--muted") + ')">' + o.score + "/6</b>", endSub: esc(t("sc_target")) + " " + cur(o.x, o.target) })).join("") + "</ul>" : '<div class="notice">' + esc(t("sc_none")) + "</div>");
+    (r.res.length ? '<div class="stack dg-desk">' + r.res.map(card).join("") + "</div>" + '<ul class="dgm-list dg-mob">' + r.res.map((o, k) => mRow({ act: "sc-open", k: String(k), s: o.x.s, name: dkName(o.x.s), cls: o.x.m === "SA" ? "dg-big" : "dg-tech", meta: esc(t("sc_entry")) + " " + cur(o.x, o.c) + " · " + esc(t("sc_stop")) + " " + cur(o.x, o.stop), end: '<b class="num" style="color:var(' + (o.score >= 6 ? "--up" : o.score >= 4 ? "--amber-ink" : "--muted") + ')">' + o.score + "/8</b>", endSub: esc(t("sc_target")) + " " + cur(o.x, o.target) })).join("") + "</ul>" : '<div class="notice">' + esc(t("sc_none")) + "</div>");
 }
 let SC_LAST = [], SC_CARD = null;
 document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="sc-open"]'); if (!el) return; const k = Number(el.dataset.k); mSheet("sc:" + k, () => (SC_LAST[k] && SC_CARD ? SC_CARD(SC_LAST[k], k) : ""), el); });
