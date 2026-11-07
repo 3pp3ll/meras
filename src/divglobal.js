@@ -224,7 +224,7 @@ function dgSheetRefresh() { const b = document.getElementById("dgs-body"); if (b
 function mSheet(key, fn, from) { dgSheetFocus = from || document.activeElement; dgSheetS = key; dgSheetR = fn; dgSheet(true); }
 /* one compact row: avatar, name + ticker, a meta line, and a value on the end side */
 function mRow(o) {
-  return '<li><button class="dgm-row" data-act="' + o.act + '" data-k="' + esc(o.k) + '"><span class="dgm-av ' + (o.cls || "dg-tech") + '">' + esc(dgShort(o.s)) + '</span><span class="dgm-mid"><span class="dgm-nm"><span class="dgm-n">' + esc(o.name || o.s) + '</span><small class="num">' + esc(o.s) + '</small></span><span class="dgm-meta">' + (o.dot != null ? '<i class="dgm-dot ' + esc(o.dot) + '"></i>' : "") + o.meta + '</span></span><span class="dgm-end">' + o.end + (o.endSub ? "<small>" + o.endSub + "</small>" : "") + "</span></button></li>";
+  return '<li><button class="dgm-row" data-act="' + o.act + '" data-k="' + esc(o.k) + '"><span class="dgm-av ' + (o.cls || "dg-tech") + '">' + esc(dgShort(o.s)) + '</span><span class="dgm-mid"><span class="dgm-nm"><span class="dgm-n">' + esc(o.name || o.s) + '</span><small class="num">' + esc(o.s) + '</small></span><span class="dgm-meta">' + (o.dot != null ? '<i class="dgm-dot ' + esc(o.dot) + '"></i>' : "") + String(o.meta || "").split(" · ").map((x) => '<span class="dgm-seg">' + x + "</span>").join(" · ") + '</span></span><span class="dgm-end">' + o.end + (o.endSub ? "<small>" + o.endSub + "</small>" : "") + "</span></button></li>";
 }
 
 /* ----- owner tab inside مكتبي ----- */
