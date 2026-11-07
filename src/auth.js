@@ -140,7 +140,7 @@ function maView() {
   if (v === "login") return '<form data-form="ma-login" novalidate><p class="ma-h">' + esc(t("ma_in")) + '</p><p class="ma-s">' + esc(t("ma_in_s")) + "</p>" + maEm("ma-em") + maPw("ma-pw", "ma_pass", "current-password") +
     '<div class="ma-row"><label class="ma-chk"><input type="checkbox" id="ma-rem"' + (maRem() ? " checked" : "") + "> " + esc(t("ma_rem")) + '</label><button type="button" class="ma-lnk" data-act="ma-view" data-v="forgot">' + esc(t("ma_forgot")) + "</button></div>" + maMsg() +
     '<button class="ma-go" type="submit">' + esc(t("ma_go")) + '</button><div class="ma-sep">' + esc(t("ma_no_acc")) + '</div><button type="button" class="ma-go ghost" data-act="ma-view" data-v="signup">' + esc(t("ma_new")) + "</button></form>" + maLang();
-  if (v === "signup") return '<form data-form="ma-signup" novalidate><p class="ma-h">' + esc(t("ma_new")) + '</p><div class="ma-f"><label for="ma-nm">' + esc(t("ma_name")) + '</label><input id="ma-nm" autocomplete="name" maxlength="40"></div>' + maEm("ma-em") + maPw("ma-pw", "ma_pass8", "new-password") + maMsg() +
+  if (v === "signup") return '<form data-form="ma-signup" novalidate><p class="ma-h">' + esc(t("ma_new")) + '</p><div class="ma-f"><label for="ma-nm">' + esc(t("ma_name")) + '</label><input id="ma-nm" autocomplete="name" maxlength="40"></div>' + maEm("ma-em") + maPw("ma-pw", "ma_pass8", "new-password") + '<label class="ma-chk ma-agree"><input type="checkbox" id="ma-agree"> <span>' + t("lg_agree").replace("{t}", '<a href="#terms">' + esc(t("lg_terms")) + "</a>").replace("{p}", '<a href="#privacy">' + esc(t("lg_priv")) + "</a>") + "</span></label>" + maMsg() +
     '<button class="ma-go" type="submit">' + esc(t("ma_new")) + '</button><p class="ma-alt">' + esc(t("ma_have")) + ' <button type="button" class="ma-lnk" data-act="ma-view" data-v="login">' + esc(t("ma_in")) + "</button></p></form>";
   if (v === "forgot") return '<form data-form="ma-forgot" novalidate><p class="ma-h">' + esc(t("ma_fg_h")) + '</p><p class="ma-s">' + esc(t("ma_fg_s")) + "</p>" + maEm("ma-em") + maMsg() + '<button class="ma-go" type="submit">' + esc(t("ma_fg_go")) + '</button><p class="ma-alt"><button type="button" class="ma-lnk" data-act="ma-view" data-v="login">' + esc(t("ma_back")) + "</button></p></form>";
   if (v === "reset") return '<form data-form="ma-reset" novalidate><p class="ma-h">' + esc(t("ma_rs_h")) + "</p>" + maPw("ma-np", "ma_pass8", "new-password") + maMsg() + '<button class="ma-go" type="submit">' + esc(t("ma_rs_go")) + "</button></form>";
@@ -246,7 +246,8 @@ document.addEventListener("submit", async (e) => {
     } else if (k === "ma-signup") {
       const pw = document.getElementById("ma-pw").value;
       if (!v("ma-nm")) return maSay(t("ma_name")); if (!okEm(v("ma-em"))) return maSay(t("ma_e_email")); if (pw.length < 8) return maSay(t("ma_e_pw"));
-      const { data, error } = await MA.sb.auth.signUp({ email: v("ma-em"), password: pw, options: { data: { name: v("ma-nm") }, emailRedirectTo: page } });
+      if (!document.getElementById("ma-agree").checked) return maSay(t("lg_e_agree"));
+      const { data, error } = await MA.sb.auth.signUp({ email: v("ma-em"), password: pw, options: { data: { name: v("ma-nm"), agreed: LEGAL_DATE }, emailRedirectTo: page } });
       if (error) return maSay(maErr(error));
       if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length && window.REF) REF.signup();
       if (data && data.user && Array.isArray(data.user.identities) && !data.user.identities.length) return maSay(t("ma_e_dup"));

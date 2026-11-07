@@ -1622,3 +1622,13 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .sy-sec summary .sy-cnt{margin-inline-start:auto}
 .tag.sy-up{background:rgba(47,158,110,.14);color:#1f8a5b}
 .tag.sy-dn{background:rgba(214,69,69,.13);color:#c23b3b}
+
+/* سياسة الخصوصية والشروط */
+.legal{max-width:78ch;margin-block:18px 40px;display:grid;gap:10px;line-height:1.95}
+.legal h2{font-size:18px;margin-top:14px}
+.legal ul{margin:0;padding-inline-start:22px;display:grid;gap:6px}
+.legal p,.legal li{overflow-wrap:anywhere}
+.foot-legal a{color:inherit}
+.ma-agree{align-items:flex-start;line-height:1.6;margin-top:6px}
+.ma-agree input{margin-top:4px;flex:none}
+.ma-agree a{color:inherit;font-weight:700}
