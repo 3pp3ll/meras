@@ -114,7 +114,7 @@ function v2Shell(r, html) {
   v2Groups().forEach((k) => {
     nav += link(k, v2Label(k), k, g === k && r === k, V2_TINT[k]);
   });
-  return '<div class="wrap side-shell v2-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + (S.lang === "ar" ? "الأقسام" : "Sections") + '">' + nav + "</nav>" + (v2Own() && !mini ? '<div class="v2-side-map">' + v2MiniMap() + "</div>" : "") + '</aside><div class="side-main">' + v2Crumb(r, g) + html + "</div></div>";
+  return '<div class="wrap side-shell v2-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + (S.lang === "ar" ? "الأقسام" : "Sections") + '">' + nav + "</nav>" + '</aside><div class="side-main">' + v2Crumb(r, g) + html + "</div></div>";
 }
 sideW = function () {
   const vw = document.documentElement.clientWidth || 0;
@@ -207,7 +207,7 @@ function pageHome2() {
   if (typeof DG !== "undefined" && !DG.loaded && typeof loadDG === "function") loadDG();
   if (typeof EXTRA !== "undefined" && !EXTRA && typeof loadExtra === "function") loadExtra();
   const name = (typeof MA !== "undefined" && MA.prof && MA.prof.name) || (typeof MA !== "undefined" && MA.user && MA.user.user_metadata && MA.user.user_metadata.name) || "";
-  const hi = '<div class="v2-hi"><h1>' + esc(t(v2Riyadh() < 12 ? "v2_hi_m" : "v2_hi_e")) + (name ? " " + esc(name.split(" ")[0]) : "") + ' <span class="tag ' + (v2Own() ? "v2-own" : "") + '">' + esc(t(v2Own() ? "v2_owner" : "v2_free")) + "</span>" + (v2Own() ? '<button class="v2-mapbtn" data-act="v2-map" aria-label="' + esc(t("pm_map")) + '" title="' + esc(t("pm_map")) + '">' + v2Ic("map", 18) + '<span aria-hidden="true">‹</span></button>' : "") + "</h1></div>";
+  const hi = '<div class="v2-hi"><h1>' + esc(t(v2Riyadh() < 12 ? "v2_hi_m" : "v2_hi_e")) + (name ? " " + esc(name.split(" ")[0]) : "") + ' <span class="tag ' + (v2Own() ? "v2-own" : "") + '">' + esc(t(v2Own() ? "v2_owner" : "v2_free")) + "</span>" + (v2Own() ? '<button class="v2-mapbtn" data-act="v2-map" aria-label="' + esc(t("pm_map")) + '" title="' + esc(t("pm_map")) + '">' + v2Ic("map", 18) + "<span>" + esc(t("pm_map")) + '</span><span aria-hidden="true">‹</span></button>' : "") + "</h1></div>";
   const search = '<button class="v2-search" data-act="sr-open"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>' + esc(t("v2_q")) + "</span></button>";
   const nwI = (typeof NW !== "undefined" && NW.data && NW.data.items) || [];
   const news = v2Card(t("v2_news"), "#news", t("v2_news_all"), nwI.length ? '<ul class="v2-news v2-dots v2-short">' + nwI.filter((x) => x.imp >= 2).slice(0, 4).map((x) => '<li><a href="#news" data-nwgo="' + esc(x.t) + '" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</a></li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_news_none")) + "</p>");
