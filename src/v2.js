@@ -533,13 +533,13 @@ UI.dv_f_30 = ["30 يوم", "30 days"]; UI.v2_div_sa = ["السعودي", "Saudi"
 }
 
 /* ----- AI: صفحة وحدة (الملخص بالنقاط، تقرير المحفظة، أرشيف التنبيهات باليوم) ----- */
-Object.assign(UI, { v2_ai_rep_p: ["رأس المال والربح والتوزيع والأداء مقارنة بالمؤشر. يتحول لداشبورد تحليلي في مرحلته.", "Capital, profit, allocation and performance against the index. Becomes an analytics dashboard in its phase."], v2_ai_open: ["افتح المحفظة", "Open the portfolio"], v2_arch: ["أرشيف التنبيهات", "Alerts archive"], v2_arch_p: ["كل تنبيه محفوظ بيومه وتاريخه، ترجع له متى ما بغيت.", "Every alert kept under its day, for whenever you need it."] });
+Object.assign(UI, { v2_why: ["شوف السبب", "See why"], v2_ai_rep_p: ["رأس المال والربح والتوزيع والأداء مقارنة بالمؤشر. يتحول لداشبورد تحليلي في مرحلته.", "Capital, profit, allocation and performance against the index. Becomes an analytics dashboard in its phase."], v2_ai_open: ["افتح المحفظة", "Open the portfolio"], v2_arch: ["أرشيف التنبيهات", "Alerts archive"], v2_arch_p: ["كل تنبيه محفوظ بيومه وتاريخه، ترجع له متى ما بغيت.", "Every alert kept under its day, for whenever you need it."] });
 NAV_GROUPS.ai.items = [["portfolio", "v2_report", "dk_g_pf", 1], ["ai-bell", "v2_arch", "v2_arch_p", 1]];
 function v2AiPage() {
   if (!v2Own()) return v2Hub("ai");
   const all = typeof ntItems === "function" ? ntItems() : [], r = typeof ntRead === "function" ? ntRead() : new Set();
   let day = "", rows = "";
-  all.forEach((i) => { const d = typeof ntDay === "function" ? ntDay(i.date) : i.date; if (d !== day) { day = d; rows += '<li class="nt-day">' + esc(d) + "</li>"; } rows += typeof ntRow === "function" ? ntRow(i, r) : ""; });
+  all.forEach((i) => { const d = typeof ntDay === "function" ? ntDay(i.date) : i.date; if (d !== day) { day = d; rows += '<li class="nt-day">' + esc(d) + "</li>"; } rows += typeof ntRow === "function" ? ntRow(i, r).replace("</b>", '</b><button class="v2-why" data-act="v2-why">' + esc(t("v2_why")) + "</button>") : ""; });
   const rep = '<section class="panel stack v2-card"><div class="row" style="justify-content:space-between;align-items:center"><h2>' + esc(t("v2_report")) + '</h2><a class="small" href="#portfolio">' + esc(t("v2_ai_open")) + " ←</a></div><p class=\"muted small\" style=\"margin:0\">" + esc(t("v2_ai_rep_p")) + "</p></section>";
   const arch = '<section class="panel stack v2-card" id="v2-arch"><h2>' + esc(t("v2_arch")) + '</h2><p class="muted small" style="margin:0">' + esc(t("v2_arch_p")) + '</p><ul class="nt-list2 v2-arch">' + (rows || '<li class="nt-empty">' + esc(t("nt_empty")) + "</li>") + "</ul></section>";
   return '<div class="wrap"><div class="page-head"><h1>AI</h1></div><div class="stack" style="padding-block:14px 40px;gap:14px">' + v2BriefCard() + rep + arch + "</div></div>";
@@ -553,3 +553,5 @@ NAV_GROUPS.office.items = NAV_GROUPS.office.items.filter((x) => x[0] !== "mychar
 V2_TABS.saved = "sv"; V2_TABS.mycharts = "sv";
 V2_TABSET.sv = { h: "v2_saved", d: "v2_saved_d", items: [["saved", "sv_t"], ["mycharts", "dk_t_ch"]] };
 { const og = groupOf; groupOf = (r) => (["saved", "mycharts"].includes(r) ? "office" : og(r)); }
+
+document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest('[data-act="v2-why"]'); if (!b) return; e.preventDefault(); const li = b.closest("li"); const was = li.classList.contains("open"); li.parentElement.querySelectorAll("li.open").forEach((x) => x.classList.remove("open")); if (!was) li.classList.add("open"); });

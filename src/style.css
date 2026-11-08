@@ -1900,3 +1900,12 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .v2-nomu{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);flex:1 1 100%;line-height:1.5}
 .v2-nomu input{margin:0;flex:none;width:15px;height:15px}
 .v2-arch{max-height:none!important;overflow:visible!important;padding:0;margin:0}
+.v2-why{display:none;border:0;background:none;padding:0;margin-top:2px;color:var(--amber-ink);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;text-align:start}
+@media (max-width:760px){
+  .v2-arch .nt-tx > b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .v2-arch .nt-tx{min-width:0}
+  .v2-arch .v2-why{display:block}
+  .v2-arch li:not(.open) .nt-tx > p,.v2-arch li:not(.open) .nt-acts{display:none}
+  .v2-arch li.open .v2-why{display:none}
+}
+@media (max-width:760px){.v2-arch li{min-width:0}.v2-arch .nt-tx{flex:1 1 auto;overflow:hidden;max-width:100%}}
