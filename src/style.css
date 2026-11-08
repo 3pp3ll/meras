@@ -1797,3 +1797,16 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .v2-tabs a{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 16px;font-weight:700;font-size:14.5px;color:var(--muted);text-decoration:none}
 .v2-tabs a:hover{border-color:var(--amber)}
 .v2-tabs a[aria-current="page"]{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.v2-note{font-size:13.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.v2-note summary{cursor:pointer;list-style:none}
+.v2-note summary::-webkit-details-marker{display:none}
+.v2-note summary span{color:var(--amber-ink);font-weight:700;margin-inline-start:4px}
+.v2-note[open] summary span{display:none}
+.v2-note p{margin:6px 0 0;line-height:1.8}
+.v2-h1b{display:flex;align-items:center;gap:10px}
+.v2-bell{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
+.v2-bell.on{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.v2-shbox{gap:8px;max-width:560px}
+.v2-shbox input{width:100%}
+#asfab.dragging{opacity:.85;cursor:grabbing}
+#asfab{cursor:grab}

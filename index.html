@@ -1831,6 +1831,19 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .v2-tabs a{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 16px;font-weight:700;font-size:14.5px;color:var(--muted);text-decoration:none}
 .v2-tabs a:hover{border-color:var(--amber)}
 .v2-tabs a[aria-current="page"]{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.v2-note{font-size:13.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.v2-note summary{cursor:pointer;list-style:none}
+.v2-note summary::-webkit-details-marker{display:none}
+.v2-note summary span{color:var(--amber-ink);font-weight:700;margin-inline-start:4px}
+.v2-note[open] summary span{display:none}
+.v2-note p{margin:6px 0 0;line-height:1.8}
+.v2-h1b{display:flex;align-items:center;gap:10px}
+.v2-bell{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
+.v2-bell.on{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
+.v2-shbox{gap:8px;max-width:560px}
+.v2-shbox input{width:100%}
+#asfab.dragging{opacity:.85;cursor:grabbing}
+#asfab{cursor:grab}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -10930,6 +10943,93 @@ Object.assign(UI, { v2_opps: ["الفرص", "Opportunities"], v2_opps_d: ["ال�
     return html.replace(/<div class="page-head">[\s\S]*?<\/div>/, '<div class="page-head"><h1>' + esc(t("v2_opps")) + "</h1><p>" + esc(t("v2_opps_d")) + "</p></div>" + tabs);
   };
 }
+
+/* ----- أفضل حركة: النص ملاحظة مختصرة تحت، والجرس أيقونة جنب عنوان «الفرص» ----- */
+Object.assign(UI, { v2_more: ["المزيد", "More"], v2_note: ["ملاحظة:", "Note:"], v2_bell_on: ["نغمة التنبيه شغالة. اضغط لإيقافها", "Alert sound is on. Tap to turn off"], v2_bell_off: ["شغّل نغمة التنبيه", "Turn on the alert sound"] });
+function v2Note(txt) {
+  const w = String(txt || "").split(/\s+/);
+  return '<details class="v2-note"><summary><b>' + esc(t("v2_note")) + "</b> " + esc(w.slice(0, 2).join(" ")) + '… <span>' + esc(t("v2_more")) + "</span></summary><p>" + esc(txt) + "</p></details>";
+}
+{
+  const ot = dkTop;
+  dkTop = function () {
+    const head = '<p class="muted" style="margin:0">' + esc(t("tp_p")) + '</p><div class="row"><button class="btn sm' + (topSound ? " on" : "") + '" data-act="top-sound">🔔 ' + esc(t(topSound ? "tp_sound_on" : "tp_sound")) + '</button><button class="btn sm ghost" data-act="top-test">' + esc(t("tp_test")) + '</button></div><p class="small muted" style="margin:0">' + esc(t("tp_gh")) + "</p>";
+    const h = ot();
+    return (h.startsWith(head) ? h.slice(head.length) : h) + v2Note(t("tp_p"));
+  };
+  const od = deskPage;
+  deskPage = function (r) {
+    let h = od(r);
+    if (r !== "movers") return h;
+    const on = typeof topSound !== "undefined" && topSound;
+    const bell = '<button class="v2-bell' + (on ? " on" : "") + '" data-act="top-sound" aria-pressed="' + on + '" aria-label="' + esc(t(on ? "v2_bell_on" : "v2_bell_off")) + '" title="' + esc(t(on ? "v2_bell_on" : "v2_bell_off")) + '">' + v2Ic("ai-bell", 18) + "</button>";
+    return h.replace("<h1>" + esc(t("v2_opps")) + "</h1>", '<h1 class="v2-h1b">' + esc(t("v2_opps")) + bell + "</h1>");
+  };
+}
+
+/* ----- الفرز الشرعي: خانة بحث وآخر تحديث بس، والباقي «المزيد» لك أنت ----- */
+shFinder = function () {
+  if (!shTried) loadSharia();
+  const ups = [SHSA && SHSA.updated, typeof SHUS !== "undefined" && SHUS && SHUS.updated].filter(Boolean).map((x) => new Date(x)).filter((d) => !isNaN(d)).sort((a, b) => b - a);
+  const loc = S.lang === "ar" ? "ar-SA-u-ca-gregory-nu-latn" : "en-GB";
+  const when = ups.length ? ups[0].toLocaleString(loc, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }) : "–";
+  const more = shOwner() ? '<details class="v2-note"><summary>' + esc(t("v2_more")) + "</summary><p>" + esc(t("sh_p")) + "</p>" + (typeof SHUS !== "undefined" && SHUS ? "<p>" + esc(t("sh_db").replace("{n}", SHUS.count || 0).replace("{u}", SHUS.universe || "–").replace("{d}", whenText(SHUS.updated))) + "</p>" : "") + "</details>" : "";
+  return '<div class="panel stack v2-shbox"><input id="sh-q" data-sh="q" type="search" autocomplete="off" aria-label="' + esc(t("sh_q")) + '" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"><p class="small muted" style="margin:0">' + esc(t("sh_asof")) + ': <span class="num">' + esc(when) + "</span></p>" + more + '</div><div id="sh-res">' + shResults() + "</div>";
+};
+pageSharia = function () { if (!shTried) loadSharia(); return svcShell("sharia", shFinder()); };
+
+/* ----- محفظتي بعد التنظيم: «سجلي» (سجل التداول + تحليلاتي) و«التوزيعات» (السعودي + العالمي) بتبويبات ----- */
+Object.assign(UI, { v2_log: ["سجلي", "My log"], v2_log_d: ["صفقاتك وتحليلاتك في مكان واحد.", "Your trades and analyses in one place."], v2_div_sa: ["السوق السعودي", "Saudi market"], v2_div_gl: ["العالمية", "Global"], v2_div_d: ["تقويم التوزيعات والعائد، السعودي والعالمي.", "Dividend calendar and yield, Saudi and global."] });
+const V2_TABS = {
+  journal: "log", analyses: "log", dividends: "div", gdiv: "div"
+};
+const V2_TABSET = {
+  log: { h: "v2_log", d: "v2_log_d", items: [["journal", "tab_journal"], ["analyses", "nav_an"]] },
+  div: { h: "tab_div", d: "v2_div_d", items: [["dividends", "v2_div_sa"], ["gdiv", "v2_div_gl"]] }
+};
+{
+  const it = NAV_GROUPS.pf.items;
+  NAV_GROUPS.pf.items = it.filter((x) => !["analyses", "gdiv"].includes(x[0])).map((x) => (x[0] === "journal" ? ["journal", "v2_log", "v2_log_d"] : x[0] === "dividends" ? ["dividends", "tab_div", "v2_div_d"] : x));
+  const og = groupOf; groupOf = (r) => (["analyses", "gdiv"].includes(r) ? "pf" : og(r));
+  const os = v2Shell;
+  v2Shell = function (r, html) {
+    const set = V2_TABSET[V2_TABS[r]];
+    if (set) {
+      const tabs = '<nav class="v2-tabs" aria-label="' + esc(t(set.h)) + '">' + set.items.map(([h, k]) => '<a href="#' + h + '"' + (h === r ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav>";
+      const nh = '<div class="page-head"><h1>' + esc(t(set.h)) + "</h1><p>" + esc(t(set.d)) + "</p></div>" + tabs;
+      html = /<div class="page-head">[\s\S]*?<\/div>/.test(html) ? html.replace(/<div class="page-head">[\s\S]*?<\/div>/, nh) : html.replace('<div class="wrap">', '<div class="wrap">' + nh);
+    }
+    return os(r, html);
+  };
+}
+
+/* ----- شات بوت: تسحبه بإصبعك أو بالماوس لأي مكان، ويتذكر مكانه ----- */
+(function () {
+  const KEY = "meras.fabpos";
+  const get = () => { try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { return null; } };
+  const place = (b, p) => {
+    const w = b.offsetWidth || 56, h = b.offsetHeight || 64, vw = window.innerWidth, vh = window.innerHeight;
+    const x = Math.min(Math.max(6, p.x * vw), vw - w - 6), y = Math.min(Math.max(6, p.y * vh), vh - h - 6);
+    b.style.left = x + "px"; b.style.top = y + "px"; b.style.right = "auto"; b.style.bottom = "auto"; b.style.insetInlineEnd = "auto"; b.style.insetInlineStart = "auto";
+  };
+  function arm(b) {
+    if (b.dataset.drag) return; b.dataset.drag = "1"; b.style.touchAction = "none";
+    const p = get(); if (p) place(b, p);
+    let st = null, moved = false;
+    b.addEventListener("pointerdown", (e) => { st = { x: e.clientX, y: e.clientY, l: b.getBoundingClientRect().left, t: b.getBoundingClientRect().top }; moved = false; try { b.setPointerCapture(e.pointerId); } catch (x) {} });
+    b.addEventListener("pointermove", (e) => {
+      if (!st) return; const dx = e.clientX - st.x, dy = e.clientY - st.y;
+      if (!moved && Math.hypot(dx, dy) < 8) return; moved = true; b.classList.add("dragging");
+      place(b, { x: (st.l + dx) / window.innerWidth, y: (st.t + dy) / window.innerHeight });
+    });
+    const end = () => { if (!st) return; st = null; b.classList.remove("dragging"); if (moved) { const r = b.getBoundingClientRect(); try { localStorage.setItem(KEY, JSON.stringify({ x: r.left / window.innerWidth, y: r.top / window.innerHeight })); } catch (x) {} } };
+    b.addEventListener("pointerup", end); b.addEventListener("pointercancel", end);
+    b.addEventListener("click", (e) => { if (moved) { e.stopImmediatePropagation(); e.preventDefault(); moved = false; } }, true);
+    window.addEventListener("resize", () => { const q = get(); if (q) place(b, q); });
+  }
+  const tick = () => { const b = document.getElementById("asfab"); if (b) arm(b); };
+  setInterval(tick, 1500); tick();
+})();
 /* ===== التشغيل ===== */
 lastRoute = route();
 render();
