@@ -260,8 +260,9 @@ pageIndices = function () {
 
 /* ----- هيكل المنصة المصغر: تحت القائمة الجانبية على الكمبيوتر، ونافذة صغيرة على الجوال ----- */
 function v2MiniMap() {
-  const br = (g) => '<li><a href="#' + g + '" style="--tint:' + V2_TINT[g] + '"><i></i>' + esc(v2Label(g)) + "</a><ul>" + navItems(g).map(([h, k]) => '<li><a href="' + (h === "ai-brief" ? "#" : "#" + h) + '">' + esc(t(k)) + "</a></li>").join("") + "</ul></li>";
-  return '<div class="v2-mm"><b>' + esc(t("pm_map")) + '</b><ul class="v2-mmt"><li><a href="#" style="--tint:' + V2_TINT.home + '"><i></i>' + esc(t("nav_home")) + "</a></li>" + v2Groups().map(br).join("") + "</ul></div>";
+  const leaf = (h, k, g) => '<a class="v2-tl" href="' + (h === "ai-brief" ? "#" : "#" + h) + '" title="' + esc(t(k)) + '" aria-label="' + esc(t(k)) + '" style="--tint:' + V2_TINT[g] + '">' + v2Ic(h, 15) + "</a>";
+  const br = (g) => '<div class="v2-tg" style="--tint:' + V2_TINT[g] + '"><a class="v2-tn" href="#' + g + '" title="' + esc(v2Label(g)) + '"><span>' + v2Ic(g, 18) + "</span><small>" + esc(v2Label(g)) + '</small></a><div class="v2-tls">' + navItems(g).map(([h, k]) => leaf(h, k, g)).join("") + "</div></div>";
+  return '<div class="v2-tree" aria-label="' + esc(t("pm_map")) + '"><a class="v2-troot" href="#" title="' + esc(t("nav_home")) + '">' + LOGO + "</a>" + '<div class="v2-tb">' + v2Groups().map(br).join("") + "</div></div>";
 }
 document.addEventListener("click", (e) => {
   const nw = e.target.closest && e.target.closest("[data-nwgo]");

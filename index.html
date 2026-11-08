@@ -1800,6 +1800,26 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .v2-flash{outline:2px solid var(--amber);outline-offset:2px;transition:outline-color 2s}
 .v2-short{display:block}.v2-short li{overflow:hidden;min-width:0}
 .dk-side .v2-side-map a{padding:0!important;border-radius:0;display:inline;background:none!important}.dk-side .v2-side-map .v2-mmt>li>a{display:flex}.dk-side .v2-side-map .v2-mmt ul{gap:2px 10px}
+/* هيكل المنصة كشكل: جذع وفروع وأيقونات */
+.v2-tree{display:grid;justify-items:center;gap:0}
+.v2-troot{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:var(--surface);border:1px solid var(--line);box-shadow:0 4px 12px rgba(40,30,60,.08)}
+.v2-troot svg{width:30px;height:30px}
+.v2-tb{position:relative;display:grid;gap:12px;width:100%;padding-top:14px;padding-inline-start:22px}
+.v2-tb::before{content:"";position:absolute;top:0;bottom:22px;inset-inline-start:calc(50% - 1px);width:2px;background:var(--line)}
+.v2-tb{padding-inline-start:0}
+.v2-tb::before{inset-inline-start:17px}
+.v2-tg{position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center;padding-inline-start:0}
+.v2-tn{display:grid;justify-items:center;gap:1px;text-decoration:none;position:relative;z-index:1}
+.v2-tn span{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--tint);color:#fff;box-shadow:0 0 0 3px var(--surface)}
+.v2-tn small{font-size:9.5px;font-weight:700;color:var(--ink);white-space:nowrap}
+.v2-tls{display:flex;flex-wrap:wrap;gap:5px;position:relative;padding:6px 8px;border-radius:14px;background:color-mix(in srgb,var(--tint) 8%,var(--surface));border:1px dashed color-mix(in srgb,var(--tint) 35%,var(--line))}
+.v2-tls::before{content:"";position:absolute;top:50%;inset-inline-start:-10px;width:10px;border-top:2px solid color-mix(in srgb,var(--tint) 45%,var(--line))}
+.v2-tl{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--tint);border:1px solid color-mix(in srgb,var(--tint) 30%,var(--line));text-decoration:none}
+.v2-tl:hover{background:var(--tint);color:#fff}
+.dk-side .v2-side-map a.v2-tl,.dk-side .v2-side-map a.v2-tn,.dk-side .v2-side-map a.v2-troot{padding:0!important;display:grid!important}
+.dk-side .v2-side-map a.v2-tl{border-radius:50%!important;background:var(--surface)!important}
+.dk-side .v2-side-map a.v2-tl:hover{background:var(--tint)!important;color:#fff}
+.dk-side .v2-side-map a.v2-troot{border-radius:14px!important}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -10864,8 +10884,9 @@ pageIndices = function () {
 
 /* ----- هيكل المنصة المصغر: تحت القائمة الجانبية على الكمبيوتر، ونافذة صغيرة على الجوال ----- */
 function v2MiniMap() {
-  const br = (g) => '<li><a href="#' + g + '" style="--tint:' + V2_TINT[g] + '"><i></i>' + esc(v2Label(g)) + "</a><ul>" + navItems(g).map(([h, k]) => '<li><a href="' + (h === "ai-brief" ? "#" : "#" + h) + '">' + esc(t(k)) + "</a></li>").join("") + "</ul></li>";
-  return '<div class="v2-mm"><b>' + esc(t("pm_map")) + '</b><ul class="v2-mmt"><li><a href="#" style="--tint:' + V2_TINT.home + '"><i></i>' + esc(t("nav_home")) + "</a></li>" + v2Groups().map(br).join("") + "</ul></div>";
+  const leaf = (h, k, g) => '<a class="v2-tl" href="' + (h === "ai-brief" ? "#" : "#" + h) + '" title="' + esc(t(k)) + '" aria-label="' + esc(t(k)) + '" style="--tint:' + V2_TINT[g] + '">' + v2Ic(h, 15) + "</a>";
+  const br = (g) => '<div class="v2-tg" style="--tint:' + V2_TINT[g] + '"><a class="v2-tn" href="#' + g + '" title="' + esc(v2Label(g)) + '"><span>' + v2Ic(g, 18) + "</span><small>" + esc(v2Label(g)) + '</small></a><div class="v2-tls">' + navItems(g).map(([h, k]) => leaf(h, k, g)).join("") + "</div></div>";
+  return '<div class="v2-tree" aria-label="' + esc(t("pm_map")) + '"><a class="v2-troot" href="#" title="' + esc(t("nav_home")) + '">' + LOGO + "</a>" + '<div class="v2-tb">' + v2Groups().map(br).join("") + "</div></div>";
 }
 document.addEventListener("click", (e) => {
   const nw = e.target.closest && e.target.closest("[data-nwgo]");
