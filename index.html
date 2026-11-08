@@ -1823,8 +1823,9 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .v2-mapbtn{gap:6px;font-size:13px;font-weight:700;padding:5px 10px}
 /* الكمبيوتر: أدوات الهيدر فوق القائمة الجانبية، والشعار مكانها */
 @media (min-width:1000px){
-  .top > .wrap{max-width:1320px}
-  .top .tools{order:-1;margin-inline-start:0!important;margin-inline-end:auto}
+  .top > .wrap{justify-content:center}
+  .top .tools{margin-inline-start:0!important}
+  .top .brand{margin-inline-end:160px}
 }
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
@@ -10899,7 +10900,7 @@ document.addEventListener("click", (e) => {
   if (nw) { try { sessionStorage.setItem("meras.nwgo", nw.dataset.nwgo); } catch (x) {} return; }
   const b = e.target.closest && e.target.closest('[data-act="v2-map"],[data-act="v2-map-x"]'); if (!b) return;
   e.preventDefault();
-  if (window.matchMedia("(min-width:1000px)").matches) { location.hash = "map"; return; }
+  location.hash = "map"; return;
   let sh = document.getElementById("v2mapsheet");
   if (b.dataset.act === "v2-map-x" || sh) { if (sh) sh.remove(); return; }
   sh = document.createElement("div"); sh.id = "v2mapsheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true");

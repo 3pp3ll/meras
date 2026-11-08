@@ -1789,6 +1789,7 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .v2-mapbtn{gap:6px;font-size:13px;font-weight:700;padding:5px 10px}
 /* الكمبيوتر: أدوات الهيدر فوق القائمة الجانبية، والشعار مكانها */
 @media (min-width:1000px){
-  .top > .wrap{max-width:1320px}
-  .top .tools{order:-1;margin-inline-start:0!important;margin-inline-end:auto}
+  .top > .wrap{justify-content:center}
+  .top .tools{margin-inline-start:0!important}
+  .top .brand{margin-inline-end:160px}
 }

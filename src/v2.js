@@ -269,7 +269,7 @@ document.addEventListener("click", (e) => {
   if (nw) { try { sessionStorage.setItem("meras.nwgo", nw.dataset.nwgo); } catch (x) {} return; }
   const b = e.target.closest && e.target.closest('[data-act="v2-map"],[data-act="v2-map-x"]'); if (!b) return;
   e.preventDefault();
-  if (window.matchMedia("(min-width:1000px)").matches) { location.hash = "map"; return; }
+  location.hash = "map"; return;
   let sh = document.getElementById("v2mapsheet");
   if (b.dataset.act === "v2-map-x" || sh) { if (sh) sh.remove(); return; }
   sh = document.createElement("div"); sh.id = "v2mapsheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true");
