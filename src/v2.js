@@ -208,10 +208,10 @@ function pageHome2() {
   const hi = '<div class="v2-hi"><h1>' + esc(t(v2Riyadh() < 12 ? "v2_hi_m" : "v2_hi_e")) + (name ? " " + esc(name.split(" ")[0]) : "") + ' <span class="tag ' + (v2Own() ? "v2-own" : "") + '">' + esc(t(v2Own() ? "v2_owner" : "v2_free")) + "</span></h1></div>";
   const search = '<button class="v2-search" data-act="sr-open"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>' + esc(t("v2_q")) + "</span></button>";
   const nwI = (typeof NW !== "undefined" && NW.data && NW.data.items) || [];
-  const news = v2Card(t("v2_news"), "#news", t("v2_news_all"), nwI.length ? '<ul class="v2-news">' + nwI.filter((x) => x.imp >= 2).slice(0, 3).map((x) => '<li><a href="' + esc(x.u || "#news") + '" target="_blank" rel="noopener" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</a>" + (x.src || x.sym ? '<small class="muted">' + esc(x.sym || x.src || "") + "</small>" : "") + "</li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_news_none")) + "</p>");
+  const news = v2Card(t("v2_news"), "#news", t("v2_news_all"), nwI.length ? '<ul class="v2-news v2-dots">' + nwI.filter((x) => x.imp >= 2).slice(0, 5).map((x) => '<li><a href="' + esc(x.u || "#news") + '" target="_blank" rel="noopener" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</a>" + (x.src || x.sym ? '<small class="muted">' + esc(x.sym || x.src || "") + "</small>" : "") + "</li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_news_none")) + "</p>");
   const td = today(), al = typeof ntItems === "function" ? ntItems().filter((i) => (i.date || "").slice(0, 10) === td).slice(0, 5) : [];
   const alerts = v2Card(t("v2_alerts"), "#nt", t("v2_alerts_all"), al.length ? '<ul class="v2-news">' + al.map((i) => "<li><span>" + esc(v2NtText(i)) + "</span></li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_alerts_none")) + "</p>");
-  return '<div class="wrap v2-home"><div class="stack" style="padding-block:14px 40px;gap:14px">' + hi + search + '<div class="v2-grid"><div class="stack" style="gap:14px">' + v2BriefCard() + news + '</div><div class="stack" style="gap:14px">' + alerts + v2Now() + "</div></div></div></div>";
+  return '<div class="wrap v2-home"><div class="stack" style="padding-block:14px 40px;gap:14px">' + hi + search + '<div class="v2-grid"><div class="stack" style="gap:14px">' + v2BriefCard() + news + '</div><div class="stack" style="gap:14px">' + v2Now() + alerts + "</div></div></div></div>";
 }
 function v2NtText(i) {
   try {
@@ -238,10 +238,20 @@ document.addEventListener("click", (e) => { const a = e.target.closest && e.targ
 })();
 
 /* ----- مقاطع الدروس (30 ثانية، عربي وإنجليزي حسب لغة المستخدم) ----- */
-Object.assign(UI, { lv_h: ["الدرس في 30 ثانية", "The lesson in 30 seconds"] });
+Object.assign(UI, { lv_h: ["{t} في 30 ثانية", "{t} in 30 seconds"], as_btn: ["شات بوت", "Chatbot"] });
 const LESSON_VID = { "trd-1-1": "candle", "trd-1-2": "volume", "trd-2-1": "support", "trd-3-1": "ma", "inv-2-3": "exdate" };
 function lessonVideo(id) {
   const v = LESSON_VID[id]; if (!v) return "";
   const f = "videos/" + v + "-" + (S.lang === "en" ? "en" : "ar");
-  return '<figure class="lv"><figcaption>' + esc(t("lv_h")) + '</figcaption><video controls playsinline preload="none" poster="' + f + '.jpg" src="' + f + '.mp4"></video></figure>';
+  return '<figure class="lv"><figcaption>' + esc(t("lv_h").replace("{t}", L((LESSONS.find((x) => x.id === id) || { title: ["", ""] }).title))) + '</figcaption><video controls playsinline preload="none" poster="' + f + '.jpg" src="' + f + '.mp4"></video></figure>';
 }
+
+/* ----- المؤشرات: صفوف بعرض الشاشة، والتفاصيل بالضغط ----- */
+pageIndices = function () {
+  const head = '<div class="page-head"><h1>' + esc(t("nav_indices")) + "</h1><p>" + esc(t("d_indices")) + "</p></div>";
+  const items = typeof tkItems === "function" ? tkItems() : [];
+  if (!items.length) { if (v2Own() && typeof loadExtra === "function") loadExtra(); return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t(v2Own() ? "dh_loading" : "ow_need")) + "</div></div>"; }
+  const rows = items.map((x) => { const d = x.st.d || 0;
+    return '<button class="v2-ix" data-act="tk-open" data-s="' + esc(x.it.s) + '"><span class="v2-ixn"><b>' + esc(L(x.it.n)) + "</b><small>" + esc(L(x.it.mk)) + '</small></span><b class="num" dir="ltr">' + tkFmt(x.st.c) + '</b><span class="tag ' + (d >= 0 ? "up" : "ex-dn") + ' num" dir="ltr">' + (d > 0 ? "+" : "") + (d * 100).toFixed(2) + "%</span>" + (x.R && typeof biasWord === "function" ? '<span class="tk-b ' + x.R.fb + '">' + esc(biasWord(x.R.fb)) + "</span>" : "<span></span>") + '<span class="v2-ixgo" aria-hidden="true">‹</span></button>'; }).join("");
+  return '<div class="wrap">' + head + '<div class="v2-ixl">' + rows + "</div></div>";
+};

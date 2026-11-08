@@ -437,7 +437,7 @@ function renderNow() {
   else { const g = typeof groupOf === "function" ? groupOf(r) : ""; if (["learn", "market", "pf"].includes(g) && typeof sideShell === "function") html = sideShell(g, r, html); }
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "pf" || g === "market" ? "s" : r === "" || r === "home" ? "a" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;
-  $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + '</span><span class="foot-legal">' + legalLinks() + "</span></div>";
+  $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + '</span></div>';
   if (r === "calc") runCalc();
   if (r === "dividends") runDiv();
   if (r === "chart" && typeof maybeAutoAnalysis === "function") setTimeout(maybeAutoAnalysis, 0);

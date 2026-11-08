@@ -1752,6 +1752,34 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .lv{margin:4px 0 8px;display:grid;gap:8px;justify-items:center}
 .lv figcaption{font-weight:700;font-size:15px;justify-self:start}
 .lv video{width:100%;max-width:340px;aspect-ratio:9/16;border-radius:18px;background:var(--sunk);border:1px solid var(--line);object-fit:cover}
+/* الأخبار نقاط */
+.v2-dots{list-style:disc;padding-inline-start:20px}
+.v2-dots li{display:list-item;border-top:0;padding:4px 0}
+.v2-dots li::marker{color:var(--amber)}
+/* المؤشرات صفوف */
+.v2-ixl{display:grid;gap:8px;padding-block:14px 40px}
+.v2-ix{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto 14px;gap:12px;align-items:center;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font:inherit;color:inherit;text-align:start;cursor:pointer}
+.v2-ix:hover{border-color:var(--amber)}
+.v2-ixn{display:grid;min-width:0;line-height:1.4}
+.v2-ixn small{color:var(--muted);font-size:12px}
+.v2-ix > b{font-size:16px}
+.v2-ixgo{color:var(--muted);font-size:20px;line-height:1}
+@media (max-width:520px){.v2-ix{grid-template-columns:minmax(0,1fr) auto auto 12px;gap:8px}.v2-ix .tk-b{display:none}}
+/* شات بوت: دائرة صغيرة فوق سهم الأعلى */
+#asfab{inset-inline-start:auto!important;inset-inline-end:16px;flex-direction:column;gap:2px;padding:0;background:none!important;box-shadow:none;color:var(--ink);border-radius:0;bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+#asfab svg{width:46px;height:46px;padding:13px;border-radius:50%;background:#3346A8;color:#fff;box-shadow:0 6px 18px rgba(30,40,90,.3);box-sizing:border-box}
+#asfab span{font-size:10.5px;font-weight:700;line-height:1.3;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:0 7px}
+#tobot{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+#totop:not([hidden]) ~ #tobot{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+#totop:not([hidden]) ~ #asfab,#tobot:not([hidden]) ~ #asfab{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+#totop:not([hidden]) ~ #tobot:not([hidden]) ~ #asfab{bottom:calc(126px + env(safe-area-inset-bottom,0px))}
+@media (max-width:999px){
+  body.has-tabbar #totop{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  body.has-tabbar #tobot,body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  body.has-tabbar #totop:not([hidden]) ~ #tobot{bottom:calc(132px + env(safe-area-inset-bottom,0px))}
+  body.has-tabbar #totop:not([hidden]) ~ #asfab,body.has-tabbar #tobot:not([hidden]) ~ #asfab{bottom:calc(132px + env(safe-area-inset-bottom,0px))}
+  body.has-tabbar #totop:not([hidden]) ~ #tobot:not([hidden]) ~ #asfab{bottom:calc(186px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2971,7 +2999,7 @@ function renderNow() {
   else { const g = typeof groupOf === "function" ? groupOf(r) : ""; if (["learn", "market", "pf"].includes(g) && typeof sideShell === "function") html = sideShell(g, r, html); }
   { const g = typeof groupOf === "function" ? groupOf(r) : ""; document.body.dataset.br = g === "learn" ? "l" : g === "pf" || g === "market" ? "s" : r === "" || r === "home" ? "a" : r === "desk" || r === "owner" ? "a" : r === "plans" || r === "account" || r === "checkout" ? "p" : ""; }
   $("#main").innerHTML = html;
-  $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + '</span><span class="foot-legal">' + legalLinks() + "</span></div>";
+  $("#foot").innerHTML = '<div class="wrap"><span>' + esc(t("disclaimer")) + "</span><span>" + esc(t("foot_data")) + '</span></div>';
   if (r === "calc") runCalc();
   if (r === "dividends") runDiv();
   if (r === "chart" && typeof maybeAutoAnalysis === "function") setTimeout(maybeAutoAnalysis, 0);
@@ -10764,10 +10792,10 @@ function pageHome2() {
   const hi = '<div class="v2-hi"><h1>' + esc(t(v2Riyadh() < 12 ? "v2_hi_m" : "v2_hi_e")) + (name ? " " + esc(name.split(" ")[0]) : "") + ' <span class="tag ' + (v2Own() ? "v2-own" : "") + '">' + esc(t(v2Own() ? "v2_owner" : "v2_free")) + "</span></h1></div>";
   const search = '<button class="v2-search" data-act="sr-open"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>' + esc(t("v2_q")) + "</span></button>";
   const nwI = (typeof NW !== "undefined" && NW.data && NW.data.items) || [];
-  const news = v2Card(t("v2_news"), "#news", t("v2_news_all"), nwI.length ? '<ul class="v2-news">' + nwI.filter((x) => x.imp >= 2).slice(0, 3).map((x) => '<li><a href="' + esc(x.u || "#news") + '" target="_blank" rel="noopener" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</a>" + (x.src || x.sym ? '<small class="muted">' + esc(x.sym || x.src || "") + "</small>" : "") + "</li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_news_none")) + "</p>");
+  const news = v2Card(t("v2_news"), "#news", t("v2_news_all"), nwI.length ? '<ul class="v2-news v2-dots">' + nwI.filter((x) => x.imp >= 2).slice(0, 5).map((x) => '<li><a href="' + esc(x.u || "#news") + '" target="_blank" rel="noopener" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</a>" + (x.src || x.sym ? '<small class="muted">' + esc(x.sym || x.src || "") + "</small>" : "") + "</li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_news_none")) + "</p>");
   const td = today(), al = typeof ntItems === "function" ? ntItems().filter((i) => (i.date || "").slice(0, 10) === td).slice(0, 5) : [];
   const alerts = v2Card(t("v2_alerts"), "#nt", t("v2_alerts_all"), al.length ? '<ul class="v2-news">' + al.map((i) => "<li><span>" + esc(v2NtText(i)) + "</span></li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_alerts_none")) + "</p>");
-  return '<div class="wrap v2-home"><div class="stack" style="padding-block:14px 40px;gap:14px">' + hi + search + '<div class="v2-grid"><div class="stack" style="gap:14px">' + v2BriefCard() + news + '</div><div class="stack" style="gap:14px">' + alerts + v2Now() + "</div></div></div></div>";
+  return '<div class="wrap v2-home"><div class="stack" style="padding-block:14px 40px;gap:14px">' + hi + search + '<div class="v2-grid"><div class="stack" style="gap:14px">' + v2BriefCard() + news + '</div><div class="stack" style="gap:14px">' + v2Now() + alerts + "</div></div></div></div>";
 }
 function v2NtText(i) {
   try {
@@ -10794,13 +10822,23 @@ document.addEventListener("click", (e) => { const a = e.target.closest && e.targ
 })();
 
 /* ----- مقاطع الدروس (30 ثانية، عربي وإنجليزي حسب لغة المستخدم) ----- */
-Object.assign(UI, { lv_h: ["الدرس في 30 ثانية", "The lesson in 30 seconds"] });
+Object.assign(UI, { lv_h: ["{t} في 30 ثانية", "{t} in 30 seconds"], as_btn: ["شات بوت", "Chatbot"] });
 const LESSON_VID = { "trd-1-1": "candle", "trd-1-2": "volume", "trd-2-1": "support", "trd-3-1": "ma", "inv-2-3": "exdate" };
 function lessonVideo(id) {
   const v = LESSON_VID[id]; if (!v) return "";
   const f = "videos/" + v + "-" + (S.lang === "en" ? "en" : "ar");
-  return '<figure class="lv"><figcaption>' + esc(t("lv_h")) + '</figcaption><video controls playsinline preload="none" poster="' + f + '.jpg" src="' + f + '.mp4"></video></figure>';
+  return '<figure class="lv"><figcaption>' + esc(t("lv_h").replace("{t}", L((LESSONS.find((x) => x.id === id) || { title: ["", ""] }).title))) + '</figcaption><video controls playsinline preload="none" poster="' + f + '.jpg" src="' + f + '.mp4"></video></figure>';
 }
+
+/* ----- المؤشرات: صفوف بعرض الشاشة، والتفاصيل بالضغط ----- */
+pageIndices = function () {
+  const head = '<div class="page-head"><h1>' + esc(t("nav_indices")) + "</h1><p>" + esc(t("d_indices")) + "</p></div>";
+  const items = typeof tkItems === "function" ? tkItems() : [];
+  if (!items.length) { if (v2Own() && typeof loadExtra === "function") loadExtra(); return '<div class="wrap">' + head + '<div class="notice" style="margin-block:18px">' + esc(t(v2Own() ? "dh_loading" : "ow_need")) + "</div></div>"; }
+  const rows = items.map((x) => { const d = x.st.d || 0;
+    return '<button class="v2-ix" data-act="tk-open" data-s="' + esc(x.it.s) + '"><span class="v2-ixn"><b>' + esc(L(x.it.n)) + "</b><small>" + esc(L(x.it.mk)) + '</small></span><b class="num" dir="ltr">' + tkFmt(x.st.c) + '</b><span class="tag ' + (d >= 0 ? "up" : "ex-dn") + ' num" dir="ltr">' + (d > 0 ? "+" : "") + (d * 100).toFixed(2) + "%</span>" + (x.R && typeof biasWord === "function" ? '<span class="tk-b ' + x.R.fb + '">' + esc(biasWord(x.R.fb)) + "</span>" : "<span></span>") + '<span class="v2-ixgo" aria-hidden="true">‹</span></button>'; }).join("");
+  return '<div class="wrap">' + head + '<div class="v2-ixl">' + rows + "</div></div>";
+};
 /* ===== التشغيل ===== */
 lastRoute = route();
 render();
