@@ -292,7 +292,7 @@ Object.assign(UI, { v2_opps: ["الفرص", "Opportunities"], v2_opps_d: ["ال�
     const html = od(r);
     if (!["screener", "movers", "radar"].includes(r)) return html;
     const tabs = '<nav class="v2-tabs" aria-label="' + esc(t("v2_opps")) + '">' + [["screener", "sc_t"], ["movers", "tp_t"], ["radar", "rd_t"]].map(([h, k]) => '<a href="#' + h + '"' + (h === r ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav>";
-    return html.replace(/<div class="page-head">[\s\S]*?<\/div>/, '<div class="page-head"><h1>' + esc(t("v2_opps")) + "</h1><p>" + esc(t("v2_opps_d")) + "</p></div>" + tabs);
+    return html.replace(/<div class="page-head">[\s\S]*?<\/div>/, '<div class="page-head"><h1>' + esc(t("v2_opps")) + "</h1></div>" + tabs);
   };
 }
 
@@ -362,7 +362,7 @@ const V2_TABSET = {
   const place = (b, p) => {
     const w = b.offsetWidth || 56, h = b.offsetHeight || 64, vw = window.innerWidth, vh = window.innerHeight;
     const x = Math.min(Math.max(6, p.x * vw), vw - w - 6), y = Math.min(Math.max(6, p.y * vh), vh - h - 6);
-    b.style.left = x + "px"; b.style.top = y + "px"; b.style.right = "auto"; b.style.bottom = "auto"; b.style.insetInlineEnd = "auto"; b.style.insetInlineStart = "auto";
+    b.style.right = "auto"; b.style.bottom = "auto"; b.style.left = x + "px"; b.style.top = y + "px";
   };
   function arm(b) {
     if (b.dataset.drag) return; b.dataset.drag = "1"; b.style.touchAction = "none"; b.style.userSelect = "none";
@@ -405,7 +405,7 @@ dkRadar = function () {
   if (RDJ) setTimeout(rdPaint, 30);
   const re = '<button class="v2-re" data-act="rd-refresh" title="' + esc(t("rd_refresh")) + '" aria-label="' + esc(t("rd_refresh")) + '"' + (RDJ ? " disabled" : "") + '><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
   return '<div class="row" style="justify-content:space-between;align-items:center"><p class="small muted" style="margin:0">' + esc(t("rd_scan").replace("{n}", RD.scanned || 0).replace("{d}", whenText(RD.updated))) + "</p>" + top + "</div>" + bar +
-    chips(rdF, "type", ["all", "breakout", "gainer", "momentum"]) + chips(rdM, "mk", ["all", "sa", "us"], re) +
+    '<div class="v2-rdrow">' + chips(rdF, "type", ["all", "breakout", "gainer", "momentum"]) + chips(rdM, "mk", ["all", "sa", "us"]) + re + "</div>" +
     (rdF !== "all" ? '<p class="small muted" style="margin:0">' + esc(t("rd_d_" + rdF)) + "</p>" : "") +
     (list.length ? '<div class="stack">' + list.map(rdCard).join("") + "</div>" : '<div class="notice">' + esc(t("rd_none")) + "</div>") +
     (log.length ? owPanel(t("rd_log"), '<ul class="tp-left">' + log.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc((typeof dkName === "function" && dkName(x.s)) || x.n || "") + ' <span class="tag">' + esc(t("rd_" + x.type)) + '</span> <span class="small muted num">' + esc(x.d) + " · " + esc(t("rd_str").replace("{n}", x.strength)) + "</span></li>").join("") + "</ul>") : "") + foot;
@@ -413,7 +413,7 @@ dkRadar = function () {
 { const os = dkScreener; dkScreener = function () { return os() + v2Note(t("sc_p")); }; }
 
 /* ----- التوزيعات السعودية: ملاحظة بسطر، الخانات أفقية بالنص داخلها، والأحقية تحت ----- */
-Object.assign(UI, { v2_dv_lead: ["كل أسهم السوق اللي توزع أرباح…", "Every paying share in the market…"], v2_dv_amt: ["المبلغ لكل سهم", "Amount per share"], v2_dv_fee: ["العمولة لكل عملية %", "Commission per side %"], v2_dv_q: ["ابحث بالاسم أو الرمز", "Search name or code"] });
+Object.assign(UI, { v2_dv_lead: ["كل أسهم السوق اللي توزع أرباح…", "Every paying share in the market…"], v2_dv_amt: ["مبلغ السهم", "Per share"], v2_dv_fee: ["العمولة %", "Commission %"], v2_dv_q: ["ابحث بالاسم أو الرمز", "Search name or code"] });
 pageDividends = function () {
   const c = divCfg(), list = divList(), real = list !== DIV_SAMPLE, canStar = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
   if (canStar && DIVW == null) setTimeout(loadDividends, 0);
@@ -426,12 +426,12 @@ pageDividends = function () {
     return '<tr id="dv-r' + i + '" data-s="' + esc(x.s) + '" data-n="' + esc(String(x.name || "").toLowerCase()) + '"><td><button type="button" class="dv-star" data-act="dv-star" data-sym="' + esc(x.s) + '" aria-pressed="' + !!on + '" title="' + esc(t("dv_star")) + '" aria-label="' + esc(t("dv_star")) + " " + esc(x.s) + '">' + (on ? "★" : "☆") + '</button></td><td title="' + esc(x.s) + '"><b>' + esc((typeof saName === "function" && saName(x.s)) || x.name || x.s) + "</b>" + (/^9/.test(x.s) ? ' <span class="tag">' + esc(t("dv_nomu_tag")) + "</span>" : "") + '</td><td class="num" id="dv-p' + i + '"></td><td class="num">' + (x.next_amt ? fmt(x.next_amt, x.next_amt < 1 ? 3 : 2) : "–") + "</td><td>" + ex + '</td><td id="dv-d' + i + '"></td><td class="num">' + (x.next_ex ? esc(buyBy(x.next_ex)) : "–") + '</td><td class="num" id="dv-y' + i + '"></td><td class="num" id="dv-m' + i + '"></td><td class="num" id="dv-s' + i + '"></td><td class="num pos" id="dv-a' + i + '"></td></tr>';
   }).join("");
   const count = real ? '<span class="small muted v2-cnt">' + esc(t("dv_count").replace("{n}", list.length).replace("{d}", DIV.as_of || whenText(DIV.fetched_at))) + "</span>" : "";
-  const nomu = v2Own() ? '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" : "";
+  const nomu = v2Own() ? '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + ' <span class="tag">VIP-VVIP</span></label>' : "";
   return svcShell("dividends",
     v2Note(t("dv_p"), t("v2_dv_lead")) +
     (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") +
     '<a class="v2-rlink" href="#dv-elig" data-v2go="dv-elig">' + esc(t("dve_h")) + " ↓</a>" +
-    '<div class="panel stack v2-dvf"><div class="v2-row3">' + inp("dv-budget", t("v2_dv_amt") + " ريال", c.budget, 50) + inp("dv-fee", t("v2_dv_fee"), c.fee, 0.01) + '<label class="v2-in"><span>' + esc(t("dv_search")) + '</span><input id="dv-q" value="' + esc(DVQ) + '" data-div="dv-q" autocomplete="off" aria-label="' + esc(t("dv_search")) + '"></label></div><div class="row v2-dvb">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + nomu + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
+    '<div class="panel stack v2-dvf"><div class="v2-row2">' + inp("dv-budget", t("v2_dv_amt") + " ريال", c.budget, 50) + inp("dv-fee", t("v2_dv_fee"), c.fee, 0.01) + '</div><div class="row v2-dvb">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + '</button><label class="v2-q"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="dv-q" type="search" value="' + esc(DVQ) + '" data-div="dv-q" autocomplete="off" placeholder="' + esc(t("v2_dv_q")) + '" aria-label="' + esc(t("v2_dv_q")) + '"></label></div><div class="row v2-dvb">' + nomu + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
     '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
     '<div id="dv-elig">' + dvEligHtml().replace('<details class="panel dve"', '<details open class="panel dve"').replace(' open open', ' open') + "</div>" +
     '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +
@@ -470,3 +470,29 @@ function v2Sar(root) {
 
 /* شات بوت: يتسلّح بالسحب أول ما ينخلق، عشان يبقى قابل للحركة دايماً */
 new MutationObserver(() => { const b = document.getElementById("asfab"); if (b && !b.dataset.drag) { const ev = new Event("v2arm"); b.dispatchEvent(ev); } }).observe(document.body, { childList: true });
+
+/* ----- الدروس بعد التنظيم: العقود لمكتبي، والمصطلحات درس داخل المسارات ----- */
+UI.v2_terms = ["درس المصطلحات", "Key terms lesson"]; UI.v2_terms_d = ["أهم مصطلحات السوق، كل مصطلح بشرح قصير.", "The key market terms, each with a short explanation."];
+NAV_GROUPS.learn.items = NAV_GROUPS.learn.items.filter((x) => !["options", "glossary"].includes(x[0]));
+NAV_GROUPS.office.items.splice(4, 0, ["options", "op_t", "dk_g_op", 1]);
+{ const og = groupOf; groupOf = (r) => (r === "options" ? "office" : r === "glossary" ? "learn" : og(r)); }
+{ const ot = pageTracks; pageTracks = function () { const h = ot(); const card = '<a class="v2-tile v2-termc" href="#glossary" style="--tint:' + V2_TINT.learn + '"><span class="v2-ic">' + v2Ic("tracks", 24) + "</span><b>" + esc(t("v2_terms")) + "</b><small>" + esc(t("v2_terms_d")) + "</small></a>"; return h.replace(/(<div class="page-head">[\s\S]*?<\/div>)/, "$1" + card); }; }
+
+/* ----- التوزيعات العالمية (الجوال): الإحصائيتين بسطر، «أتابعها» جنب التبويبات، والمجموعات قائمة منسدلة ----- */
+UI.v2_watch = ["★ أتابعها", "★ Watching"];
+{
+  const os = v2Shell;
+  v2Shell = function (r, html) {
+    html = os(r, html);
+    if (r === "gdiv") {
+      const on = typeof dgF !== "undefined" && dgF === "watch";
+      html = html.replace(/(<nav class="v2-tabs"[^>]*>[\s\S]*?)<\/nav>/, '$1<button class="v2-tabb" data-act="dg-f" data-f="watch" aria-pressed="' + on + '">' + esc(t("v2_watch")) + "</button></nav>");
+      html = html.replace(/<div class="dg-chips"([^>]*)>([\s\S]*?)<\/div>/, (m, attrs, btns) => {
+        const cur = (btns.match(/aria-pressed="true">([^<]*)</) || [, t("dg_g_all")])[1];
+        return '<details class="v2-dd"><summary>' + cur + ' <span aria-hidden="true">▾</span></summary><div class="v2-ddl">' + btns + "</div></details>" + m;
+      });
+    }
+    return html;
+  };
+}
+document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest(".v2-ddl button"); if (b) { const d = b.closest("details"); if (d) d.open = false; } });
