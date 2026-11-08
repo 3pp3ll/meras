@@ -1746,3 +1746,23 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   body.has-tabbar #totop:not([hidden]) ~ #asfab,body.has-tabbar #tobot:not([hidden]) ~ #asfab{bottom:calc(132px + env(safe-area-inset-bottom,0px))}
   body.has-tabbar #totop:not([hidden]) ~ #tobot:not([hidden]) ~ #asfab{bottom:calc(186px + env(safe-area-inset-bottom,0px))}
 }
+.v2-short li a{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v2-mapbtn{display:inline-flex;align-items:center;gap:2px;margin-inline-start:auto;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:5px 8px;color:var(--ink);cursor:pointer;font:inherit;font-size:16px;line-height:1}
+.v2-mapbtn:hover{border-color:var(--amber);color:var(--amber-ink)}
+.v2-mm{display:grid;gap:6px;font-size:13px}
+.v2-mm>b{font-size:13.5px}
+.v2-mmt,.v2-mmt ul{list-style:none;margin:0;padding:0}
+.v2-mmt{display:grid;gap:4px;border-inline-start:2px solid var(--line);padding-inline-start:10px}
+.v2-mmt>li>a{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--ink);text-decoration:none}
+.v2-mmt>li>a i{width:8px;height:8px;border-radius:3px;background:var(--tint)}
+.v2-mmt ul{display:flex;flex-wrap:wrap;gap:3px 10px;padding:2px 14px 4px}
+.v2-mmt ul a{color:var(--muted);text-decoration:none;font-size:12.5px}
+.v2-mmt a:hover{color:var(--amber-ink)}
+.v2-side-map{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px}
+#v2mapsheet{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px}
+.v2-ms-back{position:absolute;inset:0;background:rgba(20,25,40,.45)}
+.v2-ms-card{position:relative;width:min(380px,100%);max-height:80vh;overflow:auto;background:var(--surface);border-radius:18px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.v2-ms-x{position:absolute;top:8px;inset-inline-end:10px;border:0;background:none;font-size:24px;line-height:1;color:var(--muted);cursor:pointer}
+.v2-flash{outline:2px solid var(--amber);outline-offset:2px;transition:outline-color 2s}
+.v2-short{display:block}.v2-short li{overflow:hidden;min-width:0}
+.dk-side .v2-side-map a{padding:0!important;border-radius:0;display:inline;background:none!important}.dk-side .v2-side-map .v2-mmt>li>a{display:flex}.dk-side .v2-side-map .v2-mmt ul{gap:2px 10px}

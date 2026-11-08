@@ -29,7 +29,8 @@ Object.assign(UI, {
 /* ----- الأقسام ----- */
 NAV_GROUPS.market.items.splice(1, 0, ["news", "nav_news", "d_news", 1]);
 NAV_GROUPS.pf.items = NAV_GROUPS.pf.items.filter((x) => !["apps", "saved", "mycharts"].includes(x[0]));
-NAV_GROUPS.ai = { label: "v2_ai", items: [["ai-brief", "v2_brief", "v2_b_m", 1], ["ai-ask", "v2_ask", "v2_ai_p", 1], ["portfolio", "v2_report", "dk_g_pf", 1], ["ai-bell", "v2_bell", "v2_alerts", 1]] };
+NAV_GROUPS.market.items.unshift(["ai-brief", "v2_brief", "v2_b_m"]);
+NAV_GROUPS.ai = { label: "v2_ai", items: [["ai-ask", "v2_ask", "v2_ai_p", 1], ["portfolio", "v2_report", "dk_g_pf", 1], ["ai-bell", "v2_bell", "v2_alerts", 1]] };
 NAV_GROUPS.office = { label: "v2_office", items: [["owner", "ow_h", "map_owner_p", 1], ["apps", "ap_t", "dk_g_apps", 1], ["saved", "sv_t", "dk_g_sv", 1], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["map", "pm_map", "map_p", 1], ["settings", "set_h", "set_h", 1]] };
 UI.d_news = UI.d_news || ["أخبار السوق والشركات", "Market and company news"];
 const V2_ORDER = ["market", "ai", "pf", "learn", "office"];
@@ -41,6 +42,7 @@ const v2Label = (g) => (g === "home" ? t("nav_home") : NAV_GROUPS[g] ? t(NAV_GRO
   const og = groupOf;
   groupOf = function (r) {
     if (r === "news") return "market";
+    if (r === "ai-brief") return "market";
     if (r === "ai" || r.startsWith("ai-")) return "ai";
     if (r === "office") return "office";
     return og(r);
@@ -108,12 +110,11 @@ function v2Shell(r, html) {
   if (!g || ["plans", "checkout", "account", "privacy", "terms", "welcome"].includes(r)) return html;
   const sub = subOf(r), mini = typeof SIDE_MINI !== "undefined" && SIDE_MINI.includes(r);
   const link = (h, label, ic, on, tint) => '<a href="#' + h + '"' + (on ? ' aria-current="page"' : "") + ' title="' + esc(label) + '" style="--tint:' + tint + '"><span class="dk-si">' + v2Ic(ic, 19) + '</span><span class="dk-sl"><b>' + esc(label) + "</b></span></a>";
-  let nav = link("", t("nav_home"), "home", g === "home", V2_TINT.home);
+  let nav = link("", t("nav_home"), "home", g === "home", V2_TINT.home) + link("blog", t("nav_blog"), "blog", g === "blog", "#C2577E");
   v2Groups().forEach((k) => {
     nav += link(k, v2Label(k), k, g === k && r === k, V2_TINT[k]);
-    if (g === k) nav += '<div class="v2-sub">' + navItems(k).map(([h, lk]) => '<a href="#' + h + '"' + (sub === h ? ' aria-current="page"' : "") + ">" + esc(t(lk)) + "</a>").join("") + "</div>";
   });
-  return '<div class="wrap side-shell v2-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + (S.lang === "ar" ? "الأقسام" : "Sections") + '">' + nav + '</nav></aside><div class="side-main">' + v2Crumb(r, g) + html + "</div></div>";
+  return '<div class="wrap side-shell v2-shell' + (mini ? " mini" : "") + '"><aside class="dk-side"><nav aria-label="' + (S.lang === "ar" ? "الأقسام" : "Sections") + '">' + nav + "</nav>" + (v2Own() && !mini ? '<div class="v2-side-map">' + v2MiniMap() + "</div>" : "") + '</aside><div class="side-main">' + v2Crumb(r, g) + html + "</div></div>";
 }
 sideW = function () {
   const vw = document.documentElement.clientWidth || 0;
@@ -128,7 +129,8 @@ function v2Hub(g) {
   const tiles = navItems(g).map(([h, k, d]) => {
     const act = h === "ai-ask" ? ' data-act="as-toggle"' : h === "ai-bell" ? ' data-act="nt-bell"' : "";
     const href = h === "ai-brief" ? "#" : h === "ai-ask" || h === "ai-bell" ? "#ai" : "#" + h;
-    return '<a class="v2-tile" href="' + href + '"' + act + ' style="--tint:' + V2_TINT[g] + '"><span class="v2-ic">' + v2Ic(h, 26) + "</span><b>" + esc(t(k)) + "</b><small>" + esc(UI[d] ? t(d) : "") + "</small></a>";
+    const tint = h === "ai-brief" ? V2_TINT.market : V2_TINT[g];
+    return '<a class="v2-tile" href="' + href + '"' + act + ' style="--tint:' + tint + '"><span class="v2-ic">' + v2Ic(h, 26) + "</span><b>" + esc(t(k)) + "</b><small>" + esc(UI[d] ? t(d) : "") + "</small></a>";
   }).join("");
   return '<div class="wrap"><div class="page-head"><h1>' + esc(v2Label(g)) + "</h1><p>" + esc(t(p)) + '</p></div><div class="v2-tiles">' + tiles + "</div></div>";
 }
@@ -205,10 +207,10 @@ function pageHome2() {
   if (typeof DG !== "undefined" && !DG.loaded && typeof loadDG === "function") loadDG();
   if (typeof EXTRA !== "undefined" && !EXTRA && typeof loadExtra === "function") loadExtra();
   const name = (typeof MA !== "undefined" && MA.prof && MA.prof.name) || (typeof MA !== "undefined" && MA.user && MA.user.user_metadata && MA.user.user_metadata.name) || "";
-  const hi = '<div class="v2-hi"><h1>' + esc(t(v2Riyadh() < 12 ? "v2_hi_m" : "v2_hi_e")) + (name ? " " + esc(name.split(" ")[0]) : "") + ' <span class="tag ' + (v2Own() ? "v2-own" : "") + '">' + esc(t(v2Own() ? "v2_owner" : "v2_free")) + "</span></h1></div>";
+  const hi = '<div class="v2-hi"><h1>' + esc(t(v2Riyadh() < 12 ? "v2_hi_m" : "v2_hi_e")) + (name ? " " + esc(name.split(" ")[0]) : "") + ' <span class="tag ' + (v2Own() ? "v2-own" : "") + '">' + esc(t(v2Own() ? "v2_owner" : "v2_free")) + "</span>" + (v2Own() ? '<button class="v2-mapbtn" data-act="v2-map" aria-label="' + esc(t("pm_map")) + '" title="' + esc(t("pm_map")) + '">' + v2Ic("map", 18) + '<span aria-hidden="true">‹</span></button>' : "") + "</h1></div>";
   const search = '<button class="v2-search" data-act="sr-open"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>' + esc(t("v2_q")) + "</span></button>";
   const nwI = (typeof NW !== "undefined" && NW.data && NW.data.items) || [];
-  const news = v2Card(t("v2_news"), "#news", t("v2_news_all"), nwI.length ? '<ul class="v2-news v2-dots">' + nwI.filter((x) => x.imp >= 2).slice(0, 5).map((x) => '<li><a href="' + esc(x.u || "#news") + '" target="_blank" rel="noopener" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</a>" + (x.src || x.sym ? '<small class="muted">' + esc(x.sym || x.src || "") + "</small>" : "") + "</li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_news_none")) + "</p>");
+  const news = v2Card(t("v2_news"), "#news", t("v2_news_all"), nwI.length ? '<ul class="v2-news v2-dots v2-short">' + nwI.filter((x) => x.imp >= 2).slice(0, 4).map((x) => '<li><a href="#news" data-nwgo="' + esc(x.t) + '" dir="' + (x.lang === "ar" ? "rtl" : "ltr") + '">' + esc(x.t) + "</a></li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_news_none")) + "</p>");
   const td = today(), al = typeof ntItems === "function" ? ntItems().filter((i) => (i.date || "").slice(0, 10) === td).slice(0, 5) : [];
   const alerts = v2Card(t("v2_alerts"), "#nt", t("v2_alerts_all"), al.length ? '<ul class="v2-news">' + al.map((i) => "<li><span>" + esc(v2NtText(i)) + "</span></li>").join("") + "</ul>" : '<p class="muted small">' + esc(t("v2_alerts_none")) + "</p>");
   return '<div class="wrap v2-home"><div class="stack" style="padding-block:14px 40px;gap:14px">' + hi + search + '<div class="v2-grid"><div class="stack" style="gap:14px">' + v2BriefCard() + news + '</div><div class="stack" style="gap:14px">' + v2Now() + alerts + "</div></div></div></div>";
@@ -255,3 +257,24 @@ pageIndices = function () {
     return '<button class="v2-ix" data-act="tk-open" data-s="' + esc(x.it.s) + '"><span class="v2-ixn"><b>' + esc(L(x.it.n)) + "</b><small>" + esc(L(x.it.mk)) + '</small></span><b class="num" dir="ltr">' + tkFmt(x.st.c) + '</b><span class="tag ' + (d >= 0 ? "up" : "ex-dn") + ' num" dir="ltr">' + (d > 0 ? "+" : "") + (d * 100).toFixed(2) + "%</span>" + (x.R && typeof biasWord === "function" ? '<span class="tk-b ' + x.R.fb + '">' + esc(biasWord(x.R.fb)) + "</span>" : "<span></span>") + '<span class="v2-ixgo" aria-hidden="true">‹</span></button>'; }).join("");
   return '<div class="wrap">' + head + '<div class="v2-ixl">' + rows + "</div></div>";
 };
+
+/* ----- هيكل المنصة المصغر: تحت القائمة الجانبية على الكمبيوتر، ونافذة صغيرة على الجوال ----- */
+function v2MiniMap() {
+  const br = (g) => '<li><a href="#' + g + '" style="--tint:' + V2_TINT[g] + '"><i></i>' + esc(v2Label(g)) + "</a><ul>" + navItems(g).map(([h, k]) => '<li><a href="' + (h === "ai-brief" ? "#" : "#" + h) + '">' + esc(t(k)) + "</a></li>").join("") + "</ul></li>";
+  return '<div class="v2-mm"><b>' + esc(t("pm_map")) + '</b><ul class="v2-mmt"><li><a href="#" style="--tint:' + V2_TINT.home + '"><i></i>' + esc(t("nav_home")) + "</a></li>" + v2Groups().map(br).join("") + "</ul></div>";
+}
+document.addEventListener("click", (e) => {
+  const nw = e.target.closest && e.target.closest("[data-nwgo]");
+  if (nw) { try { sessionStorage.setItem("meras.nwgo", nw.dataset.nwgo); } catch (x) {} return; }
+  const b = e.target.closest && e.target.closest('[data-act="v2-map"],[data-act="v2-map-x"]'); if (!b) return;
+  e.preventDefault();
+  if (window.matchMedia("(min-width:1000px)").matches) { location.hash = "map"; return; }
+  let sh = document.getElementById("v2mapsheet");
+  if (b.dataset.act === "v2-map-x" || sh) { if (sh) sh.remove(); return; }
+  sh = document.createElement("div"); sh.id = "v2mapsheet"; sh.setAttribute("role", "dialog"); sh.setAttribute("aria-modal", "true");
+  sh.innerHTML = '<div class="v2-ms-back" data-act="v2-map-x"></div><div class="v2-ms-card"><button class="v2-ms-x" data-act="v2-map-x" aria-label="' + esc(t("tk_close")) + '">×</button>' + v2MiniMap() + "</div>";
+  document.body.appendChild(sh);
+});
+window.addEventListener("hashchange", () => { const sh = document.getElementById("v2mapsheet"); if (sh) sh.remove();
+  if (route() !== "news") return; let q = ""; try { q = sessionStorage.getItem("meras.nwgo") || ""; sessionStorage.removeItem("meras.nwgo"); } catch (x) {}
+  if (!q) return; setTimeout(() => { const h = [...document.querySelectorAll(".nw-title")].find((x) => x.textContent.trim() === q.trim()); const c = h && h.closest(".nw-card"); if (c) { c.scrollIntoView({ block: "center" }); c.classList.add("v2-flash"); setTimeout(() => c.classList.remove("v2-flash"), 2200); } }, 400); });

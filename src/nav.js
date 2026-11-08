@@ -27,7 +27,7 @@ Object.assign(UI, {
 const NAV_GROUPS = {
   market: { label: "nav_market", items: [["chart", "nav_chart", "d_chart"], ["symbols", "nav_symbols", "d_symbols"], ["indices", "nav_indices", "d_indices", 1], ["tech", "tab_tech", "d_tech"], ["metals", "tab_met", "d_met"], ["screener", "sc_t", "dk_g_sc", 1], ["movers", "tp_t", "dk_g_top", 1], ["radar", "rd_t", "dk_g_rd", 1], ["usm", "us_t", "dk_g_us", 1]] },
   pf: { label: "nav_pf", items: [["apps", "ap_t", "dk_g_apps", 1], ["portfolio", "dk_t_pf", "dk_g_pf", 1], ["journal", "tab_journal", "d_journal"], ["saved", "sv_t", "dk_g_sv", 1], ["analyses", "nav_an", "d_an"], ["mycharts", "dk_t_ch", "dk_g_ch", 1], ["dividends", "tab_div", "d_div"], ["gdiv", "dg_t", "dk_g_dg", 1], ["invest", "tab_inv", "d_invest"], ["sharia", "tab_sharia", "d_sharia"], ["calc", "tab_calc", "d_calc"]] },
-  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["blog", "nav_blog", "d_blog"], ["progress", "nav_progress", "d_prog"]] }
+  learn: { label: "nav_learn", items: [["tracks", "nav_tracks", "d_tracks"], ["schools", "nav_schools", "d_schools"], ["guides", "nav_guides", "d_guides"], ["lab", "nav_lab", "d_lab"], ["options", "op_t", "dk_g_op", 1], ["glossary", "tab_gloss", "d_gloss"], ["progress", "nav_progress", "d_prog"]] }
 };
 /* بنود المالك (العلامة 1) تختفي إذا ما فيه ربط GitHub */
 const navItems = (g) => (NAV_GROUPS[g] ? NAV_GROUPS[g].items.filter((x) => !x[3] || (typeof HOSTED !== "undefined" && HOSTED && CFG.token)) : []);
