@@ -265,7 +265,7 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
   var HOSTED = !window.claude && /^https?:$/.test(location.protocol) && !/[?&]demo\b/.test(location.search);
   var START_EQ = 100000, TARGET = 0.8;
   var MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-  var CAT = { ai: "الذكاء الاصطناعي", leaders: "القيادية", gold: "الذهب", sa_leaders: "القيادية السعودية", sa_tech: "التقنية السعودية", cn_ai: "🇨🇳 الذكاء الاصطناعي الصيني", us_movers: "🔥 الأكثر حركة", sa_movers: "🔥 الأكثر حركة" };
+  var CAT = { ai: "الذكاء الاصطناعي", leaders: "القيادية", gold: "الذهب", sa_leaders: "القيادية السعودية", sa_tech: "التقنية السعودية", cn_ai: "🇨🇳 الذكاء الاصطناعي الصيني", us_movers: "🔥 الأكثر حركة", sa_movers: "🔥 الأكثر حركة", sa_gold: "الذهب (تداول)" };
   var MKT = { us: "🇺🇸 الأمريكي", sa: "🇸🇦 السعودي" };
   var PAGES = ["overview", "signals", "archive", "reports", "control", "settings"];
   var TITLES = { overview: "الأداء", signals: "سجل التوصيات", archive: "الأرشيف الشهري", reports: "التقارير والتصدير", control: "لوحة التحكم", settings: "الإعدادات" };
@@ -515,7 +515,8 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       swing: Object.assign({ tp1_pct: 10, tp2_pct: 20, max_loss_pct: 5 }, c.swing || {}),
       quick: { tp_pct: (c.quick || {}).tp_pct || 3, stop_pct: (c.quick || {}).stop_pct || 2 },
       links: Object.assign({ channel: "", bot: "https://t.me/Matrix4H_ProBot" }, c.links || {}),
-      members: (c.members || []).map(function (m) { return Object.assign({}, m); }) };
+      members: (c.members || []).map(function (m) { return Object.assign({}, m); }),
+      paused: (c.paused || []).slice() };
   }
   function loadControl() {
     if (DEMO) { CTRL.data = CTRL.data || ctrlDefaults(); return; }
@@ -592,7 +593,20 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
       '<div class="row" style="justify-content:flex-start"><button class="btn" type="submit">احفظ المشترك</button><button class="btn ghost" type="button" data-act="m-cancel">إلغاء</button></div></form>' : "";
     var members = '<div class="panel stack"><div class="row"><h2>المشتركين</h2><button class="btn ghost" type="button" data-act="m-new">+ مشترك</button></div>' +
       '<p class="note">في شهر التجربة القائمة للتجهيز بس: التوصيات توصلك أنت لين تفتح النشر.</p>' + form + (rows || '<div class="empty" style="padding:18px"><b>ما فيه مشتركين للحين</b>اضغط "+ مشترك" وأضف أول واحد، مثلاً أخوك.</div>') + "</div>";
-    return '<section class="stack">' + warn + trade + links + members + "</section>";
+    var paused = c.paused || [];
+    var tick = ((DATA && DATA.tickers && DATA.tickers.list) || []).filter(function (t) { return t.verified || paused.indexOf(t.symbol) >= 0; });
+    var grp = {};
+    tick.forEach(function (t) { var k = (t.market || "us"); (grp[k] = grp[k] || []).push(t); });
+    var symRows = ["us", "sa"].filter(function (k) { return grp[k]; }).map(function (k) {
+      return "<h3>" + MKT[k] + ' <span class="note">(' + grp[k].length + ")</span></h3>" + grp[k].map(function (t) {
+        var off = paused.indexOf(t.symbol) >= 0;
+        return '<div class="mrow"><div class="who"><b>' + esc(t.name || t.symbol) + "</b><span class=\"note\">" + (t.name ? '<span class="num">' + esc(t.symbol) + "</span> · " : "") + esc(CAT[t.category] || t.category) + (t.purify != null ? " · تطهير " + t.purify + "%" : "") + "</span></div>" +
+          '<button class="btn ' + (off ? "ghost" : "") + '" type="button" data-act="sym" data-s="' + esc(t.symbol) + '" aria-pressed="' + (off ? "false" : "true") + '">' + (off ? "⏸ موقف" : "✓ مفعّل") + "</button></div>";
+      }).join("");
+    }).join("");
+    var syms = '<div class="panel stack"><h2>الرموز</h2><p class="note"><b>مفعّل:</b> إذا طلعت إشارة كويسة تنرسل التوصية. <b>موقف:</b> ما تطلع عليه توصية جديدة، والصفقات المفتوحة تكمل متابعتها. يتطبق من التشغيلة الجاية.</p>' +
+      (symRows || '<div class="empty" style="padding:18px"><b>ما فيه رموز مجازة للحين</b></div>') + "</div>";
+    return '<section class="stack">' + warn + trade + syms + links + members + "</section>";
   }
 
   /* ---------- التنقل ---------- */
@@ -657,6 +671,11 @@ ol.steps { margin: 0; padding-inline-start: 20px; display: grid; gap: 6px; font-
     if (a === "m-new") { CTRL.edit = -1; render(); return; }
     if (a === "m-edit") { CTRL.edit = +el.dataset.i; render(); return; }
     if (a === "m-cancel") { CTRL.edit = null; render(); return; }
+    if (a === "sym") {
+      var sym = el.dataset.s, list = CTRL.data.paused = CTRL.data.paused || [], at = list.indexOf(sym);
+      if (at >= 0) list.splice(at, 1); else list.push(sym);
+      saveControl((at >= 0 ? "resume " : "pause ") + sym); return;
+    }
     if (a === "m-del") { var gone = CTRL.data.members.splice(+el.dataset.i, 1)[0]; CTRL.edit = null; saveControl("remove member " + (gone && gone.email)); return; }
     if (a === "copy" || a === "share") {
       var inp = $("l-" + el.dataset.k), url = inp && inp.value.trim();
