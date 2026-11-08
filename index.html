@@ -1749,6 +1749,9 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 .v2-tbl td:nth-child(2){width:84px}.v2-tbl td:last-child{width:80px}
 .v2-sym{max-width:100%}
 .v2-sym b,.v2-sym small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.lv{margin:4px 0 8px;display:grid;gap:8px;justify-items:center}
+.lv figcaption{font-weight:700;font-size:15px;justify-self:start}
+.lv video{width:100%;max-width:340px;aspect-ratio:9/16;border-radius:18px;background:var(--sunk);border:1px solid var(--line);object-fit:cover}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -2819,7 +2822,7 @@ function pageLesson(id) {
   const allRight = qs.checked && l.quiz.every((q, qi) => qs.picks[qi] === q.a);
   const verdict = qs.checked ? '<div class="row"><span class="tag ' + (allRight ? "up" : "down") + '">' + esc(allRight ? t("passed") : t("failed")) + "</span>" + (allRight ? "" : '<button class="btn sm" data-act="quiz-retry" data-id="' + id + '">' + esc(t("retry")) + "</button>") + "</div>" : '<div><button class="btn primary" data-act="quiz-check" data-id="' + id + '">' + esc(t("check")) + "</button></div>";
   return '<div class="wrap"><article class="lesson"><div class="crumbs"><a href="#tracks">' + esc(t("nav_tracks")) + "</a> / " + esc(L(tr.name)) + " / " + esc(t("step")) + " " + l.level + '</div><div class="stack" style="gap:8px"><h1>' + esc(L(l.title)) + '</h1><div class="row small muted"><span>' + l.mins + " " + esc(t("mins")) + "</span>" + (isDone(id) ? '<span class="tag amber">' + esc(t("done")) + "</span>" : "") + "</div></div>" +
-    '<div class="prose">' + l.body.map((b) => block(b, id)).join("") + '</div>' + (typeof asLessonBox === "function" ? asLessonBox() : "") + '<section class="quiz"><h2 style="font-size:24px">' + esc(t("quiz_h")) + "</h2>" + quiz + verdict + "</section>" +
+    (typeof lessonVideo === "function" ? lessonVideo(id) : "") + '<div class="prose">' + l.body.map((b) => block(b, id)).join("") + '</div>' + (typeof asLessonBox === "function" ? asLessonBox() : "") + '<section class="quiz"><h2 style="font-size:24px">' + esc(t("quiz_h")) + "</h2>" + quiz + verdict + "</section>" +
     '<nav class="lesson-nav">' + (prev ? '<a class="btn" href="#l-' + prev.id + '">' + esc(t("prev")) + "</a>" : '<a class="btn" href="#tracks">' + esc(t("back_tracks")) + "</a>") + (next ? '<a class="btn ' + (isDone(id) ? "primary" : "") + '" href="#l-' + next.id + '">' + esc(t("next")) + "</a>" : '<a class="btn" href="#progress">' + esc(t("nav_progress")) + "</a>") + "</nav></article></div>";
 }
 
@@ -10789,6 +10792,15 @@ document.addEventListener("click", (e) => { const a = e.target.closest && e.targ
   const upd = () => { const left = document.documentElement.scrollHeight - window.innerHeight - window.scrollY; b.hidden = document.documentElement.scrollHeight < window.innerHeight * 2 || left < 400; b.setAttribute("aria-label", t("v2_down")); b.title = t("v2_down"); };
   window.addEventListener("scroll", upd, { passive: true }); window.addEventListener("hashchange", () => setTimeout(upd, 300)); setTimeout(upd, 1500);
 })();
+
+/* ----- مقاطع الدروس (30 ثانية، عربي وإنجليزي حسب لغة المستخدم) ----- */
+Object.assign(UI, { lv_h: ["الدرس في 30 ثانية", "The lesson in 30 seconds"] });
+const LESSON_VID = { "trd-1-1": "candle", "trd-1-2": "volume", "trd-2-1": "support", "trd-3-1": "ma", "inv-2-3": "exdate" };
+function lessonVideo(id) {
+  const v = LESSON_VID[id]; if (!v) return "";
+  const f = "videos/" + v + "-" + (S.lang === "en" ? "en" : "ar");
+  return '<figure class="lv"><figcaption>' + esc(t("lv_h")) + '</figcaption><video controls playsinline preload="none" poster="' + f + '.jpg" src="' + f + '.mp4"></video></figure>';
+}
 /* ===== التشغيل ===== */
 lastRoute = route();
 render();

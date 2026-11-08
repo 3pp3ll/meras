@@ -236,3 +236,12 @@ document.addEventListener("click", (e) => { const a = e.target.closest && e.targ
   const upd = () => { const left = document.documentElement.scrollHeight - window.innerHeight - window.scrollY; b.hidden = document.documentElement.scrollHeight < window.innerHeight * 2 || left < 400; b.setAttribute("aria-label", t("v2_down")); b.title = t("v2_down"); };
   window.addEventListener("scroll", upd, { passive: true }); window.addEventListener("hashchange", () => setTimeout(upd, 300)); setTimeout(upd, 1500);
 })();
+
+/* ----- مقاطع الدروس (30 ثانية، عربي وإنجليزي حسب لغة المستخدم) ----- */
+Object.assign(UI, { lv_h: ["الدرس في 30 ثانية", "The lesson in 30 seconds"] });
+const LESSON_VID = { "trd-1-1": "candle", "trd-1-2": "volume", "trd-2-1": "support", "trd-3-1": "ma", "inv-2-3": "exdate" };
+function lessonVideo(id) {
+  const v = LESSON_VID[id]; if (!v) return "";
+  const f = "videos/" + v + "-" + (S.lang === "en" ? "en" : "ar");
+  return '<figure class="lv"><figcaption>' + esc(t("lv_h")) + '</figcaption><video controls playsinline preload="none" poster="' + f + '.jpg" src="' + f + '.mp4"></video></figure>';
+}

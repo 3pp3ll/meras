@@ -1,5 +1,5 @@
 /* مِراس: يخلي المنصة تفتح بدون نت. غيّر رقم النسخة عند كل تحديث كبير. */
-const CACHE = "meras-v111";
+const CACHE = "meras-v112";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {
@@ -11,6 +11,7 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request, url = new URL(req.url);
   if (req.method !== "GET" || url.hostname === "api.github.com" || url.hostname === "openrouter.ai") return;
+  if (url.pathname.includes("/sentinel/") || url.pathname.includes("/videos/")) return;   // المقاطع تنسحب مباشرة (طلبات الأجزاء ما تنخزن)
   if (url.pathname.includes("/sentinel/")) return;   // تطبيق Sentinel له ملف تخزين خاص فيه   // المزامنة والأسعار دائماً من الشبكة
   if (url.origin === location.origin) {
     // ملفات المنصة: الشبكة أولاً عشان التحديثات توصل، والمخزن عند انقطاع النت
