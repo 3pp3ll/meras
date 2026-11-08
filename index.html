@@ -1929,6 +1929,10 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 /* النجمة */
 .v2-star{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:19px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
 .v2-star.on{color:#E8B21C;border-color:#E8B21C;background:color-mix(in srgb,#E8B21C 12%,var(--surface))}
+.v2-dhub.on circle{fill:#2F3A4F;stroke:#2F3A4F}
+.v2-dhub.on text{fill:#fff}
+.v2-nomu{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);flex:1 1 100%;line-height:1.5}
+.v2-nomu input{margin:0;flex:none;width:15px;height:15px}
 </style>
 <header class="top" id="top"></header><main id="main"></main><footer class="foot" id="foot"></footer><div id="toast" hidden role="status" aria-live="polite"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -11138,7 +11142,7 @@ dkRadar = function () {
   if (RDJ) setTimeout(rdPaint, 30);
   const re = '<button class="v2-re" data-act="rd-refresh" title="' + esc(t("rd_refresh")) + '" aria-label="' + esc(t("rd_refresh")) + '"' + (RDJ ? " disabled" : "") + '><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
   return '<div class="row" style="justify-content:space-between;align-items:center"><p class="small muted" style="margin:0">' + esc(t("rd_scan").replace("{n}", RD.scanned || 0).replace("{d}", whenText(RD.updated))) + "</p>" + top + "</div>" + bar +
-    '<div class="v2-rdrow">' + v2Dial("type", rdF, [["breakout", "#E07A4E"], ["gainer", "#3C8CC9"], ["momentum", "#2E9C73"]]) + v2Dial("mk", rdM, [["sa", "#2E9C73"], ["us", "#3C6FD1"]]) + re + "</div>" +
+    '<div class="v2-rdrow">' + v2Dial("type", rdF, [["breakout", "#E0875E"], ["gainer", "#D27396"], ["momentum", "#5E9FD6"]]) + v2Dial("mk", rdM, [["sa", "#E0875E"], ["us", "#5E9FD6"]]) + re + "</div>" +
     (rdF !== "all" ? '<p class="small muted" style="margin:0">' + esc(t("rd_d_" + rdF)) + "</p>" : "") +
     (list.length ? '<div class="stack">' + list.map(rdCard).join("") + "</div>" : '<div class="notice">' + esc(t("rd_none")) + "</div>") +
     (log.length ? owPanel(t("rd_log"), '<ul class="tp-left">' + log.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc((typeof dkName === "function" && dkName(x.s)) || x.n || "") + ' <span class="tag">' + esc(t("rd_" + x.type)) + '</span> <span class="small muted num">' + esc(x.d) + " · " + esc(t("rd_str").replace("{n}", x.strength)) + "</span></li>").join("") + "</ul>") : "") + foot;
@@ -11159,7 +11163,7 @@ pageDividends = function () {
     return '<tr id="dv-r' + i + '" data-s="' + esc(x.s) + '" data-n="' + esc(String(x.name || "").toLowerCase()) + '"><td><button type="button" class="dv-star" data-act="dv-star" data-sym="' + esc(x.s) + '" aria-pressed="' + !!on + '" title="' + esc(t("dv_star")) + '" aria-label="' + esc(t("dv_star")) + " " + esc(x.s) + '">' + (on ? "★" : "☆") + '</button></td><td title="' + esc(x.s) + '"><b>' + esc((typeof saName === "function" && saName(x.s)) || x.name || x.s) + "</b>" + (/^9/.test(x.s) ? ' <span class="tag">' + esc(t("dv_nomu_tag")) + "</span>" : "") + '</td><td class="num" id="dv-p' + i + '"></td><td class="num">' + (x.next_amt ? fmt(x.next_amt, x.next_amt < 1 ? 3 : 2) : "–") + "</td><td>" + ex + '</td><td id="dv-d' + i + '"></td><td class="num">' + (x.next_ex ? esc(buyBy(x.next_ex)) : "–") + '</td><td class="num" id="dv-y' + i + '"></td><td class="num" id="dv-m' + i + '"></td><td class="num" id="dv-s' + i + '"></td><td class="num pos" id="dv-a' + i + '"></td></tr>';
   }).join("");
   const count = real ? '<span class="small muted v2-cnt">' + esc(t("dv_count").replace("{n}", list.length).replace("{d}", DIV.as_of || whenText(DIV.fetched_at))) + "</span>" : "";
-  const nomu = v2Own() ? '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + ' <span class="tag">VIP-VVIP</span></label>' : "";
+  const nomu = v2Own() ? '<label class="v2-nomu"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + "><span>" + esc(t("dv_nomu")) + " (VIP-VVIP)</span></label>" : "";
   return svcShell("dividends",
     v2Note(t("dv_p"), t("v2_dv_lead")) +
     (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") +
