@@ -298,9 +298,9 @@ Object.assign(UI, { v2_opps: ["الفرص", "Opportunities"], v2_opps_d: ["ال�
 
 /* ----- أفضل حركة: النص ملاحظة مختصرة تحت، والجرس أيقونة جنب عنوان «الفرص» ----- */
 Object.assign(UI, { v2_more: ["المزيد", "More"], v2_note: ["ملاحظة:", "Note:"], v2_bell_on: ["نغمة التنبيه شغالة. اضغط لإيقافها", "Alert sound is on. Tap to turn off"], v2_bell_off: ["شغّل نغمة التنبيه", "Turn on the alert sound"] });
-function v2Note(txt) {
-  const w = String(txt || "").split(/\s+/);
-  return '<details class="v2-note"><summary><b>' + esc(t("v2_note")) + "</b> " + esc(w.slice(0, 2).join(" ")) + '… <span>' + esc(t("v2_more")) + "</span></summary><p>" + esc(txt) + "</p></details>";
+function v2Note(txt, lead) {
+  const w = String(txt || "").split(/\s+/), sh = lead || w.slice(0, 3).join(" ") + "…";
+  return '<div class="v2-note"><p><b class="v2-nl">' + esc(t("v2_note")) + '</b> <span class="v2-nf">' + esc(txt) + '</span><span class="v2-ns">' + esc(sh) + ' <button type="button" class="v2-nm" data-act="v2-nm">' + esc(t("v2_more")) + "</button></span></p></div>";
 }
 {
   const ot = dkTop;
@@ -315,7 +315,7 @@ function v2Note(txt) {
     if (r !== "movers") return h;
     const on = typeof topSound !== "undefined" && topSound;
     const bell = '<button class="v2-bell' + (on ? " on" : "") + '" data-act="top-sound" aria-pressed="' + on + '" aria-label="' + esc(t(on ? "v2_bell_on" : "v2_bell_off")) + '" title="' + esc(t(on ? "v2_bell_on" : "v2_bell_off")) + '">' + v2Ic("ai-bell", 18) + "</button>";
-    return h.replace("<h1>" + esc(t("v2_opps")) + "</h1>", '<h1 class="v2-h1b">' + esc(t("v2_opps")) + bell + "</h1>");
+    return h.replace("</nav>", bell + "</nav>");
   };
 }
 
@@ -331,7 +331,7 @@ shFinder = function () {
 pageSharia = function () { if (!shTried) loadSharia(); return svcShell("sharia", shFinder()); };
 
 /* ----- محفظتي بعد التنظيم: «سجلي» (سجل التداول + تحليلاتي) و«التوزيعات» (السعودي + العالمي) بتبويبات ----- */
-Object.assign(UI, { v2_log: ["سجلي", "My log"], v2_log_d: ["صفقاتك وتحليلاتك في مكان واحد.", "Your trades and analyses in one place."], v2_div_sa: ["السوق السعودي", "Saudi market"], v2_div_gl: ["العالمية", "Global"], v2_div_d: ["تقويم التوزيعات والعائد، السعودي والعالمي.", "Dividend calendar and yield, Saudi and global."] });
+Object.assign(UI, { v2_log: ["السجل", "Log"], v2_log_d: ["صفقاتك وتحليلاتك في مكان واحد.", "Your trades and analyses in one place."], v2_div_sa: ["السوق السعودي", "Saudi market"], v2_div_gl: ["العالمية", "Global"], v2_div_d: ["تقويم التوزيعات والعائد، السعودي والعالمي.", "Dividend calendar and yield, Saudi and global."] });
 const V2_TABS = {
   journal: "log", analyses: "log", dividends: "div", gdiv: "div"
 };
@@ -365,7 +365,7 @@ const V2_TABSET = {
     b.style.left = x + "px"; b.style.top = y + "px"; b.style.right = "auto"; b.style.bottom = "auto"; b.style.insetInlineEnd = "auto"; b.style.insetInlineStart = "auto";
   };
   function arm(b) {
-    if (b.dataset.drag) return; b.dataset.drag = "1"; b.style.touchAction = "none";
+    if (b.dataset.drag) return; b.dataset.drag = "1"; b.style.touchAction = "none"; b.style.userSelect = "none";
     const p = get(); if (p) place(b, p);
     let st = null, moved = false;
     b.addEventListener("pointerdown", (e) => { st = { x: e.clientX, y: e.clientY, l: b.getBoundingClientRect().left, t: b.getBoundingClientRect().top }; moved = false; try { b.setPointerCapture(e.pointerId); } catch (x) {} });
@@ -379,6 +379,94 @@ const V2_TABSET = {
     b.addEventListener("click", (e) => { if (moved) { e.stopImmediatePropagation(); e.preventDefault(); moved = false; } }, true);
     window.addEventListener("resize", () => { const q = get(); if (q) place(b, q); });
   }
+  document.addEventListener("v2arm", (e) => arm(e.target), true);
   const tick = () => { const b = document.getElementById("asfab"); if (b) arm(b); };
   setInterval(tick, 1500); tick();
 })();
+
+document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest('[data-act="v2-nm"]'); if (b) { e.preventDefault(); b.closest(".v2-note").classList.add("open"); } });
+document.addEventListener("click", (e) => { const a = e.target.closest && e.target.closest("[data-v2go]"); if (!a) return; e.preventDefault(); const el = document.getElementById(a.dataset.v2go); if (el) { el.scrollIntoView({ behavior: "smooth", block: "start" }); el.classList.add("v2-flash"); setTimeout(() => el.classList.remove("v2-flash"), 2000); } });
+
+/* ----- رادار الزخم: القواعد والشرح تحت، وزر التحديث أيقونة جنب «الأمريكي» ----- */
+UI.v2_rules = ["قواعد مهمة ↓", "Key rules ↓"];
+dkRadar = function () {
+  if (!RD && !rdLoading) loadRadar();
+  const chips = (cur, key, list, extra) => '<div class="nt-filters v2-chips" role="group">' + list.map((k) => '<button class="dg-chip" data-act="rd-f" data-key="' + key + '" data-f="' + k + '" aria-pressed="' + (cur === k) + '">' + esc(t(k === "all" ? "rd_all" : "rd_" + k)) + "</button>").join("") + (extra || "") + "</div>";
+  const rules = '<details class="panel" id="rd-rules" open><summary><b>' + esc(t("rd_rules")) + '</b></summary><ul class="small">' + ["rd_r1", "rd_r2", "rd_r3", "rd_r4"].map((k) => "<li>" + esc(t(k)) + "</li>").join("") + "</ul>" + '<p class="small"><a href="#sch-momentum">' + esc(t("rd_lesson")) + " ←</a></p>" +
+    ["breakout", "gainer", "momentum"].map((k) => '<p class="small"><b>' + esc(t("rd_" + k)) + ":</b> " + esc(t("rd_d_" + k)) + "</p>").join("") + "</details>";
+  const foot = rules + v2Note(t("rd_p"));
+  const top = '<a class="v2-rlink small" href="#rd-rules" data-v2go="rd-rules">' + esc(t("v2_rules")) + "</a>";
+  if (!RD) return top + '<div class="notice">' + esc(t("dk_loading")) + "</div>" + foot;
+  if (!RD.updated) return top + '<div class="notice">' + esc(t("rd_wait")) + "</div>" + foot;
+  const list = (RD.items || []).filter((x) => (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
+  const log = (RD.log || []).slice(-15).reverse();
+  setTimeout(() => { if (typeof ntMark === "function") ntMark((RD.log || []).map((x) => "r:" + x.id)); if (typeof topBell === "function") topBell(); }, 1500);
+  const bar = RDJ ? '<div class="rd-prog" id="rd-prog"><div><i></i></div><span>' + esc(t("rd_busy").replace("{t}", "3:00")) + "</span></div>" : "";
+  if (RDJ) setTimeout(rdPaint, 30);
+  const re = '<button class="v2-re" data-act="rd-refresh" title="' + esc(t("rd_refresh")) + '" aria-label="' + esc(t("rd_refresh")) + '"' + (RDJ ? " disabled" : "") + '><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+  return '<div class="row" style="justify-content:space-between;align-items:center"><p class="small muted" style="margin:0">' + esc(t("rd_scan").replace("{n}", RD.scanned || 0).replace("{d}", whenText(RD.updated))) + "</p>" + top + "</div>" + bar +
+    chips(rdF, "type", ["all", "breakout", "gainer", "momentum"]) + chips(rdM, "mk", ["all", "sa", "us"], re) +
+    (rdF !== "all" ? '<p class="small muted" style="margin:0">' + esc(t("rd_d_" + rdF)) + "</p>" : "") +
+    (list.length ? '<div class="stack">' + list.map(rdCard).join("") + "</div>" : '<div class="notice">' + esc(t("rd_none")) + "</div>") +
+    (log.length ? owPanel(t("rd_log"), '<ul class="tp-left">' + log.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc((typeof dkName === "function" && dkName(x.s)) || x.n || "") + ' <span class="tag">' + esc(t("rd_" + x.type)) + '</span> <span class="small muted num">' + esc(x.d) + " · " + esc(t("rd_str").replace("{n}", x.strength)) + "</span></li>").join("") + "</ul>") : "") + foot;
+};
+{ const os = dkScreener; dkScreener = function () { return os() + v2Note(t("sc_p")); }; }
+
+/* ----- التوزيعات السعودية: ملاحظة بسطر، الخانات أفقية بالنص داخلها، والأحقية تحت ----- */
+Object.assign(UI, { v2_dv_lead: ["كل أسهم السوق اللي توزع أرباح…", "Every paying share in the market…"], v2_dv_amt: ["المبلغ لكل سهم", "Amount per share"], v2_dv_fee: ["العمولة لكل عملية %", "Commission per side %"], v2_dv_q: ["ابحث بالاسم أو الرمز", "Search name or code"] });
+pageDividends = function () {
+  const c = divCfg(), list = divList(), real = list !== DIV_SAMPLE, canStar = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
+  if (canStar && DIVW == null) setTimeout(loadDividends, 0);
+  const inp = (id, ph, val, step) => '<label class="v2-in"><span>' + esc(ph) + '</span><input id="' + id + '" class="num" type="number" min="0" step="' + (step || "any") + '" value="' + val + '" data-div="' + id + '" aria-label="' + esc(ph) + '"></label>';
+  const fb = (v, k) => '<button type="button" class="btn sm tgl' + (c.f === v ? " on" : "") + '" data-act="dv-f" data-f="' + v + '" aria-pressed="' + (c.f === v) + '">' + esc(t(k)) + "</button>";
+  const head = ["", "dv_sym", "dv_price", "dv_next", "dv_ex", "dv_left", "dv_buyby", "dv_yld", "dv_min", "dv_sh", "dv_get"].map((k) => "<th>" + (k ? esc(t(k)) : "") + "</th>").join("");
+  const rows = list.map((x, i) => {
+    const on = DIVW && DIVW.includes(x.s);
+    const ex = x.next_ex ? '<span class="num">' + esc(x.next_ex) + '</span> <span class="tag' + (x.announced ? " up" : "") + '">' + esc(t(x.announced ? "dv_ann" : "dv_exp")) + "</span>" : '<span class="muted">' + esc(t("dv_none")) + "</span>";
+    return '<tr id="dv-r' + i + '" data-s="' + esc(x.s) + '" data-n="' + esc(String(x.name || "").toLowerCase()) + '"><td><button type="button" class="dv-star" data-act="dv-star" data-sym="' + esc(x.s) + '" aria-pressed="' + !!on + '" title="' + esc(t("dv_star")) + '" aria-label="' + esc(t("dv_star")) + " " + esc(x.s) + '">' + (on ? "★" : "☆") + '</button></td><td title="' + esc(x.s) + '"><b>' + esc((typeof saName === "function" && saName(x.s)) || x.name || x.s) + "</b>" + (/^9/.test(x.s) ? ' <span class="tag">' + esc(t("dv_nomu_tag")) + "</span>" : "") + '</td><td class="num" id="dv-p' + i + '"></td><td class="num">' + (x.next_amt ? fmt(x.next_amt, x.next_amt < 1 ? 3 : 2) : "–") + "</td><td>" + ex + '</td><td id="dv-d' + i + '"></td><td class="num">' + (x.next_ex ? esc(buyBy(x.next_ex)) : "–") + '</td><td class="num" id="dv-y' + i + '"></td><td class="num" id="dv-m' + i + '"></td><td class="num" id="dv-s' + i + '"></td><td class="num pos" id="dv-a' + i + '"></td></tr>';
+  }).join("");
+  const count = real ? '<span class="small muted v2-cnt">' + esc(t("dv_count").replace("{n}", list.length).replace("{d}", DIV.as_of || whenText(DIV.fetched_at))) + "</span>" : "";
+  const nomu = v2Own() ? '<label class="row small" style="gap:6px"><input type="checkbox" id="dv-nomu" data-div="dv-nomu"' + (c.nomu ? " checked" : "") + ">" + esc(t("dv_nomu")) + "</label>" : "";
+  return svcShell("dividends",
+    v2Note(t("dv_p"), t("v2_dv_lead")) +
+    (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") +
+    '<a class="v2-rlink" href="#dv-elig" data-v2go="dv-elig">' + esc(t("dve_h")) + " ↓</a>" +
+    '<div class="panel stack v2-dvf"><div class="v2-row3">' + inp("dv-budget", t("v2_dv_amt") + " ريال", c.budget, 50) + inp("dv-fee", t("v2_dv_fee"), c.fee, 0.01) + '<label class="v2-in"><span>' + esc(t("dv_search")) + '</span><input id="dv-q" value="' + esc(DVQ) + '" data-div="dv-q" autocomplete="off" aria-label="' + esc(t("dv_search")) + '"></label></div><div class="row v2-dvb">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + "</button>" + nomu + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
+    '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
+    '<div id="dv-elig">' + dvEligHtml().replace('<details class="panel dve"', '<details open class="panel dve"').replace(' open open', ' open') + "</div>" +
+    '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +
+    '<p class="small muted">' + esc(t("dv_src")) + " " + esc(t("disclaimer")) + "</p>");
+};
+
+/* ----- رمز الريال السعودي الجديد بدل كلمة «ريال» في كل المنصة ----- */
+const V2_SAR = '<svg class="sar" viewBox="0 0 1124.14 1256.39" aria-hidden="true"><path fill="currentColor" d="M699.62 1113.02c-20.06 44.48-33.32 92.75-38.4 143.37l424.51-90.24c20.06-44.47 33.31-92.75 38.4-143.37l-424.51 90.24zM1085.73 895.8c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.33v-135.2l292.27-62.11c20.06-44.47 33.32-92.75 38.4-143.37l-330.68 70.27V66.13c-50.67 28.45-95.67 66.32-132.25 110.99v403.35l-132.25 28.11V0c-50.67 28.44-95.67 66.32-132.25 110.99v525.69l-295.91 62.88c-20.06 44.47-33.33 92.75-38.42 143.37l334.33-71.05v170.26l-358.3 76.14c-20.06 44.47-33.32 92.75-38.4 143.37l375.04-79.7c30.53-6.35 56.77-24.4 73.83-49.24l68.78-101.97v-.02c7.14-10.55 11.3-23.27 11.3-36.97V743.33l132.25-28.11v270.4l424.53-90.28z"/></svg>';
+function v2Sar(root) {
+  if (S.lang !== "ar" || !root) return;
+  const re = /(?<![\u0600-\u06FF])(?:ريال(?:\s+سعودي)?|ر\.س)(?![\u0600-\u06FF])/g;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (!n.parentElement || n.parentElement.closest("script,style,option,textarea,input,select,svg,.sar,[contenteditable]") || !/ريال|ر\.س/.test(n.nodeValue) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+  const ns = []; while (w.nextNode()) ns.push(w.currentNode);
+  ns.forEach((n) => { re.lastIndex = 0; if (!re.test(n.nodeValue)) return; const sp = document.createElement("span"); sp.innerHTML = esc(n.nodeValue).replace(re, '<span class="sar-w" role="img" aria-label="ريال">' + V2_SAR + "</span>"); n.replaceWith(...sp.childNodes); });
+}
+{ let q = 0; new MutationObserver(() => { if (q) return; q = requestAnimationFrame(() => { q = 0; v2Sar(document.getElementById("main")); v2Sar(document.getElementById("aspanel")); }); }).observe(document.body, { childList: true, subtree: true }); }
+
+/* ----- سهم الرجوع: نص لفة على جنب الشاشة، تسحبه لفوق وتحت ----- */
+(function () {
+  const b = document.createElement("button"); b.id = "v2back"; b.type = "button"; b.hidden = true;
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5L3.5 10.5 9 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10.5h9a6.5 6.5 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" transform="translate(0,-3)"/></svg>';
+  document.body.appendChild(b);
+  let y = null; try { y = +localStorage.getItem("meras.backy") || null; } catch (e) {}
+  const put = () => { if (y != null) b.style.top = Math.min(Math.max(70, y * window.innerHeight), window.innerHeight - 140) + "px"; };
+  put();
+  let st = null, moved = false;
+  b.style.touchAction = "none";
+  b.addEventListener("pointerdown", (e) => { st = { y: e.clientY, t: b.getBoundingClientRect().top }; moved = false; try { b.setPointerCapture(e.pointerId); } catch (x) {} });
+  b.addEventListener("pointermove", (e) => { if (!st) return; const d = e.clientY - st.y; if (!moved && Math.abs(d) < 8) return; moved = true; y = (st.t + d) / window.innerHeight; put(); });
+  const end = () => { if (!st) return; st = null; if (moved) try { localStorage.setItem("meras.backy", String(y)); } catch (x) {} };
+  b.addEventListener("pointerup", end); b.addEventListener("pointercancel", end);
+  b.addEventListener("click", (e) => { if (moved) { moved = false; return; } const r = route(), g = groupOf(r); if (history.length > 1) history.back(); else location.hash = g && g !== r ? g : ""; });
+  const upd = () => { const r = route(); b.hidden = r === "" || r === "home" || (typeof lnShow === "function" && lnShow()); b.setAttribute("aria-label", S.lang === "ar" ? "رجوع" : "Back"); b.title = b.getAttribute("aria-label"); b.classList.toggle("en", S.lang !== "ar"); };
+  window.addEventListener("hashchange", upd); setTimeout(upd, 500); setInterval(upd, 2000);
+})();
+
+/* شات بوت: يتسلّح بالسحب أول ما ينخلق، عشان يبقى قابل للحركة دايماً */
+new MutationObserver(() => { const b = document.getElementById("asfab"); if (b && !b.dataset.drag) { const ev = new Event("v2arm"); b.dispatchEvent(ev); } }).observe(document.body, { childList: true });
