@@ -315,7 +315,7 @@ function v2Note(txt, lead) {
     if (r !== "movers") return h;
     const on = typeof topSound !== "undefined" && topSound;
     const bell = '<button class="v2-bell' + (on ? " on" : "") + '" data-act="top-sound" aria-pressed="' + on + '" aria-label="' + esc(t(on ? "v2_bell_on" : "v2_bell_off")) + '" title="' + esc(t(on ? "v2_bell_on" : "v2_bell_off")) + '">' + v2Ic("ai-bell", 18) + "</button>";
-    return h.replace("</nav>", bell + "</nav>");
+    return h.replace("</nav>", bell + "</nav>").replace("<h1>" + esc(t("v2_opps")) + "</h1>", '<h1 class="v2-h1b">' + esc(t("v2_opps")) + bell.replace('class="v2-bell', 'class="v2-bell v2-bell-m') + "</h1>");
   };
 }
 
@@ -405,7 +405,7 @@ dkRadar = function () {
   if (RDJ) setTimeout(rdPaint, 30);
   const re = '<button class="v2-re" data-act="rd-refresh" title="' + esc(t("rd_refresh")) + '" aria-label="' + esc(t("rd_refresh")) + '"' + (RDJ ? " disabled" : "") + '><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
   return '<div class="row" style="justify-content:space-between;align-items:center"><p class="small muted" style="margin:0">' + esc(t("rd_scan").replace("{n}", RD.scanned || 0).replace("{d}", whenText(RD.updated))) + "</p>" + top + "</div>" + bar +
-    '<div class="v2-rdrow">' + chips(rdF, "type", ["all", "breakout", "gainer", "momentum"]) + chips(rdM, "mk", ["all", "sa", "us"]) + re + "</div>" +
+    '<div class="v2-rdrow">' + v2Dial("type", rdF, [["breakout", "#E07A4E"], ["gainer", "#3C8CC9"], ["momentum", "#2E9C73"]]) + v2Dial("mk", rdM, [["sa", "#2E9C73"], ["us", "#3C6FD1"]]) + re + "</div>" +
     (rdF !== "all" ? '<p class="small muted" style="margin:0">' + esc(t("rd_d_" + rdF)) + "</p>" : "") +
     (list.length ? '<div class="stack">' + list.map(rdCard).join("") + "</div>" : '<div class="notice">' + esc(t("rd_none")) + "</div>") +
     (log.length ? owPanel(t("rd_log"), '<ul class="tp-left">' + log.map((x) => '<li><span class="num">' + esc(x.s) + "</span> " + esc((typeof dkName === "function" && dkName(x.s)) || x.n || "") + ' <span class="tag">' + esc(t("rd_" + x.type)) + '</span> <span class="small muted num">' + esc(x.d) + " · " + esc(t("rd_str").replace("{n}", x.strength)) + "</span></li>").join("") + "</ul>") : "") + foot;
@@ -431,7 +431,7 @@ pageDividends = function () {
     v2Note(t("dv_p"), t("v2_dv_lead")) +
     (real ? "" : '<div class="notice">' + esc(t("dv_sample")) + "</div>") +
     '<a class="v2-rlink" href="#dv-elig" data-v2go="dv-elig">' + esc(t("dve_h")) + " ↓</a>" +
-    '<div class="panel stack v2-dvf"><div class="v2-row2">' + inp("dv-budget", t("v2_dv_amt") + " ريال", c.budget, 50) + inp("dv-fee", t("v2_dv_fee"), c.fee, 0.01) + '</div><div class="row v2-dvb">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ ' + esc(t("dv_pdf")) + '</button><label class="v2-q"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="dv-q" type="search" value="' + esc(DVQ) + '" data-div="dv-q" autocomplete="off" placeholder="' + esc(t("v2_dv_q")) + '" aria-label="' + esc(t("v2_dv_q")) + '"></label></div><div class="row v2-dvb">' + nomu + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
+    '<div class="panel stack v2-dvf"><div class="v2-row2">' + inp("dv-budget", t("v2_dv_amt") + " ريال", c.budget, 50) + inp("dv-fee", t("v2_dv_fee"), c.fee, 0.01) + '</div><div class="row v2-dvb">' + fb("all", "dv_f_all") + fb("30", "dv_f_30") + fb("star", "dv_f_star") + '<button type="button" class="btn sm" data-act="dv-pdf" title="' + esc(t("dv_pdf_tip")) + '">⤓ PDF</button><label class="v2-q"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="dv-q" type="search" value="' + esc(DVQ) + '" data-div="dv-q" autocomplete="off" placeholder="' + esc(t("v2_dv_q")) + '" aria-label="' + esc(t("v2_dv_q")) + '"></label></div><div class="row v2-dvb">' + nomu + count + '<span class="small" id="dv-shown" role="status"></span></div></div>' +
     '<div class="tablewrap dv-table"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>" +
     '<div id="dv-elig">' + dvEligHtml().replace('<details class="panel dve"', '<details open class="panel dve"').replace(' open open', ' open') + "</div>" +
     '<div class="grid2"><div class="panel stack"><h3>' + esc(t("dv_alert_h")) + "</h3><p>" + esc(t("dv_alert")) + "</p><h3>" + esc(t("dv_rule_h")) + "</h3><p>" + esc(t("dv_rule")) + '</p></div><div class="panel stack"><h3>' + esc(t("dv_sell_h")) + "</h3><p>" + esc(t("dv_sell")) + '</p><div class="notice">' + esc(t("dv_fee_note")) + "</div></div></div>" +
@@ -452,7 +452,7 @@ function v2Sar(root) {
 /* ----- سهم الرجوع: نص لفة على جنب الشاشة، تسحبه لفوق وتحت ----- */
 (function () {
   const b = document.createElement("button"); b.id = "v2back"; b.type = "button"; b.hidden = true;
-  b.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5L3.5 10.5 9 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10.5h9a6.5 6.5 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" transform="translate(0,-3)"/></svg>';
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   document.body.appendChild(b);
   let y = null; try { y = +localStorage.getItem("meras.backy") || null; } catch (e) {}
   const put = () => { if (y != null) b.style.top = Math.min(Math.max(70, y * window.innerHeight), window.innerHeight - 140) + "px"; };
@@ -496,3 +496,38 @@ UI.v2_watch = ["★ أتابعها", "★ Watching"];
   };
 }
 document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest(".v2-ddl button"); if (b) { const d = b.closest("details"); if (d) d.open = false; } });
+
+/* ----- دوائر فلاتر الرادار: النص على الشكل الدائري ----- */
+Object.assign(UI, { v2_rd_breakout: ["اختراق", "Breakout"], v2_rd_gainer: ["الأكثر ارتفاعاً", "Top gainers"], v2_rd_momentum: ["زخم مستمر", "Momentum"], v2_rd_sa: ["السعودي", "Saudi"], v2_rd_us: ["الأمريكي", "US"] });
+function v2Dial(key, cur, list) {
+  const C = 60, ro = 58, ri = 27, rt = 43, n = list.length, step = 2 * Math.PI / n, st = n === 2 ? -Math.PI : -Math.PI / 2 - step / 2;
+  const P = (r, a) => (C + r * Math.cos(a)).toFixed(2) + " " + (C + r * Math.sin(a)).toFixed(2);
+  const id = "v2d-" + key;
+  let h = "";
+  list.forEach(([k, col], i) => {
+    const a0 = st + i * step + 0.02, a1 = st + (i + 1) * step - 0.02, mid = (a0 + a1) / 2, down = Math.sin(mid) > 0.2, big = a1 - a0 > Math.PI ? 1 : 0;
+    const seg = "M" + P(ro, a0) + " A" + ro + " " + ro + " 0 " + big + " 1 " + P(ro, a1) + " L" + P(ri, a1) + " A" + ri + " " + ri + " 0 " + big + " 0 " + P(ri, a0) + "Z";
+    const tp = down ? "M" + P(rt, a1) + " A" + rt + " " + rt + " 0 " + big + " 0 " + P(rt, a0) : "M" + P(rt, a0) + " A" + rt + " " + rt + " 0 " + big + " 1 " + P(rt, a1);
+    const on = cur === k, off = cur !== "all" && !on;
+    h += '<g class="v2-dseg' + (off ? " off" : "") + '" data-act="rd-f" data-key="' + key + '" data-f="' + (on ? "all" : k) + '" role="button" tabindex="0" aria-pressed="' + on + '" aria-label="' + esc(t("v2_rd_" + k)) + '"><path d="' + seg + '" fill="' + col + '"/><path id="' + id + i + '" d="' + tp + '" fill="none"/><text dy="3" font-size="' + (t("v2_rd_" + k).length > 10 ? 7.4 : 8.6) + '" font-weight="700"><textPath href="#' + id + i + '" startOffset="50%" text-anchor="middle">' + esc(t("v2_rd_" + k)) + "</textPath></text></g>";
+  });
+  h += '<g class="v2-dhub' + (cur === "all" ? " on" : "") + '" data-act="rd-f" data-key="' + key + '" data-f="all" role="button" tabindex="0" aria-pressed="' + (cur === "all") + '"><circle cx="' + C + '" cy="' + C + '" r="' + (ri - 3) + '"/><text x="' + C + '" y="' + (C + 4) + '" text-anchor="middle" font-size="11" font-weight="700">' + esc(t("rd_all")) + "</text></g>";
+  return '<svg class="v2-dial" viewBox="0 0 120 120" role="group" aria-label="' + esc(t(key === "type" ? "rd_all" : "rd_all")) + '">' + h + "</svg>";
+}
+document.addEventListener("keydown", (e) => { const g = e.target.closest && e.target.closest(".v2-dial [data-act]"); if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); g.dispatchEvent(new MouseEvent("click", { bubbles: true })); } });
+
+/* ----- التوزيعات: «30 يوم»، والمفضلة نجمة، و«السعودي» ----- */
+UI.dv_f_30 = ["30 يوم", "30 days"]; UI.v2_div_sa = ["السعودي", "Saudi"];
+{
+  const op = pageDividends;
+  pageDividends = function () {
+    const c = divCfg(), on = c.f === "star";
+    return op().replace(/<button type="button" class="btn sm tgl[^"]*" data-act="dv-f" data-f="star"[^>]*>[^<]*<\/button>/, '<button type="button" class="v2-star' + (on ? " on" : "") + '" data-act="dv-f" data-f="star" aria-pressed="' + on + '" aria-label="' + esc(t("dv_f_star")) + '" title="' + esc(t("dv_f_star")) + '">' + (on ? "★" : "☆") + "</button>");
+  };
+  const os = v2Shell;
+  v2Shell = function (r, html) {
+    html = os(r, html);
+    if (r === "gdiv") html = html.replace(/<button class="v2-tabb" data-act="dg-f" data-f="watch" aria-pressed="(true|false)">[^<]*<\/button>/, (m, p) => '<button class="v2-star' + (p === "true" ? " on" : "") + '" data-act="dg-f" data-f="watch" aria-pressed="' + p + '" aria-label="' + esc(t("dg_st_watch")) + '" title="' + esc(t("dg_st_watch")) + '">' + (p === "true" ? "★" : "☆") + "</button>");
+    return html;
+  };
+}

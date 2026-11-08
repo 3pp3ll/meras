@@ -1874,3 +1874,24 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 }
 .v2-termc{max-width:520px;margin-block:12px 0}
 @media (max-width:640px){.v2-tile.v2-termc{grid-template-columns:auto minmax(0,1fr);justify-items:start;text-align:start;background:var(--surface);border:1px solid var(--line);padding:12px}.v2-termc .v2-ic{grid-row:span 2;width:48px;height:48px}.v2-termc small{display:block}}
+/* دوائر الرادار */
+.v2-dial{width:118px;height:118px;flex:none;overflow:visible}
+.v2-dseg{cursor:pointer}
+.v2-dseg path:first-child{stroke:var(--surface);stroke-width:1.5}
+.v2-dseg text{font:700 8.6px var(--font,inherit);fill:#fff;pointer-events:none}
+.v2-dseg.off{opacity:.3}
+.v2-dseg:hover{opacity:.85}
+.v2-dhub{cursor:pointer}
+.v2-dhub circle{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.v2-dhub text{font:700 11px inherit;fill:var(--muted);pointer-events:none}
+.v2-dhub.on circle{fill:var(--ink);stroke:var(--ink)}
+.v2-dhub.on text{fill:var(--bg)}
+.v2-rdrow{gap:12px 64px;align-items:center}
+@media (max-width:640px){.v2-rdrow{gap:10px;justify-content:space-around}.v2-rdrow .v2-re{margin-inline-start:0}}
+/* الجرس: جنب كلمة الفرص على الجوال، وآخر التبويبات على الكمبيوتر */
+.v2-bell-m{display:none}
+@media (max-width:760px){.v2-tabs .v2-bell{display:none}.v2-h1b{gap:18px}.v2-bell-m{display:grid}}
+.v2-h1b{display:inline-flex!important;align-items:center}
+/* النجمة */
+.v2-star{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:19px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
+.v2-star.on{color:#E8B21C;border-color:#E8B21C;background:color-mix(in srgb,#E8B21C 12%,var(--surface))}
