@@ -279,3 +279,19 @@ document.addEventListener("click", (e) => {
 window.addEventListener("hashchange", () => { const sh = document.getElementById("v2mapsheet"); if (sh) sh.remove();
   if (route() !== "news") return; let q = ""; try { q = sessionStorage.getItem("meras.nwgo") || ""; sessionStorage.removeItem("meras.nwgo"); } catch (x) {}
   if (!q) return; setTimeout(() => { const h = [...document.querySelectorAll(".nw-title")].find((x) => x.textContent.trim() === q.trim()); const c = h && h.closest(".nw-card"); if (c) { c.scrollIntoView({ block: "center" }); c.classList.add("v2-flash"); setTimeout(() => c.classList.remove("v2-flash"), 2200); } }, 400); });
+
+/* ----- قسم السوق بعد التنظيم: «الفرص» تجمع الباحث وأفضل حركة ورادار الزخم، والتحليل الفني صار من الشارت ----- */
+Object.assign(UI, { v2_opps: ["الفرص", "Opportunities"], v2_opps_d: ["الباحث، وأفضل حركة، ورادار الزخم في مكان واحد.", "The screener, top movers and the momentum radar in one place."] });
+{
+  const it = NAV_GROUPS.market.items, at = it.findIndex((x) => x[0] === "screener");
+  NAV_GROUPS.market.items = it.filter((x) => !["tech", "screener", "movers", "radar"].includes(x[0]));
+  NAV_GROUPS.market.items.splice(Math.max(0, at - 1), 0, ["screener", "v2_opps", "v2_opps_d", 1]);
+  const og = groupOf; groupOf = (r) => (["tech", "movers", "radar"].includes(r) ? "market" : og(r));
+  const od = deskPage;
+  deskPage = function (r) {
+    const html = od(r);
+    if (!["screener", "movers", "radar"].includes(r)) return html;
+    const tabs = '<nav class="v2-tabs" aria-label="' + esc(t("v2_opps")) + '">' + [["screener", "sc_t"], ["movers", "tp_t"], ["radar", "rd_t"]].map(([h, k]) => '<a href="#' + h + '"' + (h === r ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav>";
+    return html.replace(/<div class="page-head">[\s\S]*?<\/div>/, '<div class="page-head"><h1>' + esc(t("v2_opps")) + "</h1><p>" + esc(t("v2_opps_d")) + "</p></div>" + tabs);
+  };
+}

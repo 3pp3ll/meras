@@ -1793,3 +1793,7 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   .top .tools{margin-inline-start:0!important}
   .top .brand{margin-inline-end:160px}
 }
+.v2-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.v2-tabs a{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 16px;font-weight:700;font-size:14.5px;color:var(--muted);text-decoration:none}
+.v2-tabs a:hover{border-color:var(--amber)}
+.v2-tabs a[aria-current="page"]{background:var(--amber);border-color:var(--amber);color:var(--on-amber)}
