@@ -8388,6 +8388,7 @@ Object.assign(UI, {
   sh_notfound: ["ما لقينا هذا السهم في بياناتنا. ما نخمن الحكم، تأكد من المصدر:", "We do not have this share. We do not guess a ruling, check the source:"],
   sh_empty_sa: ["قائمة الأسهم السعودية لسا ما انضافت.", "The Saudi list has not been added yet."],
   sh_sa: ["سهم سعودي", "Saudi share"], sh_us: ["سهم أمريكي", "US share"],
+  sh_yq_h: ["حكم يقين", "Yaqeen ruling"], sh_yq_out: ["مو في قائمة يقين للمتوافقة، فهو محل نظر لين تتحدث القائمة.", "Not on Yaqeen's compliant list, so it stays under review until the list is updated."],
   sh_ok: ["متوافق", "Compliant"], sh_no: ["غير متوافق", "Not compliant"], sh_review: ["محل نظر", "Under review"], sh_incomplete: ["بيانات ناقصة", "Incomplete data"], sh_all: ["متوافق عند الهيئات الثلاث", "Compliant with all three boards"], sh_part: ["متوافق عند {n} من 3 هيئات", "Compliant with {n} of 3 boards"], sh_none: ["مو ضمن أي قائمة متوافقة", "Not on any compliant list"], sh_unlisted: ["غير مدرج في القائمة", "Not on the list"],
   sh_boards: ["قوائم الهيئات الشرعية", "Sharia board lists"], sh_asof: ["آخر تحديث", "Updated"], sh_src: ["المصدر", "Source"],
   sh_b_rajhi: ["الراجحي المالية", "Al Rajhi Capital"], sh_b_osaimi: ["د. محمد بن سعود العصيمي", "Dr. Mohammed Al-Osaimi"], sh_b_bilad: ["البلاد المالية", "Albilad Capital"],
@@ -8414,12 +8415,13 @@ Object.assign(UI, {
 
 const SH_BOARDS = ["rajhi", "osaimi", "bilad"];
 const SH_ARGAAM = "https://www.argaam.com/ar/company/shariahcompanies";
-let SHUNI = null, SHUS = null, SHQ = null, SHQ_SHA, shTried = false, SHSA = null, SHOWN = null, SHOWN_SHA, SHSA_SHA, shQ = "", shPick = null, shAmt = "", shRatio = "", shLoading = false, shDraft = null;
+let SHUNI = null, SHYQ = null, SHUS = null, SHQ = null, SHQ_SHA, shTried = false, SHSA = null, SHOWN = null, SHOWN_SHA, SHSA_SHA, shQ = "", shPick = null, shAmt = "", shRatio = "", shLoading = false, shDraft = null;
 try { SHSA = JSON.parse(localStorage.getItem("meras.shsa") || "null"); } catch (e) {}
 
 async function loadSharia() {
   if (shLoading) return; shLoading = true; shTried = true;
   try { const r = await fetch("./sharia_sa.json?t=" + Date.now(), { cache: "no-store" }); if (r.ok) { const d = await r.json(); if (d && Array.isArray(d.rows)) SHSA = d; } } catch (e) {}
+  try { const r = await fetch("./us_yaqeen.json?t=" + Date.now(), { cache: "no-store" }); if (r.ok) { const d = await r.json(); if (d && d.stocks) SHYQ = d; } } catch (e) {}
   if (HOSTED && CFG.token) {
     try { const f = await readJson("sharia_sa.json"); if (f && f.data && Array.isArray(f.data.rows) && (!SHSA || (f.data.updated || "") >= (SHSA.updated || ""))) SHSA = f.data; SHSA_SHA = f ? f.sha : undefined; } catch (e) {}
     try { const un = await readJson("us_universe.json"); SHUNI = (un && un.data && un.data.stocks) || null; } catch (e) {}
@@ -8439,6 +8441,7 @@ function shSearch(q) {
   (SHSA && SHSA.rows || []).forEach((r) => { if (r.s === n || r.s.startsWith(n) || shNorm(r.n).includes(n)) push({ m: "SA", s: r.s, n: r.n, row: r }); });
   if (/^\d{4}$/.test(n)) { if (!out.length) push({ m: "SA", s: n, n: "", row: null }); }
   if (typeof US !== "undefined" && US && US.symbols) Object.entries(US.symbols).forEach(([s, v]) => { if ((s.toLowerCase().startsWith(n) || shNorm(v.n).includes(n))) push({ m: "US", s, n: v.n }); });
+  if (SHYQ) Object.entries(SHYQ.stocks).forEach(([s, v]) => { if (out.length < 40 && (s.toLowerCase().startsWith(n) || (n.length > 2 && shNorm(v.n).includes(n)))) push({ m: "US", s, n: v.n || "" }); });
   if (SHUS && SHUS.stocks) Object.entries(SHUS.stocks).forEach(([s, v]) => { if (out.length < 40 && (s.toLowerCase().startsWith(n) || (n.length > 2 && shNorm(v.n).includes(n)))) push({ m: "US", s, n: v.n || "" }); });
   if (SHUNI) Object.entries(SHUNI).forEach(([s, v]) => { if (out.length < 40 && (s.toLowerCase() === n || (n.length > 2 && (s.toLowerCase().startsWith(n) || shNorm(v.n).includes(n))))) push({ m: "US", s, n: v.n || "" }); });
   if (SHOWN) Object.entries(SHOWN).forEach(([s, v]) => { if (s.toLowerCase().startsWith(n) || shNorm(v.n).includes(n)) push({ m: /^\d{4}$/.test(s) ? "SA" : "US", s, n: v.n || "" }); });
@@ -8470,6 +8473,9 @@ function shCard(r) {
     const est = owner && SHUS && SHUS.stocks && SHUS.stocks[r.s];
     if (usv && usv.k !== "stock") return '<div class="panel stack sh-card"><h3><span class="num">' + esc(r.s) + "</span> " + esc(usv.n || "") + '</h3><p class="small muted" style="margin:0">' + esc(t(usv.k === "fx" ? "sh_isfx" : "sh_iscmd")) + "</p></div>";
     if (est && est.n && !r.n) r.n = est.n;
+    const yq = SHYQ && SHYQ.stocks[r.s];
+    if (yq && yq.n && !r.n) r.n = yq.n;
+    if (SHYQ) body += '<div class="sh-b"><span>' + esc(t("sh_yq_h")) + (SHYQ.asof ? ' <span class="small muted num">' + esc(SHYQ.asof) + "</span>" : "") + "</span>" + shTag(yq ? "ok" : "review") + "</div>" + (yq ? "" : '<p class="small muted" style="margin:0">' + esc(t("sh_yq_out")) + "</p>");
     if (est && !est.err) {
       st = est.status;
       purify = est.purify;
@@ -8482,6 +8488,7 @@ function shCard(r) {
     }
     else if (!own) body += '<p class="small muted">' + esc(t("sh_notfound")) + "</p>";
   }
+  if (r.m === "US" && SHYQ) { const yq = SHYQ.stocks[r.s]; st = yq ? "ok" : "review"; purify = yq && yq.p != null ? yq.p : null; }
   if (own) { st = own.status || st; if (own.purify != null) purify = own.purify; body += '<div class="sh-own"><b class="small">' + esc(t("sh_own")) + "</b> " + shTag(own.status) + (own.purify != null ? ' <span class="small">' + esc(t("sh_purify")) + ': <b class="num">' + fmt(own.purify, 2) + "%</b></span>" : "") + (own.src ? ' <span class="small muted">· ' + esc(own.src) + (own.date ? " · " + esc(own.date) : "") + "</span>" : "") + "</div>"; }
   const link = r.m === "US" ? '<a class="btn sm" href="https://yaaqen.com/stocks/' + encodeURIComponent(r.s) + '" target="_blank" rel="noopener">' + esc(t("sh_yaqeen")) + " ↗</a>" : '<a class="btn sm" href="' + SH_ARGAAM + '" target="_blank" rel="noopener">' + esc(t("sh_argaam")) + " ↗</a>";
   const pick = shPick === r.m + r.s;
@@ -11073,8 +11080,9 @@ shFinder = function () {
   const loc = S.lang === "ar" ? "ar-SA-u-ca-gregory-nu-latn" : "en-GB";
   const when = ups.length ? ups[0].toLocaleString(loc, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }) : "–";
   const more = shOwner() ? '<details class="v2-note"><summary>' + esc(t("v2_more")) + "</summary><p>" + esc(t("sh_p")) + "</p>" + (typeof SHUS !== "undefined" && SHUS ? "<p>" + esc(t("sh_db").replace("{n}", SHUS.count || 0).replace("{u}", SHUS.universe || "–").replace("{d}", whenText(SHUS.updated))) + "</p>" : "") + "</details>" : "";
-  return '<div class="panel stack v2-shbox"><input id="sh-q" data-sh="q" type="search" autocomplete="off" aria-label="' + esc(t("sh_q")) + '" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"><p class="small muted" style="margin:0">' + esc(t("sh_asof")) + ': <span class="num">' + esc(when) + "</span></p>" + more + '</div><div id="sh-res">' + shResults() + "</div>";
+  return '<div class="panel stack v2-shbox"><input id="sh-q" data-sh="q" type="search" autocomplete="off" aria-label="' + esc(t("sh_q")) + '" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"><p class="small muted" style="margin:0">' + esc(t("sh_asof")) + ': <span class="num">' + esc(when) + "</span></p>" + (typeof SHYQ !== "undefined" && SHYQ ? '<p class="small muted" style="margin:0">' + esc(t("sh_yq_line").replace("{n}", SHYQ.count || 0)).replace("{d}", '<span class="num">' + esc(SHYQ.asof || "–") + "</span>") + "</p>" : "") + more + '</div><div id="sh-res">' + shResults() + "</div>";
 };
+UI.sh_yq_line = ["الأمريكي: {n} سهم متوافق حسب يقين (تحديث {d})، والباقي محل نظر", "US: {n} shares compliant per Yaqeen (updated {d}); the rest under review"];
 pageSharia = function () { if (!shTried) loadSharia(); return svcShell("sharia", shFinder()); };
 
 /* ----- محفظتي بعد التنظيم: «سجلي» (سجل التداول + تحليلاتي) و«التوزيعات» (السعودي + العالمي) بتبويبات ----- */

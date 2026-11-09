@@ -326,8 +326,9 @@ shFinder = function () {
   const loc = S.lang === "ar" ? "ar-SA-u-ca-gregory-nu-latn" : "en-GB";
   const when = ups.length ? ups[0].toLocaleString(loc, { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }) : "–";
   const more = shOwner() ? '<details class="v2-note"><summary>' + esc(t("v2_more")) + "</summary><p>" + esc(t("sh_p")) + "</p>" + (typeof SHUS !== "undefined" && SHUS ? "<p>" + esc(t("sh_db").replace("{n}", SHUS.count || 0).replace("{u}", SHUS.universe || "–").replace("{d}", whenText(SHUS.updated))) + "</p>" : "") + "</details>" : "";
-  return '<div class="panel stack v2-shbox"><input id="sh-q" data-sh="q" type="search" autocomplete="off" aria-label="' + esc(t("sh_q")) + '" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"><p class="small muted" style="margin:0">' + esc(t("sh_asof")) + ': <span class="num">' + esc(when) + "</span></p>" + more + '</div><div id="sh-res">' + shResults() + "</div>";
+  return '<div class="panel stack v2-shbox"><input id="sh-q" data-sh="q" type="search" autocomplete="off" aria-label="' + esc(t("sh_q")) + '" placeholder="' + esc(t("sh_ph")) + '" value="' + esc(shQ) + '"><p class="small muted" style="margin:0">' + esc(t("sh_asof")) + ': <span class="num">' + esc(when) + "</span></p>" + (typeof SHYQ !== "undefined" && SHYQ ? '<p class="small muted" style="margin:0">' + esc(t("sh_yq_line").replace("{n}", SHYQ.count || 0)).replace("{d}", '<span class="num">' + esc(SHYQ.asof || "–") + "</span>") + "</p>" : "") + more + '</div><div id="sh-res">' + shResults() + "</div>";
 };
+UI.sh_yq_line = ["الأمريكي: {n} سهم متوافق حسب يقين (تحديث {d})، والباقي محل نظر", "US: {n} shares compliant per Yaqeen (updated {d}); the rest under review"];
 pageSharia = function () { if (!shTried) loadSharia(); return svcShell("sharia", shFinder()); };
 
 /* ----- محفظتي بعد التنظيم: «سجلي» (سجل التداول + تحليلاتي) و«التوزيعات» (السعودي + العالمي) بتبويبات ----- */
