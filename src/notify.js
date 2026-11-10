@@ -27,7 +27,7 @@ function ntItems() {
   const items = [];
   (NOTICES || []).filter(ntLive).forEach((n) => items.push({ id: "n:" + n.id, kind: "notice", n, date: n.from || "" }));
   const owner = typeof HOSTED !== "undefined" && HOSTED && CFG.token;
-  if (owner && typeof TOP !== "undefined" && TOP && Array.isArray(TOP.log)) TOP.log.filter((x) => x.in).slice(-40).forEach((x) => items.push({ id: "m:" + x.s + "|" + x.in, kind: "mover", x, date: x.in }));
+  if (owner && typeof TOP !== "undefined" && TOP && Array.isArray(TOP.log)) TOP.log.filter((x) => x.in && !usHide(x.s, x.m, x.sharia)).slice(-40).forEach((x) => items.push({ id: "m:" + x.s + "|" + x.in, kind: "mover", x, date: x.in }));
   if (typeof dgBellItems === "function") dgBellItems().forEach((d) => items.push(d));
   try { if (owner && typeof rdBellItems === "function") rdBellItems().forEach((d) => items.push(d)); } catch (e) {}
   return items.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));

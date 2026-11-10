@@ -400,7 +400,7 @@ dkRadar = function () {
   if (!RD) return top + '<div class="notice">' + esc(t("dk_loading")) + "</div>" + foot;
   if (!RD.updated) return top + '<div class="notice">' + esc(t("rd_wait")) + "</div>" + foot;
   const list = (RD.items || []).filter((x) => !usHide(x.s, x.m, x.sharia) && (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
-  const log = (RD.log || []).slice(-15).reverse();
+  const log = (RD.log || []).filter((x) => !usHide(x.s, x.m, x.sharia)).slice(-15).reverse();
   setTimeout(() => { if (typeof ntMark === "function") ntMark((RD.log || []).map((x) => "r:" + x.id)); if (typeof topBell === "function") topBell(); }, 1500);
   const bar = RDJ ? '<div class="rd-prog" id="rd-prog"><div><i></i></div><span>' + esc(t("rd_busy").replace("{t}", "3:00")) + "</span></div>" : "";
   if (RDJ) setTimeout(rdPaint, 30);

@@ -97,7 +97,7 @@ function dkRadar() {
   if (!RD) return head + '<div class="notice">' + esc(t("dk_loading")) + "</div>";
   if (!RD.updated) return head + '<div class="notice">' + esc(t("rd_wait")) + "</div>";
   const list = (RD.items || []).filter((x) => !usHide(x.s, x.m, x.sharia) && (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
-  const log = (RD.log || []).slice(-15).reverse();
+  const log = (RD.log || []).filter((x) => !usHide(x.s, x.m, x.sharia)).slice(-15).reverse();
   setTimeout(() => { if (typeof ntMark === "function") ntMark((RD.log || []).map((x) => "r:" + x.id)); if (typeof topBell === "function") topBell(); }, 1500);
   const bar = RDJ ? '<div class="rd-prog" id="rd-prog"><div><i></i></div><span>' + esc(t("rd_busy").replace("{t}", "3:00")) + "</span></div>" : "";
   if (RDJ) setTimeout(rdPaint, 30);
@@ -111,7 +111,7 @@ function dkRadar() {
 /* الجرس: كل إشارة قوتها 2 أو أكثر، والغير مقروء يحسب بس القوية والغير مخالفة شرعياً */
 function rdBellItems() {
   if (!RD || !Array.isArray(RD.log)) return [];
-  return RD.log.filter((x) => x.strength >= 2 && x.sharia !== "no").slice(-40).map((x) => ({ id: "r:" + x.id, kind: "radar", x, date: String(x.at || x.d).slice(0, 10) }));
+  return RD.log.filter((x) => x.strength >= 2 && x.sharia !== "no" && !usHide(x.s, x.m, x.sharia)).slice(-40).map((x) => ({ id: "r:" + x.id, kind: "radar", x, date: String(x.at || x.d).slice(0, 10) }));
 }
 
 document.addEventListener("click", (e) => {
