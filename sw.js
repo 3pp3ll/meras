@@ -1,5 +1,5 @@
 /* مِراس: يخلي المنصة تفتح بدون نت. غيّر رقم النسخة عند كل تحديث كبير. */
-const CACHE = "meras-v135";
+const CACHE = "meras-v136";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {

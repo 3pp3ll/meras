@@ -26,8 +26,8 @@ Object.assign(UI, {
   sh_refs_used: ["يقين ما يغطي هذا السهم، فاعتمدنا شارت آيديا وعوائد: لازم الاثنين يقولون متوافق، ونسبة التطهير ناخذ الأعلى منهم (الأحوط).", "Yaqeen doesn't cover this share, so Chart Idea and Awaed are used: both must say compliant, and the higher purification ratio applies."],
   sh_go: ["افحص السهم في المنصة نفسها", "Check this share on the source platform"],
   sh_src_one: ["الحكم حسب المصدر المذكور. افحصه بنفسك من الرابط ↗.", "Ruling per the source shown. Verify it via the ↗ link."],
-  sh_src_all: ["المصادر متفقة على التوافق، ونسبة التطهير المعروضة هي الأعلى بينها (الأحوط).", "Sources agree it's compliant; the purification shown is the highest of them (most cautious)."],
-  sh_src_split: ["المصادر مختلفة: فيه مصدر معتمد يقول متوافق وفيه مصدر يقول غير. اقرأ حكم كل مصدر وافحصه من الرابط ↗، ونسبة التطهير المعروضة هي الأعلى (الأحوط).", "Sources differ: at least one approved source says compliant and another doesn't. Read each and verify via ↗; the purification shown is the highest (most cautious)."],
+  sh_src_all: ["المصادر متفقة على التوافق، ونسبة التطهير المعروضة هي أعلى نسبة سجلناها من كل المصادر (الأحوط).", "Sources agree it's compliant; the purification shown is the highest of them (most cautious)."],
+  sh_src_split: ["المصادر مختلفة: فيه مصدر معتمد يقول متوافق وفيه مصدر يقول غير. اقرأ حكم كل مصدر وافحصه من الرابط ↗، ونسبة التطهير المعروضة هي أعلى نسبة سجلناها من كل المصادر (الأحوط).", "Sources differ: at least one approved source says compliant and another doesn't. Read each and verify via ↗; the purification shown is the highest (most cautious)."],
   sh_src_none: ["ما فيه مصدر معتمد عندنا يقول إنه متوافق، فهو محل نظر.", "No approved source we track says it's compliant, so it stays under review."],
   sh_ok: ["متوافق", "Compliant"], sh_no: ["غير متوافق", "Not compliant"], sh_review: ["محل نظر", "Under review"], sh_incomplete: ["بيانات ناقصة", "Incomplete data"], sh_all: ["متوافق عند الهيئات الثلاث", "Compliant with all three boards"], sh_part: ["متوافق عند {n} من 3 هيئات", "Compliant with {n} of 3 boards"], sh_none: ["مو ضمن أي قائمة متوافقة", "Not on any compliant list"], sh_unlisted: ["غير مدرج في القائمة", "Not on the list"],
   sh_boards: ["قوائم الهيئات الشرعية", "Sharia board lists"], sh_asof: ["آخر تحديث", "Updated"], sh_src: ["المصدر", "Source"],
@@ -143,7 +143,7 @@ function shCard(r) {
     else if (!own) body += '<p class="small muted">' + esc(t("sh_notfound")) + "</p>";
   }
   if (r.m === "US" && SHYQ) { const vd = usVerdict(r.s); st = vd.st; purify = vd.st === "ok" ? vd.p : null; }
-  if (own) { st = own.status || st; if (own.purify != null) purify = own.purify; body += '<div class="sh-own"><b class="small">' + esc(t("sh_own")) + "</b> " + shTag(own.status) + (own.purify != null ? ' <span class="small">' + esc(t("sh_purify")) + ': <b class="num">' + fmt(own.purify, 2) + "%</b></span>" : "") + (own.src ? ' <span class="small muted">· ' + esc(own.src) + (own.date ? " · " + esc(own.date) : "") + "</span>" : "") + "</div>"; }
+  if (own) { st = own.status || st; if (own.purify != null) purify = purify != null ? Math.max(purify, own.purify) : own.purify; body += '<div class="sh-own"><b class="small">' + esc(t("sh_own")) + "</b> " + shTag(own.status) + (own.purify != null ? ' <span class="small">' + esc(t("sh_purify")) + ': <b class="num">' + fmt(own.purify, 2) + "%</b></span>" : "") + (own.src ? ' <span class="small muted">· ' + esc(own.src) + (own.date ? " · " + esc(own.date) : "") + "</span>" : "") + "</div>"; }
   const link = r.m === "US" ? '<a class="btn sm" href="https://yaaqen.com/stocks/' + encodeURIComponent(r.s) + '" target="_blank" rel="noopener">' + esc(t("sh_yaqeen")) + " ↗</a>" : '<a class="btn sm" href="' + SH_ARGAAM + '" target="_blank" rel="noopener">' + esc(t("sh_argaam")) + " ↗</a>";
   const pick = shPick === r.m + r.s;
   return '<div class="panel stack sh-card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3><span class="num">' + esc(r.s) + "</span> " + esc(r.n || "") + '</h3><span class="small muted">' + esc(t(r.m === "SA" ? "sh_sa" : "sh_us")) + '</span></div><div class="row" style="gap:6px">' + (st ? shTag(st) : "") + (purify != null ? '<span class="tag">' + esc(t("sh_purify")) + " " + fmt(purify, 2) + "%</span>" : "") + "</div></div>" + body +
@@ -264,7 +264,8 @@ function usVerdict(s) {
   const aw = SHAW && SHAW.stocks[s]; if (aw && aw.st) src.push({ k: "awaed", st: aw.st, p: aw.p });
   const fd = SHFD && SHFD.stocks[s]; if (fd) src.push({ k: "fund", st: fd.st, p: null, kind: fd.kind });
   const ok = src.filter((x) => x.st === "ok");
-  if (ok.length) { const ps = ok.map((x) => x.p).filter((x) => x != null); return { st: "ok", src: ok.map((x) => x.k).join(","), n: ok.length, split: ok.length < src.length, kind: fd && fd.kind, p: ps.length ? Math.max(...ps) : null }; }
+  const ps = src.map((x) => x.p).filter((x) => x != null); // أعلى نسبة تطهير من أي مصدر (الأحوط)
+  if (ok.length) { return { st: "ok", src: ok.map((x) => x.k).join(","), n: ok.length, split: ok.length < src.length, kind: fd && fd.kind, p: ps.length ? Math.max(...ps) : null }; }
   if (src.length) return { st: src.some((x) => x.st === "no") ? "no" : "review", src: src[0].k, p: null };
   return { st: "review", src: null, p: null };
 }
