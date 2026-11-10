@@ -24,6 +24,11 @@ Object.assign(UI, {
   sh_fd_isl_note: ["للاطلاع والاستثمار الطويل بس، مو توصية تداول.", "For information and long-term investing only, not a trading recommendation."],
   sh_aw_h: ["حكم عوائد", "Awaed ruling"], sh_aw_part: ["سهم جزئي (دخل مختلط)", "Partial (mixed income)"],
   sh_refs_used: ["يقين ما يغطي هذا السهم، فاعتمدنا شارت آيديا وعوائد: لازم الاثنين يقولون متوافق، ونسبة التطهير ناخذ الأعلى منهم (الأحوط).", "Yaqeen doesn't cover this share, so Chart Idea and Awaed are used: both must say compliant, and the higher purification ratio applies."],
+  sh_go: ["افحص السهم في المنصة نفسها", "Check this share on the source platform"],
+  sh_src_one: ["الحكم حسب المصدر المذكور. افحصه بنفسك من الرابط ↗.", "Ruling per the source shown. Verify it via the ↗ link."],
+  sh_src_all: ["المصادر متفقة على التوافق، ونسبة التطهير المعروضة هي الأعلى بينها (الأحوط).", "Sources agree it's compliant; the purification shown is the highest of them (most cautious)."],
+  sh_src_split: ["المصادر مختلفة: فيه مصدر معتمد يقول متوافق وفيه مصدر يقول غير. اقرأ حكم كل مصدر وافحصه من الرابط ↗، ونسبة التطهير المعروضة هي الأعلى (الأحوط).", "Sources differ: at least one approved source says compliant and another doesn't. Read each and verify via ↗; the purification shown is the highest (most cautious)."],
+  sh_src_none: ["ما فيه مصدر معتمد عندنا يقول إنه متوافق، فهو محل نظر.", "No approved source we track says it's compliant, so it stays under review."],
   sh_ok: ["متوافق", "Compliant"], sh_no: ["غير متوافق", "Not compliant"], sh_review: ["محل نظر", "Under review"], sh_incomplete: ["بيانات ناقصة", "Incomplete data"], sh_all: ["متوافق عند الهيئات الثلاث", "Compliant with all three boards"], sh_part: ["متوافق عند {n} من 3 هيئات", "Compliant with {n} of 3 boards"], sh_none: ["مو ضمن أي قائمة متوافقة", "Not on any compliant list"], sh_unlisted: ["غير مدرج في القائمة", "Not on the list"],
   sh_boards: ["قوائم الهيئات الشرعية", "Sharia board lists"], sh_asof: ["آخر تحديث", "Updated"], sh_src: ["المصدر", "Source"],
   sh_b_rajhi: ["الراجحي المالية", "Al Rajhi Capital"], sh_b_osaimi: ["د. محمد بن سعود العصيمي", "Dr. Mohammed Al-Osaimi"], sh_b_bilad: ["البلاد المالية", "Albilad Capital"],
@@ -112,19 +117,19 @@ function shCard(r) {
     const est = owner && SHUS && SHUS.stocks && SHUS.stocks[r.s];
     const fd = SHFD && SHFD.stocks[r.s];
     if (fd) return '<div class="panel stack sh-card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3><span class="num">' + esc(r.s) + "</span> " + esc(fd.n || "") + '</h3><span class="small muted">' + esc(t(fd.kind === "gold" ? "sh_fd_gold" : "sh_fd_isl")) + "</span></div>" + shTag(fd.st) + "</div>" +
-      '<div class="sh-b"><span>' + esc(t(fd.kind === "gold" ? "sh_fd_src" : "sh_fd_board")) + '</span><b class="small">' + esc((fd.src || []).join(" · ")) + "</b></div>" + (fd.basis ? '<p class="small muted" style="margin:0">' + esc(fd.basis) + "</p>" : "") +
+      '<div class="sh-b"><span>' + esc(t(fd.kind === "gold" ? "sh_fd_src" : "sh_fd_board")) + '</span><b class="small">' + (fd.src || []).map((x) => esc(x) + shGo(x, r.s)).join(" · ") + "</b></div>" + (fd.basis ? '<p class="small muted" style="margin:0">' + esc(fd.basis) + "</p>" : "") +
       '<p class="small muted" style="margin:0">' + esc(t(fd.kind === "gold" ? "sh_fd_gold_pu" : "sh_fd_isl_pu")) + "</p>" + (fd.kind === "islamic" ? '<p class="small" style="margin:0"><b>' + esc(t("sh_fd_isl_note")) + "</b></p>" : "") +
       (SHFD.asof ? '<p class="small muted" style="margin:0">' + esc(t("sh_asof")) + ' <span class="num">' + esc(SHFD.asof) + "</span></p>" : "") + "</div>";
     if (usv && usv.k !== "stock") return '<div class="panel stack sh-card"><h3><span class="num">' + esc(r.s) + "</span> " + esc(usv.n || "") + '</h3><p class="small muted" style="margin:0">' + esc(t(usv.k === "fx" ? "sh_isfx" : "sh_iscmd")) + "</p></div>";
     if (est && est.n && !r.n) r.n = est.n;
     const yq = SHYQ && SHYQ.stocks[r.s], yx = SHYQ && SHYQ.x && SHYQ.x[r.s], ci = SHCI && SHCI.stocks[r.s];
     if (yq && yq.n && !r.n) r.n = yq.n;
-    if (SHYQ) body += '<div class="sh-b"><span>' + esc(t("sh_yq_h")) + (SHYQ.asof ? ' <span class="small muted num">' + esc(SHYQ.asof) + "</span>" : "") + "</span>" + (yq ? shTag("ok") : yx === "no" ? shTag("no") : yx ? '<span class="tag amber">' + esc(t(yx === "check" ? "sh_yq_check" : "sh_review")) + "</span>" : '<span class="tag">' + esc(t("sh_yq_none")) + "</span>") + "</div>" + (yq && yq.p != null ? '<p class="small muted" style="margin:0">' + esc(t("sh_yq_pu")).replace("{p}", '<b class="num">' + fmt(yq.p, 2) + "%</b>") + "</p>" : "");
-    if (ci && !yq) { const pc = (v) => (v == null ? "–" : '<span class="num">' + fmt(v, 1) + "%</span>"); body += '<div class="sh-b"><span>' + esc(t("sh_ci_h")) + (SHCI.asof ? ' <span class="small muted num">' + esc(SHCI.asof) + "</span>" : "") + "</span>" + shTag(ci.st) + "</div>" + '<p class="small muted" style="margin:0">' + esc(t("sh_debt")) + ": " + pc(ci.debt) + " · " + esc(t("sh_ci_int")) + ": " + pc(ci.int) + " · " + esc(t("sh_purify")) + ": " + pc(ci.p) + (ci.mix ? " · " + esc(t("sh_ci_mix")) : "") + "</p>"; }
+    if (SHYQ) body += '<div class="sh-b"><span>' + esc(t("sh_yq_h")) + shGo("yaqeen", r.s) + (SHYQ.asof ? ' <span class="small muted num">' + esc(SHYQ.asof) + "</span>" : "") + "</span>" + (yq ? shTag("ok") : yx === "no" ? shTag("no") : yx ? '<span class="tag amber">' + esc(t(yx === "check" ? "sh_yq_check" : "sh_review")) + "</span>" : '<span class="tag">' + esc(t("sh_yq_none")) + "</span>") + "</div>" + (yq && yq.p != null ? '<p class="small muted" style="margin:0">' + esc(t("sh_yq_pu")).replace("{p}", '<b class="num">' + fmt(yq.p, 2) + "%</b>") + "</p>" : "");
+    if (ci) { const pc = (v) => (v == null ? "–" : '<span class="num">' + fmt(v, 1) + "%</span>"); body += '<div class="sh-b"><span>' + esc(t("sh_ci_h")) + shGo("chartidea", r.s) + (SHCI.asof ? ' <span class="small muted num">' + esc(SHCI.asof) + "</span>" : "") + "</span>" + shTag(ci.st) + "</div>" + '<p class="small muted" style="margin:0">' + esc(t("sh_debt")) + ": " + pc(ci.debt) + " · " + esc(t("sh_ci_int")) + ": " + pc(ci.int) + " · " + esc(t("sh_purify")) + ": " + pc(ci.p) + (ci.mix ? " · " + esc(t("sh_ci_mix")) : "") + "</p>"; }
     const aw = SHAW && SHAW.stocks[r.s];
-    if (aw && !yq) body += '<div class="sh-b"><span>' + esc(t("sh_aw_h")) + (SHAW.asof ? ' <span class="small muted num">' + esc(SHAW.asof) + "</span>" : "") + "</span>" + shTag(aw.st) + "</div>" + '<p class="small muted" style="margin:0">' + esc(t("sh_purify")) + ': <span class="num">' + (aw.p == null ? "–" : fmt(aw.p, 2) + "%") + "</span>" + (aw.partial ? " · " + esc(t("sh_aw_part")) : "") + "</p>";
+    if (aw) body += '<div class="sh-b"><span>' + esc(t("sh_aw_h")) + shGo("awaed", r.s) + (SHAW.asof ? ' <span class="small muted num">' + esc(SHAW.asof) + "</span>" : "") + "</span>" + shTag(aw.st) + "</div>" + '<p class="small muted" style="margin:0">' + esc(t("sh_purify")) + ': <span class="num">' + (aw.p == null ? "–" : fmt(aw.p, 2) + "%") + "</span>" + (aw.partial ? " · " + esc(t("sh_aw_part")) : "") + "</p>";
     const vd = usVerdict(r.s);
-    if (SHYQ && !yq) body += '<p class="small muted" style="margin:0">' + esc(t(vd.src === "refs" ? (vd.n > 1 ? "sh_refs_used" : "sh_ci_used") : yx === "check" ? "sh_yq_wait" : "sh_yq_out")) + "</p>";
+    if (SHYQ) body += '<p class="small muted" style="margin:0">' + esc(t(vd.st === "ok" ? (vd.split ? "sh_src_split" : vd.n > 1 ? "sh_src_all" : "sh_src_one") : "sh_src_none")) + "</p>";
     if (est && !est.err) {
       st = est.status;
       purify = est.purify;
@@ -248,16 +253,21 @@ document.addEventListener("submit", async (e) => {
 
 /* الأسهم الأمريكية: المتوافق بس اللي في قائمة يقين، والباقي يختفي من الرادار والفرص والأكثر ارتفاعاً */
 async function loadYaqeen() { if (SHYQ) return; try { const c = await fetch("./us_awaed.json", { cache: "no-cache" }); if (c.ok) { const d = await c.json(); if (d && d.stocks) SHAW = d; } } catch (e) {} try { const c = await fetch("./us_funds.json", { cache: "no-cache" }); if (c.ok) { const d = await c.json(); if (d && d.stocks) SHFD = d; } } catch (e) {} try { const c = await fetch("./us_chartidea.json", { cache: "no-cache" }); if (c.ok) { const d = await c.json(); if (d && d.stocks) SHCI = d; } } catch (e) {} try { const r = await fetch("./us_yaqeen.json", { cache: "no-cache" }); if (r.ok) { const d = await r.json(); if (d && d.stocks) { SHYQ = d; if (["screener", "movers", "radar", "desk", "home"].includes(route())) render(); } } } catch (e) {} }
-/* يقين أولاً، والمستبعد عنده (x) يبقى مستبعد، وشارت آيديا للي يقين ما يغطيه، والباقي محل نظر */
+/* يتعدد المرجع: السهم متوافق إذا حكم بتوافقه مصدر معتمد (يقين، شارت آيديا، عوائد، أو مصدر الصندوق)، ونعرض حكم كل مصدر، ونسبة التطهير الأعلى (الأحوط) */
+const SH_LINKS = { yaqeen: (s) => "https://yaaqen.com/stocks/" + encodeURIComponent(s), chartidea: () => "https://chart-idea.com", awaed: () => "https://apps.apple.com/sa/app/id1610134585", Musaffa: () => "https://musaffa.com", Zoya: () => "https://zoya.finance" };
+function shGo(k, s) { const f = SH_LINKS[k]; return f ? ' <a class="sh-go" href="' + esc(f(s)) + '" target="_blank" rel="noopener" title="' + esc(t("sh_go")) + '" aria-label="' + esc(t("sh_go")) + '">↗</a>' : ""; }
 function usVerdict(s) {
-  const yq = SHYQ && SHYQ.stocks[s];
-  if (yq) return { st: "ok", src: "yaqeen", p: yq.p };
-  if (SHYQ && SHYQ.x && SHYQ.x[s]) return { st: SHYQ.x[s] === "no" ? "no" : "review", src: "yaqeen", p: null };
-  const refs = [SHCI && SHCI.stocks[s], SHAW && SHAW.stocks[s]].filter((x) => x && x.st);
-  if (refs.length) { const ok = refs.every((x) => x.st === "ok"), ps = refs.map((x) => x.p).filter((x) => x != null); return { st: ok ? "ok" : "review", src: "refs", n: refs.length, p: ok && ps.length ? Math.max(...ps) : null }; }
-  const fd = SHFD && SHFD.stocks[s];
-  if (fd) return { st: fd.st, src: "fund", kind: fd.kind, p: null };
+  const src = [];
+  const yq = SHYQ && SHYQ.stocks[s], yx = SHYQ && SHYQ.x && SHYQ.x[s];
+  if (yq) src.push({ k: "yaqeen", st: "ok", p: yq.p }); else if (yx && yx !== "check") src.push({ k: "yaqeen", st: yx === "no" ? "no" : "review", p: null });
+  const ci = SHCI && SHCI.stocks[s]; if (ci && ci.st) src.push({ k: "chartidea", st: ci.st, p: ci.p });
+  const aw = SHAW && SHAW.stocks[s]; if (aw && aw.st) src.push({ k: "awaed", st: aw.st, p: aw.p });
+  const fd = SHFD && SHFD.stocks[s]; if (fd) src.push({ k: "fund", st: fd.st, p: null, kind: fd.kind });
+  const ok = src.filter((x) => x.st === "ok");
+  if (ok.length) { const ps = ok.map((x) => x.p).filter((x) => x != null); return { st: "ok", src: ok.map((x) => x.k).join(","), n: ok.length, split: ok.length < src.length, kind: fd && fd.kind, p: ps.length ? Math.max(...ps) : null }; }
+  if (src.length) return { st: src.some((x) => x.st === "no") ? "no" : "review", src: src[0].k, p: null };
   return { st: "review", src: null, p: null };
 }
+
 function usHide(s, m, flag) { if (m !== "US") return false; if (!SHYQ) return flag !== "ok"; const v = usVerdict(s); return v.st !== "ok" || v.kind === "islamic"; }
 setTimeout(loadYaqeen, 1500);

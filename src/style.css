@@ -1909,3 +1909,6 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
   .v2-arch li.open .v2-why{display:none}
 }
 @media (max-width:760px){.v2-arch li{min-width:0}.v2-arch .nt-tx{flex:1 1 auto;overflow:hidden;max-width:100%}}
+
+.sh-go{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);font-size:11px;text-decoration:none;vertical-align:middle;margin-inline-start:4px;color:var(--ink)}
+.sh-go:hover{background:var(--line)}
