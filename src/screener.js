@@ -42,7 +42,7 @@ function scSharia(x) {
     return { ok, known: !!row || !!own, purify: own && own.purify != null ? own.purify : null, label: own ? t("sh_" + own.status) : row ? (ticks === 3 ? t("sh_all") : ticks ? t("sh_part").replace("{n}", ticks) : t("sh_none")) : t("sh_unlisted") };
   }
   if (own) return { ok: own.status === "ok", known: true, purify: own.purify, label: t("sh_" + own.status) };
-  if (typeof SHYQ !== "undefined" && SHYQ) { const yq = SHYQ.stocks[x.s]; return { ok: !!yq, known: true, purify: yq ? yq.p : null, label: t(yq ? "sh_ok" : "sh_review") }; }
+  if (typeof SHYQ !== "undefined" && SHYQ) { const vd = usVerdict(x.s); return { ok: vd.st === "ok", known: true, purify: vd.st === "ok" ? vd.p : null, label: t("sh_" + vd.st) }; }
   const est = typeof SHUS !== "undefined" && SHUS && SHUS.stocks && SHUS.stocks[x.s];
   if (own) return { ok: own.status === "ok", known: true, purify: own.purify, label: t("sh_" + own.status) };
   if (est && !est.err && est.status) return { ok: est.status === "ok", known: true, purify: est.purify, label: t("sh_" + est.status) };
