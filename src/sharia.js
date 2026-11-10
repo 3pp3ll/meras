@@ -13,6 +13,7 @@ Object.assign(UI, {
   sh_empty_sa: ["قائمة الأسهم السعودية لسا ما انضافت.", "The Saudi list has not been added yet."],
   sh_sa: ["سهم سعودي", "Saudi share"], sh_us: ["سهم أمريكي", "US share"],
   sh_yq_h: ["حكم يقين", "Yaqeen ruling"], sh_yq_out: ["مو في قائمة يقين للمتوافقة، فهو محل نظر لين تتحدث القائمة.", "Not on Yaqeen's compliant list, so it stays under review until the list is updated."],
+  sh_yq_pu: ["نسبة التطهير {p} محسوبة بطريقة يقين، وهي غير نسبة الدخل المحرم من الإيرادات. طهّر بها أرباحك من السهم.", "Purification {p} is Yaqeen's figure, not the share of impermissible revenue. Apply it to your gains from the stock."],
   sh_ok: ["متوافق", "Compliant"], sh_no: ["غير متوافق", "Not compliant"], sh_review: ["محل نظر", "Under review"], sh_incomplete: ["بيانات ناقصة", "Incomplete data"], sh_all: ["متوافق عند الهيئات الثلاث", "Compliant with all three boards"], sh_part: ["متوافق عند {n} من 3 هيئات", "Compliant with {n} of 3 boards"], sh_none: ["مو ضمن أي قائمة متوافقة", "Not on any compliant list"], sh_unlisted: ["غير مدرج في القائمة", "Not on the list"],
   sh_boards: ["قوائم الهيئات الشرعية", "Sharia board lists"], sh_asof: ["آخر تحديث", "Updated"], sh_src: ["المصدر", "Source"],
   sh_b_rajhi: ["الراجحي المالية", "Al Rajhi Capital"], sh_b_osaimi: ["د. محمد بن سعود العصيمي", "Dr. Mohammed Al-Osaimi"], sh_b_bilad: ["البلاد المالية", "Albilad Capital"],
@@ -99,7 +100,7 @@ function shCard(r) {
     if (est && est.n && !r.n) r.n = est.n;
     const yq = SHYQ && SHYQ.stocks[r.s];
     if (yq && yq.n && !r.n) r.n = yq.n;
-    if (SHYQ) body += '<div class="sh-b"><span>' + esc(t("sh_yq_h")) + (SHYQ.asof ? ' <span class="small muted num">' + esc(SHYQ.asof) + "</span>" : "") + "</span>" + shTag(yq ? "ok" : "review") + "</div>" + (yq ? "" : '<p class="small muted" style="margin:0">' + esc(t("sh_yq_out")) + "</p>");
+    if (SHYQ) body += '<div class="sh-b"><span>' + esc(t("sh_yq_h")) + (SHYQ.asof ? ' <span class="small muted num">' + esc(SHYQ.asof) + "</span>" : "") + "</span>" + shTag(yq ? "ok" : "review") + "</div>" + (yq ? (yq.p != null ? '<p class="small muted" style="margin:0">' + esc(t("sh_yq_pu")).replace("{p}", '<b class="num">' + fmt(yq.p, 2) + "%</b>") + "</p>" : "") : '<p class="small muted" style="margin:0">' + esc(t("sh_yq_out")) + "</p>");
     if (est && !est.err) {
       st = est.status;
       purify = est.purify;
