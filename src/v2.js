@@ -399,7 +399,7 @@ dkRadar = function () {
   const top = '<a class="v2-rlink small" href="#rd-rules" data-v2go="rd-rules">' + esc(t("v2_rules")) + "</a>";
   if (!RD) return top + '<div class="notice">' + esc(t("dk_loading")) + "</div>" + foot;
   if (!RD.updated) return top + '<div class="notice">' + esc(t("rd_wait")) + "</div>" + foot;
-  const list = (RD.items || []).filter((x) => (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
+  const list = (RD.items || []).filter((x) => !usHide(x.s, x.m, x.sharia) && (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
   const log = (RD.log || []).slice(-15).reverse();
   setTimeout(() => { if (typeof ntMark === "function") ntMark((RD.log || []).map((x) => "r:" + x.id)); if (typeof topBell === "function") topBell(); }, 1500);
   const bar = RDJ ? '<div class="rd-prog" id="rd-prog"><div><i></i></div><span>' + esc(t("rd_busy").replace("{t}", "3:00")) + "</span></div>" : "";

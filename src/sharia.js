@@ -221,3 +221,8 @@ document.addEventListener("submit", async (e) => {
   SHOWN = SHOWN || {}; SHOWN[f.dataset.s] = { n: f.dataset.n, status: document.getElementById("so-st").value, purify: isFinite(p) ? p : null, src: document.getElementById("so-src").value.trim(), date: today() };
   shDraft = null; const box = document.getElementById("sh-res"); if (box) box.innerHTML = shResults(); await shSaveOwn();
 });
+
+/* الأسهم الأمريكية: المتوافق بس اللي في قائمة يقين، والباقي يختفي من الرادار والفرص والأكثر ارتفاعاً */
+async function loadYaqeen() { if (SHYQ) return; try { const r = await fetch("./us_yaqeen.json", { cache: "no-cache" }); if (r.ok) { const d = await r.json(); if (d && d.stocks) { SHYQ = d; if (["screener", "movers", "radar", "desk", "home"].includes(route())) render(); } } } catch (e) {} }
+function usHide(s, m, flag) { if (m !== "US") return false; return SHYQ ? !SHYQ.stocks[s] : flag !== "ok"; }
+setTimeout(loadYaqeen, 1500);

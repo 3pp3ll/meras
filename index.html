@@ -8038,7 +8038,7 @@ Object.assign(UI, {
 });
 function dkBadge(k) { try {
   if (k === "top" && typeof topActive === "function" && TOP) { const n = topActive().length; return n ? String(n) : ""; }
-  if (k === "rd" && typeof RD !== "undefined" && RD && RD.items) { const n = RD.items.filter((x) => x.strength >= 3 && x.sharia !== "no").length; return n ? String(n) : ""; }
+  if (k === "rd" && typeof RD !== "undefined" && RD && RD.items) { const n = RD.items.filter((x) => x.strength >= 3 && x.sharia !== "no" && !usHide(x.s, x.m, x.sharia)).length; return n ? String(n) : ""; }
   if (k === "dg" && DG.data && DG.data.stocks) { const n = DG.data.stocks.filter(dgSoon).length; return n ? String(n) : ""; }
 } catch (e) {} return ""; }
 function dkGridHtml(tabs) {
@@ -8597,6 +8597,11 @@ document.addEventListener("submit", async (e) => {
   SHOWN = SHOWN || {}; SHOWN[f.dataset.s] = { n: f.dataset.n, status: document.getElementById("so-st").value, purify: isFinite(p) ? p : null, src: document.getElementById("so-src").value.trim(), date: today() };
   shDraft = null; const box = document.getElementById("sh-res"); if (box) box.innerHTML = shResults(); await shSaveOwn();
 });
+
+/* الأسهم الأمريكية: المتوافق بس اللي في قائمة يقين، والباقي يختفي من الرادار والفرص والأكثر ارتفاعاً */
+async function loadYaqeen() { if (SHYQ) return; try { const r = await fetch("./us_yaqeen.json", { cache: "no-cache" }); if (r.ok) { const d = await r.json(); if (d && d.stocks) { SHYQ = d; if (["screener", "movers", "radar", "desk", "home"].includes(route())) render(); } } } catch (e) {} }
+function usHide(s, m, flag) { if (m !== "US") return false; return SHYQ ? !SHYQ.stocks[s] : flag !== "ok"; }
+setTimeout(loadYaqeen, 1500);
 /* ===== مِراس: الباحث (داخل مكتبي، للمالك فقط) =====
    يمر على الأسهم اللي نسحب شموعها (السعودية في قائمة الشارت، والأمريكية في السوق الأمريكي)،
    ويرتبها كمرشحين للتحليل حسب: الشرعية، الميزانية، الاتجاه، السيولة، والحركة.
@@ -8640,6 +8645,8 @@ function scSharia(x) {
     const ok = own ? own.status === "ok" : ticks >= SC.boards;
     return { ok, known: !!row || !!own, purify: own && own.purify != null ? own.purify : null, label: own ? t("sh_" + own.status) : row ? (ticks === 3 ? t("sh_all") : ticks ? t("sh_part").replace("{n}", ticks) : t("sh_none")) : t("sh_unlisted") };
   }
+  if (own) return { ok: own.status === "ok", known: true, purify: own.purify, label: t("sh_" + own.status) };
+  if (typeof SHYQ !== "undefined" && SHYQ) { const yq = SHYQ.stocks[x.s]; return { ok: !!yq, known: true, purify: yq ? yq.p : null, label: t(yq ? "sh_ok" : "sh_review") }; }
   const est = typeof SHUS !== "undefined" && SHUS && SHUS.stocks && SHUS.stocks[x.s];
   if (own) return { ok: own.status === "ok", known: true, purify: own.purify, label: t("sh_" + own.status) };
   if (est && !est.err && est.status) return { ok: est.status === "ok", known: true, purify: est.purify, label: t("sh_" + est.status) };
@@ -8746,7 +8753,7 @@ async function loadTop(quiet) {
   try { const f = await readJson("top.json"); const prev = topNewCount(); TOP = (f && f.data) || { items: {}, log: [] }; const now = topNewCount(); if (now > prev && prev >= 0 && topSound && quiet) topBeep(); } catch (e) {}
   topLoading = false; topBell(); if (deskOn("top")) render();
 }
-function topActive() { return TOP ? Object.entries(TOP.items || {}).filter(([, v]) => v.active) : []; }
+function topActive() { return TOP ? Object.entries(TOP.items || {}).filter(([s, v]) => v.active && !(v.m === "US" && usHide(s, "US", v.sharia))) : []; }
 function topNewCount() { if (!TOP) return -1; const seen = topSeen(); return topActive().filter(([s, v]) => v.sharia === "ok" && !seen.includes(topKey(s, v))).length; }
 function topBell() {
   let b = document.getElementById("topbell");
@@ -9545,7 +9552,7 @@ function dkRadar() {
   const head = '<p class="muted" style="margin:0">' + esc(t("rd_p")) + "</p>" + rules;
   if (!RD) return head + '<div class="notice">' + esc(t("dk_loading")) + "</div>";
   if (!RD.updated) return head + '<div class="notice">' + esc(t("rd_wait")) + "</div>";
-  const list = (RD.items || []).filter((x) => (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
+  const list = (RD.items || []).filter((x) => !usHide(x.s, x.m, x.sharia) && (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
   const log = (RD.log || []).slice(-15).reverse();
   setTimeout(() => { if (typeof ntMark === "function") ntMark((RD.log || []).map((x) => "r:" + x.id)); if (typeof topBell === "function") topBell(); }, 1500);
   const bar = RDJ ? '<div class="rd-prog" id="rd-prog"><div><i></i></div><span>' + esc(t("rd_busy").replace("{t}", "3:00")) + "</span></div>" : "";
@@ -11154,7 +11161,7 @@ dkRadar = function () {
   const top = '<a class="v2-rlink small" href="#rd-rules" data-v2go="rd-rules">' + esc(t("v2_rules")) + "</a>";
   if (!RD) return top + '<div class="notice">' + esc(t("dk_loading")) + "</div>" + foot;
   if (!RD.updated) return top + '<div class="notice">' + esc(t("rd_wait")) + "</div>" + foot;
-  const list = (RD.items || []).filter((x) => (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
+  const list = (RD.items || []).filter((x) => !usHide(x.s, x.m, x.sharia) && (rdF === "all" || x.type === rdF) && (rdM === "all" || x.m === rdM.toUpperCase()));
   const log = (RD.log || []).slice(-15).reverse();
   setTimeout(() => { if (typeof ntMark === "function") ntMark((RD.log || []).map((x) => "r:" + x.id)); if (typeof topBell === "function") topBell(); }, 1500);
   const bar = RDJ ? '<div class="rd-prog" id="rd-prog"><div><i></i></div><span>' + esc(t("rd_busy").replace("{t}", "3:00")) + "</span></div>" : "";

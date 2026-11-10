@@ -181,7 +181,7 @@ Object.assign(UI, {
 });
 function dkBadge(k) { try {
   if (k === "top" && typeof topActive === "function" && TOP) { const n = topActive().length; return n ? String(n) : ""; }
-  if (k === "rd" && typeof RD !== "undefined" && RD && RD.items) { const n = RD.items.filter((x) => x.strength >= 3 && x.sharia !== "no").length; return n ? String(n) : ""; }
+  if (k === "rd" && typeof RD !== "undefined" && RD && RD.items) { const n = RD.items.filter((x) => x.strength >= 3 && x.sharia !== "no" && !usHide(x.s, x.m, x.sharia)).length; return n ? String(n) : ""; }
   if (k === "dg" && DG.data && DG.data.stocks) { const n = DG.data.stocks.filter(dgSoon).length; return n ? String(n) : ""; }
 } catch (e) {} return ""; }
 function dkGridHtml(tabs) {
