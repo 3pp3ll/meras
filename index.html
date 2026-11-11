@@ -8233,7 +8233,8 @@ Object.assign(UI, {
   us_last: ["آخر إقفال", "Last close"], us_1d: ["اليوم", "1 day"], us_5d: ["5 أيام", "5 days"], us_1m: ["شهر", "1 month"], us_range: ["مدى 30 يوم", "30-day range"],
   us_none: ["البيانات لسا ما وصلت. أول تشغيل ياخذ 5 دقايق تقريباً بعد إضافة المفتاح، وبعدها مرة كل يوم 3:30 الفجر.", "No data yet. The first run takes about 5 minutes after the key is added, then once a day at 3:30 am Riyadh time."],
   us_meta: ["آخر تحديث {d} · استخدم {n} من 25 طلب", "Updated {d} · used {n} of 25 requests"],
-  us_err: ["رموز ما وصلت بياناتها", "Symbols with no data"], us_note: ["البيانات للاستخدام الشخصي حسب رخصة Alpha Vantage، فهي تظهر لك أنت بس.", "Data is for personal use under the Alpha Vantage licence, so it is shown to you only."],
+  us_err: ["رموز ما وصلت بياناتها", "Symbols with no data"],
+  us_lim: ["{n} رمز ما تحدّث هالمرة:", "{n} symbols were not refreshed:"], us_lim2: ["حد Alpha Vantage المجاني (25 طلب باليوم) خلص، فتطلع آخر أسعار محفوظة لين التحديث الجاي.", "the free Alpha Vantage limit (25 requests a day) ran out, so the last saved prices show until the next update."], us_note: ["البيانات للاستخدام الشخصي حسب رخصة Alpha Vantage، فهي تظهر لك أنت بس.", "Data is for personal use under the Alpha Vantage licence, so it is shown to you only."],
   us_gold: ["الذهب (أونصة)", "Gold (oz)"], us_silver: ["الفضة (أونصة)", "Silver (oz)"]
 });
 
@@ -8287,6 +8288,15 @@ function usSheet(s) {
     (o.chartable ? '<button class="btn primary" data-act="dk-chart" data-s="' + esc(s) + '">' + esc(t("dk_open_ch")) + "</button>" : "");
 }
 document.addEventListener("click", (e) => { const el = e.target.closest && e.target.closest('[data-act="us-open"]'); if (!el) return; const k = el.dataset.k; mSheet("us:" + k, () => usSheet(k), el); });
+// تنبيه قصير بدل رسائل Alpha Vantage الخام (كانت طويلة وفيها المفتاح)
+function usErrNote(errs) {
+  if (!errs.length) return "";
+  const lim = errs.filter(([, m]) => /^(limit|cap)$/.test(m) || /rate limit|requests per day|premium/i.test(m)).map(([s]) => s);
+  const other = errs.filter(([s]) => lim.indexOf(s) < 0).map(([s]) => s);
+  const list = (a) => '<span class="num" dir="ltr">' + a.map(esc).join(" · ") + "</span>";
+  return '<div class="notice small">' + (lim.length ? "<b>" + esc(t("us_lim").replace("{n}", lim.length)) + "</b> " + esc(t("us_lim2")) + "<br>" + list(lim) : "") +
+    (other.length ? (lim.length ? "<br>" : "") + "<b>" + esc(t("us_err")) + ":</b> " + list(other) : "") + "</div>";
+}
 function dkUS() {
   if (!US || !US.symbols || !Object.keys(US.symbols).length) return '<div class="notice">' + esc(t("us_none")) + "</div>";
   const head = "<thead><tr><th>" + esc(t("ow_sym")) + "</th><th>" + esc(t("us_last")) + "</th><th>" + esc(t("us_1d")) + "</th><th>" + esc(t("us_5d")) + "</th><th>" + esc(t("us_1m")) + "</th><th>" + esc(t("us_range")) + "</th><th></th><th></th></tr></thead>";
@@ -8299,7 +8309,7 @@ function dkUS() {
   if (USM) [["gold", "us_gold", "XAU"], ["silver", "us_silver", "XAG"]].forEach(([k, lab, s]) => { const m = USM[k]; if (!m) return; const rows = LIVE.history[s] && LIVE.history[s].length > 1 ? LIVE.history[s] : Array.isArray(m.hist) ? m.hist.map(([d, c]) => ({ d, o: c, h: c, l: c, c })) : []; if (rows.length) { metals += usRow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); mmetals += mrow(s, t(lab), rows, LIVE.history[s] && LIVE.history[s].length > 1, 2); } });
   const errs = Object.entries(US.errors || {});
   return '<h3 style="font-size:19px;margin:0">' + esc(t("tab_sharia")) + "</h3>" + shFinder() + '<p class="small muted" style="margin:0">' + esc(t("us_meta").replace("{d}", whenText(US.fetched_at)).replace("{n}", US.requests != null ? US.requests : "–")) + " · " + esc(t("us_note")) + "</p>" +
-    (errs.length ? '<div class="notice"><b>' + esc(t("us_err")) + ":</b> " + errs.map(([s, m]) => '<span class="num">' + esc(s) + "</span> <span class=\"small\">(" + esc(m) + ")</span>").join("، ") + "</div>" : "") +
+    usErrNote(errs) +
     table("movers") + table("ai") + table("fx") + table("cmd", metals, mmetals);
 }
 
