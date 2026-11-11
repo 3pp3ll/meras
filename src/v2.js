@@ -102,7 +102,7 @@ tabbarSync = function (r) {
 /* ----- القائمة الجانبية (الكمبيوتر) + المسار فوق الصفحة ----- */
 function v2Crumb(r, g) {
   if (!g || g === "home" || r === g || r === "" ) return "";
-  const lab = typeof pageLabel === "function" ? pageLabel({ r }) : "";
+  const lab = /^deep(-|$)/.test(r) ? t("dp_t") + (r.length > 5 ? " · " + decodeURIComponent(r.slice(5)) : "") : typeof pageLabel === "function" ? pageLabel({ r }) : "";
   return '<nav class="v2-crumb" aria-label="' + (S.lang === "ar" ? "مكانك" : "You are here") + '"><a href="#' + g + '">' + esc(v2Label(g)) + "</a><span aria-hidden=\"true\">›</span><b>" + esc(lab || r) + "</b></nav>";
 }
 function v2Shell(r, html) {
@@ -286,12 +286,12 @@ Object.assign(UI, { v2_opps: ["الفرص", "Opportunities"], v2_opps_d: ["ال�
   const it = NAV_GROUPS.market.items, at = it.findIndex((x) => x[0] === "screener");
   NAV_GROUPS.market.items = it.filter((x) => !["tech", "screener", "movers", "radar"].includes(x[0]));
   NAV_GROUPS.market.items.splice(Math.max(0, at - 1), 0, ["screener", "v2_opps", "v2_opps_d", 1]);
-  const og = groupOf; groupOf = (r) => (["tech", "movers", "radar"].includes(r) ? "market" : og(r));
+  const og = groupOf; groupOf = (r) => (["tech", "movers", "radar", "deep"].includes(r) || /^deep-/.test(r) ? "market" : og(r));
   const od = deskPage;
   deskPage = function (r) {
     const html = od(r);
     if (!["screener", "movers", "radar"].includes(r)) return html;
-    const tabs = '<nav class="v2-tabs" aria-label="' + esc(t("v2_opps")) + '">' + [["screener", "sc_t"], ["movers", "tp_t"], ["radar", "rd_t"]].map(([h, k]) => '<a href="#' + h + '"' + (h === r ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav>";
+    const tabs = '<nav class="v2-tabs" aria-label="' + esc(t("v2_opps")) + '">' + [["screener", "sc_t"], ["movers", "tp_t"], ["radar", "rd_t"]].concat(typeof pageDeep === "function" && isOwner() ? [["deep", "dp_t"]] : []).map(([h, k]) => '<a href="#' + h + '"' + (h === r ? ' aria-current="page"' : "") + ">" + esc(t(k)) + "</a>").join("") + "</nav>";
     return html.replace(/<div class="page-head">[\s\S]*?<\/div>/, '<div class="page-head"><h1>' + esc(t("v2_opps")) + "</h1></div>" + tabs);
   };
 }
