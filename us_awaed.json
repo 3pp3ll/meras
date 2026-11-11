@@ -1,1 +1,74 @@
-{"src":"عوائد","url":"https://awaed.com","asof":"2026-11-10","count":9,"note":"مرجع شرعي من منصة عوائد المالية (فلتر التطبيق). يُعتمد بس للسهم اللي يقين ما يغطيه، ومع شارت آيديا ناخذ الأحوط.","stocks":{"AAPL":{"st":"ok","p":4.72,"partial":true},"META":{"st":"ok","p":1.04,"partial":true},"AMAT":{"st":"ok","p":2.8,"partial":true},"TSLA":{"st":"ok","p":3.6,"partial":true},"AMD":{"st":"ok","p":1.13,"partial":true},"ASML":{"st":"ok","p":0.68,"partial":true},"AMZN":{"st":"ok","p":6.17,"partial":true},"ADBE":{"st":"ok","p":1.28,"partial":true},"AVGO":{"st":"ok","p":0.54,"partial":true}}}
+{
+ "src": "عوائد",
+ "url": "https://awaed.com",
+ "asof": "2026-11-11",
+ "count": 14,
+ "note": "مرجع شرعي من منصة عوائد المالية (فلتر التطبيق). يُعتمد بس للسهم اللي يقين ما يغطيه، ومع شارت آيديا ناخذ الأحوط.",
+ "stocks": {
+  "AAPL": {
+   "st": "ok",
+   "p": 4.72,
+   "partial": true
+  },
+  "META": {
+   "st": "ok",
+   "p": 1.04,
+   "partial": true
+  },
+  "AMAT": {
+   "st": "ok",
+   "p": 2.8,
+   "partial": true
+  },
+  "TSLA": {
+   "st": "ok",
+   "p": 3.6,
+   "partial": true
+  },
+  "AMD": {
+   "st": "ok",
+   "p": 1.13,
+   "partial": true
+  },
+  "ASML": {
+   "st": "ok",
+   "p": 0.68,
+   "partial": true
+  },
+  "AMZN": {
+   "st": "ok",
+   "p": 6.17,
+   "partial": true
+  },
+  "ADBE": {
+   "st": "ok",
+   "p": 1.28,
+   "partial": true
+  },
+  "AVGO": {
+   "st": "ok",
+   "p": 0.54,
+   "partial": true
+  },
+  "MA": {
+   "st": "ok",
+   "p": 0.98
+  },
+  "V": {
+   "st": "ok",
+   "p": 1.93
+  },
+  "LLY": {
+   "st": "ok",
+   "p": 0.0
+  },
+  "NFLX": {
+   "st": "no",
+   "note": "غير مصنف في الأسهم الشرعية"
+  },
+  "COST": {
+   "st": "no",
+   "note": "غير مصنف في الأسهم الشرعية"
+  }
+ }
+}
