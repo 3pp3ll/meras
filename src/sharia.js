@@ -270,11 +270,15 @@ function usVerdict(s) {
   const aw = SHAW && SHAW.stocks[s]; if (aw && aw.st) src.push({ k: "awaed", st: aw.st, p: aw.p });
   const fl = SHFL && SHFL.stocks[s]; if (fl && fl.st) src.push({ k: "filterna", st: fl.st, p: fl.p });
   const fd = SHFD && SHFD.stocks[s]; if (fd) src.push({ k: "fund", st: fd.st, p: null, kind: fd.kind });
-  const ok = src.filter((x) => x.st === "ok");
-  const ps = src.filter((x) => x.p != null); // أعلى نسبة تطهير من أي مصدر (الأحوط)، ومعها اسم مصدرها
+  // الحكم من يقين أو عوائد أو هيئة الصندوق. شارت آيديا للتطهير بس، وفلترنا للاطلاع.
+  const RULE = { yaqeen: 1, awaed: 1, fund: 1 }, PURIFY = { yaqeen: 1, awaed: 1, chartidea: 1 };
+  const ok = src.filter((x) => x.st === "ok" && RULE[x.k]);
+  const ps = src.filter((x) => x.p != null && PURIFY[x.k]); // أعلى نسبة تطهير (الأحوط) ومعها اسم مصدرها
   const top = ps.length ? ps.reduce((a, b) => (b.p > a.p ? b : a)) : null;
-  if (ok.length) { return { st: "ok", src: ok.map((x) => x.k).join(","), n: ok.length, split: ok.length < src.length, kind: fd && fd.kind, p: top ? top.p : null, pk: top ? top.k : null }; }
-  if (src.length) return { st: src.some((x) => x.st === "no") ? "no" : "review", src: src[0].k, p: null };
+  if (ok.length) { return { st: "ok", src: ok.map((x) => x.k).join(","), n: ok.length, split: ok.length < src.filter((x) => RULE[x.k]).length, kind: fd && fd.kind, p: top ? top.p : null, pk: top ? top.k : null }; }
+  const rs = src.filter((x) => RULE[x.k]);
+  if (rs.length) return { st: rs.some((x) => x.st === "no") ? "no" : "review", src: rs[0].k, p: null };
+  if (src.length) return { st: "review", src: src[0].k, p: null };
   return { st: "review", src: null, p: null };
 }
 
