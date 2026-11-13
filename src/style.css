@@ -750,7 +750,7 @@ body.dg-lock{overflow:hidden}
 #tabbar{display:none}
 @media (max-width:640px){
   #tabbar:not([hidden]){display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-  .tb-in{display:grid;grid-template-columns:repeat(5,1fr);height:62px}
+  .tb-in{display:grid;grid-template-columns:repeat(var(--n,5),1fr);height:62px}
   .tb{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
   .tb svg{width:23px;height:23px}
   .tb[aria-current="page"]{color:var(--amber-ink)}
@@ -1637,7 +1637,7 @@ body.has-tabbar #asfab{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
 #topclock{display:none}
 @media (min-width:641px) and (max-width:999px){
   #tabbar:not([hidden]){display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-  .tb-in{display:grid;grid-template-columns:repeat(5,1fr);height:62px;max-width:640px;margin:0 auto}
+  .tb-in{display:grid;grid-template-columns:repeat(var(--n,5),1fr);height:62px;max-width:640px;margin:0 auto}
   .tb{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:12px;font-weight:700;text-decoration:none}
   .tb svg{width:23px;height:23px}
   .tb[aria-current="page"]{color:var(--amber-ink)}

@@ -94,6 +94,7 @@ tabbarSync = function (r) {
   const items = [["", "home", "nav_home"], ["market", "market", "nav_market"]];
   if (v2Own()) items.push(["ai", "ai", "v2_ai"]);
   items.push(["pf", "pf", "nav_pf"], ["learn", "learn", "tb_learn"]);
+  if (v2Own()) items.push(["office", "office", "v2_office"]);
   bar.setAttribute("aria-label", S.lang === "ar" ? "التنقل" : "Navigation");
   bar.innerHTML = '<div class="tb-in" style="--n:' + items.length + '">' + items.map(([h, ic, k]) => '<a class="tb' + (ic === "ai" ? " tb-ai" : "") + '" href="#' + h + '"' + ((h === "" ? g === "home" : g === h) ? ' aria-current="page"' : "") + ">" + (ic === "ai" ? "<span>" + v2Ic("ai", 22) + "</span>" : v2Ic(ic, 22)) + esc(t(k)) + "</a>").join("") + "</div>";
   bar.hidden = false; document.body.classList.add("has-tabbar");
